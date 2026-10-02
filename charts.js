@@ -421,13 +421,13 @@ function _attachLinePan(svg) {
 // dots (kept a constant screen size so close points actually separate), re-label
 // the fixed-position ticks for the visible window, and flag `zoomed` for the
 // frame highlight + level badge. Max zoom-out is the default (full) view; zoom in
-// to MAX (15x). Records _lastPanEnd so the click that ends a gesture does not select a
+// to MAX (20x). Records _lastPanEnd so the click that ends a gesture does not select a
 // dot, and touch-action flips to 'none' only while zoomed so the page still
 // scrolls at the default view.
 function _attachZoom(svg) {
   const pan = svg.querySelector('.ch-pan');
   if (!pan) return;
-  const FW = 440, FH = 280, MAX = 15;
+  const FW = 440, FH = 280, MAX = 20;
   const L = +pan.dataset.l, R = +pan.dataset.r, T = +pan.dataset.t, B = +pan.dataset.b;
   const PW = FW - L - R, PH = FH - T - B;
   const xlo = +pan.dataset.xlo, xhi = +pan.dataset.xhi, ylo = +pan.dataset.ylo, yhi = +pan.dataset.yhi;
