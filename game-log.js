@@ -52,7 +52,7 @@ async function init() {
   await loadLocationOptions();
   await load();
   updateFilterUI();      // show the included-character count from the start
-  pace.updatePaceUI();   // initialise the pace swatches + My-boxes button
+  pace.updatePaceUI();   // initialize the pace swatches + My-boxes button
 }
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ function updateFilterUI() {
 // ── PACE / MY-BOXES SELECTION ──────────────────────────────────────────────────
 // Exactly the new-game model, applied to the log: clicking a character excludes
 // it (struck through), pace is a single-select that RESETS the pool to that
-// colour's band (Pace+ also covers the neighbours), and "My boxes" is a sticky
+// color's band (Pace+ also covers the neighbors), and "My boxes" is a sticky
 // toggle every reset takes into account. The included set (everything not
 // excluded) feeds char_filter, so games using any excluded character drop out.
 // State + DOM sync live in the shared pace-filter controller; these are just the

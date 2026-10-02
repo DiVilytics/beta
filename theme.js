@@ -1,7 +1,7 @@
 // ── THEME ─────────────────────────────────────────────────────────────────────
 // Light / dark / auto theme: applied before first paint, persisted in
 // localStorage, and reflected into the nav logo, favicon and mobile address-bar
-// colour. `_updateThemeBtn` / `_updateThemeIcons` are called by shared.js when it
+// color. `_updateThemeBtn` / `_updateThemeIcons` are called by shared.js when it
 // (re)paints the nav, so theme.js must load before shared.js.
 
 (function () {
@@ -60,7 +60,7 @@ function _updateThemeIcons() {
   _updateThemeColor();
 }
 
-// Match the mobile browser address-bar colour to the app theme (the page
+// Match the mobile browser address-bar color to the app theme (the page
 // background), so the chrome isn't stuck on the default/dark value.
 function _updateThemeColor() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -100,7 +100,7 @@ function _updateFavicon() {
   }
 }
 
-// Match the favicon + address-bar colour to the theme resolved on initial load.
+// Match the favicon + address-bar color to the theme resolved on initial load.
 _updateFavicon();
 _updateThemeColor();
 

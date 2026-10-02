@@ -1,7 +1,7 @@
 // ── CHARTS ─────────────────────────────────────────────────────────────────────
 // Tiny hand-rolled SVG chart helpers for the charts page. No dependencies.
 // Each returns an SVG string on a fixed viewBox; CSS scales it to the container
-// width. Colours come from theme CSS variables so light/dark both work. Values
+// width. Colors come from theme CSS variables so light/dark both work. Values
 // interpolated into markup are escaped via _esc (db.js).
 
 const Charts = (() => {
@@ -25,7 +25,7 @@ const Charts = (() => {
   function titleText(name, meta) { return _esc(meta ? name + ': ' + meta : (name == null ? '' : String(name))); }
 
   // Sequential indigo ramp for ordinal categories (e.g. table sizes). Deliberately
-  // avoids the pace colours (green/yellow/orange/red) so slices are not misread as
+  // avoids the pace colors (green/yellow/orange/red) so slices are not misread as
   // a pace band.
   const PALETTE = ['#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#4338ca', '#3730a3', '#312e81', '#1e1b4b'];
 
@@ -149,7 +149,7 @@ const Charts = (() => {
       const v = ylo + (yhi - ylo) * i / 4, yy = sy(v);
       grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 6}" y="${yy.toFixed(1)}" class="ch-ax ch-ytick" text-anchor="end" dominant-baseline="middle">${_esc(Math.round(v) + ySuffix)}</text>`;
     }
-    // x gridlines + ticks (ch-xtick), likewise re-labelled on zoom.
+    // x gridlines + ticks (ch-xtick), likewise re-labeled on zoom.
     for (let i = 0; i <= 4; i++) {
       const v = xlo + (xhi - xlo) * i / 4, xx = sx(v);
       const anchor = i === 0 ? 'start' : i === 4 ? 'end' : 'middle';
@@ -159,7 +159,7 @@ const Charts = (() => {
     // clickable caption on tap (the <title> hover tooltip does not fire on touch).
     // A transparent, wide stroke pads the tappable area well past the visible
     // fill (the SVG "painted" hit-test area includes the stroke even though
-    // its colour is invisible) without changing how the dot looks; .ch-dot's
+    // its color is invisible) without changing how the dot looks; .ch-dot's
     // non-scaling-stroke keeps that padding a constant screen size at every
     // zoom level, same as the dot radius itself.
     const dots = points.map(p => {
@@ -216,7 +216,7 @@ const Charts = (() => {
     const pannable = !!visible && n > visible;
     const PAD = 10;                                  // pannable: room at both ends so the edge labels (wider on phones) fit
     const slot = (PW - 2 * PAD) / (visible || n);    // pannable: width of one point's slot
-    // Pannable points sit in content space (centre of their slot), the pan group
+    // Pannable points sit in content space (center of their slot), the pan group
     // is translated into place; otherwise they're spread edge to edge as before.
     const sx = pannable
       ? i => PAD + (i + 0.5) * slot
@@ -278,7 +278,7 @@ const Charts = (() => {
     if (!segments.length) return empty();
     const total = segments.reduce((a, s) => a + s.value, 0);
     const r = 114, rin = 68, cy = H / 2;
-    // Centre the donut + legend as one block (the legend width is estimated from
+    // Center the donut + legend as one block (the legend width is estimated from
     // the longest label) rather than pinning the donut to the left.
     const maxLabel = Math.max(...segments.map(s => String(s.label).length));
     const legendW = 19 + maxLabel * 6.5, gap = 26;   // swatch + gap + ~text width
@@ -291,7 +291,7 @@ const Charts = (() => {
       const frac = s.value / total, a1 = a0 + frac * 2 * Math.PI, big = (a1 - a0) > Math.PI ? 1 : 0;
       const col = s.color || PALETTE[i % PALETTE.length];
       const meta = s.meta != null ? s.meta : `${s.value} (${Math.round(frac * 100)}%)`;
-      // A stroke in the card colour gives every slice a uniform separator.
+      // A stroke in the card color gives every slice a uniform separator.
       arcs += `<path${hit(s.label, meta, s.href)} d="M${p(r, a0)} A${r} ${r} 0 ${big} 1 ${p(r, a1)} L${p(rin, a1)} A${rin} ${rin} 0 ${big} 0 ${p(rin, a0)} Z" fill="${col}" stroke="var(--s1)" stroke-width="2"><title>${titleText(s.label, meta)}</title></path>`;
       a0 = a1;
     });

@@ -48,7 +48,7 @@
   --r: 10px;
   --rs: 6px;
 
-  /* Pace band colours, shared by the pace dots (character pages) and the
+  /* Pace band colors, shared by the pace dots (character pages) and the
      new-game / game-log pace swatches. */
   --pace-green:  #4ade80;
   --pace-yellow: #facc15;
@@ -650,14 +650,15 @@ main {
 .cs-adv-seg .seg-btn { padding: 4px 11px; }
 
 /* Character detail: Villain deck, Fate deck and extras, one column per card
-   type, coloured like the physical cards' type banner. */
+   type, colored like the physical cards' type banner. */
 .deck-ally      { --deck-c: #e5484d; }
 .deck-hero      { --deck-c: var(--gold); }
 .deck-effect    { --deck-c: #46a758; }
 .deck-item      { --deck-c: #3e9fe0; }
 .deck-condition { --deck-c: #d6409f; }
 .deck-other     { --deck-c: #8e4ec6; }
-.cs-deck { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.cs-deck { display: flex; gap: 12px; align-items: flex-start; }
+.cs-deck-stack { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }   /* gap = DECK_STACK_GAP in villains.js */
 .cs-deck-col { border-top: 3px solid var(--deck-c); }
 .cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: 12px; letter-spacing: 0.06em; }
 .cs-deck-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--deck-c); vertical-align: 1px; }
@@ -701,7 +702,7 @@ main {
 }
 .chart-select:open ~ .chart-chevron { transform: translateY(-50%) rotate(180deg); }
 /* Inherits height/line-height/border/box-sizing/appearance from the global
-   select rule, which UA-centres the value; we only retune colour, weight, the
+   select rule, which UA-centers the value; we only retune color, weight, the
    right padding for the chevron, and hide the global arrow. */
 .chart-select {
   width: 100%;
@@ -1407,7 +1408,7 @@ select:disabled {
   object-fit: cover;
   pointer-events: none;
   user-select: none;
-  /* The source art sits slightly left of centre; nudge every layer right.
+  /* The source art sits slightly left of center; nudge every layer right.
      Percentage keeps it proportional at every avatar size (nav → lightbox). */
   transform: translateX(2%);
 }
@@ -1585,7 +1586,7 @@ select:disabled {
   transition: filter 0.2s, opacity 0.2s;
 }
 .box-ach.played .box-ach-img { filter: none; opacity: 1; }
-/* Won-all: a crown badge on the top-right corner of the (full-colour) cover. */
+/* Won-all: a crown badge on the top-right corner of the (full-color) cover. */
 .box-ach.won { position: relative; }
 .box-ach.won::after { content: '👑'; position: absolute; top: -4px; left: -4px; font-size: 15px; line-height: 1; }
 /* Medal strip under achievement / box-completion tiles. */
@@ -1677,7 +1678,7 @@ select:disabled {
 /* Cup tier tints, recolor the 🏆 emoji per tier via filters.
    The trick: grayscale flattens the emoji, then sepia + hue-rotate
    tints it toward bronze/silver/gold. Silver keeps a slight cool tint so
-   it doesn't blend into the neutral-grey locked state. */
+   it doesn't blend into the neutral-gray locked state. */
 /* Star tier tints, same recipe as the cups so plays/wins share an aura. */
 .ach-cup.ach-cup-bronze,
 .ach-star.ach-star-bronze {
@@ -1791,10 +1792,10 @@ select:disabled {
 .pace-color.orange { background: var(--pace-orange); }
 .pace-color.red    { background: var(--pace-red); }
 .pace-color:hover  { transform: scale(1.08); }
-/* Selection states. "primary" is the clicked colour, full colour + the black
+/* Selection states. "primary" is the clicked color, full color + the black
    ring (2px border + 1px box-shadow, which Firefox renders evenly, unlike a 3px
-   border). Pace+ neighbours render at full colour with no ring (no rule needed).
-   Colours outside the selection stay coloured but fade back. */
+   border). Pace+ neighbors render at full color with no ring (no rule needed).
+   Colors outside the selection stay colored but fade back. */
 .pace-color.sel-primary { border-color: var(--text); box-shadow: 0 0 0 1px var(--text); }
 .pace-color.sel-out     { opacity: 0.2; }
 

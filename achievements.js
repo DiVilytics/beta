@@ -9,7 +9,7 @@ const ACH_TIERS = [
   { id: 'silver', threshold: 5,  label: 'Silver', icon: '⭐', cupIcon: '🏆' },
   { id: 'gold',   threshold: 10, label: 'Gold',   icon: '⭐', cupIcon: '🏆' },
 ];
-// Locked / not-yet-earned slots render as a subtle dot rather than a greyed
+// Locked / not-yet-earned slots render as a subtle dot rather than a grayed
 // trophy/star, so they read as "empty" instead of "dim silver".
 const ACH_EMPTY_ICON       = '·';
 const ACH_EMPTY_MEDAL_ICON = '·';
@@ -81,7 +81,7 @@ function countBoxAchievements(boxRows) {
 }
 
 // Compact strip of box covers, grayscale until the box is fully played (then
-// full colour, mirroring the box picker), with a gold star (played all) and cup
+// full color, mirroring the box picker), with a gold star (played all) and cup
 // (won all) marker beneath.
 function renderBoxStripHTML(boxRows, onClickFn = '_showBoxDetail') {
   const tiles = boxRows.map(r => {
@@ -324,7 +324,7 @@ function renderGlobalStripHTML(global, onlyEarned = false, onClickFn = '_showGlo
 }
 
 function renderGlobalDetailHTML(key, global) {
-  // One tier row, coloured by tier (bronze/silver/gold) like the character sheet.
+  // One tier row, colored by tier (bronze/silver/gold) like the character sheet.
   const tierTrack = (count, tiers, label, kind) => {
     const isCup = kind === 'cup';
     const idx   = _tierIndex(count, tiers);

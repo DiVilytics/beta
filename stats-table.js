@@ -80,7 +80,7 @@ function boxAnchorId(box) {
 //   getKey(r)     : returns the row's display name (string)
 //   getHref(key)  : returns the link target
 //   getIdentity(key): returns the inline HTML for the row's avatar/portrait
-//   getSub(key)   : optional, returns small grey sub-text under the name
+//   getSub(key)   : optional, returns small gray sub-text under the name
 //   wrapClass     : optional extra class on the `lb-table` wrapper
 //   limit         : render only the top N rows (default: all).
 //   selfKey       : highlight the row whose key matches; if that row falls beyond

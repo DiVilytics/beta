@@ -241,6 +241,7 @@ let csAllChars  = [];        // full character list for search
 let csBoxInfo   = {};        // loadBoxInfo(), used to order box groups by release date
 let csAvgDur    = null;      // avg game duration (minutes) across this character's games
 let csAvgTurns  = null;      // avg rounds across this character's games
+let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -326,7 +327,7 @@ function _rosterBoxGroups(chars) {
   }));
 }
 
-// Group by the four paces (in pace order); any character without a recognised
+// Group by the four paces (in pace order); any character without a recognized
 // pace falls into a trailing "Gray" group rather than vanishing.
 function _rosterPaceGroups(chars) {
   const paces = [['green', 'Green'], ['yellow', 'Yellow'], ['orange', 'Orange'], ['red', 'Red']];
@@ -369,19 +370,30 @@ async function renderDetailPage(charName) {
   await _renderCharIdentity();
   document.getElementById('csSearchInput').disabled = false;
   _attachCharSearch();
-  renderDeck(charName);
-  renderFaqLink(charName);
+
+  // While the stats load, draw their final layout with '-' values (same boxes,
+  // seg and table rows) so nothing shifts when the numbers arrive. Rivalries,
+  // decks and the FAQ link only go in afterwards, below, so they never get
+  // pushed down by content loading above them.
+  csBuckets = _foldBuckets([]); csAdversaries = []; csAvgDur = csAvgTurns = null;
+  csLoading = true;
+  render();
+  const renderExtras = () => { renderDeck(charName); renderFaqLink(charName); };
 
   // Load bucketed stats via server-side aggregation (one RPC, no row-limit risk)
   const { data: buckets, error } = await db.rpc('character_bucket_stats', { char_name: charName });
 
   if (error) {
+    csLoading = false;
     _showCsEmpty(`<div class="empty"><p>Error: ${_esc(error.message)}</p></div>`);
+    renderExtras();
     return;
   }
 
   if (!buckets || !buckets.length) {
+    csLoading = false;
     _showCsEmpty(`<div class="empty"><div class="empty-icon">🎭</div><h3>No games yet</h3><p>${_esc(csChar.name)} hasn't been played in any recorded games.</p></div>`);
+    renderExtras();
     return;
   }
 
@@ -404,7 +416,9 @@ async function renderDetailPage(charName) {
     opponent: a.opponent, wins: Number(a.wins), losses: Number(a.losses), games: Number(a.games),
   }));
 
+  csLoading = false;
   render();
+  renderExtras();
 }
 
 async function _renderCharIdentity() {
@@ -489,14 +503,15 @@ function render() {
   const overall  = csBuckets.all;
   const csWinPct = overall.games ? Math.round((overall.wins / overall.games) * 100) : 0;
 
+  const v = val => csLoading ? '-' : val;
   root.innerHTML = `
     <div class="summary">
       ${statBoxesHTML([
-        { val: overall.games,   lbl: 'Games' },
+        { val: v(overall.games), lbl: 'Games' },
         { val: csAvgDur   != null ? Math.round(csAvgDur) + 'm' : '-', lbl: 'Avg duration' },
         { val: csAvgTurns != null ? Math.round(csAvgTurns)     : '-', lbl: 'Avg rounds' },
-        { val: csWinPct + '%',  lbl: 'Win rate' },
-        { val: overall.wins,    lbl: 'Wins' },
+        { val: v(csWinPct + '%'), lbl: 'Win rate' },
+        { val: v(overall.wins),   lbl: 'Wins' },
       ])}
     </div>
     ${statModeSegHTML(csMode, 'csSetMode')}
@@ -521,7 +536,7 @@ function render() {
               </div>
             </div>
             <div class="row-val">${dispVal}</div>
-            <div class="row-games">${secondary}</div>
+            <div class="row-games">${v(secondary)}</div>
           </div>`;
       }).join('')}
     </div>
@@ -591,7 +606,7 @@ function _adversariesSectionHTML() {
 
 // ── DECKS ─────────────────────────────────────────────────────────────────────
 
-// Card types in display order, coloured like the cards' type banner; anything
+// Card types in display order, colored like the cards' type banner; anything
 // else (Titan, Curse, Witch, Maui, ...) follows in purple.
 const DECK_TYPES  = ['Ally', 'Hero', 'Effect', 'Item', 'Condition'];
 const DECK_PLURAL = { Ally: 'Allies', Hero: 'Heroes', Witch: 'Witches', 'Ally/Item': 'Ally/Item', 'Hero/Effect': 'Hero/Effect' };
@@ -660,12 +675,13 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false }
     </div>
     ${note ? `<p class="cs-deck-note">${_esc(note)}</p>` : ''}
     <div class="cs-deck">
-      ${types.map(t => {
+      <div class="cs-deck-stack">
+      ${types.map((t, i) => {
         const list = keepOrder ? byType.get(t) : byType.get(t).slice().sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
         const n    = _cardTotal(list);
         const lbl  = n === 1 ? t : (DECK_PLURAL[t] || `${t}s`);
         return `
-          <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}">
+          <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}" data-i="${i}">
             <div class="cs-adv-title"><span class="cs-deck-dot"></span>${_esc(lbl)} | ${n}</div>
             ${list.map(c => `
               <button class="cs-deck-row" type="button" onclick="openCardSheet(${_deckCards.push(c) - 1})">
@@ -677,8 +693,38 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false }
               </button>`).join('')}
           </div>`;
       }).join('')}
+      </div>
+      <div class="cs-deck-stack"></div>
     </div>`;
 }
+
+// Spread each deck's type boxes over its two stacks so the columns end up as
+// even as possible. A deck has at most a handful of types, so every split is
+// tried (the first box always on the left) and the one with the shortest
+// taller column wins; each column keeps the boxes in display order. Heights are
+// the rendered ones, so wrapped names count.
+const DECK_STACK_GAP = 12;   // matches .cs-deck-stack gap
+function _balanceDecks(root) {
+  if (!root) return;
+  for (const deck of root.querySelectorAll('.cs-deck')) {
+    const [left, right] = deck.querySelectorAll(':scope > .cs-deck-stack');
+    const boxes = [...deck.querySelectorAll('.cs-deck-col')].sort((a, b) => a.dataset.i - b.dataset.i);
+    const heights = boxes.map(b => b.offsetHeight + DECK_STACK_GAP);   // same width in either stack
+    let best = null;
+    for (let mask = 0; mask < (1 << boxes.length); mask += 2) {      // bit i set = box i on the right
+      let hl = 0, hr = 0;
+      heights.forEach((h, i) => { if (mask & (1 << i)) hr += h; else hl += h; });
+      const score = [Math.max(hl, hr), Math.abs(hl - hr)];
+      if (!best || score[0] < best.score[0] || (score[0] === best.score[0] && score[1] < best.score[1])) best = { mask, score };
+    }
+    boxes.forEach((b, i) => (best.mask & (1 << i) ? right : left).appendChild(b));
+  }
+}
+let _deckResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_deckResizeTimer);
+  _deckResizeTimer = setTimeout(() => _balanceDecks(document.getElementById('csDeck')), 150);
+});
 
 // Villain deck, Fate deck, then any extra deck or tile (Maui deck, Merlin's
 // Transformation deck, Omnidroids, ...). Data: villain-decks.json.
@@ -694,6 +740,7 @@ async function renderDeck(charName) {
         note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true,
       })).join('')
     + `<p class="cs-deck-src">Card lists and texts from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>. Tap a card to read it.</p>`;
+  _balanceDecks(el);
 }
 
 // ── RULES FAQ LINK ────────────────────────────────────────────────────────────

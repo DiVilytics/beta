@@ -1,4 +1,4 @@
-// Theme (light/dark/auto, favicon + address-bar colour) lives in theme.js,
+// Theme (light/dark/auto, favicon + address-bar color) lives in theme.js,
 // loaded before this file.
 
 // ── CHARACTER HELPERS ─────────────────────────────────────────────────────────

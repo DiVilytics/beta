@@ -3,8 +3,8 @@
 // Game Log "included characters" filter. The two pages drive an identical model:
 //
 //   • a per-character `excluded` set (struck-through pills),
-//   • a single-select pace colour that RESETS the pool to that colour's band
-//     (Pace+ also covers the neighboring colours),
+//   • a single-select pace color that RESETS the pool to that color's band
+//     (Pace+ also covers the neighboring colors),
 //   • a sticky "My boxes" toggle that further limits the pool to the user's boxes.
 //
 // createPaceFilter() owns that state and all the DOM sync (pills, pace swatches,
@@ -34,7 +34,7 @@ function createPaceFilter({
   let   pacePlus     = false;
   let   mineOn       = false;
 
-  // The paces a colour selection covers: just that colour, or it plus its
+  // The paces a color selection covers: just that color, or it plus its
   // immediate neighbors when Pace+ is on.
   function paceBand(color) {
     if (!pacePlus) return new Set([color]);
@@ -109,13 +109,13 @@ function createPaceFilter({
     onChange();
   }
 
-  // Clicking a colour resets the pool to that colour's band (not additive).
+  // Clicking a color resets the pool to that color's band (not additive).
   function selectPace(color) {
     selectedPace = color;
     applyPaceSelection();
   }
 
-  // "Pace" vs "Pace+", whether a colour selection also covers the neighbors.
+  // "Pace" vs "Pace+", whether a color selection also covers the neighbors.
   function setPaceMode(plus) {
     pacePlus = plus;
     if (selectedPace) applyPaceSelection();  // re-apply with the wider/narrower band

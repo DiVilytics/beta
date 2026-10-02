@@ -188,8 +188,8 @@ function applyExclude() {
 }
 
 // ── PACE / MINE SELECTION ─────────────────────────────────────────────────────
-// Pace is a single-select *inclusion* filter: clicking a colour RESETS the pool
-// to that colour's characters (or the colour plus its neighbours when Pace+ is
+// Pace is a single-select *inclusion* filter: clicking a color RESETS the pool
+// to that color's characters (or the color plus its neighbors when Pace+ is
 // on), it is not additive. "Mine" is a sticky toggle that further limits the
 // pool to your boxes, and every reset takes it into account. The per-character
 // pills below let you fine-tune on top after a reset. All of this lives in the
@@ -509,7 +509,7 @@ function _updateActionBtns() {
   }
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
-  // Until then they grey out (with the reason as a tooltip). Date/sign-in are
+  // Until then they gray out (with the reason as a tooltip). Date/sign-in are
   // still validated in the handlers.
   const lineupErr = _validateLineup();                     // null = ready to start
   const hasWinner = orderSlots.some(s => s.isWinner);

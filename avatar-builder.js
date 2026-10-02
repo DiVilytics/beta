@@ -1,6 +1,6 @@
 // ── AVATAR BUILDER ─────────────────────────────────────────────────────────────
 // The account page's "compose your own icon" UI: pick one transparent PNG part
-// per body slot over a background colour. The parts, draw order and per-part
+// per body slot over a background color. The parts, draw order and per-part
 // option counts live in AVATAR_BUILDER (avatar.js), the same config the renderer
 // uses, so the builder and every display point can never drift. Saving stores a
 // compact recipe string in avatar_url; avatarHTML() composes it on the fly. The
@@ -10,7 +10,7 @@
 //   getSavedAvatar(), the avatar currently saved on the profile (to seed from)
 //   onPreview()     , called after any edit so the host can re-render the preview
 const avatarBuilder = (() => {
-  // Disney Villainous jewel tones, villain signature colours over a dark, moody
+  // Disney Villainous jewel tones, villain signature colors over a dark, moody
   // base (Maleficent purple/green, Ursula teal, Jafar/Hook crimson, Prince John
   // gold, Hades blue, the black-and-gold box).
   const BG_SWATCHES = ['#4a1d6e', '#6b2d8c', '#7d1f3f', '#a01515', '#b8621b', '#c9a227', '#1f7a4d', '#0e5c6b', '#15182e'];
@@ -80,7 +80,7 @@ const avatarBuilder = (() => {
             <span class="builder-row-label">Background</span>
             <div class="builder-swatches">
               ${swatches}
-              <label class="builder-swatch builder-swatch-custom" title="Custom colour">
+              <label class="builder-swatch builder-swatch-custom" title="Custom color">
                 <input type="color" id="builderBgInput" value="${bg}" oninput="avatarBuilder.setBg(this.value)">
               </label>
             </div>

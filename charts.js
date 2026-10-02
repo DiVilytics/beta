@@ -87,7 +87,7 @@ const CHARTS = [
   },
   {
     id: 'pace', icon: '🎨', label: 'Win rate by pace',
-    desc: "Each pace band's overall win rate, pooling every villain of that colour (total wins over total games). Tap a band for its games and villains.",
+    desc: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
     async render() {
       const cs = await _characterStats();
       const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
@@ -248,7 +248,7 @@ const CHARTS = [
   },
   {
     id: 'time', icon: '📈', label: 'Games over time',
-    desc: 'Games recorded per calendar month, by play date (labelled YYYY/MM), from December 2024. Shows the latest 12 months; drag sideways to see earlier ones.',
+    desc: 'Games recorded per calendar month, by play date (labeled YYYY/MM), from December 2024. Shows the latest 12 months; drag sideways to see earlier ones.',
     async render() {
       const byMonth = {};
       for (const g of await _gamesLite()) {
@@ -301,7 +301,7 @@ const CHARTS = [
         const size = Number(r.player_count), seat = Number(r.seat);
         (bySize[size] ||= {})[seat] = { games: Number(r.games), wins: Number(r.wins) };
       }
-      const sizes = [2, 3, 4, 5, 6];              // always render the full grid; cells with no data show greyed
+      const sizes = [2, 3, 4, 5, 6];              // always render the full grid; cells with no data show grayed
       const maxSeat = 6;
       const rowLabels = sizes.map(s => `${s}p`);
       const colLabels = Array.from({ length: maxSeat }, (_, i) => `Seat ${i + 1}`);
