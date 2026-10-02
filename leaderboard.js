@@ -149,16 +149,16 @@ function render({ rows, summary }) {
     ${statModeSegHTML(lbMode, 'setMode')}
     ${renderStatTableHTML(rankRows, {
       mode:        lbMode,
-      headLabel:   isChar ? 'Character' : 'Player',
+      headLabel:   isChar ? 'Villain' : 'Player',
       limit:       lbDisplayLimit,
       selfKey,
       getKey:      r   => isChar ? r.character : r.nickname,
       getHref:     key => isChar
-        ? `characters.html?char=${encodeURIComponent(key)}`
+        ? `villains.html?vil=${encodeURIComponent(key)}`
         : `players.html?nick=${encodeURIComponent(key)}`,
       getIdentity: key => isChar ? charImgHTML(key) : playerAvatarHTML(lbNickAvatarMap[key]),
       getSub:      key => isChar ? lbCharBoxMap[key] : '',
-      getSubHref:  key => (isChar && lbCharBoxMap[key]) ? `characters.html?box=${boxAnchorId(lbCharBoxMap[key])}` : '',
+      getSubHref:  key => (isChar && lbCharBoxMap[key]) ? `villains.html?box=${boxAnchorId(lbCharBoxMap[key])}` : '',
     })}
     ${hasMore ? `<button class="btn-load-more" onclick="lbLoadMore()">Load more</button>` : ''}`;
 }

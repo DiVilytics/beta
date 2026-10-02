@@ -28,7 +28,7 @@ function charImgHTML(name) {
 // draw-pool grid, the new-game character picker, achievements' box
 // completion) keep counting a character toward its one primary box only;
 // opt in per-caller where showing every box a character appears in makes
-// sense (the characters.html roster).
+// sense (the villains.html roster).
 function groupByBox(chars, boxInfo, includeExtra = false) {
   const map = {};
   for (const c of chars) {
@@ -51,7 +51,7 @@ function groupByBox(chars, boxInfo, includeExtra = false) {
 
 function charSelectHTML(chars, selected = '', boxInfo) {
   const byBox = groupByBox(chars, boxInfo);
-  let html = '<option value="">Character</option>';
+  let html = '<option value="">Villain</option>';
   for (const [box, cs] of Object.entries(byBox)) {
     html += `<optgroup label="${box}">`;
     for (const c of cs) {
@@ -100,7 +100,7 @@ function buildCharPillGrid(container, chars, set, { activeClass = 'on', onToggle
   for (const [box, cs] of Object.entries(byBox)) {
     const group = document.createElement('div');
     group.className = 'box-group';
-    group.innerHTML = `<button type="button" class="box-name" title="Toggle all ${_esc(box)} characters">${_esc(box)}</button><div class="box-pills"></div>`;
+    group.innerHTML = `<button type="button" class="box-name" title="Toggle all ${_esc(box)} villains">${_esc(box)}</button><div class="box-pills"></div>`;
     container.appendChild(group);
     const pillsEl = group.querySelector('.box-pills');
 

@@ -32,7 +32,7 @@
       <a href="new-game.html" title="New Game">🎲</a>
       <a href="game-log.html" title="Game Log">🕒</a>
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="characters.html" title="Characters">🎭</a>
+      <a href="villains.html" title="Villains">🎭</a>
       <a href="players.html" id="navProfile" title="Player">👤</a>
       <a href="charts.html" title="Charts">📊</a>
     </div>
@@ -49,105 +49,13 @@
     <p class="home-tagline">Archive, track, and analyze your Disney Villainous sessions. Every game you record joins a shared community database, turning one evening around the table into win rates, leaderboards, and per-villain stats for you and everyone you play with.</p>
   </div>
 
-  <h2 class="home-steps-title">How it works</h2>
-  <div class="home-steps">
-    <div class="home-step">
-      <span class="home-step-num">1</span>
-      <div class="home-step-body">
-        <strong>Sign in</strong>
-        <span>Create a profile with a unique nickname. It holds your full game history and stats, and it is how other players link you into their games.</span>
-      </div>
+  <a class="home-section-link home-tutorial-link" href="tutorial.html">
+    <span class="home-section-icon">📖</span>
+    <div class="home-section-text">
+      <span class="home-section-name">Tutorial</span>
+      <span class="home-section-desc">New here? Step by step: recording a game, claiming your villain, and finding your stats</span>
     </div>
-    <div class="home-step">
-      <span class="home-step-num">2</span>
-      <div class="home-step-body">
-        <strong>Set up the game</strong>
-        <span>Pick villains yourself or let DiVilytics draw them at random, then shuffle to settle the starting player and play order.</span>
-      </div>
-    </div>
-    <div class="home-step">
-      <span class="home-step-num">3</span>
-      <div class="home-step-body">
-        <strong>Play</strong>
-        <span>Start the timer and tap once per round. The exact game duration is recorded, even with the screen locked.</span>
-      </div>
-    </div>
-    <div class="home-step">
-      <span class="home-step-num">4</span>
-      <div class="home-step-body">
-        <strong>Save and sync</strong>
-        <span>Declare the winner and save to the community archive. Each player scans one QR code to link the villain they played, and everyone's stats update.</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="home-sections">
-    <a class="home-section-link" href="new-game.html">
-      <span class="home-section-icon">🎲</span>
-      <div class="home-section-text">
-        <span class="home-section-name">New Game</span>
-        <span class="home-section-desc">Build your villain lineup and start recording a new game</span>
-      </div>
-    </a>
-    <a class="home-section-link" href="game-log.html">
-      <span class="home-section-icon">🕒</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Game Log</span>
-        <span class="home-section-desc">Browse game history</span>
-      </div>
-    </a>
-    <a class="home-section-link" href="leaderboard.html">
-      <span class="home-section-icon">🏆</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Leaderboard</span>
-        <span class="home-section-desc">Rankings, win rates, and stats across characters and players</span>
-      </div>
-    </a>
-    <a class="home-section-link" href="characters.html">
-      <span class="home-section-icon">🎭</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Characters</span>
-        <span class="home-section-desc">Win rates and stats for each villain</span>
-      </div>
-    </a>
-    <a class="home-section-link" href="players.html">
-      <span class="home-section-icon">👤</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Player</span>
-        <span class="home-section-desc">Profile, game history, and stats for you or any player</span>
-      </div>
-    </a>
-    <a class="home-section-link" href="charts.html">
-      <span class="home-section-icon">📊</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Charts</span>
-        <span class="home-section-desc">Visualizations and trends across every recorded game</span>
-      </div>
-    </a>
-    <div class="home-section-link home-section-static" id="homeThemeRow">
-      <span class="home-section-icon" id="homeThemeIcon">☀️</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Theme</span>
-        <span class="home-section-desc">Set the app to dark, light, or system theme</span>
-      </div>
-      <div class="home-section-btns">
-        <button class="btn btn-ghost btn-sm" onclick="setTheme('dark')"  title="Force dark">🌙</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTheme('light')" title="Force light">☀️</button>
-        <button class="btn btn-ghost btn-sm" onclick="setTheme('auto')"  title="Follow system">🌗</button>
-      </div>
-    </div>
-    <div class="home-section-link home-section-static" id="homeAuthRow">
-      <span class="home-section-icon">⎆</span>
-      <div class="home-section-text">
-        <span class="home-section-name">Account</span>
-        <span class="home-section-desc">Sign in to log games and appear on the leaderboard</span>
-      </div>
-      <div class="home-section-btns">
-        <button class="btn btn-ghost btn-sm" title="Sign in"  onclick="goToSignIn()">⎆</button>
-        <button class="btn btn-ghost btn-sm" title="Sign out" onclick="signOut()">⏻</button>
-      </div>
-    </div>
-  </div>
+  </a>
 
   <div class="home-faq">
     <h2 class="home-faq-title">F.A.Q. <span>General Gameplay &amp; Core Mechanics</span></h2>
@@ -169,7 +77,7 @@
     <h2 class="home-faq-title">Acknowledgments</h2>
     <div class="home-ack-card">
       <p><em>Disney Villainous</em> is a board game by <a href="https://www.ravensburger.us/en-US" target="_blank" rel="noopener">Ravensburger</a>.</p>
-      <p>Character and box artwork is the property of Disney and Ravensburger, sourced from the <a href="https://disney-villainous.fandom.com/wiki/Disney_Villainous_Wiki" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>
+      <p>Villain and box artwork is the property of Disney and Ravensburger, sourced from the <a href="https://disney-villainous.fandom.com/wiki/Disney_Villainous_Wiki" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>
       <p>The DiVilytics web client is open source. The code lives on <a href="https://github.com/DiVilytics/divilytics.github.io" target="_blank" rel="noopener">GitHub</a>, where you can report issues or suggest features.</p>
       <p>Game log data comes from games recorded directly in the app by players, a daily sync with <a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>'s log, and an additional historical log for 2-player games from <a href="https://boardgamegeek.com/" target="_blank" rel="noopener">BoardGameGeek</a>.</p>
       <p>We thank <a href="https://www.instagram.com/rakujin_kun/" target="_blank" rel="noopener">Rakujin</a> for the avatar build illustrations.</p>

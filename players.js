@@ -318,12 +318,12 @@ function render() {
 
     ${renderStatTableHTML(charRows, {
       mode:        pfMode,
-      headLabel:   'Character',
+      headLabel:   'Villain',
       getKey:      r   => r.character,
-      getHref:     key => `characters.html?char=${encodeURIComponent(key)}`,
+      getHref:     key => `villains.html?vil=${encodeURIComponent(key)}`,
       getIdentity: key => charImgHTML(key),
       getSub:      key => pfCharBoxMap[key],
-      getSubHref:  key => pfCharBoxMap[key] ? `characters.html?box=${boxAnchorId(pfCharBoxMap[key])}` : '',
+      getSubHref:  key => pfCharBoxMap[key] ? `villains.html?box=${boxAnchorId(pfCharBoxMap[key])}` : '',
       wrapClass:   'mb-1-25',
     })}
 

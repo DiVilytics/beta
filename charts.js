@@ -76,9 +76,9 @@ const CHARTS = [
           y: pct,
           label: c.name,
           color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
-          href: `characters.html?char=${encodeURIComponent(c.name)}`,
+          href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           box: c.box || null,
-          boxHref: c.box ? `characters.html?box=${boxAnchorId(c.box)}` : null,
+          boxHref: c.box ? `villains.html?box=${boxAnchorId(c.box)}` : null,
           meta: `${c.games} games | ${pct}% win rate`,
         };
       });
@@ -96,7 +96,7 @@ const CHARTS = [
         const games = rows.reduce((a, c) => a + c.games, 0);
         const wins  = rows.reduce((a, c) => a + c.wins,  0);
         const pct   = games ? Math.round(wins / games * 100) : 0;
-        return { label: b[0].toUpperCase() + b.slice(1), value: pct, games, color: `var(--pace-${b})`, href: `characters.html?pace=${b}`, meta: `${pct}% win rate | ${games} games | ${rows.length} villains` };
+        return { label: b[0].toUpperCase() + b.slice(1), value: pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${pct}% win rate | ${games} games | ${rows.length} villains` };
       }).filter(d => d.games > 0);
       return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
     },
@@ -123,7 +123,7 @@ const CHARTS = [
             label: box,
             value: pct,
             games: v.games,
-            href: `characters.html?box=${boxAnchorId(box)}`,
+            href: `villains.html?box=${boxAnchorId(box)}`,
             meta: `${year ? year + ' | ' : ''}${pct}% win rate | ${v.games} games | ${v.villains} villains`,
           };
         })
@@ -152,7 +152,7 @@ const CHARTS = [
           return {
             label: box,
             value: v.games,
-            href: `characters.html?box=${boxAnchorId(box)}`,
+            href: `villains.html?box=${boxAnchorId(box)}`,
             meta: `${year ? year + ' | ' : ''}${v.games} picks | ${Math.round(v.games / (total || 1) * 100)}% of all picks | ${v.villains} villains`,
           };
         })

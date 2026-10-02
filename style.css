@@ -650,7 +650,8 @@ main {
 .cs-adv-seg .seg-btn { padding: 4px 11px; }
 
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
-.charts-intro { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+/* One-line description of what a page is for, right under its header. */
+.page-intro { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 0 0 16px; }
 .chart-picker { margin-bottom: 16px; min-height: 38px; }   /* the select is injected by JS; hold its height so the card doesn't jump down */
 .chart-select-wrap { position: relative; width: 100%; }
 .chart-chevron {
@@ -2379,12 +2380,6 @@ select:disabled {
   color: var(--text);
 }
 
-.home-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .home-section-link {
   display: flex;
   align-items: center;
@@ -2400,20 +2395,6 @@ select:disabled {
   font-weight: 500;
   transition: background 0.12s;
   box-sizing: border-box;
-}
-
-.home-section-static { cursor: default; }
-
-.home-section-btns {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-.home-section-btns .btn {
-  min-width: 34px;
-  padding: 5px 8px;
-  justify-content: center;
 }
 
 .home-section-icon {
@@ -2496,6 +2477,18 @@ select:disabled {
 .home-ack-card p + p { margin-top: 8px; }
 .home-ack-card strong { color: var(--text); font-weight: 600; }
 .home-ack-card a { color: var(--accent); text-decoration: none; }
+
+
+/* ── TUTORIAL PAGE ───────────────────────────────────────────────── */
+/* Reuses the home page's steps / FAQ cards; only the inline links are its own. */
+.tut-link { color: var(--accent); text-decoration: none; }
+.tut-open { margin-top: 4px; font-size: 12px; font-weight: 600; align-self: flex-start; }
+/* Button / label names (<em>) read as semibold upright text, not italics: the
+   site font only ships upright, and its synthesized slant eats the following space. */
+.tutorial em { font-style: normal; font-weight: 600; color: var(--text); }
+/* Inline emoji (button icons): some emoji fonts draw wider than their advance and
+   collide with the next word, so give them explicit breathing room. */
+.tut-ico { display: inline-block; margin-right: 0.2em; }
 
 /* ── ACCOUNT PAGE ────────────────────────────────────────────────── */
 
@@ -2673,6 +2666,7 @@ select:disabled {
   .cs-adv-row:hover                         { background: var(--s2); }
   .cs-adv-row:hover .cs-adv-name            { text-decoration: underline; }
   .home-ack-card a:hover                    { text-decoration: underline; }
+  .tut-link:hover                           { text-decoration: underline; }
   .acct-nick-link:hover                     { text-decoration: underline; text-underline-offset: 2px; }
   .lb-row:hover                             { background: var(--s2); }
   .pf-identity:hover                        { opacity: 1; }

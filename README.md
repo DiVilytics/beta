@@ -1,6 +1,6 @@
 # DiVilytics | Disney Villainous Analytics
 
-An unofficial companion web app for the *Disney Villainous* board game: record your games, track win rates, browse character stats and leaderboards, and earn achievements.
+An unofficial companion web app for the *Disney Villainous* board game: record your games, track win rates, browse villain stats and leaderboards, and earn achievements.
 
 **Live site:** [https://divilytics.github.io](https://divilytics.github.io)
 

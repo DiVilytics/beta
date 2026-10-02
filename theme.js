@@ -24,7 +24,6 @@ function _onAutoChange(e) {
   else           document.documentElement.setAttribute('data-theme', 'light');
   _updateThemeBtn();
   _updateThemeIcons();
-  if (typeof _updateHomeThemeBtns === 'function') _updateHomeThemeBtns();
 }
 
 function _applyTheme(state) {
@@ -43,7 +42,6 @@ function _applyTheme(state) {
   localStorage.setItem('theme', state);
   _updateThemeBtn();
   _updateThemeIcons();
-  if (typeof _updateHomeThemeBtns === 'function') _updateHomeThemeBtns();
 }
 
 // Re-attach auto listener on page load when following the device (explicit

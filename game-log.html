@@ -32,7 +32,7 @@
       <a href="new-game.html" title="New Game">🎲</a>
       <a href="game-log.html" title="Game Log">🕒</a>
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="characters.html" title="Characters">🎭</a>
+      <a href="villains.html" title="Villains">🎭</a>
       <a href="players.html" id="navProfile" title="Player">👤</a>
       <a href="charts.html" title="Charts">📊</a>
     </div>
@@ -48,6 +48,7 @@
       <div class="cs-dropdown" id="locationDropdown"></div>
     </div>
   </div>
+  <p class="page-intro">Every recorded game, newest first. Filter by number of players, location or villains.</p>
 
   <div class="err" id="err"></div>
 
@@ -62,7 +63,7 @@
       <button class="pill" onclick="setCountFilter(6)">6p</button>
     </div>
     <button class="filter-char-toggle" onclick="toggleCharFilter()" id="charFilterToggle">
-      <span>Included characters</span>
+      <span>Included villains</span>
       <div class="toggle-right">
         <span class="badge" id="charBadge"></span>
         <span class="chevron" id="charChevron">▼</span>
@@ -83,13 +84,13 @@
           <button class="seg-btn"    type="button" onclick="glSetPaceMode(true)"  title="Also select the neighbouring colours">Pace+</button>
         </div>
         <div class="pace-colors" id="glPaceColors">
-          <button class="pace-color green"  data-pace="green"  onclick="glSelectPace('green')"  type="button" title="Only green characters"></button>
-          <button class="pace-color yellow" data-pace="yellow" onclick="glSelectPace('yellow')" type="button" title="Only yellow characters"></button>
-          <button class="pace-color orange" data-pace="orange" onclick="glSelectPace('orange')" type="button" title="Only orange characters"></button>
-          <button class="pace-color red"    data-pace="red"    onclick="glSelectPace('red')"    type="button" title="Only red characters"></button>
+          <button class="pace-color green"  data-pace="green"  onclick="glSelectPace('green')"  type="button" title="Only green villains"></button>
+          <button class="pace-color yellow" data-pace="yellow" onclick="glSelectPace('yellow')" type="button" title="Only yellow villains"></button>
+          <button class="pace-color orange" data-pace="orange" onclick="glSelectPace('orange')" type="button" title="Only orange villains"></button>
+          <button class="pace-color red"    data-pace="red"    onclick="glSelectPace('red')"    type="button" title="Only red villains"></button>
         </div>
       </div>
-      <p class="gl-filter-hint">Click to exclude characters; games using any excluded character are hidden.</p>
+      <p class="gl-filter-hint">Click to exclude villains; games using any excluded villain are hidden.</p>
       <div id="charGrid"></div>
     </div>
   </div>

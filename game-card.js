@@ -31,9 +31,9 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     const cls = `chip ${p.is_winner ? 'winner' : ''}${isSelf(p) ? ' self' : ''}`;
     return `<div class="${cls}">
       ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
-      <a class="char-link chip-img" href="characters.html?char=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
+      <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
-        <div class="chip-char"><a class="char-link" href="characters.html?char=${encodeURIComponent(p.character)}">${_esc(p.character)}</a></div>
+        <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${_esc(p.character)}</a></div>
         ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>` : ''}
       </div>
     </div>`;

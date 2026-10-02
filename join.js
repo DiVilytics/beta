@@ -58,7 +58,7 @@ function render() {
       <div class="empty">
         <div class="empty-icon">🔒</div>
         <h3>Sign in to claim</h3>
-        <p>You need to be signed in to claim your character.</p>
+        <p>You need to be signed in to claim your villain.</p>
         <button class="btn btn-primary" onclick="goToSignIn()">Sign in</button>
       </div>`;
     return;
@@ -69,7 +69,7 @@ function render() {
       <div class="empty">
         <div class="empty-icon">👤</div>
         <h3>Set a nickname first</h3>
-        <p>You need a nickname before you can claim a character.</p>
+        <p>You need a nickname before you can claim a villain.</p>
         <button class="btn btn-primary" onclick="_openNicknameModal()">Set nickname</button>
       </div>`;
     return;
@@ -210,9 +210,9 @@ function claimCharacter(playerId) {
 
   openConfirmSheet({
     id:           'claimConfirmOverlay',
-    title:        'Confirm your character',
+    title:        'Confirm your villain',
     bodyHTML:     `<p class="confirm-text">You're about to claim <strong class="text-emph">${charImgHTML(player.character)}${_esc(player.character)}</strong> in this game. Picked the wrong one? You can release it afterwards.</p>`,
-    confirmLabel: 'Claim character',
+    confirmLabel: 'Claim villain',
     busyLabel:    'Claiming…',
     onConfirm:    () => _doClaim(playerId),
   });
@@ -244,7 +244,7 @@ function releaseCharacter(playerId) {
 
   openConfirmSheet({
     id:           'releaseConfirmOverlay',
-    title:        'Release this character?',
+    title:        'Release this villain?',
     bodyHTML:     `<p class="confirm-text">This frees up <strong class="text-emph">${charImgHTML(player.character)}${_esc(player.character)}</strong> so it can be claimed again, by you or another player.</p>`,
     confirmLabel: 'Release',
     busyLabel:    'Releasing…',

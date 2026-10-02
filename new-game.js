@@ -270,7 +270,7 @@ function removeOrderSlot(id) {
 
 function toggleMe(id) {
   if (!getCurrentUser()) {
-    showErr('Sign in first to mark your character.');
+    showErr('Sign in first to mark your villain.');
     return;
   }
   for (const s of orderSlots) s.isMe = (s.id === id ? !s.isMe : false);
@@ -429,7 +429,7 @@ function shuffleOrder() {
       const nameEl   = el.querySelector('.order-slot-name');
       const numEl    = el.querySelector('.row-num');
       if (portrait) portrait.src = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-      if (nameEl)   nameEl.textContent = s.char || 'Character';
+      if (nameEl)   nameEl.textContent = s.char || 'Villain';
       if (numEl)    numEl.textContent = origPos.get(s.id) + '.';
     });
   }, FRAME_MS);
@@ -448,8 +448,8 @@ function renderOrderSlots() {
     const taken     = new Set(orderSlots.filter(o => o.id !== s.id && o.char).map(o => o.char));
     const available = chars.filter(c => !taken.has(c.name));
     const src       = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-    const nameTxt   = s.char ? _esc(s.char) : '<span class="order-slot-empty">Character</span>';
-    const meTitle   = isAuthed ? 'My character' : 'Sign in to mark your character';
+    const nameTxt   = s.char ? _esc(s.char) : '<span class="order-slot-empty">Villain</span>';
+    const meTitle   = isAuthed ? 'My villain' : 'Sign in to mark your villain';
     return `
       <div class="order-slot" data-id="${s.id}">
         <div class="drag-handle">
@@ -505,7 +505,7 @@ function _updateActionBtns() {
   }
   if (shuffleBtn) {
     shuffleBtn.disabled = animating || filled < 2;
-    shuffleBtn.title    = animating ? '' : (filled < 2 ? 'Pick at least 2 characters first' : '');
+    shuffleBtn.title    = animating ? '' : (filled < 2 ? 'Pick at least 2 villains first' : '');
   }
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
@@ -603,10 +603,10 @@ function showErr(msg) {
 
 function _validateLineup() {
   if (orderSlots.length < 2) return 'A game must have at least 2 players.';
-  if (orderSlots.some(s => !s.char)) return 'Choose a character for each player.';
+  if (orderSlots.some(s => !s.char)) return 'Choose a villain for each player.';
   const names = orderSlots.map(s => s.char);
-  if (new Set(names).size !== names.length) return 'Each player must use a different character.';
-  if (!orderSlots.some(s => s.isMe)) return 'Mark which character you played with 👤.';
+  if (new Set(names).size !== names.length) return 'Each player must use a different villain.';
+  if (!orderSlots.some(s => s.isMe)) return 'Mark which villain you played with 👤.';
   return null;
 }
 

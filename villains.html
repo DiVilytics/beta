@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Leaderboard</title>
+  <title>DiVilytics | Villains</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -41,33 +41,21 @@
 </nav>
 
 <main>
-  <div class="page-header">
-    <h2>Leaderboard</h2>
-    <!-- Villains / Players tab -->
-    <div class="seg">
-      <button class="seg-btn on" id="tabChars"  onclick="setTab('characters')">Villains</button>
-      <button class="seg-btn"   id="tabPlayers" onclick="setTab('players')">Players</button>
+  <div class="page-header align-top">
+    <div>
+      <h2>Villains</h2>
+    </div>
+    <div class="cs-search hidden" id="csSearchWrap">
+      <input type="text" id="csSearchInput" placeholder="Jump to villain…" autocomplete="off">
+      <div class="cs-dropdown" id="csDropdown"></div>
     </div>
   </div>
-  <p class="page-intro">Villains and players ranked by win rate, wins or games played, overall or by table size.</p>
+  <p class="page-intro">Win rates and stats for each villain, grouped by box or pace, with each one's objective, rivalries and rules FAQ.</p>
 
-  <div class="controls">
-    <!-- Player-count filter -->
-    <div class="pill-group" id="filterPills">
-      <button class="pill on" onclick="setFilter('all')">All</button>
-      <button class="pill"   onclick="setFilter(2)">2p</button>
-      <button class="pill"   onclick="setFilter(3)">3p</button>
-      <button class="pill"   onclick="setFilter(4)">4p</button>
-      <button class="pill"   onclick="setFilter(5)">5p</button>
-      <button class="pill"   onclick="setFilter(6)">6p</button>
-    </div>
-  </div>
+  <div id="csIdentity"></div>
 
-  <!-- Summary stats -->
-  <div class="summary" id="summary"></div>
-
-  <!-- Table -->
-  <div id="lb" class="spinner">Loading…</div>
+  <div id="csRoot" class="spinner">Loading…</div>
+  <div id="csFaq"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -81,6 +69,6 @@
   <script src="search.js"></script>
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
-<script src="leaderboard.js"></script>
+<script src="villains.js"></script>
 </body>
 </html>

@@ -72,7 +72,7 @@ function boxAnchorId(box) {
 
 // Renders the rank | identity | bar | value | sub stat table. Used by the
 // leaderboard and the player profile (the character-detail stat table has a
-// different shape and is built inline in characters.js).
+// different shape and is built inline in villains.js).
 //
 // Required opts:
 //   mode          : 'pct' | 'count' | 'games'
@@ -115,7 +115,7 @@ function renderStatTableHTML(rows, opts) {
           <div class="row-id-text">
             <a class="row-name row-name-link" href="${getHref(key, r)}">${_esc(key)}</a>
             ${sub ? (subHref
-              ? `<a class="row-sub row-sub-link" href="${_esc(subHref)}" title="View ${_esc(sub)} characters">${_esc(sub)}</a>`
+              ? `<a class="row-sub row-sub-link" href="${_esc(subHref)}" title="View ${_esc(sub)} villains">${_esc(sub)}</a>`
               : `<div class="row-sub">${_esc(sub)}</div>`) : ''}
           </div>
         </div>

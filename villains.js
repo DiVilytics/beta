@@ -205,7 +205,7 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
       const top    = sortedRows.slice(0, 3);
       const bottom = sortedRows.slice(-3).reverse();
       const row = r => `
-        <a class="cs-mini-row" href="characters.html?char=${encodeURIComponent(r.name)}" title="${_esc(r.name)}">
+        <a class="cs-mini-row" href="villains.html?vil=${encodeURIComponent(r.name)}" title="${_esc(r.name)}">
           <img class="char-portrait" src="${charImgSrc(r.name)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(r.name)}">
           <span class="cs-mini-val">${fmt(r)}</span>
         </a>`;
@@ -245,11 +245,11 @@ let csAvgTurns  = null;      // avg rounds across this character's games
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init() {
-  setActiveNav('characters.html');
+  setActiveNav('villains.html');
   await initAuth();
 
   const params   = new URLSearchParams(location.search);
-  const charName = (params.get('char') || '').trim();
+  const charName = (params.get('vil') || '').trim();
   if (charName) { await renderDetailPage(charName); return; }
 
   // ?pace= opens the roster straight into pace view, scrolled to that band
@@ -268,7 +268,7 @@ async function init() {
 let csRosterView = 'box';
 
 async function renderRosterPage(scrollBox) {
-  document.title = 'DiVilytics | Characters';
+  document.title = 'DiVilytics | Villains';
 
   [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   setVisible('csSearchWrap', true);
@@ -339,7 +339,7 @@ function _rosterPaceGroups(chars) {
 
 function _rosterItemHTML(c) {
   return `
-    <a class="char-roster-item" href="characters.html?char=${encodeURIComponent(c.name)}">
+    <a class="char-roster-item" href="villains.html?vil=${encodeURIComponent(c.name)}">
       <img class="char-roster-portrait" src="${charImgSrc(c.name)}" alt="" onerror="this.src='asset/players/default.svg'">
       <div class="char-roster-name">${_esc(c.name)}</div>
     </a>`;
@@ -358,7 +358,7 @@ async function renderDetailPage(charName) {
   csChar     = csAllChars.find(c => c.name === charName);
 
   if (!csChar) {
-    _showCsEmpty(`<div class="empty"><h3>Character not found</h3><p>${_esc(charName)}</p></div>`);
+    _showCsEmpty(`<div class="empty"><h3>Villain not found</h3><p>${_esc(charName)}</p></div>`);
     return;
   }
 
@@ -406,10 +406,10 @@ async function _renderCharIdentity() {
   const objectives = await loadObjectives();
   const objective  = objectives[csChar.name];
   const paceDot    = csChar.pace
-    ? `<a class="pace-dot ${csChar.pace}" href="characters.html?pace=${csChar.pace}" title="View ${_esc(csChar.pace)}-pace characters"></a>`
-    : `<a class="pace-dot gray" href="characters.html?pace=gray" title="Pace not yet set"></a>`;
+    ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="View ${_esc(csChar.pace)}-pace villains"></a>`
+    : `<a class="pace-dot gray" href="villains.html?pace=gray" title="Pace not yet set"></a>`;
   document.getElementById('csIdentity').innerHTML =
-    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="characters.html?box=${boxAnchorId(csChar.box)}" title="View ${_esc(csChar.box)} characters">${_esc(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
+    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="View ${_esc(csChar.box)} villains">${_esc(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
 }
 
 function _foldBuckets(buckets) {
@@ -460,7 +460,7 @@ function _attachCharSearch() {
         <span>${_esc(c.name)}</span>
         <span class="cs-option-box">${_esc(c.box)}</span>
       </div>`,
-    onSelect: opt => { location.href = `characters.html?char=${encodeURIComponent(opt.dataset.name)}`; },
+    onSelect: opt => { location.href = `villains.html?vil=${encodeURIComponent(opt.dataset.name)}`; },
   });
 }
 
@@ -559,7 +559,7 @@ function _adversariesSectionHTML() {
     <button class="seg-btn ${csRivalMode === 'count' ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="Rank by win/loss count">#</button>
   </div>`;
   const row = (opponent, countText) => `
-    <a class="cs-adv-row" href="characters.html?char=${encodeURIComponent(opponent)}">
+    <a class="cs-adv-row" href="villains.html?vil=${encodeURIComponent(opponent)}">
       ${charImgHTML(opponent)}
       <span class="cs-adv-name">${_esc(opponent)}</span>
       <span class="cs-adv-count">${countText}</span>

@@ -20,7 +20,7 @@ const pace = createPaceFilter({
     signIn:  'Sign in to use your boxes',
     noBoxes: 'Mark which boxes you own on the account page first',
     on:      'Limited to your boxes',
-    off:     'Limit to characters in your boxes',
+    off:     'Limit to villains in your boxes',
   },
   onChange: () => updateFilterUI(),
   onError:  showErr,

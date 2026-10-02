@@ -245,7 +245,7 @@ async function exportMyData() {
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Character', 'Seat', 'Winner'];
+    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner'];
     const rows = [header];
     for (const g of games) {
       const dateStr = _csvDateTime(g.played_at);

@@ -32,7 +32,7 @@
       <a href="new-game.html" title="New Game">🎲</a>
       <a href="game-log.html" title="Game Log">🕒</a>
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="characters.html" title="Characters">🎭</a>
+      <a href="villains.html" title="Villains">🎭</a>
       <a href="players.html" id="navProfile" title="Player">👤</a>
       <a href="charts.html" title="Charts">📊</a>
     </div>
@@ -48,6 +48,7 @@
       <button class="btn btn-ghost btn-sm hidden"   id="discardBtn" onclick="discardLiveGame()">Discard</button>
     </div>
   </div>
+  <p class="page-intro">Pick the villains and the play order, time the game and count rounds while you play, then save it and let everyone claim their villain with a QR code.</p>
 
   <div class="err" id="err"></div>
 
@@ -90,7 +91,7 @@
       </div>
     </div>
 
-    <div class="section-label"><span>Characters and Players</span></div>
+    <div class="section-label"><span>Villains and Players</span></div>
     <div class="draw-mode-row">
       <button class="exclude-toggle exclude-toggle-inline" type="button" onclick="toggleExclude()">
         <span class="exclude-toggle-label">Draw pool</span>
@@ -119,10 +120,10 @@
           <button class="seg-btn"    type="button" onclick="setPaceMode(true)"  title="Also include the neighbouring colours">Pace+</button>
         </div>
         <div class="pace-colors" id="paceColors">
-          <button class="pace-color green"  data-pace="green"  onclick="selectPace('green')"  type="button" title="Draw only green characters"></button>
-          <button class="pace-color yellow" data-pace="yellow" onclick="selectPace('yellow')" type="button" title="Draw only yellow characters"></button>
-          <button class="pace-color orange" data-pace="orange" onclick="selectPace('orange')" type="button" title="Draw only orange characters"></button>
-          <button class="pace-color red"    data-pace="red"    onclick="selectPace('red')"    type="button" title="Draw only red characters"></button>
+          <button class="pace-color green"  data-pace="green"  onclick="selectPace('green')"  type="button" title="Draw only green villains"></button>
+          <button class="pace-color yellow" data-pace="yellow" onclick="selectPace('yellow')" type="button" title="Draw only yellow villains"></button>
+          <button class="pace-color orange" data-pace="orange" onclick="selectPace('orange')" type="button" title="Draw only orange villains"></button>
+          <button class="pace-color red"    data-pace="red"    onclick="selectPace('red')"    type="button" title="Draw only red villains"></button>
         </div>
       </div>
       <div id="excludeGrid"></div>
@@ -165,7 +166,7 @@
       <button class="sheet-close" onclick="closeQR()">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint">Other players can scan this QR code to claim their character and appear in the game record.</p>
+      <p class="modal-hint">Other players can scan this QR code to claim their villain and appear in the game record.</p>
       <div class="qr-wrap">
         <div id="qrCode"></div>
       </div>

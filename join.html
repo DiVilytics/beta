@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Claim Character</title>
+  <title>DiVilytics | Claim Villain</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -32,7 +32,7 @@
       <a href="new-game.html" title="New Game">🎲</a>
       <a href="game-log.html" title="Game Log">🕒</a>
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="characters.html" title="Characters">🎭</a>
+      <a href="villains.html" title="Villains">🎭</a>
       <a href="players.html" id="navProfile" title="Player">👤</a>
       <a href="charts.html" title="Charts">📊</a>
     </div>
@@ -45,7 +45,7 @@
     <button class="btn btn-ghost btn-sm" onclick="claimGoBack()">← Back</button>
   </div>
   <div class="page-header">
-    <h2>Claim your character</h2>
+    <h2>Claim your villain</h2>
   </div>
   <div id="claimRoot" class="spinner">Loading…</div>
 </main>
@@ -59,7 +59,7 @@
       <button class="sheet-close" onclick="closeOverlay('qrOverlay')">×</button>
     </div>
     <div class="sheet-body">
-      <p id="qrBlurb" class="modal-hint">Other players can scan this to claim their character in this game.</p>
+      <p id="qrBlurb" class="modal-hint">Other players can scan this to claim their villain in this game.</p>
       <div class="qr-wrap">
         <div id="qrCode"></div>
       </div>

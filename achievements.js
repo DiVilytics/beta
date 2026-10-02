@@ -359,7 +359,7 @@ function renderGlobalDetailHTML(key, global) {
       <div class="ach-detail-head"><div class="ach-detail-name">🤝 Players</div></div>
       ${tierTrack(global.players.played, ACH_TIERS, 'Distinct players played with', 'medal')}
       ${tierTrack(global.players.won,    ACH_TIERS, 'Distinct players beaten',      'cup')}
-      <p class="modal-hint">Only players who've claimed their character in a game count.</p>`;
+      <p class="modal-hint">Only players who've claimed their villain in a game count.</p>`;
   }
   if (key === 'tables') {
     return _setCompletionDetailHTML('🪑 Table sizes',
@@ -370,7 +370,7 @@ function renderGlobalDetailHTML(key, global) {
     const names = { green: '🟢 Green', yellow: '🟡 Yellow', orange: '🟠 Orange', red: '🔴 Red' };
     return _setCompletionDetailHTML('🌈 Pace rainbow',
       PACE_KEYS.map(k => ({ label: names[k], played: global.pace[k].played, won: global.pace[k].won })),
-      'Played a character of every pace', 'Won with a character of every pace');
+      'Played a villain of every pace', 'Won with a villain of every pace');
   }
   if (key === 'positions') {
     const ord = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
@@ -492,7 +492,7 @@ function achievementsSectionHTML({ ach, chars, boxInfo, global, onlyEarned = fal
       ${renderGlobalStripHTML(global, onlyEarned)}` : ''}
     <div class="ach-group-label">Boxes | ${bc.earned} / ${bc.total}</div>
     ${renderBoxStripHTML(boxesToShow)}
-    <div class="ach-group-label">Characters | ${ch.earned} / ${ch.total}</div>
+    <div class="ach-group-label">Villains | ${ch.earned} / ${ch.total}</div>
     ${renderAchievementsGridHTML(ach, charsToShow)}`;
 }
 
