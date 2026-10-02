@@ -84,28 +84,25 @@ function render() {
     claimGame.location  ? claimGame.location             : null,
   ].filter(Boolean).join(' | ');
 
+  // Like the game cards: the player's nickname sits under the villain's name;
+  // the right side only holds the action (Release your claim, or Claim).
   const rowsHTML = claimPlayers.map(p => {
     const isMine = p.user_id === user.id;
-    let actionHTML;
+    let nickHTML = '', actionHTML = '';
+    if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
+    else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">Unclaimed</div>`;
     if (isMine) {
       // Your own claim: let you release it (e.g. if you picked the wrong one).
-      actionHTML = `
-        <div class="claim-mine-actions">
-          <span class="claim-nick">${_esc(p.nickname)}</span>
-          <button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">Release</button>
-        </div>`;
-    } else if (p.nickname) {
-      actionHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
-    } else if (myClaim) {
-      actionHTML = `<div class="claim-nick unclaimed">Unclaimed</div>`;
-    } else {
+      actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">Release</button>`;
+    } else if (!p.nickname && !myClaim) {
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="claimCharacter('${p.id}')">Claim</button>`;
     }
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
           ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
-          ${charImgHTML(p.character)}${_esc(p.character)}
+          ${charImgHTML(p.character)}
+          <div class="claim-who"><div class="claim-name">${_esc(p.character)}</div>${nickHTML}</div>
         </div>
         ${actionHTML}
       </div>`;
