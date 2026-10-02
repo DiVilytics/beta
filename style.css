@@ -630,23 +630,23 @@ main {
 .pf-friend-nick  { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pf-friend-count { flex-shrink: 0; font-size: 13px; color: var(--dim); }
 
-/* Character detail: "Rivalries", most-beaten / most-lost-to opponents. */
-.cs-adv { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.cs-adv-col { background: var(--s1); border-radius: var(--r); overflow: hidden; }
+/* Character detail: "Rivalries", three side-by-side columns (beaten most, lost
+   to most, faced most) of opponent portrait + value, like the monthly report. */
+.cs-adv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+.cs-adv-col { min-width: 0; background: var(--s1); border-radius: var(--r); overflow: hidden; }
 .cs-adv-title {
-  padding: 10px 14px 8px;
-  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 9px 10px 7px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   color: var(--muted);
 }
 .cs-adv-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 14px; text-decoration: none; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; text-decoration: none; color: var(--text);
   border-top: 1px solid var(--border);
 }
-.cs-adv-row .char-portrait { width: 24px; height: 24px; flex-shrink: 0; }
-.cs-adv-name  { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cs-adv-count { flex-shrink: 0; font-size: 12px; color: var(--dim); }
-.cs-adv-empty { padding: 4px 14px 12px; color: var(--dim); font-size: 13px; }
+.cs-adv-row .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
+.cs-adv-count { margin-left: auto; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.cs-adv-empty { padding: 4px 10px 12px; color: var(--dim); font-size: 13px; }
 .cs-adv-seg .seg-btn { padding: 4px 11px; }
 
 /* Character detail: Villain deck, Fate deck and extras, one column per card
@@ -659,14 +659,35 @@ main {
 .deck-other     { --deck-c: #8e4ec6; }
 .cs-deck { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
 .cs-deck-col { border-top: 3px solid var(--deck-c); }
+.cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: 12px; letter-spacing: 0.06em; }
 .cs-deck-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--deck-c); vertical-align: 1px; }
-.cs-deck-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-top: 1px solid var(--border); }
-.cs-deck-name  { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--text); }
+/* Each row is a button opening the card sheet. */
+.cs-deck-row {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 7px 14px; border: none; border-top: 1px solid var(--border);
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.cs-deck-card  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.cs-deck-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+.cs-deck-meta  { font-size: 11px; color: var(--muted); }
 .cs-deck-count { flex-shrink: 0; font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
 .cs-deck-total { font-size: 12px; color: var(--muted); }
 .cs-deck-note { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
 .cs-deck-src { margin: 14px 2px 0; font-size: 12px; color: var(--muted); }
 .cs-deck-src a { color: var(--accent); text-decoration: none; }
+
+/* Card detail sheet. */
+.cs-card-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.cs-card-stat { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--s2); border-radius: var(--r); }
+.cs-card-stat span { font-size: 11px; color: var(--muted); }
+.cs-card-stat strong { font-size: 14px; font-weight: 600; color: var(--text); }
+.cs-card-text p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
+.cs-card-empty { color: var(--muted) !important; font-style: italic; }
+.cs-card-back { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.cs-card-sub { margin-bottom: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cs-card-versions { margin: 12px 0 0; padding: 10px 12px; background: var(--s2); border-radius: var(--r); font-size: 13px; color: var(--muted); line-height: 1.5; }
+.cs-card-src { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+.cs-card-src a { color: var(--accent); text-decoration: none; }
 
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
 /* One-line description of what a page is for, right under its header. */
@@ -1187,10 +1208,12 @@ select:disabled {
 .stat-box.hot .stat-val { color: var(--gold); }
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
+/* The last column is wider than its numbers need so its header ("# Games") has
+   clear space from the one before it ("% Wins") instead of running into it. */
 .lb-head,
 .lb-row {
   display: grid;
-  grid-template-columns: 28px 1fr 80px 58px 52px;
+  grid-template-columns: 28px 1fr 80px 58px 72px;
   padding: 9px 14px;
   align-items: center;
 }
@@ -2057,7 +2080,7 @@ select:disabled {
 /* ── CHARACTER STATS PAGE ─────────────────────────────────────────── */
 .cs-table .lb-head,
 .cs-table .lb-row {
-  grid-template-columns: 80px 1fr 64px 52px;
+  grid-template-columns: 80px 1fr 64px 72px;
 }
 
 .row-label {
@@ -2508,7 +2531,8 @@ select:disabled {
 .home-faq-link { margin-top: 8px; }
 
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
-.faq-back { display: block; width: fit-content; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+/* "← All …" link back to a page's overview (FAQ topics, villain detail). */
+.back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
 .faq-general-link { margin-bottom: 2rem; }
 .faq-group { margin-bottom: 2rem; }
 .faq-group-intro { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
@@ -2707,10 +2731,9 @@ select:disabled {
   .pf-friend:hover                          { background: var(--s2); }
   .pf-friend:hover .pf-friend-nick          { text-decoration: underline; }
   .cs-adv-row:hover                         { background: var(--s2); }
-  .cs-adv-row:hover .cs-adv-name            { text-decoration: underline; }
   .home-ack-card a:hover                    { text-decoration: underline; }
   .tut-link:hover                           { text-decoration: underline; }
-  .faq-back:hover, .faq-title-link:hover,
+  .back-link:hover, .faq-title-link:hover,
   .faq-credit a:hover                       { text-decoration: underline; }
   .acct-nick-link:hover                     { text-decoration: underline; text-underline-offset: 2px; }
   .lb-row:hover                             { background: var(--s2); }
@@ -2736,6 +2759,7 @@ select:disabled {
   .avatar-option:hover                      { opacity: 1; }
   .char-pill:hover                          { color: var(--text); border-color: var(--s4); }
   .char-roster-item:hover                   { background: var(--s2); border-color: var(--s4); }
+  .cs-deck-row:hover                        { background: var(--s2); }
   .cs-option:hover                          { background: var(--s3); }
   .home-section-link:hover                  { background: var(--s2); }
   .home-tutorial-link:hover                 { background: rgba(124, 106, 247, 0.2); }
@@ -2754,8 +2778,8 @@ select:disabled {
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
   .home-faq-list { grid-template-columns: 1fr; }
-  .lb-head, .lb-row                     { grid-template-columns: 24px 1fr 52px 52px 44px; }
-  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 56px 44px; }
+  .lb-head, .lb-row                     { grid-template-columns: 24px 1fr 40px 52px 68px; }
+  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 56px 68px; }
   .form-row input { font-size: 13px; }
   .filter-bulk-row .pace-color    { width: 22px; height: 22px; }
   /* Tighter box picker: lets 3 columns fit instead of 2, keeping cover art

@@ -246,10 +246,12 @@ let csAvgTurns  = null;      // avg rounds across this character's games
 
 async function init() {
   setActiveNav('villains.html');
-  await initAuth();
-
   const params   = new URLSearchParams(location.search);
   const charName = (params.get('vil') || '').trim();
+  // Detail view: show the way back to the roster right away, before any data loads.
+  if (charName) document.getElementById('csBack').classList.remove('hidden');
+  await initAuth();
+
   if (charName) { await renderDetailPage(charName); return; }
 
   // ?pace= opens the roster straight into pace view, scrolled to that band
@@ -316,8 +318,10 @@ function _rosterGroupsHTML(chars) {
     </div>`).join('');
 }
 
+// Primary box only: reprint boxes (e.g. Darkness Brewing, which only repackages
+// villains listed elsewhere) don't get a group of their own here.
 function _rosterBoxGroups(chars) {
-  return Object.entries(groupByBox(chars, csBoxInfo, true)).map(([box, cs]) => ({
+  return Object.entries(groupByBox(chars, csBoxInfo)).map(([box, cs]) => ({
     id: boxAnchorId(box), header: _esc(box), chars: cs,
   }));
 }
@@ -534,41 +538,43 @@ function _adversariesSectionHTML() {
   const adversaries = csAdversaries.filter(a => a.games >= MIN_GAMES_FOR_RIVALRY);
   if (!adversaries.length) return '';
 
-  // % = wins or losses / games vs that opponent (third-player wins mean
-  // win% + loss% can be < 100%). The seg also picks the ranking key.
+  // Beaten / Lost to: % = wins or losses / games vs that opponent (third-player
+  // wins mean win% + loss% can be < 100%); the seg also picks the ranking key.
+  // Faced most: always ranked by games together; % = share of this villain's
+  // games with that opponent at the table (sums past 100% with 3+ players).
   const pct     = (n, g) => g ? Math.round((n / g) * 100) : 0;
-  const winKey  = a => csRivalMode === 'pct' ? pct(a.wins,   a.games) : a.wins;
-  const lossKey = a => csRivalMode === 'pct' ? pct(a.losses, a.games) : a.losses;
+  const total   = csBuckets.all.games;
+  const isPct   = csRivalMode === 'pct';
+  const winKey  = a => isPct ? pct(a.wins,   a.games) : a.wins;
+  const lossKey = a => isPct ? pct(a.losses, a.games) : a.losses;
+  const top5    = (list, key, tie) => list.slice()
+    .sort((a, b) => key(b) - key(a) || tie(b) - tie(a) || a.opponent.localeCompare(b.opponent)).slice(0, 5);
 
-  const byWins = adversaries.filter(a => a.wins > 0)
-    .sort((a, b) => winKey(b) - winKey(a) || b.wins - a.wins || a.opponent.localeCompare(b.opponent)).slice(0, 5);
-  const byLoss = adversaries.filter(a => a.losses > 0)
-    .sort((a, b) => lossKey(b) - lossKey(a) || b.losses - a.losses || a.opponent.localeCompare(b.opponent)).slice(0, 5);
-  if (!byWins.length && !byLoss.length) return '';
+  const byWins  = top5(adversaries.filter(a => a.wins > 0),   winKey,  a => a.wins);
+  const byLoss  = top5(adversaries.filter(a => a.losses > 0), lossKey, a => a.losses);
+  const byGames = top5(adversaries, a => a.games, a => a.games);
 
-  // Row label: the selected metric first, the other after a "|".
-  const winsTxt = a => {
-    const c = `${a.wins} ${a.wins === 1 ? 'win' : 'wins'}`, p = `${pct(a.wins, a.games)}%`;
-    return csRivalMode === 'pct' ? `${p} | ${c}` : `${c} | ${p}`;
-  };
-  const lossTxt = a => {
-    const c = `${a.losses} ${a.losses === 1 ? 'loss' : 'losses'}`, p = `${pct(a.losses, a.games)}%`;
-    return csRivalMode === 'pct' ? `${p} | ${c}` : `${c} | ${p}`;
-  };
+  // Rows show only the opponent's portrait and the selected value, like the
+  // monthly report; the name and both values are in the tooltip.
+  const winsCol  = a => ({ val: isPct ? `${pct(a.wins, a.games)}%`   : a.wins,   tip: `${a.wins} ${a.wins === 1 ? 'win' : 'wins'} in ${a.games} games (${pct(a.wins, a.games)}%)` });
+  const lossCol  = a => ({ val: isPct ? `${pct(a.losses, a.games)}%` : a.losses, tip: `${a.losses} ${a.losses === 1 ? 'loss' : 'losses'} in ${a.games} games (${pct(a.losses, a.games)}%)` });
+  const gamesCol = a => ({ val: isPct ? `${pct(a.games, total)}%`    : a.games,  tip: `${a.games} of ${total} games (${pct(a.games, total)}%)` });
   const seg = `<div class="seg cs-adv-seg">
-    <button class="seg-btn ${csRivalMode === 'pct'   ? 'on' : ''}" type="button" onclick="csSetRivalMode('pct')" title="Rank by win/loss %">%</button>
-    <button class="seg-btn ${csRivalMode === 'count' ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="Rank by win/loss count">#</button>
+    <button class="seg-btn ${isPct  ? 'on' : ''}" type="button" onclick="csSetRivalMode('pct')" title="Show and rank by %">%</button>
+    <button class="seg-btn ${!isPct ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="Show and rank by count">#</button>
   </div>`;
-  const row = (opponent, countText) => `
-    <a class="cs-adv-row" href="villains.html?vil=${encodeURIComponent(opponent)}">
-      ${charImgHTML(opponent)}
-      <span class="cs-adv-name">${_esc(opponent)}</span>
-      <span class="cs-adv-count">${countText}</span>
-    </a>`;
-  const col = (title, rowsHTML) => `
+  const row = (a, fmt) => {
+    const { val, tip } = fmt(a);
+    return `
+      <a class="cs-adv-row" href="villains.html?vil=${encodeURIComponent(a.opponent)}" title="${_esc(`${a.opponent}: ${tip}`)}">
+        <img class="char-portrait" src="${charImgSrc(a.opponent)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(a.opponent)}">
+        <span class="cs-adv-count">${val}</span>
+      </a>`;
+  };
+  const col = (title, list, fmt) => `
     <div class="cs-adv-col">
       <div class="cs-adv-title">${title}</div>
-      ${rowsHTML || '<div class="cs-adv-empty">-</div>'}
+      ${list.length ? list.map(a => row(a, fmt)).join('') : '<div class="cs-adv-empty">-</div>'}
     </div>`;
 
   return `
@@ -577,8 +583,9 @@ function _adversariesSectionHTML() {
       ${seg}
     </div>
     <div class="cs-adv">
-      ${col('Beaten most',  byWins.map(a => row(a.opponent, winsTxt(a))).join(''))}
-      ${col('Lost to most', byLoss.map(a => row(a.opponent, lossTxt(a))).join(''))}
+      ${col('Beaten most',  byWins,  winsCol)}
+      ${col('Lost to most', byLoss,  lossCol)}
+      ${col('Faced most',   byGames, gamesCol)}
     </div>`;
 }
 
@@ -594,6 +601,45 @@ function _deckTypeClass(type) {
 }
 
 const _cardTotal = cards => cards.reduce((n, c) => n + c.count, 0);
+
+// Cards of the rendered decks, indexed by the rows' openCardSheet(i).
+let _deckCards = [];
+
+// Row summary of a cost/strength value: Card Guard's "1 (Club and Diamond) |
+// 2 (Spade and Heart)" shortens to "1/2"; the sheet shows the full value.
+function _shortStat(v) {
+  return v.includes(' | ') ? v.split(' | ').map(p => p.split(' ')[0]).join('/') : v;
+}
+
+function _cardMetaHTML(c) {
+  const parts = [];
+  if (c.cost     != null) parts.push(`Cost ${_esc(_shortStat(c.cost))}`);
+  if (c.strength != null) parts.push(`Strength ${_esc(_shortStat(c.strength))}`);
+  return parts.length ? `<span class="cs-deck-meta">${parts.join(' | ')}</span>` : '';
+}
+
+const _cardTextHTML = t => t
+  ? t.split('\n\n').map(p => `<p>${_esc(p).replace(/\n/g, '<br>')}</p>`).join('')
+  : '<p class="cs-card-empty">No ability text.</p>';
+
+function openCardSheet(i) {
+  const c = _deckCards[i];
+  if (!c) return;
+  const stat = (lbl, v) => v != null ? `<div class="cs-card-stat"><span>${lbl}</span><strong>${_esc(v.replace(/ \| /g, ', '))}</strong></div>` : '';
+  document.getElementById('cardTitle').textContent = c.name;
+  document.getElementById('cardBody').innerHTML = `
+    <div class="cs-card-stats">
+      <div class="cs-card-stat"><span>Type</span><strong class="${_deckTypeClass(c.type)}"><span class="cs-deck-dot"></span>${_esc(c.type)}</strong></div>
+      <div class="cs-card-stat"><span>Copies</span><strong>${c.count}</strong></div>
+      ${stat('Cost', c.cost)}
+      ${stat('Strength', c.strength)}
+    </div>
+    <div class="cs-card-text">${_cardTextHTML(c.text)}</div>
+    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">Other side: ${_esc(c.back.name)}</div><div class="cs-card-text">${_cardTextHTML(c.back.text)}</div></div>` : ''}
+    ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}
+    <p class="cs-card-src">Card text from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>`;
+  openOverlay('cardOverlay');
+}
 
 // One deck: a header with its total, an optional note, then one column per
 // card type. Main decks sort by copies then name; extras (`keepOrder`) keep the
@@ -622,10 +668,13 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false }
           <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}">
             <div class="cs-adv-title"><span class="cs-deck-dot"></span>${_esc(lbl)} | ${n}</div>
             ${list.map(c => `
-              <div class="cs-deck-row">
-                <span class="cs-deck-name">${_esc(c.name)}</span>
+              <button class="cs-deck-row" type="button" onclick="openCardSheet(${_deckCards.push(c) - 1})">
+                <span class="cs-deck-card">
+                  <span class="cs-deck-name">${_esc(c.name)}</span>
+                  ${_cardMetaHTML(c)}
+                </span>
                 <span class="cs-deck-count">×${c.count}</span>
-              </div>`).join('')}
+              </button>`).join('')}
           </div>`;
       }).join('')}
     </div>`;
@@ -638,12 +687,13 @@ async function renderDeck(charName) {
   if (!el) return;
   const deck = (await loadVillainDecks())[charName];
   if (!deck) { el.innerHTML = ''; return; }
+  _deckCards = [];
   el.innerHTML = _deckHTML('Villain deck', deck.villain)
     + _deckHTML('Fate deck', deck.fate)
     + (deck.extra || []).map(e => _deckHTML(e.title, e.cards, {
         note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true,
       })).join('')
-    + `<p class="cs-deck-src">Card lists from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>`;
+    + `<p class="cs-deck-src">Card lists and texts from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>. Tap a card to read it.</p>`;
 }
 
 // ── RULES FAQ LINK ────────────────────────────────────────────────────────────

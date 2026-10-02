@@ -85,7 +85,7 @@ function _menuHTML() {
     <p class="faq-credit">Translated from the F.A.Q. by <a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a> (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.</p>`;
 }
 
-const _BACK_HTML = `<a class="faq-back" href="faq.html">← All topics</a>`;
+const _BACK_HTML = `<a class="back-link" href="faq.html">← All topics</a>`;
 
 function _generalHTML() {
   return _BACK_HTML + faqData.general.map(g => `

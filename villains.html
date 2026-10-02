@@ -51,6 +51,7 @@
     </div>
   </div>
   <p class="page-intro">Stats, rivalries and objectives for every villain.</p>
+  <a class="back-link hidden" id="csBack" href="villains.html">← All villains</a>
 
   <div id="csIdentity"></div>
 
@@ -58,6 +59,18 @@
   <div id="csDeck"></div>
   <div id="csFaq"></div>
 </main>
+
+<!-- Card detail sheet (opened from a deck row) -->
+<div class="overlay" id="cardOverlay" onclick="if(event.target===this) closeOverlay('cardOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="cardTitle">Card</h3>
+      <button class="sheet-close" onclick="closeOverlay('cardOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="cardBody"></div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
