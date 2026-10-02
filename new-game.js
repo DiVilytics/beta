@@ -33,7 +33,7 @@ const pace = createPaceFilter({
     on:      'Pool limited to your boxes',
     off:     'Limit the pool to your boxes',
   },
-  onChange: () => { updateExcludeUI(); _updateActionBtns(); _updateDiscardBtn(); },
+  onChange: () => { updateExcludeUI(); _updateActionBtns(); },
   onError:  showErr,
 });
 
@@ -666,15 +666,15 @@ function _clearLiveState() {
 let _freshDate = '';
 function _markFresh() { _freshDate = document.getElementById('fDate')?.value || ''; }
 
-// True when anything differs from a fresh page load: player count, villains,
-// 👤 / 👑 marks, date, location, duration, rounds or the draw pool.
+// True when the game itself differs from a fresh page load: player count,
+// villains, 👤 / 👑 marks, date, location, duration or rounds. The draw pool is
+// a setting, not part of the game, so it doesn't count (and Discard keeps it).
 function _isFormChanged() {
   const val = id => document.getElementById(id)?.value || '';
   return orderSlots.length !== 2
       || orderSlots.some(s => s.char || s.isMe || s.isWinner)
       || val('fDate') !== _freshDate
-      || !!(val('fLocation') || val('fDur') || val('fTurns'))
-      || pace.excluded.size > 0 || !!pace.selectedPace || pace.pacePlus || pace.mineOn;
+      || !!(val('fLocation') || val('fDur') || val('fTurns'));
 }
 
 // Discard shows as soon as anything changed, or while a game session exists.
@@ -690,7 +690,7 @@ function _confirmDiscard(onConfirm) {
   openConfirmSheet({
     id:           'discardGameOverlay',
     title:        'Discard this game?',
-    bodyHTML:     '<p class="confirm-text">This resets the form (villains, players, details and draw pool) and clears any saved progress.</p>',
+    bodyHTML:     '<p class="confirm-text">This resets the form (villains, players and details) and clears any saved progress. Your draw pool stays as it is.</p>',
     confirmLabel: 'Discard',
     danger:       true,
     onConfirm,
@@ -718,8 +718,6 @@ function _doDiscard() {
   orderSlots = [];
   addOrderSlot();
   addOrderSlot();
-
-  pace.reset();
 
   setLiveUI(false);
   _markFresh();
