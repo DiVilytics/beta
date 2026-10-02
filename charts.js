@@ -55,6 +55,11 @@ async function _playerStats() {
   return _data.playerStats;
 }
 
+// First month (YYYY-MM, inclusive) the "Games over time" chart shows. Earlier
+// months are only the imported BoardGameGeek games, whose dates are placeholders
+// spread over Apr 2020 - Nov 2024; real recorded games start in December 2024.
+const TIME_CHART_FROM = '2024-12';
+
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
 // Each: { id, icon, label, desc, render() -> SVG/HTML string }.
 
@@ -62,27 +67,15 @@ const CHARTS = [
   {
     id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
     desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
-    extraControls: () => `
-      <div class="cs-roster-controls"><span class="cs-roster-controls-lbl">Color by</span><div class="seg">
-        <button class="seg-btn ${_scatterColorMode === 'pace' ? 'on' : ''}" type="button" onclick="setScatterColorMode('pace')">Pace</button>
-        <button class="seg-btn ${_scatterColorMode === 'box'  ? 'on' : ''}" type="button" onclick="setScatterColorMode('box')">Box</button>
-      </div></div>`,
     async render() {
-      const [cs, boxInfo] = await Promise.all([_characterStats(), loadBoxInfo()]);
-      // Box mode reuses the same indigo ramp as the donut charts (PALETTE),
-      // indexed by the box's release order so a given box always lands on the
-      // same shade across renders/reloads, deliberately not the pace colours
-      // (this is a different grouping and shouldn't be misread as a pace band).
-      const boxColor = box => box ? Charts.PALETTE[(boxInfo[box]?.order ?? 0) % Charts.PALETTE.length] : 'var(--pace-gray)';
-      const points = cs.filter(c => c.games > 0).map(c => {
+      const cs = (await _characterStats()).filter(c => c.games > 0);
+      const points = cs.map(c => {
         const pct = Math.round(c.wins / c.games * 100);
         return {
           x: c.games,
           y: pct,
           label: c.name,
-          color: _scatterColorMode === 'box'
-            ? boxColor(c.box)
-            : (c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)'),
+          color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `characters.html?char=${encodeURIComponent(c.name)}`,
           box: c.box || null,
           boxHref: c.box ? `characters.html?box=${boxAnchorId(c.box)}` : null,
@@ -255,16 +248,30 @@ const CHARTS = [
   },
   {
     id: 'time', icon: '📈', label: 'Games over time',
-    desc: 'Games recorded per calendar month, by play date (labelled YYYY/MM). Includes imported historical games.',
+    desc: 'Games recorded per calendar month, by play date (labelled YYYY/MM), from December 2024. Shows the latest 12 months; drag sideways to see earlier ones.',
     async render() {
       const byMonth = {};
       for (const g of await _gamesLite()) {
         if (!g.played_at) continue;
         const k = String(g.played_at).slice(0, 7);   // YYYY-MM
+        if (k < TIME_CHART_FROM) continue;
         byMonth[k] = (byMonth[k] || 0) + 1;
       }
-      const pts = Object.keys(byMonth).sort().map(k => ({ label: k.replace('-', '/'), value: byMonth[k], meta: `${byMonth[k]} game${byMonth[k] === 1 ? '' : 's'}` }));  // YYYY/MM
-      return Charts.line(pts);
+      // Every calendar month from the first to the last, empty ones as 0, so the
+      // 12 visible points are really 12 consecutive months.
+      const months = Object.keys(byMonth).sort();
+      const pts = [];
+      if (months.length) {
+        let [y, m] = months[0].split('-').map(Number);
+        const last = months[months.length - 1];
+        for (let k = months[0]; k <= last; ) {
+          const c = byMonth[k] || 0;
+          pts.push({ label: k.replace('-', '/'), value: c, meta: `${c} game${c === 1 ? '' : 's'}` });   // YYYY/MM
+          m++; if (m > 12) { m = 1; y++; }
+          k = `${y}-${String(m).padStart(2, '0')}`;
+        }
+      }
+      return Charts.line(pts, { visible: 12 });
     },
   },
   {
@@ -324,14 +331,6 @@ function _needRpc(name) {
 
 let _selected = null;
 let _lastPanEnd = 0;   // timestamp of the last scatter pan/pinch; suppresses the click that ends it
-let _scatterColorMode = 'pace';   // 'pace' | 'box', the scatter's dot-colour toggle
-
-function setScatterColorMode(mode) {
-  if (mode === _scatterColorMode) return;
-  _scatterColorMode = mode;
-  selectChart('scatter');
-}
-
 function _renderPicker() {
   document.getElementById('chartPicker').innerHTML =
     `<div class="chart-select-wrap"><select class="chart-select" aria-label="Choose a chart" onchange="selectChart(this.value)">` +
@@ -345,8 +344,6 @@ async function selectChart(id) {
   _selected = id;
   _renderPicker();
   document.getElementById('chartDesc').textContent = c.desc;
-  const extra = document.getElementById('chartExtraControls');
-  if (extra) extra.innerHTML = c.extraControls ? c.extraControls() : '';
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
   const stage = document.getElementById('chartStage');
@@ -355,10 +352,66 @@ async function selectChart(id) {
     stage.innerHTML = await c.render();
     const z = stage.querySelector('.ch-zoomable');
     if (z) _attachZoom(z);
+    const lp = stage.querySelector('.ch-pannable');
+    if (lp) _attachLinePan(lp);
   } catch (e) {
     console.error('chart render failed:', e);
     stage.innerHTML = `<div class="chart-note">Could not load this chart.</div>`;
   }
+}
+
+// Horizontal pan for a windowed line chart (Charts.line with `visible`): drag
+// (mouse or touch) or trackpad/shift+wheel slides the data under a fixed y axis.
+// It opens on the most recent points (the group is pre-translated) and is clamped
+// so you can't pan past either end. touch-action stays 'pan-y' so vertical swipes
+// still scroll the page. A drag stamps _lastPanEnd, so the click that ends it
+// doesn't select a dot (same guard as the scatter's zoom).
+function _attachLinePan(svg) {
+  const groups = [...svg.querySelectorAll('.ch-lpan')];   // data + the label row, panned together
+  const pan = groups[0];
+  if (!pan) return;
+  const FW = +pan.dataset.w, L = +pan.dataset.l, maxOff = +pan.dataset.maxoff;
+  let off = maxOff;   // content offset in viewBox units; maxOff = newest months in view
+  const apply = () => groups.forEach(g => g.setAttribute('transform', `translate(${(L - off).toFixed(2)} 0)`));
+  const clamp = () => { off = Math.min(maxOff, Math.max(0, off)); };
+
+  svg.style.touchAction = 'pan-y';
+  let startX = null, startOff = 0, moved = false;
+  svg.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    startX = e.clientX; startOff = off; moved = false;
+  });
+  svg.addEventListener('pointermove', e => {
+    if (startX == null) return;
+    const dx = e.clientX - startX;
+    if (!moved) {
+      if (Math.abs(dx) < 5) return;   // still a tap, not a drag
+      moved = true;
+      svg.classList.add('panning');
+      // Keep following the pointer past the chart's edge. Only once dragging
+      // starts: capturing on pointerdown would retarget the click away from the dot.
+      try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    off = startOff - dx / svg.getBoundingClientRect().width * FW;   // drag right -> older months
+    clamp(); apply();
+  });
+  const end = () => {
+    if (startX != null && moved) _lastPanEnd = Date.now();
+    startX = null; moved = false;
+    svg.classList.remove('panning');
+  };
+  svg.addEventListener('pointerup', end);
+  svg.addEventListener('pointercancel', end);
+
+  // Trackpad two-finger swipe (deltaX) or shift+wheel pans; plain vertical wheel
+  // is left alone so the page still scrolls.
+  svg.addEventListener('wheel', e => {
+    const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+    if (!dx) return;
+    e.preventDefault();
+    off += dx / svg.getBoundingClientRect().width * FW;
+    clamp(); apply();
+  }, { passive: false });
 }
 
 // Pinch / wheel / drag zoom for the scatter. Only the plot interior zooms: the

@@ -234,6 +234,9 @@ let csChar    = null;      // character record from DB
 let csBuckets = null;      // computed stats per player count
 let csAdversaries = [];    // head-to-head rows from the character_adversary_stats RPC
 let csRivalMode   = 'pct';   // rivalries metric (also the ranking key): 'pct' (% dominance) | 'count' (# wins/losses)
+// A head-to-head record needs at least this many shared games to count as a
+// rivalry; a 1-2 game sample would otherwise top "Beaten most" at 100% by luck.
+const MIN_GAMES_FOR_RIVALRY = 5;
 let csAllChars  = [];        // full character list for search
 let csBoxInfo   = {};        // loadBoxInfo(), used to order box groups by release date
 let csAvgDur    = null;      // avg game duration (minutes) across this character's games
@@ -524,9 +527,11 @@ function render() {
 // from the character_adversary_stats RPC. Top-5 per column (a character can
 // appear in both: a close rivalry). The %/# seg ranks AND labels each column by
 // win/loss rate or raw count; the selected metric shows first, the other after
-// a "|". Empty when there is no record yet (or the RPC is not installed).
+// a "|". Only opponents with at least MIN_GAMES_FOR_RIVALRY shared games count.
+// Empty when there is no such record yet (or the RPC is not installed).
 function _adversariesSectionHTML() {
-  if (!csAdversaries.length) return '';
+  const adversaries = csAdversaries.filter(a => a.games >= MIN_GAMES_FOR_RIVALRY);
+  if (!adversaries.length) return '';
 
   // % = wins or losses / games vs that opponent (third-player wins mean
   // win% + loss% can be < 100%). The seg also picks the ranking key.
@@ -534,9 +539,9 @@ function _adversariesSectionHTML() {
   const winKey  = a => csRivalMode === 'pct' ? pct(a.wins,   a.games) : a.wins;
   const lossKey = a => csRivalMode === 'pct' ? pct(a.losses, a.games) : a.losses;
 
-  const byWins = csAdversaries.filter(a => a.wins > 0)
+  const byWins = adversaries.filter(a => a.wins > 0)
     .sort((a, b) => winKey(b) - winKey(a) || b.wins - a.wins || a.opponent.localeCompare(b.opponent)).slice(0, 5);
-  const byLoss = csAdversaries.filter(a => a.losses > 0)
+  const byLoss = adversaries.filter(a => a.losses > 0)
     .sort((a, b) => lossKey(b) - lossKey(a) || b.losses - a.losses || a.opponent.localeCompare(b.opponent)).slice(0, 5);
   if (!byWins.length && !byLoss.length) return '';
 

@@ -170,12 +170,24 @@ const Charts = (() => {
   }
 
   // Line + soft area over ordered points = [{ label, value }].
-  function line(points, { fmt = v => v, color = 'var(--accent)' } = {}) {
+  // `visible`: when set and there are more points than that, only `visible`
+  // points are shown at a time and the rest sit off to the left, reachable by
+  // panning (charts.js _attachLinePan). It starts on the most recent points.
+  // The y scale stays fixed to the global max so the axis doesn't jump while
+  // panning; gridlines + y labels stay put and only the data pans.
+  function line(points, { fmt = v => v, color = 'var(--accent)', visible = null } = {}) {
     if (!points.length) return empty();
-    const L = 34, R = 12, T = 14, B = 28;
+    const L = 34, R = 12, T = 14, B = 28, PW = W - L - R;
     const max = Math.max(...points.map(p => p.value)) || 1;
     const n = points.length;
-    const sx = i => L + (n === 1 ? (W - L - R) / 2 : i / (n - 1) * (W - L - R));
+    const pannable = !!visible && n > visible;
+    const PAD = 10;                                  // pannable: room at both ends so the edge labels (wider on phones) fit
+    const slot = (PW - 2 * PAD) / (visible || n);    // pannable: width of one point's slot
+    // Pannable points sit in content space (centre of their slot), the pan group
+    // is translated into place; otherwise they're spread edge to edge as before.
+    const sx = pannable
+      ? i => PAD + (i + 0.5) * slot
+      : i => L + (n === 1 ? PW / 2 : i / (n - 1) * PW);
     const sy = v => (H - B) - v / max * (H - T - B);
     const path = points.map((p, i) => `${i ? 'L' : 'M'}${sx(i).toFixed(1)} ${sy(p.value).toFixed(1)}`).join(' ');
     const area = `${path} L${sx(n - 1).toFixed(1)} ${H - B} L${sx(0).toFixed(1)} ${H - B} Z`;
@@ -184,16 +196,23 @@ const Charts = (() => {
       const v = max * i / 4, yy = sy(v);
       grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 5}" y="${yy.toFixed(1)}" class="ch-ax" text-anchor="end" dominant-baseline="middle">${Math.round(v)}</text>`;
     }
-    // x ticks: cap the count by available width (~80px per label) so wide labels
-    // like YYYY/MM never crowd, picked evenly and including both endpoints. First
-    // and last are edge-anchored so they stay inside the viewBox.
-    const maxLabels = Math.max(2, Math.min(n, Math.floor((W - L - R) / 80) + 1));
-    const idxs = new Set();
-    for (let j = 0; j < maxLabels; j++) idxs.add(Math.round(j * (n - 1) / (maxLabels - 1)));
+    // x ticks. Static view: cap the count by available width (~80px per label) so
+    // wide labels like YYYY/MM never crowd, picked evenly and including both
+    // endpoints (first/last edge-anchored so they stay inside the viewBox).
+    // Pannable view: every other month counting back from the latest, so labels
+    // keep their place on the data while it pans (and the newest is always one).
+    let idxs;
+    if (pannable) {
+      idxs = new Set(points.map((_, i) => i).filter(i => (n - 1 - i) % 2 === 0));
+    } else {
+      const maxLabels = Math.max(2, Math.min(n, Math.floor(PW / 80) + 1));
+      idxs = new Set();
+      for (let j = 0; j < maxLabels; j++) idxs.add(Math.round(j * (n - 1) / (maxLabels - 1)));
+    }
     let ticks = '';
     points.forEach((p, i) => {
       if (!idxs.has(i)) return;
-      const anchor = i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle';
+      const anchor = pannable ? 'middle' : i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle';
       ticks += `<text x="${sx(i).toFixed(1)}" y="${H - 8}" class="ch-ax" text-anchor="${anchor}">${_esc(p.label)}</text>`;
     });
     // Same invisible-stroke tap padding as the scatter's dots (see there for why).
@@ -201,7 +220,23 @@ const Charts = (() => {
       const meta = p.meta != null ? p.meta : String(fmt(p.value));
       return `<circle${hit(p.label, meta, p.href)} cx="${sx(i).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="4" fill="${color}" stroke="transparent" stroke-width="16"><title>${titleText(p.label, meta)}</title></circle>`;
     }).join('');
-    return wrap(`<path d="${area}" fill="${color}" fill-opacity="0.12"/><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${grid}${ticks}${dots}`);
+    const data = `<path d="${area}" fill="${color}" fill-opacity="0.12"/><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>`;
+    if (!pannable) return wrap(`${data}${grid}${ticks}${dots}`);
+
+    // The pan groups start translated so the last `visible` points are in view;
+    // the clip keeps the older ones from spilling over the y axis. The label row
+    // gets a clip inset a little from the axis, so the label of the month just
+    // off-screen doesn't poke a stray fragment into the plot while at rest.
+    const maxOff = (n - visible) * slot;
+    const tf = `translate(${(L - maxOff).toFixed(2)} 0)`;
+    const LBL_INSET = 20;
+    return wrap(
+      `${grid}<clipPath id="lnClip"><rect x="${L}" y="0" width="${PW}" height="${H}"/></clipPath>` +
+      `<clipPath id="lnLblClip"><rect x="${L + LBL_INSET}" y="0" width="${PW - LBL_INSET}" height="${H}"/></clipPath>` +
+      `<g clip-path="url(#lnClip)"><g class="ch-lpan" data-l="${L}" data-w="${W}" data-maxoff="${maxOff.toFixed(2)}"` +
+      ` transform="${tf}">${data}${dots}</g></g>` +
+      `<g clip-path="url(#lnLblClip)"><g class="ch-lpan" transform="${tf}">${ticks}</g></g>`,
+      { cls: 'ch-pannable' });
   }
 
   // Donut: segments = [{ label, value, color? }] + side legend.

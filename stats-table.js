@@ -6,9 +6,11 @@
 // Renders the standard summary trio: e.g.
 //   statBoxesHTML([{ val: '12', lbl: 'Games' }, { val: '23m', lbl: 'Avg duration' }])
 // Returns an HTML string of three `.stat-box` divs (no wrapping element).
+// A box may set `hot: true` (+ an optional `title` tooltip) to be highlighted,
+// for a stat that is currently sitting at its record.
 function statBoxesHTML(boxes) {
   return boxes.map(b =>
-    `<div class="stat-box"><div class="stat-val">${b.val}</div><div class="stat-lbl">${b.lbl}</div></div>`
+    `<div class="stat-box${b.hot ? ' hot' : ''}"${b.title ? ` title="${_esc(b.title)}"` : ''}><div class="stat-val">${b.val}</div><div class="stat-lbl">${b.lbl}</div></div>`
   ).join('');
 }
 

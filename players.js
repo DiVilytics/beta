@@ -275,6 +275,9 @@ function render() {
     if (p.is_winner) { streakRun++; if (streakRun > bestStreak) bestStreak = streakRun; }
     else streakRun = 0;
   }
+  // The loop ends on the latest game, so streakRun is the current streak. When it
+  // equals the best one the player is on their record run right now.
+  const onBestStreak = bestStreak > 0 && streakRun === bestStreak;
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
   const avgTurns = avg(games.map(g => g.num_turns));
@@ -307,7 +310,7 @@ function render() {
         { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: 'Avg rounds' },
         { val: winPct + '%', lbl: 'Win rate' },
         { val: wins,         lbl: 'Wins' },
-        { val: bestStreak,   lbl: 'Max streak' },
+        { val: bestStreak,   lbl: 'Max streak', hot: onBestStreak, title: onBestStreak ? 'Currently on this streak' : '' },
       ])}
     </div>
 

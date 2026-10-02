@@ -685,6 +685,8 @@ main {
 /* SVG chart primitives (charts.js) */
 .chart-svg { width: 100%; height: auto; display: block; }
 .ch-zoomable { touch-action: pan-y; }   /* zoomable scatter; JS toggles to 'none' while zoomed in */
+.ch-pannable { cursor: grab; user-select: none; -webkit-user-select: none; }   /* horizontally pannable line chart */
+.ch-pannable.panning { cursor: grabbing; }
 .chart-svg text { font-family: inherit; pointer-events: none; }
 .ch-lbl { font-size: 11px; fill: var(--text); }
 .ch-ax  { font-size: 9.5px; fill: var(--muted); }
@@ -1154,6 +1156,9 @@ select:disabled {
 }
 .stat-val { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
 .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+/* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
+.stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
+.stat-box.hot .stat-val { color: var(--gold); }
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
 .lb-head,
@@ -2009,7 +2014,7 @@ select:disabled {
 /* .claim-row.winner shares .chip.winner (winner highlight, above). */
 .claim-row.mine { border-color: rgba(124, 106, 247, 0.4); }
 
-.claim-char { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.claim-char { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
 .claim-row.winner .claim-char { color: var(--gold); }
 .claim-nick { font-size: 12px; color: var(--muted); }
 .claim-nick.unclaimed { font-style: italic; }
