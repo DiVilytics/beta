@@ -651,7 +651,7 @@ main {
 
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
 .charts-intro { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
-.chart-picker { margin-bottom: 16px; }
+.chart-picker { margin-bottom: 16px; min-height: 38px; }   /* the select is injected by JS; hold its height so the card doesn't jump down */
 .chart-select-wrap { position: relative; width: 100%; }
 .chart-chevron {
   position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
@@ -676,15 +676,21 @@ main {
   border-radius: var(--r); padding: 16px;
 }
 .chart-card-desc { font-size: 13px; color: var(--muted); margin: 0 0 14px; line-height: 1.45; min-height: 4.4em; }
-.chart-stage { min-height: 240px; }
-.chart-note { color: var(--muted); font-size: 13px; text-align: center; padding: 60px 16px; }
+/* Every chart is drawn on a 440x280 viewBox and scales to the card width, so
+   reserve exactly that ratio up front: the card is already its final size
+   while "Loading…" shows, and nothing jumps when the chart arrives. */
+.chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
+.chart-stage > .chart-svg { flex-shrink: 0; }
+.chart-note { color: var(--muted); font-size: 13px; text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: 13px; font-weight: 600; color: var(--text); text-align: center; }
 .chart-caption-link { color: var(--accent); text-decoration: none; }
 
 /* SVG chart primitives (charts.js) */
 .chart-svg { width: 100%; height: auto; display: block; }
-.ch-zoomable { touch-action: pan-y; }   /* zoomable scatter; JS toggles to 'none' while zoomed in */
+/* zoomable scatter; JS toggles touch-action to 'none' while zoomed in. No text selection or iOS
+   callout: dragging, pinching and double-click-to-reset would otherwise highlight the axis labels. */
+.ch-zoomable { touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .ch-pannable { cursor: grab; user-select: none; -webkit-user-select: none; }   /* horizontally pannable line chart */
 .ch-pannable.panning { cursor: grabbing; }
 .chart-svg text { font-family: inherit; pointer-events: none; }

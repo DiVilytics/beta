@@ -44,6 +44,39 @@ const Charts = (() => {
     return { max, ticks };
   }
 
+  // Y-axis ticks for count axes (line, vertical bars): whole-number steps of
+  // 1 / 2 / 5 x 10^n, the smallest one that needs at most `maxIntervals` steps
+  // to cover the data, so 306 reads 0 50 100 ... 350 instead of 0 77 153 230 306.
+  function niceCountTicks(dmax, maxIntervals = 7) {
+    if (!(dmax > 0)) return { max: 1, ticks: [0, 1] };
+    let step = 1;
+    for (let mag = 1; ; mag *= 10) {
+      const hit = [1, 2, 5].map(m => m * mag).find(st => Math.ceil(dmax / st) <= maxIntervals);
+      if (hit) { step = hit; break; }
+    }
+    const max = Math.ceil(dmax / step) * step;
+    const ticks = [];
+    for (let v = 0; v <= max; v += step) ticks.push(v);
+    return { max, ticks };
+  }
+
+  // The scatter's y axis always draws 5 gridlines (and the zoom re-labels them
+  // by position), so give it a window of exactly 4 equal round steps that covers
+  // the data with a little margin: win rates 21-49 -> 20 30 40 50 60. `cap`
+  // (e.g. 100 for a percentage) keeps the window from running past it.
+  function niceWindow4(y0, y1, cap = null) {
+    const m = Math.max((y1 - y0) * 0.03, 0.5);
+    for (let mag = 1; ; mag *= 10) {
+      for (const st of [1, 2, 5].map(k => k * mag)) {
+        let lo = Math.floor((y0 - m) / st) * st;
+        if (lo < 0) lo = 0;
+        if (cap != null && lo + 4 * st > cap) lo = Math.max(0, Math.floor((cap - 4 * st) / st) * st);
+        if (lo <= y0 - m && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };
+        if (lo === 0 && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // 0 is as low as it goes
+      }
+    }
+  }
+
   // Horizontal bars: data = [{ label, value, color?, meta? }]. The x-axis uses
   // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
@@ -76,13 +109,13 @@ const Charts = (() => {
   function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1 } = {}) {
     if (!data.length) return empty();
     const L = 32, R = 10, T = 14, B = 26;
-    const max = Math.max(...data.map(d => d.value)) || 1;
+    const { max, ticks } = niceCountTicks(Math.max(...data.map(d => d.value)) || 1);
     const bw = (W - L - R) / data.length;
     const sy = v => (H - B) - v / max * (H - T - B);
     let grid = '';
-    for (let i = 0; i <= 4; i++) {
-      const v = max * i / 4, yy = sy(v);
-      grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 5}" y="${yy.toFixed(1)}" class="ch-ax" text-anchor="end" dominant-baseline="middle">${Math.round(v)}</text>`;
+    for (const v of ticks) {
+      const yy = sy(v);
+      grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 5}" y="${yy.toFixed(1)}" class="ch-ax" text-anchor="end" dominant-baseline="middle">${v}</text>`;
     }
     const bars = data.map((d, i) => {
       const x = L + i * bw, yv = sy(d.value), h = (H - B) - yv;
@@ -105,9 +138,9 @@ const Charts = (() => {
     // Clamp the low end at 0 (games/percent are non-negative) and the high end at
     // yMax when given (e.g. 100 for a percentage axis).
     const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
-    const xpad = (x1 - x0) * 0.08 || 1, ypad = (y1 - y0) * 0.08 || 1;
+    const xpad = (x1 - x0) * 0.08 || 1;
     const xlo = Math.max(0, x0 - xpad), xhi = x1 + xpad;
-    const ylo = Math.max(0, y0 - ypad), yhi = yMax != null ? Math.min(yMax, y1 + ypad) : y1 + ypad;
+    const { lo: ylo, hi: yhi } = niceWindow4(y0, y1, yMax);   // round gridline values, not 21 28 35 ...
     const sx = x => L + (x - xlo) / (xhi - xlo) * PW;
     const sy = y => (H - B) - (y - ylo) / (yhi - ylo) * PH;
     let grid = '';
@@ -178,7 +211,7 @@ const Charts = (() => {
   function line(points, { fmt = v => v, color = 'var(--accent)', visible = null } = {}) {
     if (!points.length) return empty();
     const L = 34, R = 12, T = 14, B = 28, PW = W - L - R;
-    const max = Math.max(...points.map(p => p.value)) || 1;
+    const { max, ticks: yTicks } = niceCountTicks(Math.max(...points.map(p => p.value)) || 1);
     const n = points.length;
     const pannable = !!visible && n > visible;
     const PAD = 10;                                  // pannable: room at both ends so the edge labels (wider on phones) fit
@@ -192,9 +225,9 @@ const Charts = (() => {
     const path = points.map((p, i) => `${i ? 'L' : 'M'}${sx(i).toFixed(1)} ${sy(p.value).toFixed(1)}`).join(' ');
     const area = `${path} L${sx(n - 1).toFixed(1)} ${H - B} L${sx(0).toFixed(1)} ${H - B} Z`;
     let grid = '';
-    for (let i = 0; i <= 4; i++) {
-      const v = max * i / 4, yy = sy(v);
-      grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 5}" y="${yy.toFixed(1)}" class="ch-ax" text-anchor="end" dominant-baseline="middle">${Math.round(v)}</text>`;
+    for (const v of yTicks) {
+      const yy = sy(v);
+      grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" class="ch-grid"/><text x="${L - 5}" y="${yy.toFixed(1)}" class="ch-ax" text-anchor="end" dominant-baseline="middle">${v}</text>`;
     }
     // x ticks. Static view: cap the count by available width (~80px per label) so
     // wide labels like YYYY/MM never crowd, picked evenly and including both
