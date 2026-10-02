@@ -178,12 +178,14 @@ function clearLocationFilter() {
 }
 
 async function loadLocationOptions() {
-  // Show the location search only if at least one game has a location (cheap
-  // count-only request, no rows transferred).
+  // The box is in the page from the start (disabled, so the header doesn't
+  // jump); hide it only if no game has a location yet (cheap count-only request,
+  // no rows transferred), otherwise enable it.
   const { count } = await db.from('games')
     .select('location', { count: 'exact', head: true })
     .not('location', 'is', null);
-  setVisible('locationSearch', (count || 0) > 0);
+  if (!count) { setVisible('locationSearch', false); return; }
+  document.getElementById('locationSearchInput').disabled = false;
 
   // Same strategy as the player search: query the DB per keystroke. The
   // search_locations(q) RPC does the DISTINCT + LIMIT server-side, so we never

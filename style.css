@@ -2257,6 +2257,8 @@ select:disabled {
   flex-shrink: 0;
 }
 .cs-search input { font-size: 13px; padding: 7px 10px; }
+/* Disabled only until its data loads: same look as the live box, no flash. */
+.cs-search input:disabled { opacity: 1; cursor: default; }
 
 /* Wrapper that anchors a .cs-dropdown to a full-width form input. */
 .ac-wrap { position: relative; }

@@ -271,7 +271,7 @@ async function renderRosterPage(scrollBox) {
   document.title = 'DiVilytics | Villains';
 
   [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
-  setVisible('csSearchWrap', true);
+  document.getElementById('csSearchInput').disabled = false;
   _attachCharSearch();
 
   const root = document.getElementById('csRoot');
@@ -363,7 +363,7 @@ async function renderDetailPage(charName) {
   }
 
   await _renderCharIdentity();
-  setVisible('csSearchWrap', true);
+  document.getElementById('csSearchInput').disabled = false;
   _attachCharSearch();
 
   // Load bucketed stats via server-side aggregation (one RPC, no row-limit risk)
