@@ -15,7 +15,9 @@ let liveTimerId     = null;        // 1s clock ticker
 let _saveIntervalId = null;        // 30s background-persist
 let _resumeTickId   = null;        // resume-banner ticker (set in _checkResume)
 
-const LEGEND_ITEMS = ['🎲 = draw', '👤 = you', '👑 = winner', '❌ = remove'];
+// Same order as the row buttons: row actions (draw, remove), then player marks
+// (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
+const LEGEND_ITEMS = ['🎲 = draw', '❌ = remove', '👤 = you', '👑 = winner'];
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -31,7 +33,7 @@ const pace = createPaceFilter({
     on:      'Pool limited to your boxes',
     off:     'Limit the pool to your boxes',
   },
-  onChange: () => { updateExcludeUI(); _updateActionBtns(); },
+  onChange: () => { updateExcludeUI(); _updateActionBtns(); _updateDiscardBtn(); },
   onError:  showErr,
 });
 
@@ -46,11 +48,15 @@ async function init() {
   // The character <select> options fill in once chars load (no visible change);
   // a saved draft, if any, replaces these rows further down.
   _setDateToNow();
+  _markFresh();
   orderSlots = [
     { id: orderNextId++, char: '', isMe: false, isWinner: false },
     { id: orderNextId++, char: '', isMe: false, isWinner: false },
   ];
   renderOrderSlots();
+  for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
+    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, _updateDiscardBtn);
+  }
 
   // Re-render slots whenever auth state changes so the Me-locked indicator
   // updates in-place after sign-in / sign-out.
@@ -207,31 +213,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (!host) return;
-
-  // Measure candidate rows with a hidden clone that copies the legend's font.
-  const cs   = getComputedStyle(host);
-  const meas = document.createElement('span');
-  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'
-    + `font:${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily};letter-spacing:${cs.letterSpacing};`;
-  document.body.appendChild(meas);
-  const maxW = host.clientWidth;
-  if (!maxW) { meas.remove(); return; }   // hidden (e.g. live game), keep current markup
-  const fits = arr => { meas.textContent = arr.join('  |  '); return meas.offsetWidth <= maxW; };
-
-  const split = arr => {
-    if (arr.length <= 1 || fits(arr)) return [arr];
-    const mid = Math.ceil(arr.length / 2);
-    return [...split(arr.slice(0, mid)), ...split(arr.slice(mid))];
-  };
-  const rows = split(LEGEND_ITEMS);
-  meas.remove();
-
-  host.innerHTML = rows.map(r =>
-    `<span class="legend-row">${
-      r.map(it => `<span class="legend-item">${it}</span>`).join('<span class="legend-sep"> | </span>')
-    }</span>`
-  ).join('');
+  if (host) layoutSeparatedRows(host, LEGEND_ITEMS);   // hidden (live game): keeps the current markup
 }
 
 function _onLegendResize() {
@@ -465,11 +447,9 @@ function renderOrderSlots() {
         </div>
         <div class="order-slot-actions">
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="Draw">🎲</button>
+          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? 'title="Remove"' : 'title="A game needs at least 2 players" disabled'}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" title="${meTitle}">👤</button>
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" title="Winner">👑</button>
-          ${orderSlots.length > 2
-            ? `<button class="pf-btn del" onclick="removeOrderSlot(${s.id})" title="Remove">❌</button>`
-            : ''}
         </div>
       </div>`;
   }).join('');
@@ -478,6 +458,7 @@ function renderOrderSlots() {
   const pcSel = document.getElementById('playerCountSel');
   if (pcSel) pcSel.value = String(orderSlots.length);
   _updateActionBtns();
+  _updateDiscardBtn();
 }
 
 function _updateActionBtns() {
@@ -566,6 +547,14 @@ function _initDrag() {
 
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
 
+// The line under "Game in progress": player count and, when set, the location.
+// Drawn on start and on resume (the form fields are hidden while live).
+function _renderLiveInfo() {
+  const infoEl   = document.getElementById('liveInfo');
+  const location = document.getElementById('fLocation').value.trim();
+  if (infoEl) infoEl.textContent = [`${orderSlots.length} players`, location ? `Playing at ${location}` : null].filter(Boolean).join(' | ');
+}
+
 function setLiveUI(on) {
   setVisible('formContent',   !on);
   setVisible('liveContent',    on);
@@ -624,11 +613,7 @@ function startLive() {
   liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 0);
   document.getElementById('liveTurnCount').textContent = liveGame.turns;
 
-  const playerCount = orderSlots.length;
-  const location    = document.getElementById('fLocation').value.trim();
-  const infoEl      = document.getElementById('liveInfo');
-  if (infoEl) infoEl.textContent = [`${playerCount} players`, location || null].filter(Boolean).join(' | ');
-
+  _renderLiveInfo();
   setLiveUI(true);
   tickLive();
   liveTimerId = setInterval(tickLive, 1000);
@@ -676,13 +661,45 @@ function _clearLiveState() {
   updateLiveGameNavBadge();
 }
 
+// The date a fresh page shows (set on load and after a discard), so editing it
+// counts as a change.
+let _freshDate = '';
+function _markFresh() { _freshDate = document.getElementById('fDate')?.value || ''; }
+
+// True when anything differs from a fresh page load: player count, villains,
+// 👤 / 👑 marks, date, location, duration, rounds or the draw pool.
+function _isFormChanged() {
+  const val = id => document.getElementById(id)?.value || '';
+  return orderSlots.length !== 2
+      || orderSlots.some(s => s.char || s.isMe || s.isWinner)
+      || val('fDate') !== _freshDate
+      || !!(val('fLocation') || val('fDur') || val('fTurns'))
+      || pace.excluded.size > 0 || !!pace.selectedPace || pace.pacePlus || pace.mineOn;
+}
+
+// Discard shows as soon as anything changed, or while a game session exists.
 function _updateDiscardBtn() {
-  setVisible('discardBtn', liveGame.hasSession);
+  setVisible('discardBtn', liveGame.hasSession || _isFormChanged());
   setVisible('resumeBtn',  liveGame.isPaused);
 }
 
-function discardLiveGame() {
-  if (!confirm('Discard the current game? This will reset the form and clear saved progress.')) return;
+// Both Discard buttons (page header and resume banner) ask with the same app
+// confirm sheet: the browser's native confirm() is suppressed (auto-cancelled)
+// in some in-app browsers and installed web apps.
+function _confirmDiscard(onConfirm) {
+  openConfirmSheet({
+    id:           'discardGameOverlay',
+    title:        'Discard this game?',
+    bodyHTML:     '<p class="confirm-text">This resets the form (villains, players, details and draw pool) and clears any saved progress.</p>',
+    confirmLabel: 'Discard',
+    danger:       true,
+    onConfirm,
+  });
+}
+
+function discardLiveGame() { _confirmDiscard(_doDiscard); }
+
+function _doDiscard() {
 
   if (liveTimerId) { clearInterval(liveTimerId); liveTimerId = null; }
   _clearLiveState();
@@ -705,6 +722,8 @@ function discardLiveGame() {
   pace.reset();
 
   setLiveUI(false);
+  _markFresh();
+  _updateDiscardBtn();
 }
 
 // ── RESUME BANNER ─────────────────────────────────────────────────────────────
@@ -727,7 +746,7 @@ function _checkResume() {
     </div>
     <div class="resume-banner-btns">
       <button class="btn btn-primary btn-sm" onclick="_doResume()">Resume</button>
-      <button class="btn btn-ghost btn-sm" onclick="_dismissResume()">Discard</button>
+      <button class="btn btn-ghost btn-sm" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">Discard</button>
     </div>`;
   document.querySelector('main').prepend(banner);
 
@@ -778,6 +797,7 @@ function _doResume() {
 
   if (state.liveStart) {
     document.getElementById('liveTurnCount').textContent = liveGame.turns;
+    _renderLiveInfo();
     setLiveUI(true);
     tickLive();
     liveTimerId = setInterval(tickLive, 1000);

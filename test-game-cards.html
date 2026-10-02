@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>DiVilytics | Game card test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="/asset/favicon/favicon-96x96.png?v=20260603b" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/asset/favicon/favicon.svg?v=20260603b" />
+  <link rel="shortcut icon" href="/asset/favicon/favicon.ico?v=20260603b" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/asset/favicon/apple-touch-icon.png?v=20260603b" />
+  <meta name="apple-mobile-web-app-title" content="DiVilytics" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="/asset/favicon/site.webmanifest?v=20260603b" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MTR91YL11"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6MTR91YL11');
+  </script>
+  <!-- Test page for the game card redesign. Not linked from the app. -->
+  <style>
+    .gc2-section { margin: 1.5rem 0 0.75rem; }
+    .gc2-list { display: flex; flex-direction: column; gap: 10px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="new-game.html" title="New Game">🎲</a>
+      <a href="game-log.html" title="Game Log">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard">🏆</a>
+      <a href="villains.html" title="Villains">🎭</a>
+      <a href="players.html" id="navProfile" title="Player">👤</a>
+      <a href="charts.html" title="Charts">📊</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h2>Game card test</h2>
+    <div class="seg" id="gcMode">
+      <button class="seg-btn on" type="button" onclick="setMode('rows')">New</button>
+      <button class="seg-btn" type="button" onclick="setMode('chips')">Current</button>
+    </div>
+  </div>
+  <p class="page-intro">Prototype of the redesigned game cards, with real games. Not linked from the app.</p>
+
+  <h2 class="home-faq-title gc2-section">Game log <span>latest games</span></h2>
+  <div class="gc2-list" id="gcLog"><div class="spinner">Loading…</div></div>
+
+  <h2 class="home-faq-title gc2-section" id="gcPlayerTitle">Player page</h2>
+  <div class="gc2-list" id="gcPlayer"><div class="spinner">Loading…</div></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script src="theme.js"></script>
+<script src="ui.js"></script>
+<script src="avatar.js"></script>
+<script src="achievements.js"></script>
+<script src="stats-table.js"></script>
+<script src="search.js"></script>
+<script src="game-card.js"></script>
+<script src="shared.js"></script>
+<script src="test-game-cards.js"></script>
+</body>
+</html>

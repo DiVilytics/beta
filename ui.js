@@ -198,6 +198,48 @@ function clearError(target) {
 
 // ── OVERLAYS ──────────────────────────────────────────────────────────────────
 
+// ── SEPARATED ROWS ────────────────────────────────────────────────────────────
+
+// Lays `items` out in `host` as lines of "a | b | c", never letting a "|" end or
+// start a line: if they don't all fit in `maxW` (default: the host's width),
+// the list is halved, recursively, until each part fits on its own line.
+// Items are HTML strings or elements; elements are moved, not copied, so their
+// event listeners survive. Returns false (markup untouched) when the host has
+// no width yet, e.g. while hidden. Used by the New Game legend and the game
+// cards' details line.
+function layoutSeparatedRows(host, items, maxW = host.clientWidth) {
+  if (!maxW || !items.length) return false;
+  const html = it => typeof it === 'string' ? it : it.outerHTML;
+  const cs   = getComputedStyle(host);
+  const meas = document.createElement('span');
+  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'
+    + `font:${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily};letter-spacing:${cs.letterSpacing};`;
+  document.body.appendChild(meas);
+  const fits = arr => { meas.innerHTML = arr.map(html).join(' | '); return meas.offsetWidth <= maxW; };
+  const split = arr => {
+    if (arr.length <= 1 || fits(arr)) return [arr];
+    const mid = Math.ceil(arr.length / 2);
+    return [...split(arr.slice(0, mid)), ...split(arr.slice(mid))];
+  };
+  const rows = split(items);
+  meas.remove();
+
+  host.textContent = '';
+  for (const r of rows) {
+    const row = document.createElement('span');
+    row.className = 'sep-row';
+    r.forEach((it, i) => {
+      if (i) row.insertAdjacentHTML('beforeend', '<span class="sep-sep"> | </span>');
+      const item = document.createElement('span');
+      item.className = 'sep-item';
+      if (typeof it === 'string') item.innerHTML = it; else item.appendChild(it);
+      row.appendChild(item);
+    });
+    host.appendChild(row);
+  }
+  return true;
+}
+
 function closeOverlay(id) {
   document.getElementById(id).classList.remove('open');
   document.body.style.overflow = '';

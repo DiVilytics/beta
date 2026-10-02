@@ -37,9 +37,16 @@ function _isFutureMonth(d) {
       || (d.getFullYear() === now.getFullYear() && d.getMonth() > now.getMonth());
 }
 
+// The report starts at December 2024 (same start as the Charts' games-over-time);
+// earlier months only hold the bulk historical imports, not tracked play.
+const REPORT_FIRST_MONTH = new Date(2024, 11, 1);
+function _isBeforeFirstMonth(d) { return d < REPORT_FIRST_MONTH; }
+const _prevMonth = () => new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() - 1, 1);
+
 async function csShiftMonth(delta) {
   const next = new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + delta, 1);
   if (delta > 0 && _isFutureMonth(next)) return;
+  if (delta < 0 && _isBeforeFirstMonth(next)) return;
   csReportMonth = next;
   await _renderMonthlyReport();
 }
@@ -75,7 +82,7 @@ function csPickerShiftYear(delta, ev) {
   ev?.stopPropagation();
   const now = new Date();
   const next = _csPickerYear + delta;
-  if (next > now.getFullYear()) return;
+  if (next > now.getFullYear() || next < REPORT_FIRST_MONTH.getFullYear()) return;
   _csPickerYear = next;
   _renderMonthPickerPanel();
 }
@@ -83,7 +90,7 @@ function csPickerShiftYear(delta, ev) {
 async function csPickerSelect(month, ev) {
   ev?.stopPropagation();
   const next = new Date(_csPickerYear, month, 1);
-  if (_isFutureMonth(next)) return;
+  if (_isFutureMonth(next) || _isBeforeFirstMonth(next)) return;
   csCloseMonthPicker();
   csReportMonth = next;
   await _renderMonthlyReport();
@@ -96,17 +103,18 @@ function _renderMonthPickerPanel() {
   const curY     = csReportMonth.getFullYear();
   const curM     = csReportMonth.getMonth();
   const nextYDis = _csPickerYear >= now.getFullYear();
+  const prevYDis = _csPickerYear <= REPORT_FIRST_MONTH.getFullYear();
   const months   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   panel.innerHTML = `
     <div class="cs-mp-year">
-      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(-1, event)" title="Previous year">‹</button>
+      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(-1, event)" title="Previous year"${prevYDis ? ' disabled' : ''}>‹</button>
       <span class="cs-mp-year-text">${_csPickerYear}</span>
       <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(1, event)" title="Next year"${nextYDis ? ' disabled' : ''}>›</button>
     </div>
     <div class="cs-mp-grid">
       ${months.map((mn, i) => {
-        const disabled = _csPickerYear > now.getFullYear()
-                      || (_csPickerYear === now.getFullYear() && i > now.getMonth());
+        const disabled = _isFutureMonth(new Date(_csPickerYear, i, 1))
+                      || _isBeforeFirstMonth(new Date(_csPickerYear, i, 1));
         const selected = _csPickerYear === curY && i === curM;
         return `<button class="cs-mp-month${selected ? ' selected' : ''}" type="button" onclick="csPickerSelect(${i}, event)"${disabled ? ' disabled' : ''}>${mn}</button>`;
       }).join('')}
@@ -149,6 +157,7 @@ function _setReportHeader(label, gameCount) {
     btn.textContent = `Monthly report: ${label} (${countTxt})`;
   }
   const navs = host.querySelectorAll('.cs-summary-header .cs-month-nav');
+  if (navs[0]) navs[0].disabled = _isBeforeFirstMonth(_prevMonth());
   if (navs[1]) navs[1].disabled = _isFutureMonth(
     new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + 1, 1)
   );
@@ -158,12 +167,13 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
   const nextDisabled = _isFutureMonth(
     new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + 1, 1)
   );
+  const prevDisabled = _isBeforeFirstMonth(_prevMonth());
   const countTxt = gameCount == null
     ? '…'
     : `${gameCount} ${gameCount === 1 ? 'game' : 'games'}`;
   const header = monthLabel
     ? `<div class="cs-summary-header">
-         <button class="cs-month-nav" type="button" onclick="csShiftMonth(-1)" title="Previous month">‹</button>
+         <button class="cs-month-nav" type="button" onclick="csShiftMonth(-1)" title="Previous month"${prevDisabled ? ' disabled' : ''}>‹</button>
          <span class="cs-month-picker-wrap">
            <button class="cs-month-text" type="button" onclick="csOpenMonthPicker(event)" title="Pick month">Monthly report: ${_esc(monthLabel)} (${countTxt})</button>
            <div class="cs-month-picker-panel" id="csMonthPickerPanel" role="dialog" aria-label="Pick month"></div>
@@ -239,6 +249,12 @@ let csRivalMode   = 'pct';   // rivalries metric (also the ranking key): 'pct' (
 const MIN_GAMES_FOR_RIVALRY = 5;
 let csAllChars  = [];        // full character list for search
 let csBoxInfo   = {};        // loadBoxInfo(), used to order box groups by release date
+
+// "Box name (year)" for display, the year from box-info.json when known.
+function _boxLabelHTML(box) {
+  const year = csBoxInfo[box]?.year;
+  return `${_esc(box)}${year ? ` <span class="cs-box-year">(${year})</span>` : ''}`;
+}
 let csAvgDur    = null;      // avg game duration (minutes) across this character's games
 let csAvgTurns  = null;      // avg rounds across this character's games
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
@@ -323,7 +339,7 @@ function _rosterGroupsHTML(chars) {
 // villains listed elsewhere) don't get a group of their own here.
 function _rosterBoxGroups(chars) {
   return Object.entries(groupByBox(chars, csBoxInfo)).map(([box, cs]) => ({
-    id: boxAnchorId(box), header: _esc(box), chars: cs,
+    id: boxAnchorId(box), header: _boxLabelHTML(box), chars: cs,
   }));
 }
 
@@ -359,7 +375,7 @@ function _showCsEmpty(html) {
 async function renderDetailPage(charName) {
   document.title = `DiVilytics | ${charName}`;
 
-  csAllChars = await loadCharacters();
+  [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   csChar     = csAllChars.find(c => c.name === charName);
 
   if (!csChar) {
@@ -428,7 +444,7 @@ async function _renderCharIdentity() {
     ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="View ${_esc(csChar.pace)}-pace villains"></a>`
     : `<a class="pace-dot gray" href="villains.html?pace=gray" title="Pace not yet set"></a>`;
   document.getElementById('csIdentity').innerHTML =
-    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="View ${_esc(csChar.box)} villains">${_esc(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
+    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="View ${_esc(csChar.box)} villains">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
 }
 
 function _foldBuckets(buckets) {

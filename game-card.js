@@ -16,7 +16,12 @@ function gameUserRole(g, gp, user) {
 // Pure HTML builder for a game card. The result is meant to be injected into
 // a `<div class="game-card">…</div>` host. Pass `locationClickable: true` to
 // render the location as a button (the caller wires the click handler).
-function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false } = {}) {
+// `layout: 'rows'` lists the players one per row in play order (seat numbers,
+// crown at the row's end) instead of wrapping chips. The purple highlight
+// always marks the signed-in player (`isSelf`), on every page.
+function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips' } = {}) {
+  const rows = layout === 'rows';
+  if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const locationPart = g.location
     ? (locationClickable ? `<button class="card-loc-btn">${_esc(g.location)}</button>` : _esc(g.location))
     : null;
@@ -25,27 +30,34 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     g.num_turns ? `${g.num_turns} rounds` : null,
     locationPart,
     `${gp.length}p`,
-  ].filter(Boolean).join(' | ');
+  ].filter(Boolean);
+  // Rows layout: the details may wrap, so they go in as separate items that
+  // layoutGameCardMeta() splits into lines without a "|" at either end.
+  const metaHTML = rows
+    ? `<span class="sep-row">${meta.map(m => `<span class="sep-item">${m}</span>`).join('<span class="sep-sep"> | </span>')}</span>`
+    : meta.join(' | ');
 
-  const chipsHTML = gp.map(p => {
+  const chipsHTML = gp.map((p, i) => {
     const cls = `chip ${p.is_winner ? 'winner' : ''}${isSelf(p) ? ' self' : ''}`;
+    const star = p.is_winner ? '<span class="win-star">👑</span>' : '';
     return `<div class="${cls}">
-      ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
+      ${rows ? `<span class="chip-seat">${i + 1}</span>` : star}
       <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
         <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${_esc(p.character)}</a></div>
         ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>` : ''}
       </div>
+      ${rows ? star : ''}
     </div>`;
   }).join('');
 
   return `
     <div class="card-body">
-      <div class="card-top">
+      <div class="card-top${rows ? ' card-top-wrap' : ''}">
         <div class="card-date">${fmtDateTime(g.played_at)}</div>
-        <div class="card-meta">${meta}</div>
+        <div class="card-meta">${metaHTML}</div>
       </div>
-      <div class="card-players">${chipsHTML}</div>
+      <div class="card-players${rows ? ' rows' : ''}">${chipsHTML}</div>
     </div>
     ${actions}`;
 }
@@ -53,13 +65,14 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
 // Wrap the HTML in a <div class="game-card"> and attach the optional
 // location-click handler. Callers that just need HTML should call
 // buildGameCardHTML directly.
-function buildGameCard(g, gp, { isSelf, actions, onLocationClick } = {}) {
+function buildGameCard(g, gp, { isSelf, actions, onLocationClick, layout } = {}) {
   const card = document.createElement('div');
   card.className = 'game-card';
   card.innerHTML = buildGameCardHTML(g, gp, {
     isSelf,
     actions,
     locationClickable: !!onLocationClick,
+    layout,
   });
   if (onLocationClick && g.location) {
     card.querySelector('.card-loc-btn')?.addEventListener('click', e => {
@@ -88,3 +101,25 @@ function appendLoadMore(container, onLoadMore) {
   btn.onclick = () => { btn.disabled = true; onLoadMore(); };
   container.appendChild(btn);
 }
+
+// Rows layout: split each card's details into lines that fit beside the date,
+// a "|" never ending or starting a line (same logic as the New Game legend).
+// Call after the cards are in the page; it re-runs by itself when the window
+// width changes.
+let _cardMetaResize = null;
+function layoutGameCardMeta(root = document) {
+  if (!_cardMetaResize) {
+    _cardMetaResize = true;
+    let t = null;
+    window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => layoutGameCardMeta(), 150); });
+  }
+  for (const top of root.querySelectorAll('.card-top-wrap')) {
+    const date = top.querySelector('.card-date');
+    const meta = top.querySelector('.card-meta');
+    if (!date || !meta) continue;
+    const items = [...meta.querySelectorAll('.sep-item')].map(it => it.firstChild && it.childNodes.length === 1 && it.firstChild.nodeType === 1 ? it.firstChild : it.innerHTML);
+    const gap = parseFloat(getComputedStyle(top).columnGap) || 8;
+    layoutSeparatedRows(meta, items, top.clientWidth - date.offsetWidth - gap);
+  }
+}
+

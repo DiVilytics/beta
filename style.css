@@ -244,7 +244,9 @@ a.chip {
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-.chip.self { outline: 1px solid rgba(124, 106, 247, 0.45); outline-offset: -2px; }
+/* Your own chip (signed-in player, on every page): a purple ring inside
+   the chip's border, strong enough to stay visible on a gold winner chip too. */
+.chip.self { outline: 1.5px solid rgba(124, 106, 247, 0.85); outline-offset: -3px; }
 
 /* Inline links within chips */
 .chip-char a.char-link {
@@ -322,8 +324,8 @@ a.pace-dot:hover { transform: scale(1.3); }
 }
 .live-info {
   text-align: center;
-  font-size: 12px;
-  color: var(--dim);
+  font-size: 13px;
+  color: var(--muted);
   margin-top: 4px;
 }
 .live-status::before {
@@ -799,6 +801,21 @@ main {
 .card-loc-btn:hover { text-decoration: underline; text-underline-offset: 2px; }
 
 .card-players { display: flex; flex-wrap: wrap; gap: 6px; }
+/* layout: 'rows' (game-card.js): the same chips, one row per player in play
+   order, with a seat number and the crown at the end so portraits line up.
+   Phones: one column. Wider screens: two columns (seats 1 2 / 3 4 / 5 6), so
+   a game never takes more than 3 rows. Rows are a bit slimmer than chips (same 32px portraits). */
+.card-players.rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+@media (min-width: 520px) { .card-players.rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.card-players.rows .chip { display: flex; min-width: 0; min-height: 42px; padding: 4px 10px; box-sizing: border-box; }
+.card-players.rows .chip-body { line-height: 1.35; }
+.card-players.rows .chip-body { flex: 1; }
+.card-players.rows .chip-char,
+.card-players.rows .chip-nick { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-seat { width: 12px; flex-shrink: 0; text-align: right; font-size: 11px; font-weight: 700; color: var(--dim); }
+/* Rows layout: the date stays on one line and the meta wraps on the right. */
+.card-top-wrap .card-date { white-space: nowrap; }
+.card-top-wrap .card-meta { flex-shrink: 1; min-width: 0; }
 
 /* Character-primary chip */
 .chip {
@@ -1068,11 +1085,12 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   flex: 1 1 auto;
   min-width: 0;
 }
-/* Each "symbol = meaning" pair stays on one line; _layoutLegend() groups pairs
-   into balanced .legend-row lines, with separators only between pairs on a row. */
-.players-legend .legend-row  { display: block; }
-.players-legend .legend-item { white-space: nowrap; }
-.players-legend .legend-sep  { white-space: pre; }
+/* layoutSeparatedRows() (ui.js): each item stays on one line, items are grouped
+   into balanced .sep-row lines, with separators only between items on a row.
+   Used by the New Game legend and the game cards' details line. */
+.sep-row  { display: block; }
+.sep-item { white-space: nowrap; }
+.sep-sep  { white-space: pre; }
 
 .row-num { font-size: 12px; color: var(--dim); width: 16px; text-align: right; flex-shrink: 0; margin-right: 8px; }
 .drag-handle {
@@ -2262,6 +2280,8 @@ select:disabled {
   letter-spacing: 0.07em;
   margin-bottom: 8px;
 }
+/* Release year after a box name, e.g. "The Worst Takes It All (2018)". */
+.cs-box-year { font-weight: 400; color: var(--dim); }
 
 .char-roster {
   display: grid;

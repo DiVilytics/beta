@@ -1049,7 +1049,7 @@
       {"name": "King Richard", "count": 1, "type": "Hero", "strength": "5", "text": "Prince John cannot play Effects."},
       {"name": "Lady Kluck", "count": 1, "type": "Hero", "strength": "6", "text": "Lady Kluck cannot be played or moved to The Jail."},
       {"name": "Little John", "count": 1, "type": "Hero", "strength": "5", "text": "The amount of Power that Prince John gains from each card or action is reduced by 1 Power."},
-      {"name": "Maid Marian", "count": 1, "type": "Hero", "strength": "3", "text": "When Maid Marian is defeated, find Robin Hood and play him"},
+      {"name": "Maid Marian", "count": 1, "type": "Hero", "strength": "3", "text": "When Maid Marian is defeated, find Robin Hood and play him."},
       {"name": "Robin Hood", "count": 1, "type": "Hero", "strength": "5", "text": "When Robin Hood is revealed or found, you MUST PLAY HIM IMMEDIATELY to Sherwood Forest. Any other Fate cards revealed during this action are discarded.\nWhen Robin Hood is defeated, move him to The Jail."},
       {"name": "Skippy", "count": 1, "type": "Hero", "strength": "2", "text": "Wolf Archers cannot be used to defeat Skippy."},
       {"name": "Toby", "count": 1, "type": "Hero", "strength": "2", "text": "When Toby is defeated, shuffle him back into Prince John's Fate deck."}

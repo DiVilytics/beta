@@ -382,6 +382,7 @@ function _renderGamesList(keepIds = pfFilteredGameIds()) {
     const gp = sortGamePlayers(byGame[g.id] || []);
     list.appendChild(buildProfileCard(g, gp));
   }
+  layoutGameCardMeta(list);
   if (hasMore) appendLoadMore(list, pfLoadMore);
 
   if (_pfScrollToId) {
@@ -405,7 +406,7 @@ function buildProfileCard(g, gp) {
       ${role.isCreator ? `<button class="btn btn-danger btn-sm" onclick="pfDeleteGame('${g.id}')">Delete</button>` : ''}
     </div>` : '';
   const me = getCurrentUser();
-  const card = buildGameCard(g, gp, { isSelf: p => me && p.user_id === me.id, actions, onLocationClick: pfSetLocationFilter });
+  const card = buildGameCard(g, gp, { isSelf: p => me && p.user_id === me.id, actions, onLocationClick: pfSetLocationFilter, layout: 'rows' });
   card.id = `pf-game-${g.id}`;   // so we can scroll back to it after opening a game
   return card;
 }

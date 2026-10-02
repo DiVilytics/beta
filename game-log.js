@@ -259,6 +259,7 @@ function render() {
     const gp = sortGamePlayers(byGame[g.id] || []);
     root.appendChild(buildCard(g, gp));
   }
+  layoutGameCardMeta(root);
 
   if (_hasMore) appendLoadMore(root, () => load(false));
 }
@@ -268,6 +269,7 @@ function buildCard(g, gp) {
   return buildGameCard(g, gp, {
     isSelf: p => me && p.user_id === me.id,
     onLocationClick: loc => _applyLocationOption(loc),
+    layout: 'rows',
   });
 }
 
