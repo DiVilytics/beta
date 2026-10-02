@@ -660,7 +660,7 @@ function openCardSheet(i) {
   document.getElementById('cardTitle').textContent = c.name;
   document.getElementById('cardBody').innerHTML = `
     <div class="cs-card-stats">
-      <div class="cs-card-stat"><span>Type</span><strong class="${_deckTypeClass(c.type)}"><span class="cs-deck-dot"></span>${_esc(c.type)}</strong></div>
+      <div class="cs-card-stat"><span>Type</span><strong class="${_deckTypeClass(c.type)} cs-deck-type">${_esc(c.type)}</strong></div>
       <div class="cs-card-stat"><span>Copies</span><strong>${c.count}</strong></div>
       ${stat('Cost', c.cost)}
       ${stat('Strength', c.strength)}
@@ -698,7 +698,7 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false }
         const lbl  = n === 1 ? t : (DECK_PLURAL[t] || `${t}s`);
         return `
           <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}" data-i="${i}">
-            <div class="cs-adv-title"><span class="cs-deck-dot"></span>${_esc(lbl)} | ${n}</div>
+            <div class="cs-adv-title cs-deck-title"><span class="cs-deck-type">${_esc(lbl)}</span><span>×${n}</span></div>
             ${list.map(c => `
               <button class="cs-deck-row" type="button" onclick="openCardSheet(${_deckCards.push(c) - 1})">
                 <span class="cs-deck-card">
