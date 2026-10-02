@@ -2087,7 +2087,9 @@ select:disabled {
 /* .claim-row.winner shares .chip.winner (winner highlight, above). */
 .claim-row.mine { border-color: rgba(124, 106, 247, 0.4); }
 
-.claim-char { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+/* Seat number, portrait, villain + nickname, then the crown at the end (like the game cards). */
+.claim-char { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.claim-char .win-star { margin-left: auto; }
 .claim-char .char-portrait { width: 32px; height: 32px; }
 .claim-row.winner .claim-char { color: var(--gold); }
 .claim-who  { min-width: 0; line-height: 1.25; }

@@ -37,7 +37,7 @@ async function init() {
   }
 
   claimGame    = game;
-  claimPlayers = players || [];
+  claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
 
   render();
 }
@@ -86,7 +86,7 @@ function render() {
 
   // Like the game cards: the player's nickname sits under the villain's name;
   // the right side only holds the action (Release your claim, or Claim).
-  const rowsHTML = claimPlayers.map(p => {
+  const rowsHTML = claimPlayers.map((p, i) => {
     const isMine = p.user_id === user.id;
     let nickHTML = '', actionHTML = '';
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
@@ -100,9 +100,10 @@ function render() {
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
-          ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
+          <span class="chip-seat">${i + 1}</span>
           ${charImgHTML(p.character)}
           <div class="claim-who"><div class="claim-name">${_esc(p.character)}</div>${nickHTML}</div>
+          ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
         </div>
         ${actionHTML}
       </div>`;
