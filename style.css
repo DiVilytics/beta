@@ -2423,6 +2423,10 @@ select:disabled {
   color: var(--muted);
 }
 
+/* Tutorial entry on the home page: accent-tinted so newcomers spot it. */
+.home-tutorial-link { background: var(--accent-d); border: 1px solid rgba(124, 106, 247, 0.28); }
+.home-tutorial-link .home-section-name { color: var(--accent); font-weight: 600; }
+
 .home-faq {
   margin-top: 2rem;
 }
@@ -2695,6 +2699,7 @@ select:disabled {
   .char-roster-item:hover                   { background: var(--s2); border-color: var(--s4); }
   .cs-option:hover                          { background: var(--s3); }
   .home-section-link:hover                  { background: var(--s2); }
+  .home-tutorial-link:hover                 { background: rgba(124, 106, 247, 0.2); }
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────────────────
