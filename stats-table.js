@@ -119,12 +119,10 @@ function renderStatTableHTML(rows, opts) {
               : `<div class="row-sub">${_esc(sub)}</div>`) : ''}
           </div>
         </div>
-        <div class="bar-cell">
-          <div class="bar-bg">
-            <div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div>
-          </div>
+        <div class="row-val row-val-stack">
+          <span>${dispVal}</span>
+          <div class="bar-bg"><div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div></div>
         </div>
-        <div class="row-val">${dispVal}</div>
         <div class="row-games">${dispSub}</div>
       </div>`;
   };
@@ -142,7 +140,6 @@ function renderStatTableHTML(rows, opts) {
       <div class="lb-head">
         <span>#</span>
         <span>${headLabel}</span>
-        <span></span>
         <span class="text-right">${statValueLabel(mode)}</span>
         <span class="text-right">${statSecondaryLabel(mode)}</span>
       </div>

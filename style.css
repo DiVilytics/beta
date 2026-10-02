@@ -1208,12 +1208,13 @@ select:disabled {
 .stat-box.hot .stat-val { color: var(--gold); }
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
-/* The last column is wider than its numbers need so its header ("# Games") has
-   clear space from the one before it ("% Wins") instead of running into it. */
+/* Rank | name | value with its bar underneath | secondary value. The last column
+   is wider than its numbers need so its header ("# Games") has clear space from
+   the one before it ("% Wins") instead of running into it. */
 .lb-head,
 .lb-row {
   display: grid;
-  grid-template-columns: 28px 1fr 80px 58px 72px;
+  grid-template-columns: 28px 1fr 72px 72px;
   padding: 9px 14px;
   align-items: center;
 }
@@ -1287,6 +1288,8 @@ select:disabled {
 .row-identity .player-avatar { width: 28px; height: 28px; flex-shrink: 0; }
 
 .row-val   { font-size: 14px; font-weight: 700; text-align: right; }
+/* Leaderboard / player tables: the value sits on top of its bar, which spans the column. */
+.row-val-stack { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
 .row-games { font-size: 12px; color: var(--muted); text-align: right; }
 
 .bar-cell { padding: 0 4px; }
@@ -2778,7 +2781,7 @@ select:disabled {
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
   .home-faq-list { grid-template-columns: 1fr; }
-  .lb-head, .lb-row                     { grid-template-columns: 24px 1fr 40px 52px 68px; }
+  .lb-head, .lb-row                     { grid-template-columns: 24px 1fr 56px 68px; }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 56px 68px; }
   .form-row input { font-size: 13px; }
   .filter-bulk-row .pace-color    { width: 22px; height: 22px; }
