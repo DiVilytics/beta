@@ -365,6 +365,8 @@ async function renderDetailPage(charName) {
   await _renderCharIdentity();
   document.getElementById('csSearchInput').disabled = false;
   _attachCharSearch();
+  renderDeck(charName);
+  renderFaqLink(charName);
 
   // Load bucketed stats via server-side aggregation (one RPC, no row-limit risk)
   const { data: buckets, error } = await db.rpc('character_bucket_stats', { char_name: charName });
@@ -399,7 +401,6 @@ async function renderDetailPage(charName) {
   }));
 
   render();
-  await renderFaq(charName);
 }
 
 async function _renderCharIdentity() {
@@ -581,22 +582,88 @@ function _adversariesSectionHTML() {
     </div>`;
 }
 
-// ── CHARACTER FAQ ─────────────────────────────────────────────────────────────
+// ── DECKS ─────────────────────────────────────────────────────────────────────
 
+// Card types in display order, coloured like the cards' type banner; anything
+// else (Titan, Curse, Witch, Maui, ...) follows in purple.
+const DECK_TYPES  = ['Ally', 'Hero', 'Effect', 'Item', 'Condition'];
+const DECK_PLURAL = { Ally: 'Allies', Hero: 'Heroes', Witch: 'Witches', 'Ally/Item': 'Ally/Item', 'Hero/Effect': 'Hero/Effect' };
 
-async function renderFaq(charName) {
+function _deckTypeClass(type) {
+  return DECK_TYPES.includes(type) ? `deck-${type.toLowerCase()}` : 'deck-other';
+}
+
+const _cardTotal = cards => cards.reduce((n, c) => n + c.count, 0);
+
+// One deck: a header with its total, an optional note, then one column per
+// card type. Main decks sort by copies then name; extras (`keepOrder`) keep the
+// wiki's order (e.g. Omnidroid v.X8, v.X9, v.10). Tiles count as tiles.
+function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false } = {}) {
+  const byType = new Map();
+  for (const c of cards) {
+    if (!byType.has(c.type)) byType.set(c.type, []);
+    byType.get(c.type).push(c);
+  }
+  const rank  = t => DECK_TYPES.includes(t) ? DECK_TYPES.indexOf(t) : DECK_TYPES.length;
+  const types = [...byType.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+  const total = _cardTotal(cards);
+  return `
+    <div class="pf-games-header mt-1-5">
+      <span class="pf-games-title">${_esc(title)}</span>
+      <span class="cs-deck-total">${total} ${unit}${total === 1 ? '' : 's'}</span>
+    </div>
+    ${note ? `<p class="cs-deck-note">${_esc(note)}</p>` : ''}
+    <div class="cs-deck">
+      ${types.map(t => {
+        const list = keepOrder ? byType.get(t) : byType.get(t).slice().sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+        const n    = _cardTotal(list);
+        const lbl  = n === 1 ? t : (DECK_PLURAL[t] || `${t}s`);
+        return `
+          <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}">
+            <div class="cs-adv-title"><span class="cs-deck-dot"></span>${_esc(lbl)} | ${n}</div>
+            ${list.map(c => `
+              <div class="cs-deck-row">
+                <span class="cs-deck-name">${_esc(c.name)}</span>
+                <span class="cs-deck-count">×${c.count}</span>
+              </div>`).join('')}
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// Villain deck, Fate deck, then any extra deck or tile (Maui deck, Merlin's
+// Transformation deck, Omnidroids, ...). Data: villain-decks.json.
+async function renderDeck(charName) {
+  const el = document.getElementById('csDeck');
+  if (!el) return;
+  const deck = (await loadVillainDecks())[charName];
+  if (!deck) { el.innerHTML = ''; return; }
+  el.innerHTML = _deckHTML('Villain deck', deck.villain)
+    + _deckHTML('Fate deck', deck.fate)
+    + (deck.extra || []).map(e => _deckHTML(e.title, e.cards, {
+        note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true,
+      })).join('')
+    + `<p class="cs-deck-src">Card lists from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>`;
+}
+
+// ── RULES FAQ LINK ────────────────────────────────────────────────────────────
+
+// The villain's rules clarifications live on faq.html; link there when it has
+// any. [TAG] reworks (e.g. "Ursula [I2E]") share their base villain's entries.
+async function renderFaqLink(charName) {
   const el = document.getElementById('csFaq');
   if (!el) return;
-  const faq   = await loadCharFaq();
-  const rules = faq[charName];
-  if (!rules || !rules.length) { el.innerHTML = ''; return; }
+  const base  = charName.replace(/\s*\[[^\]]+\]$/, '');
+  const rules = (await loadFaq()).villains?.[base] || [];
+  if (!rules.length) { el.innerHTML = ''; return; }
   el.innerHTML = `
-    <div class="home-faq mt-1-5">
-      <h2 class="home-faq-title">F.A.Q. <span>${_esc(charName)}</span></h2>
-      <div class="home-faq-list">
-        ${rules.map(r => `<div class="home-faq-item"><strong>${_esc(r.term)}</strong><span>${_esc(r.text)}</span></div>`).join('')}
+    <a class="home-section-link mt-1-5" href="faq.html?topic=${encodeURIComponent(base)}">
+      <span class="home-section-icon">📜</span>
+      <div class="home-section-text">
+        <span class="home-section-name">Rules FAQ</span>
+        <span class="home-section-desc">${rules.length} ${rules.length === 1 ? 'clarification' : 'clarifications'} for ${_esc(base)}</span>
       </div>
-    </div>`;
+    </a>`;
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

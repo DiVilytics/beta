@@ -1,0 +1,241 @@
+{
+  "general": [
+    {
+      "title": "Core rules",
+      "items": [
+        { "term": "Starting a turn", "text": "Once you move your mover to a new location, your turn has officially begun. To keep tournament play running smoothly, you can take back your move (and go to a different location) only if you have NOT yet taken any action at the new location. If you have taken even one action there, you must stay and carry on with your remaining actions." },
+        { "term": "Playing a Condition", "text": "You can't play a Condition unless you can do exactly what its text says." },
+        { "term": "0-Strength Heroes", "text": "A Hero with 0 Strength can be defeated with a Vanquish action without using Allies. You can still use Allies if you want; in that case they are not discarded after the Vanquish." },
+        { "term": "Locked locations", "text": "Items, Allies and Heroes can't be played or moved to locked locations. Items can't be attached to Heroes or Allies at locked locations, and Items at locked locations can't be activated." },
+        { "term": "Nothing below zero", "text": "No value in the game can go below zero." },
+        { "term": "Finding a card", "text": "When a card tells you to FIND another card, look first in the Realm, then in the matching discard pile, then in the matching deck." },
+        { "term": "Showing retrieved cards", "text": "To be fair to your opponents, when you retrieve a card of a specific category (Effect, Ally, etc.) from a discard pile or a deck, show it to them to prove it's the right kind. If you can retrieve any card, you don't need to show it." },
+        { "term": "Endless searches", "text": "Cards that reveal from a deck until a card of a specific type is found can loop forever if no copies of that card are left in the deck or discard pile. In that case the card can still be played, but its only effect is to reshuffle that whole deck, discard pile included.", "source": "Lord of the Board, playtester" },
+        { "term": "Discard-based Conditions", "text": "Conditions that trigger when an opponent discards cards can be used only when the opponent discards cards from their hand, either with the Discard Cards action or through other cards' effects (such as the Evil Queen's Magic Tomes). Discarding cards in any other way doesn't trigger them." }
+      ]
+    },
+    {
+      "title": "Cards that make you lose tokens",
+      "intro": "Prospero Hall era cards are read as below, as clarified by designer Stephanie Straw. Ravensburger era cards are read as below because designer Mike Mulvihill hasn't clarified them.",
+      "items": [
+        { "term": "Shadow Spirits", "villain": "Dr. Facilier", "text": "Lose up to 2 Power.", "source": "Stephanie Straw, designer" },
+        { "term": "Love's First Kiss", "villain": "Evil Queen", "text": "Evil Queen loses up to 1 Poison.", "source": "Stephanie Straw, designer" },
+        { "term": "Chicha", "villain": "Yzma", "text": "Yzma loses up to 2 Power.", "source": "Stephanie Straw, designer" },
+        { "term": "Flynn Rider", "villain": "Mother Gothel", "text": "Mother Gothel loses up to 2 Trust.", "source": "Stephanie Straw, designer" },
+        { "term": "The Witches of Morva", "villain": "Horned King", "text": "Lose 2 Power, and exactly 2.", "source": "No clarification from designer Mike Mulvihill" },
+        { "term": "Pig Maui", "villain": "Tamatoa", "text": "Tamatoa loses 3 Power, and exactly 3.", "source": "No clarification from designer Mike Mulvihill" }
+      ]
+    },
+    {
+      "title": "Cards worded with “any”",
+      "intro": "These cards say “any” in the original English text. Read them as follows.",
+      "items": [
+        { "term": "Beast", "villain": "Gaston", "text": "“any Allies to any other location”: move any number of Allies to one single location." },
+        { "term": "Mrs. Potts and Chip", "villain": "Gaston", "text": "“all Heroes”: move all Heroes." },
+        { "term": "The Black Cauldron", "villain": "Horned King", "text": "“any location”: discard a Cauldron Born from one single location." },
+        { "term": "Doli", "villain": "Horned King", "text": "“each Hero to any other location”: move each Hero to one single location." },
+        { "term": "The Key", "villain": "Lady Tremaine", "text": "“any Hero”: move exactly one Hero." },
+        { "term": "Not Age Appropriate", "villain": "Lotso", "text": "“any Hero”: move exactly one Hero (or Buzz Lightyear, whether Guardian or Ally)." },
+        { "term": "Jessie", "villain": "Lotso", "text": "“any Ally”: discard exactly one Ally." },
+        { "term": "Woody", "villain": "Lotso", "text": "“all Heroes to any other locations”: move all Heroes, possibly each to a different location." },
+        { "term": "I'll Make the Rules", "villain": "Madam Mim", "text": "“any Transformation”: defeat exactly one Transformation." },
+        { "term": "Knowledge and Wisdom", "villain": "Madam Mim", "text": "“any Transformation”: move exactly one Transformation." },
+        { "term": "Dash", "villain": "Syndrome", "text": "“any Hero”: move exactly one Hero." },
+        { "term": "Making Christmastime", "villain": "Oogie Boogie", "text": "“any action”: take exactly one action." },
+        { "term": "Bathtub", "villain": "Oogie Boogie", "text": "“any number of Allies”: move any number of Allies." },
+        { "term": "Citizens of Halloween Town", "villain": "Oogie Boogie", "text": "“any other Hero”: must be defeated before defeating any single other Hero." },
+        { "term": "Turbo-Tastic", "villain": "King Candy", "text": "“any of your three available actions”: you can take all, none or only some of them." },
+        { "term": "Can't Be Allowed to Race", "villain": "King Candy", "text": "“any number”: move any number of Allies." },
+        { "term": "Bagheera", "villain": "Shere Khan", "text": "“all… to any other locations”: move all Heroes and Allies, possibly each to a different location." },
+        { "term": "The Chase", "villain": "Davy Jones", "text": "“any Hero”: move exactly one Hero." },
+        { "term": "Tree Monster", "villain": "Tamatoa", "text": "“any card”: move exactly one card." }
+      ]
+    },
+    {
+      "title": "Cards that give access to unavailable actions",
+      "intro": "Some cards let you take actions that are normally unavailable: covered by Heroes or tokens, locked, already taken, or at another location. Some give access to the action, ignoring what blocks it; others let you take the action directly, through the card itself.",
+      "items": [
+        { "term": "Raven", "villain": "Maleficent", "text": "Lets you take an action at another location. Maleficent can take it again if she then moves to that location." },
+        { "term": "Grow Giant", "villain": "Ursula", "text": "Lets you take an action at an adjacent location. The same action can be taken again with a second copy of Grow Giant." },
+        { "term": "Black of Night", "villain": "Evil Queen", "text": "Lets you take an action at Evil Queen's location, even if it has already been taken." },
+        { "term": "Bravo! Bravo!", "villain": "Shere Khan", "text": "Lets you take a covered action. The same action can be taken again with another copy of Bravo! Bravo!." },
+        { "term": "Sir Hiss, Whatever It Takes, I'll Fix Ya!, Trapped", "villain": "Prince John, Cruella de Vil, Evil Queen, Tamatoa", "text": "These give access to an action covered by a Hero, as if that Hero weren't there. So the action counts as taken, and you can't take it again if the Hero covering it is moved or defeated." }
+      ]
+    }
+  ],
+  "villains": {
+    "Captain Hook": [
+      { "term": "Peter Pan", "text": "If Peter Pan is the first card revealed during a Fate action, the other card must be revealed too, because both are revealed at the same time.", "source": "Rulebook" }
+    ],
+    "Maleficent": [
+      { "term": "Fauna & Dreamless Sleep", "text": "If Fauna is played to a location with two Dreamless Sleep, only one copy is discarded.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Forest of Thorns & Dreamless Sleep", "text": "If Forest of Thorns and Dreamless Sleep are at the same location and a Hero with 4 or more Strength is played there, Forest of Thorns is discarded. Then the Hero gets -2 Strength from Dreamless Sleep.", "source": "Ruby Wishnietsky, designer" }
+    ],
+    "Jafar": [
+      { "term": "Deception", "text": "Its trigger (an opponent has two or more Items in their Realm) also counts Fate Items. It doesn't start a Fate action, so it doesn't trigger Conditions that react to a Fate action.", "source": "Rulebook" },
+      { "term": "Hypnotize", "text": "Each hypnotized Hero counts as an Ally for other players' Conditions. For consistency with similar mechanics, hypnotized Heroes move to the bottom of the board, at the same location.", "source": "Villain Guide" },
+      { "term": "Sorcerous Power", "text": "Both actions are optional: you can play the card without taking either of them.", "source": "Card text" },
+      { "term": "Abu & Aladdin", "text": "If Abu is played to Aladdin's location (or vice versa), Abu can NOT take an Item already attached to Aladdin (and vice versa).", "source": "Ravensburger Italy customer service" }
+    ],
+    "Prince John": [
+      { "term": "Set a Trap", "text": "Moving an Ally is optional, but the Vanquish action is mandatory. The Ally you moved doesn't have to take part in the Vanquish (the Italian edition is worded inaccurately).", "source": "Card text" },
+      { "term": "Sir Hiss", "text": "Sir Hiss lets you take a covered action only once. You can't take that action again even if the Hero covering it is defeated.", "source": "Rulebook" },
+      { "term": "Steal from the Rich", "text": "When the targeted Hero is defeated, the Power “returns” to Prince John rather than being “gained”, so it doesn't count for cards triggered by gaining Power.", "source": "Aaron Donogh, designer" },
+      { "term": "Maid Marian", "text": "If Robin Hood is already in the Realm when Maid Marian is defeated and he holds Power stolen with Steal from the Rich, that Power goes back to the Cauldron, not to Prince John. If Maid Marian is defeated by an Ally with the Golden Arrow, Robin Hood is found before the Golden Arrow's Power is gained, so you gain only 1 Power.", "source": "Rulebook" },
+      { "term": "Golden Arrow", "text": "If the Golden Arrow is attached to an Ally used to defeat Robin Hood, you gain 2 Power, because Robin Hood leaves the Realm before the Golden Arrow's effect triggers.", "source": "Rulebook" },
+      { "term": "Robin Hood", "text": "Power that “returns” to Prince John from a Hero targeted by Steal from the Rich is NOT affected by Robin Hood, so you don't get 1 Power less. The same goes for Power stolen by Little John.", "source": "Aaron Donogh, designer" }
+    ],
+    "Queen of Hearts": [
+      { "term": "Shrunk Heroes", "text": "If a Shrunk Hero shares a location with other Heroes, it is the only Hero there that covers an action. The others cover nothing until the Shrunk Hero is defeated or moved.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Size priority", "text": "Size effects take priority in this order: Enlarged, then Shrunk, then Normal.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Choosing the covered action", "text": "When a Hero is Shrunk or Enlarged, the player doing it (Queen of Hearts, or an opponent through a Fate action) chooses which action it covers. The covered actions can't change until the Hero returns to normal and is Shrunk or Enlarged again.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Altered Heroes", "text": "Shrunk and Enlarged Heroes ALWAYS have effect and can involve the same location AT THE SAME TIME, even several at once. An “altered” Hero always covers the actions it has to cover: 1 for Shrunk Heroes, 3 for Enlarged Heroes.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Enlarged and Normal Heroes", "text": "Enlarged and Normal Heroes CAN involve the same location and both cover actions there. For example, with one Hero at the Courtyard and one at the Hedge Maze, if the Courtyard Hero is Enlarged, both Hedge Maze actions are covered (one by the Enlarged Hero, both by the Normal Hero).", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Shrunk and Normal Heroes", "text": "Shrunk and Normal Heroes CAN'T involve the same location. If one or more Shrunk Heroes are at a location, any Normal Hero there covers no actions until the Shrunk Heroes are moved or defeated. If two Heroes are already at a location and one of them is Shrunk, slide the Normal Hero up so it does NOT cover both actions, leaving uncovered the one the Shrunk Hero freed.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Fury", "text": "Can only Shrink normal-sized Heroes; it can't return Enlarged Heroes to normal.", "source": "Card text" }
+    ],
+    "Dr. Facilier": [
+      { "term": "Desperation", "text": "Triggers when an opponent discards two or more cards from their hand, through the Discard Cards action or other cards' effects. They don't have to be discarded all at once. Playing an Effect doesn't count as discarding a card, and neither does discarding Allies used in a Vanquish.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Terror", "text": "The Power needed to trigger this Condition doesn't have to be gained all at once.", "source": "Rulebook" }
+    ],
+    "Evil Queen": [
+      { "term": "I'll Fix Ya!", "text": "Can be used even if there is more than one Hero at that location.", "source": "Card text" },
+      { "term": "Magic Mirror & Mummy Dust", "text": "The Fate card and the Poison token are drawn and gained only once the Fate action is over, not before. Drawing a card with Magic Mirror stays optional despite the card text, as stated in the Villain Guide.", "source": "Ruby Wishnietsky, designer" },
+      { "term": "Love's First Kiss", "text": "Can be played if Evil Queen has no Poison, but not if there are no Heroes in the discard pile.", "source": "Stephanie Straw, designer" }
+    ],
+    "Hades": [
+      { "term": "Get Ready to Rumble!", "text": "When moved two locations, Titans skip any location in between (so they avoid the abilities of Heroes placed there) and can use their ability only once, because it is a single move.", "source": "Card text" },
+      { "term": "Pegasus", "text": "Moving a Titan with Pegasus triggers its ability.", "source": "Card text" },
+      { "term": "Titans", "text": "Titans are not Allies, so they don't trigger other players' Conditions that refer to Allies.", "source": "Rulebook" }
+    ],
+    "Scar": [
+      { "term": "Be Prepared", "text": "It can't be put into your own hand, because it goes to the discard pile only after its Effect is over.", "source": "Rulebook" },
+      { "term": "Injustice", "text": "The Fate cards looked at can both be discarded, both kept, or one discarded and one kept. If you have two copies of Injustice in hand and want to play them, you must play both at the same time and resolve them one at a time.", "source": "Rulebook" },
+      { "term": "Banzai the Hyena", "text": "His ability works only when other Hyenas are discarded from his location. If Banzai himself is discarded, you gain no Power.", "source": "Rulebook" },
+      { "term": "Rafiki's Stick", "text": "If a Hero with Rafiki's Stick attached is defeated, it does NOT trigger other players' Conditions based on defeating Heroes (such as Ursula's Arrogance) because, per the rulebook, a Hero is defeated when it is discarded from the Realm after a Vanquish action or a card's effect.", "source": "Rulebook" }
+    ],
+    "Ratigan": [
+      { "term": "Airship", "text": "The Item or Ally to move must be at the Airship's location.", "source": "Card text (the Italian edition omits “at its location”)" }
+    ],
+    "Yzma": [
+      { "term": "Beauty Sleep", "text": "Yzma can choose to take one, all or none of Beauty Sleep's actions at the start of her next turn. A Cruel Irony can play this card only if it is the first and only action of the turn.", "source": "Card text" },
+      { "term": "Ferocity", "text": "Watch out for the misprint in some editions: it's 3 or more to defeat a Hero with 3 or less.", "source": "Card text" },
+      { "term": "Dagger", "text": "If Kronk becomes a Hero with the Dagger already attached, the Dagger stays attached to him at the top of the Realm. When Kronk is discarded from the Realm, the Dagger returns to the player's hand.", "source": "Card text" },
+      { "term": "Chicha", "text": "Read Chicha as “loses UP TO 2 Power”: if Yzma has fewer than 2 Power when she moves to Chicha's location, she loses them all.", "source": "Stephanie Straw, designer" },
+      { "term": "Kronk & The Path That Rocks", "text": "When Kronk reaches 3 Power and moves to the top of the Realm, the Power stays on him, because The Path That Rocks can collect it at any time.", "source": "Card text" },
+      { "term": "Beware the Groove", "text": "If it is the only card left in the Fate decks: choose a Hero from the discard pile; shuffle the discard pile, without the chosen Hero and Beware the Groove, to form four new decks; shuffle the chosen Hero into up to two decks; discard Beware the Groove (its effect is resolved).", "source": "Ruby & Karla, designers" },
+      { "term": "Fate decks", "text": "Fate cards that shuffle one or more decks can also target the deck they were drawn from. If no card in a Fate deck can be played, the deck is reshuffled and put back. No card is discarded.", "source": "Rulebook" }
+    ],
+    "Pete": [
+      { "term": "Bandit", "text": "If you play more than one Bandit through its ability, you still pay the cost of each Bandit.", "source": "Card text" },
+      { "term": "Parrot", "text": "Taking a card from the discard pile is optional.", "source": "Stephanie Straw, designer" },
+      { "term": "Goofy", "text": "His ability swaps two Goal tokens that are next to each other.", "source": "Mistranslated in some Italian editions" },
+      { "term": "Power Play & Mickey Mouse", "text": "If Pete spends 6 Power with Mickey Mouse in the Realm, Power Play can't be completed. But if Pete spends part of the 6 Power, defeats Mickey Mouse and then spends the rest, Power Play can be completed.", "source": "Card text" }
+    ],
+    "Mother Gothel": [
+      { "term": "Egomania", "text": "Can also be triggered when an Item or Ally is moved during a Fate action, and when a Hero with an Item attached is moved.", "source": "Rulebook" },
+      { "term": "Everyone Has a Dream & Now I'm the Bad Guy", "text": "The usual rule applies: you must be able to do what the card says to play it. If Mother Gothel has no Trust to lose, they can't be played.", "source": "Rulebook" },
+      { "term": "Flynn Rider", "text": "Can be played even if Mother Gothel has fewer than two Trust. If he is defeated, Mother Gothel still gains 2 Trust.", "source": "Stephanie Straw, designer" }
+    ],
+    "Gaston": [
+      { "term": "Beautiful as Me", "text": "Every extra action granted by other opponents' cards counts toward the minimum of four needed to trigger Beautiful as Me. If the last of the four opponent actions is a Fate action (against Gaston or another player), wait for it to finish before playing Beautiful as Me.", "source": "Rulebook" },
+      { "term": "Take Me Instead", "text": "Revealed Fate cards that aren't Heroes are not discarded: shuffle them back into the Fate deck. If the Hero played by Take Me Instead is Belle, you can't remove an Obstacle.", "source": "Card text" },
+      { "term": "Get Out!", "text": "Unlike Come Into the Light, it doesn't say “up to”. So Get Out! removes exactly 3 Obstacles.", "source": "Card text" },
+      { "term": "Lefou", "text": "Lefou's ability is mandatory, so the Allies used in the Vanquish return to the player's hand, Lefou included if he took part.", "source": "Card text" },
+      { "term": "Mrs. Potts and Chip", "text": "If Maurice's Invention is attached to a Hero, when Mrs. Potts and Chip are played it can be attached to any other Hero.", "source": "Lord of the Board, playtester" },
+      { "term": "The Rose", "text": "If the other revealed Fate card can't be played, or The Rose was revealed through Jafar's Deception or Ursula's Trickery, you can still resolve The Rose's full text. The Rose is discarded after the other revealed Fate card is played. So if the discard pile must be reshuffled to draw two more Fate cards, The Rose is shuffled in with it and can be drawn again.", "source": "Ravensburger America YouTube channel" },
+      { "term": "Beast", "text": "His ability is mandatory, even if Gaston played him through Take Me Instead. So any number of Allies at the location where Beast is played must be moved to one single location.", "source": "Card text" },
+      { "term": "It Is You", "text": "Can be played ONLY if at least one Obstacle is missing from every location. If even one location still has both Obstacles, It Is You can't be played.", "source": "Card text" },
+      { "term": "Maurice", "text": "When Maurice is played and Maurice's Invention is found, the Invention can be attached to him or to any other Hero at his location.", "source": "Card text" },
+      { "term": "Maurice's Invention", "text": "It's an Item to attach to a Hero: if there are no Heroes in the Realm, it can't be played. Ignore the Strength value in the bottom-left corner, it's a misprint.", "source": "Lord of the Board, playtester" },
+      { "term": "Show Me the Beast!", "text": "The exact purpose of this card is still unclear. Suggested use: remove an Obstacle if Beast is in play, or replace one if Belle is in play, to set up cards that remove a given number of Obstacles at once. Played while both Beast and Belle are in play, it only gives back the Power spent to play it.", "source": "Lord of the Board, playtester" },
+      { "term": "Saving My Life", "text": "Can be used to replace even a single Obstacle at a single location, because the original text says “all”.", "source": "Card text" }
+    ],
+    "Lady Tremaine": [
+      { "term": "I Said “If”", "text": "It isn't shuffled into the reshuffled deck.", "source": "Rulebook" },
+      { "term": "Vicious Practical Jokes", "text": "You can choose a card that can't be played, cancelling the Fate. If you choose an Effect, the Fating player decides how to apply it. If you choose a Hero, Lady Tremaine chooses where to play it, but the Fating player resolves its effects. This card can't override the restrictions of The Prince, the Glass Slipper and Ball Gown Cinderella.", "source": "Mike Mulvihill, designer" },
+      { "term": "Lucifer", "text": "Every Hero that shares Lucifer's location at any moment, whether the Hero or Lucifer is moved or played there, is Trapped. The Trapped token stays on the Hero even when Lucifer is moved or discarded from the Trapped Hero's location.", "source": "Lord of the Board, playtester" },
+      { "term": "The Key", "text": "Can be played even if Cinderella isn't in play. Ball Gown Cinderella can be moved but not Trapped.", "source": "Mike Mulvihill, designer; confirmed by Lord of the Board, playtester" },
+      { "term": "Jaq", "text": "Can't discard the Glass Slipper.", "source": "Lord of the Board and other playtesters" },
+      { "term": "The Ballroom", "text": "The only cards that can be moved or played to The Ballroom are The Prince, Ball Gown Cinderella, Ball Gown Anastasia and Ball Gown Drizella. Items can't be played there either, otherwise they would escape Lucifer's protection and Jaq's effects.", "source": "Villain Guide" },
+      { "term": "The Prince", "text": "When The Prince is revealed during a Fate action, he must be played immediately and the other revealed Fate card is discarded.", "source": "Lord of the Board, playtester" },
+      { "term": "Ball Gown Cinderella", "text": "If Ball Gown Cinderella replaces a Trapped Cinderella, the Trapped token is removed, since Ball Gown Cinderella can't be Trapped.", "source": "Card text" }
+    ],
+    "Horned King": [
+      { "term": "Cauldron Born", "text": "They can only be played by replacing Ancient Soldiers before the start of the Horned King's turn, if The Power of the Black Cauldron is showing. Their 0 Cost (top left) does NOT mean they can be played for free with a Play a Card action.", "source": "Villain Guide" },
+      { "term": "We Have Made a Bargain", "text": "It isn't shuffled back in with the Fate discard pile.", "source": "Rulebook" },
+      { "term": "The Witches of Morva", "text": "The Fating player decides what the Horned King must do. If they choose discarding cards, the Horned King picks which ones. The Horned King can't lose Power if he has fewer than 2.", "source": "Card text (inaccurate Italian translation)" }
+    ],
+    "Madam Mim": [
+      { "term": "I'll Make the Rules", "text": "Can defeat ONE of Merlin's Transformations, not all of them.", "source": "Card text" },
+      { "term": "Magnificent, Marvelous, Mad", "text": "It isn't shuffled back in with the other cards in the Villain discard pile.", "source": "Rulebook" },
+      { "term": "Archimedes", "text": "Can't be played if Merlin's Transformation deck is empty.", "source": "Card text" }
+    ],
+    "Lotso": [
+      { "term": "Welcome to Sunnyside", "text": "See Endless searches in the general rules.", "source": "Rulebook" },
+      { "term": "Smells Like Strawberries", "text": "Wait for the Fate action to end before using this Condition. It isn't shuffled back in with the rest of the discard pile.", "source": "Rulebook" },
+      { "term": "Big Baby", "text": "The other revealed cards are shuffled back into the Fate deck.", "source": "Card text" },
+      { "term": "Daisy's Locket", "text": "Can be played even if Big Baby isn't in Lotso's Realm.", "source": "Card text" },
+      { "term": "Woody", "text": "Heroes can be moved to different locations, outside the Caterpillar Room.", "source": "Card text" },
+      { "term": "Woody's Hat", "text": "When you play the Hat, put a -1 Strength token on every Hero except Woody. Rex gets -1 from Woody's Hat when he is the only Hero at a location (and keeps it when other Heroes are later played there), when all the other Heroes move away from his location, and when he is played to a location that already has other Heroes. If Bonnie's Toys is played while Woody's Hat is in play, add a -1 Strength token after applying Bonnie's Toys, except on Rex if he shares a location with other Heroes. When Woody's Hat is discarded, remove a -1 Strength token from every Hero in the Realm.", "source": "Shared ruling with the US community (presumably playtester-approved)" }
+    ],
+    "Syndrome": [
+      { "term": "Identification Please", "text": "Can't move Omnidroid v.10 while it's at the top of the Realm.", "source": "Rulebook" },
+      { "term": "Who's Super Now?", "text": "Refers to the actual cost the opponent paid for a card, not the printed cost.", "source": "Card text" },
+      { "term": "Omnidroid v.10", "text": "It's always played at Downtown Metroville: at the top of the Realm if Syndrome's Remote isn't in play or Syndrome controls it, at the bottom if the Remote is attached to a Hero. Each time a Hero is played and the Remote is attached to it, Omnidroid v.10 moves to that location, at the bottom. When the Hero with the Remote is defeated, Omnidroid v.10 moves up at the same location and the Remote drops to the bottom. Technically, activating the Remote and flipping Omnidroid v.10 to its Destroyed side should be your last action to win. You can do it FIRST and THEN defeat the remaining Heroes, but it's not recommended: the Destroyed Omnidroid would stay at the top of the Realm for good, blocking actions, and could no longer be moved (as the Villain Guide says) or used to defeat the remaining Heroes.", "source": "Lord of the Board, playtester" },
+      { "term": "Teamwork", "text": "Discard it before looking at the top six cards of the deck. If the other revealed Fate card can't be played, Teamwork can still be played. If two copies of Teamwork are revealed, they cancel each other out and only one copy is played. If the discard pile must be reshuffled to reveal six cards, Teamwork is NOT shuffled in, because its effect hasn't finished resolving.", "source": "Rulebook + presumed playtester clarification" }
+    ],
+    "Oogie Boogie": [
+      { "term": "It's a Vacation", "text": "If It's a Vacation discards Jack Skellington, he counts as a Hero, since he wasn't played from the Fate deck.", "source": "Card text" },
+      { "term": "Bats & What Have We Here?", "text": "If you use What Have We Here? and roll 8 or more, the Bats are not discarded, because What Have We Here?'s Effect is in play and finishes resolving before the Bats' one.", "source": "Rulebook" },
+      { "term": "What Did Santa Bring You?", "text": "You can choose not to discard any card and still draw two.", "source": "Card text" },
+      { "term": "Hello, Oogie!", "text": "Apply the -2 to the dice roll only after any other modifiers from other cards' abilities, Loaded Dice included. In other words, Hello, Oogie!'s -2 is the very last step to get the final result.", "source": "Rulebook" },
+      { "term": "Sally", "text": "Can be played at Oogie Boogie's current location, even though her ability makes his mover go to Sally's location. Heroes can always be played to an unlocked location, whether or not their abilities can be fully resolved.", "source": "Rulebook" },
+      { "term": "The Mayor of Halloween Town", "text": "When the Mayor is defeated, Oogie Boogie reveals cards from the Fate deck and decides where to play the Hero found. Unused Fate cards are shuffled back into the deck. If Jack Skellington comes up, he must be played because he says Hero, but as an Effect, because he is played from the Fate deck. If Sally comes up and Oogie Boogie plays her at a different location, his mover must still go to Sally's location, and the turn continues with the actions available there.", "source": "Rulebook + card text" },
+      { "term": "Doctor Finkelstein", "text": "Once defeated, he is shuffled into the deck; he doesn't have to go on top.", "source": "Lord of the Board, playtester" }
+    ],
+    "Shere Khan": [
+      { "term": "Bravo! Bravo!", "text": "Two copies can be played to take the same action in the same turn, because it's the card's Effect that lets you take the action: you aren't taking it directly.", "source": "Shared ruling with the US community (presumably playtester-approved)" },
+      { "term": "Hey Cuz", "text": "If you choose not to play the revealed Ally, it is discarded with the other cards.", "source": "Card text" },
+      { "term": "Trust in Me", "text": "You can shuffle any number of cards into the deck, from 0 to 3, so Trust in Me is playable even with no discard pile.", "source": "Card text" },
+      { "term": "Bagheera", "text": "If you use Bagheera's ability, you must move all Heroes and all Allies at Bagheera's location to other locations, not just some.", "source": "Card text" },
+      { "term": "He's My Friend", "text": "This card can always be chosen for a Fate action: choose a location and every Hero there gets +1 Strength. If there are no Heroes, just play and discard the card.", "source": "Card text" },
+      { "term": "Tiger by the Tail", "text": "You can always choose this card and apply neither of its two effects, or only one.", "source": "Card text" },
+      { "term": "Fire tokens", "text": "More than one Fire token can be stacked on the same action.", "source": "Lord of the Board, playtester" }
+    ],
+    "King Candy": [
+      { "term": "Candy Cy-Bug", "text": "If Candy Cy-Bugs are targeted by Can't Be Allowed to Race, they don't move to another location and don't get +1 Strength, because that only happens when they're actually used in a Vanquish action that would discard them.", "source": "Card text" },
+      { "term": "Go!", "text": "Can be played even if you have no Allies in play or don't want to move them.", "source": "Card text" },
+      { "term": "Turbo-Tastic", "text": "For Turbo-Tastic, actions under the Racer token also count as covered.", "source": "Lord of the Board, playtester" },
+      { "term": "Can't Be Allowed to Race", "text": "You can choose to move no Allies (“any number” includes 0), but you must still be able to perform a Vanquish action to play it.", "source": "Card text" },
+      { "term": "Pay to Race", "text": "The card text can be misleading but, as the Villain Guide says, Pay to Race is played BEFORE moving King Candy's mover, and only AFTER resolving the Racer token's movement. So, in order: move the Racer token, play Pay to Race, then declare King Candy's movement and move him.", "source": "Villain Guide" },
+      { "term": "The race", "text": "If cards move King Candy's mover or the Racer token back before the race begins, both need a full lap of the track to win. The Racer token covers the actions it sits on and prevents taking them. The Racer token stays where it is if all Glitches are removed from Vanellope.", "source": "Lord of the Board, playtester" },
+      { "term": "Glitch", "text": "Whether or not Vanellope already has a Glitch attached, King Candy's turn always ends as soon as a Glitch is played. If a Glitch makes King Candy and the Racer token cross the finish line at the same time, King Candy wins, since his name comes before the Racer token on the card.", "source": "Card text" },
+      { "term": "Ralph's Hero Medal", "text": "Vanellope von Schweetz can be played at Ralph's location only if you defeat Ralph with the Medal attached. Defeating Wreck-It Ralph without the Medal has no effect.", "source": "Card text" },
+      { "term": "Princess Vanellope", "text": "The text says “up to four action spaces”, so you can play this card and not move King Candy at all.", "source": "Card text" },
+      { "term": "The Beacon", "text": "Can be played even with no Candy Cy-Bugs in play: it asks you to choose a location and move there any Cy-Bugs at adjacent locations. The second part of the card is optional, so it doesn't stop you from playing it.", "source": "Card text" },
+      { "term": "Vanellope's Medal", "text": "Can be played even with no Heroes in the discard pile, since it says “may”. So you can choose it as one of the two Fate options and not use its ability.", "source": "Card text" }
+    ],
+    "Davy Jones": [
+      { "term": "The Crew of the Flying Dutchman & The Crew of the Black Pearl", "text": "Their Strength changes are dynamic: remember to add or remove Strength tokens as Allies or Heroes come and go.", "source": "Card text" },
+      { "term": "Do You Fear Death?", "text": "Can be played even with no Heroes left in the Fate deck; the result is rebuilding the whole Fate deck by shuffling in the discard pile.", "source": "Rulebook" },
+      { "term": "First Mate Maccus", "text": "The Ally discarded instead of First Mate Maccus must not have been involved in the Vanquish action.", "source": "Rulebook" },
+      { "term": "The Flying Dutchman", "text": "Can be used to take a covered action.", "source": "Lord of the Board, playtester" },
+      { "term": "Where Does It Point?", "text": "Both sentences say “may”, so you can play this card without resolving its effects.", "source": "Card text" },
+      { "term": "Elizabeth Swann", "text": "Her Strength bonus adds up for each Hero played after her, so she doesn't lose Strength if other Heroes leave the Realm.", "source": "Card text" },
+      { "term": "James Norrington", "text": "If he has The Heart token attached when he is defeated, resolve James Norrington's effects first, then The Heart's: gain 2 Power first, then lose all your Power.", "source": "Rulebook" },
+      { "term": "Treasure tokens", "text": "A Hero can't have more than one Treasure token. When a Hero with an unrevealed Treasure token is defeated, the token goes back face down to the supply.", "source": "Villain Guide" }
+    ],
+    "Tamatoa": [
+      { "term": "Crustacean With the Power of Creation", "text": "Although the Italian edition says “shuffle”, read it as “you may shuffle”: the Italian edition missed the final revision of the text.", "source": "Card text" },
+      { "term": "Fish Are Dumb", "text": "Can be played only at the end of an opponent's turn, if they took two or fewer actions.", "source": "Lord of the Board, playtester" },
+      { "term": "I'll Tell You in Song", "text": "Can be played only if you have at least three cards in your Villain discard pile.", "source": "Card text" },
+      { "term": "Not So Tough", "text": "To trigger this Condition, count opposing Allies' Strength as already modified by passive effects as soon as they enter the Realm, such as Scar's Hungry Hyenas (they enter with modified Strength if played where other Hyenas are) or Davy Jones' Crew of the Flying Dutchman (it enters with 4 Strength if there's at least one Ally at the other locations).", "source": "Rulebook" },
+      { "term": "Trapped", "text": "If an action is covered by both a Hero and Something Shiny, Trapped still can't let Tamatoa take it: it must be covered by a Hero only. If the covered action is at Tamatoa's location and the Hero covering it is defeated in the same turn, Tamatoa can NOT take that action a second time (if he already took it with Trapped).", "source": "Rulebook + card text" },
+      { "term": "Maui's Hook", "text": "While Tamatoa controls it and is the target of a Fate action, wait for the Fate action to end before gaining 2 Power. If Maui Time is played and Tamatoa loses control of the Hook, the 2 Power can't be gained.", "source": "Rulebook" },
+      { "term": "Maui Time", "text": "If Maui's Hook is in Tamatoa's hand, it must still be taken and attached to Maui. If Maui has Strength tokens when he is found, they are discarded.", "source": "Lord of the Board, playtester" },
+      { "term": "Beetle Maui", "text": "Strength tokens on Allies are not discarded. If Allies with the same name have different Strength tokens, redistribute them randomly.", "source": "Lord of the Board, playtester" },
+      { "term": "Heihei Maui", "text": "If revealed through Not Exactly Maui Time, it must be played.", "source": "Card text" }
+    ]
+  }
+}

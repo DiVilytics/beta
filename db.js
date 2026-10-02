@@ -125,10 +125,19 @@ async function loadObjectives() {
   return _objectives;
 }
 
-let _charFaq = null;
-async function loadCharFaq() {
-  if (!_charFaq) _charFaq = await _fetchJson(DATA_CHARACTER_FAQ_URL);
-  return _charFaq;
+// Rules F.A.Q.: { general: [{ title, intro?, items }], villains: { name: items } },
+// each item { term, text, villain?, source? }. Shown on faq.html.
+let _faq = null;
+async function loadFaq() {
+  if (!_faq) _faq = await _fetchJson(DATA_FAQ_URL);
+  return _faq;
+}
+
+// Villain decks from the Disney Villainous Wiki: name -> [{ name, count, type }].
+let _decks = null;
+async function loadVillainDecks() {
+  if (!_decks) _decks = await _fetchJson(DATA_DECKS_URL);
+  return _decks;
 }
 
 let _boxInfo = null;

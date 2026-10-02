@@ -1,0 +1,1089 @@
+{
+  "Captain Hook": {
+    "villain": [
+      {"name": "Boarding Party", "count": 3, "type": "Ally"},
+      {"name": "Give Them a Scare", "count": 3, "type": "Effect"},
+      {"name": "Swashbuckler", "count": 3, "type": "Ally"},
+      {"name": "Worthy Opponent", "count": 3, "type": "Effect"},
+      {"name": "Aye, Aye, Sir!", "count": 2, "type": "Effect"},
+      {"name": "Cannon", "count": 2, "type": "Item"},
+      {"name": "Cunning", "count": 2, "type": "Condition"},
+      {"name": "Cutlass", "count": 2, "type": "Item"},
+      {"name": "Hook's Case", "count": 2, "type": "Item"},
+      {"name": "Obsession", "count": 2, "type": "Condition"},
+      {"name": "Pirate Brute", "count": 2, "type": "Ally"},
+      {"name": "Ingenious Device", "count": 1, "type": "Item"},
+      {"name": "Mr. Starkey", "count": 1, "type": "Ally"},
+      {"name": "Never Land Map", "count": 1, "type": "Item"},
+      {"name": "Smee", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Pixie Dust", "count": 3, "type": "Item"},
+      {"name": "Lost Boys", "count": 2, "type": "Hero"},
+      {"name": "Splitting Headache", "count": 2, "type": "Effect"},
+      {"name": "Taunt", "count": 2, "type": "Item"},
+      {"name": "John", "count": 1, "type": "Hero"},
+      {"name": "Michael", "count": 1, "type": "Hero"},
+      {"name": "Peter Pan", "count": 1, "type": "Hero"},
+      {"name": "Tick Tock", "count": 1, "type": "Hero"},
+      {"name": "Tinker Bell", "count": 1, "type": "Hero"},
+      {"name": "Wendy", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Jafar": {
+    "villain": [
+      {"name": "Necessary Sacrifice", "count": 3, "type": "Effect"},
+      {"name": "Palace Guard", "count": 3, "type": "Ally"},
+      {"name": "Scimitar", "count": 3, "type": "Item"},
+      {"name": "Scrying", "count": 3, "type": "Effect"},
+      {"name": "A Snake, Am I?", "count": 2, "type": "Effect"},
+      {"name": "Deception", "count": 2, "type": "Condition"},
+      {"name": "Giant Hourglass", "count": 2, "type": "Item"},
+      {"name": "Hypnotize", "count": 2, "type": "Effect"},
+      {"name": "Manipulation", "count": 2, "type": "Condition"},
+      {"name": "Sorcerous Power", "count": 2, "type": "Effect"},
+      {"name": "Gazeem", "count": 1, "type": "Ally"},
+      {"name": "Iago", "count": 1, "type": "Ally"},
+      {"name": "Magic Lamp", "count": 1, "type": "Item"},
+      {"name": "Razoul", "count": 1, "type": "Ally"},
+      {"name": "Scarab Pendant", "count": 1, "type": "Item"},
+      {"name": "Snake Staff", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Wish", "count": 3, "type": "Item"},
+      {"name": "Crushing Blow", "count": 2, "type": "Effect"},
+      {"name": "Narrow Escape", "count": 2, "type": "Effect"},
+      {"name": "Abu", "count": 1, "type": "Hero"},
+      {"name": "Aladdin", "count": 1, "type": "Hero"},
+      {"name": "Carpet", "count": 1, "type": "Hero"},
+      {"name": "Genie", "count": 1, "type": "Hero"},
+      {"name": "Princess Jasmine", "count": 1, "type": "Hero"},
+      {"name": "Rajah", "count": 1, "type": "Hero"},
+      {"name": "Sultan", "count": 1, "type": "Hero"},
+      {"name": "Treachery", "count": 1, "type": "Effect"}
+    ]
+  },
+  "Maleficent": {
+    "villain": [
+      {"name": "Cackling Goon", "count": 3, "type": "Ally"},
+      {"name": "Dragon Form", "count": 3, "type": "Effect"},
+      {"name": "Forest of Thorns", "count": 3, "type": "Curse"},
+      {"name": "Green Fire", "count": 3, "type": "Curse"},
+      {"name": "Savage Goon", "count": 3, "type": "Ally"},
+      {"name": "Sinister Goon", "count": 3, "type": "Ally"},
+      {"name": "Vanish", "count": 3, "type": "Effect"},
+      {"name": "Dreamless Sleep", "count": 2, "type": "Curse"},
+      {"name": "Malice", "count": 2, "type": "Condition"},
+      {"name": "Tyranny", "count": 2, "type": "Condition"},
+      {"name": "Raven", "count": 1, "type": "Ally"},
+      {"name": "Spinning Wheel", "count": 1, "type": "Item"},
+      {"name": "Staff", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Guards", "count": 3, "type": "Hero"},
+      {"name": "Sword of Truth", "count": 3, "type": "Item"},
+      {"name": "Once Upon a Dream", "count": 2, "type": "Effect"},
+      {"name": "Aurora", "count": 1, "type": "Hero"},
+      {"name": "Fauna", "count": 1, "type": "Hero"},
+      {"name": "Flora", "count": 1, "type": "Hero"},
+      {"name": "King Hubert", "count": 1, "type": "Hero"},
+      {"name": "King Stefan", "count": 1, "type": "Hero"},
+      {"name": "Merryweather", "count": 1, "type": "Hero"},
+      {"name": "Prince Phillip", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Prince John": {
+    "villain": [
+      {"name": "Beautiful, Lovely Taxes", "count": 3, "type": "Effect"},
+      {"name": "Imprison", "count": 3, "type": "Effect"},
+      {"name": "Rhino Guards", "count": 3, "type": "Ally"},
+      {"name": "Warrant", "count": 3, "type": "Item"},
+      {"name": "Wolf Archers", "count": 3, "type": "Ally"},
+      {"name": "Bow and Arrows", "count": 2, "type": "Item"},
+      {"name": "Cowardice", "count": 2, "type": "Condition"},
+      {"name": "Greed", "count": 2, "type": "Condition"},
+      {"name": "Set a Trap", "count": 2, "type": "Effect"},
+      {"name": "Golden Arrow", "count": 1, "type": "Item"},
+      {"name": "Intimidation", "count": 1, "type": "Effect"},
+      {"name": "King Richard's Crown", "count": 1, "type": "Item"},
+      {"name": "Nutsy", "count": 1, "type": "Ally"},
+      {"name": "Sheriff of Nottingham", "count": 1, "type": "Ally"},
+      {"name": "Sir Hiss", "count": 1, "type": "Ally"},
+      {"name": "Trigger", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Clever Disguise", "count": 3, "type": "Item"},
+      {"name": "Steal from the Rich", "count": 3, "type": "Effect"},
+      {"name": "Alan-a-Dale", "count": 1, "type": "Hero"},
+      {"name": "Friar Tuck", "count": 1, "type": "Hero"},
+      {"name": "King Richard", "count": 1, "type": "Hero"},
+      {"name": "Lady Kluck", "count": 1, "type": "Hero"},
+      {"name": "Little John", "count": 1, "type": "Hero"},
+      {"name": "Maid Marian", "count": 1, "type": "Hero"},
+      {"name": "Robin Hood", "count": 1, "type": "Hero"},
+      {"name": "Skippy", "count": 1, "type": "Hero"},
+      {"name": "Toby", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Queen of Hearts": {
+    "villain": [
+      {"name": "Card Guard", "count": 8, "type": "Ally"},
+      {"name": "Off With Your Head!", "count": 3, "type": "Effect"},
+      {"name": "Spear", "count": 3, "type": "Item"},
+      {"name": "Take the Shot", "count": 3, "type": "Effect"},
+      {"name": "By Order of the Queen", "count": 2, "type": "Effect"},
+      {"name": "Fury", "count": 2, "type": "Condition"},
+      {"name": "Judgment", "count": 2, "type": "Condition"},
+      {"name": "Makes You Smaller", "count": 2, "type": "Effect"},
+      {"name": "Very Merry Unbirthday", "count": 2, "type": "Effect"},
+      {"name": "Stopwatch", "count": 1, "type": "Item"},
+      {"name": "The King", "count": 1, "type": "Ally"},
+      {"name": "Tweedle Dee & Tweedle Dum", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "I'm Late! I'm Late!", "count": 2, "type": "Effect"},
+      {"name": "Makes You Larger", "count": 2, "type": "Effect"},
+      {"name": "Mome Raths", "count": 2, "type": "Effect"},
+      {"name": "Alice", "count": 1, "type": "Hero"},
+      {"name": "Caterpillar", "count": 1, "type": "Hero"},
+      {"name": "Cheshire Cat", "count": 1, "type": "Hero"},
+      {"name": "Dodo", "count": 1, "type": "Hero"},
+      {"name": "Dormouse", "count": 1, "type": "Hero"},
+      {"name": "Down the Rabbit Hole", "count": 1, "type": "Effect"},
+      {"name": "Mad Hatter", "count": 1, "type": "Hero"},
+      {"name": "March Hare", "count": 1, "type": "Hero"},
+      {"name": "White Rabbit", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Ursula": {
+    "villain": [
+      {"name": "Binding Contract", "count": 6, "type": "Item"},
+      {"name": "Change Form", "count": 3, "type": "Effect"},
+      {"name": "Grow Giant", "count": 3, "type": "Effect"},
+      {"name": "Opportunist", "count": 3, "type": "Effect"},
+      {"name": "Whirlpool", "count": 3, "type": "Effect"},
+      {"name": "Arrogance", "count": 2, "type": "Condition"},
+      {"name": "Divination", "count": 2, "type": "Effect"},
+      {"name": "Trickery", "count": 2, "type": "Condition"},
+      {"name": "Cauldron", "count": 1, "type": "Item"},
+      {"name": "Crown", "count": 1, "type": "Item"},
+      {"name": "Flotsam", "count": 1, "type": "Ally"},
+      {"name": "Jetsam", "count": 1, "type": "Ally"},
+      {"name": "Poor Unfortunate Souls", "count": 1, "type": "Effect"},
+      {"name": "Trident", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Return to Form", "count": 3, "type": "Effect"},
+      {"name": "Dinglehopper", "count": 2, "type": "Item"},
+      {"name": "Snarfblat", "count": 2, "type": "Item"},
+      {"name": "Ariel", "count": 1, "type": "Hero"},
+      {"name": "Eric", "count": 1, "type": "Hero"},
+      {"name": "Flounder", "count": 1, "type": "Hero"},
+      {"name": "Grimsby", "count": 1, "type": "Hero"},
+      {"name": "King Triton", "count": 1, "type": "Hero"},
+      {"name": "Max", "count": 1, "type": "Hero"},
+      {"name": "Scuttle", "count": 1, "type": "Hero"},
+      {"name": "Sebastian", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Dr. Facilier": {
+    "villain": [
+      {"name": "Friends on the Other Side", "count": 3, "type": "Effect"},
+      {"name": "Masked Spirits", "count": 3, "type": "Ally/Item"},
+      {"name": "Shadow Spirits", "count": 3, "type": "Ally"},
+      {"name": "Sleight of Hand", "count": 3, "type": "Effect"},
+      {"name": "The Cards Will Tell", "count": 3, "type": "Effect"},
+      {"name": "Voodoo Dolls", "count": 3, "type": "Ally"},
+      {"name": "Desperation", "count": 2, "type": "Condition"},
+      {"name": "Frog Form", "count": 2, "type": "Item"},
+      {"name": "Terror", "count": 2, "type": "Condition"},
+      {"name": "Cane", "count": 1, "type": "Item"},
+      {"name": "Illusion Powder", "count": 1, "type": "Item"},
+      {"name": "Lawrence", "count": 1, "type": "Ally"},
+      {"name": "Rule New Orleans", "count": 1, "type": "Effect"},
+      {"name": "Shadow Man", "count": 1, "type": "Ally"},
+      {"name": "Talisman", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Almost There", "count": 3, "type": "Effect"},
+      {"name": "The Evening Star", "count": 3, "type": "Effect"},
+      {"name": "Big Daddy La Bouff", "count": 1, "type": "Hero"},
+      {"name": "Charlotte", "count": 1, "type": "Hero"},
+      {"name": "Eudora", "count": 1, "type": "Hero"},
+      {"name": "Juju", "count": 1, "type": "Hero"},
+      {"name": "Louis", "count": 1, "type": "Hero"},
+      {"name": "Mama Odie", "count": 1, "type": "Hero"},
+      {"name": "Naveen", "count": 1, "type": "Hero"},
+      {"name": "Ray", "count": 1, "type": "Hero"},
+      {"name": "Tiana", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Evil Queen": {
+    "villain": [
+      {"name": "Take a Bite", "count": 5, "type": "Effect"},
+      {"name": "I'll Fix Ya!", "count": 3, "type": "Effect"},
+      {"name": "Black Magic", "count": 2, "type": "Effect"},
+      {"name": "Black of Night", "count": 2, "type": "Ingredient"},
+      {"name": "Jealousy", "count": 2, "type": "Condition"},
+      {"name": "Magic Tomes", "count": 2, "type": "Item"},
+      {"name": "Mummy Dust", "count": 2, "type": "Ingredient"},
+      {"name": "Old Hag's Cackle", "count": 2, "type": "Ingredient"},
+      {"name": "Scream of Fright", "count": 2, "type": "Ingredient"},
+      {"name": "Thunderbolt", "count": 2, "type": "Effect"},
+      {"name": "Vanity", "count": 2, "type": "Condition"},
+      {"name": "Huntsman", "count": 1, "type": "Ally"},
+      {"name": "Magic Mirror", "count": 1, "type": "Item"},
+      {"name": "The Box", "count": 1, "type": "Item"},
+      {"name": "Throne", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Love's First Kiss", "count": 2, "type": "Effect"},
+      {"name": "Pickaxe", "count": 2, "type": "Item"},
+      {"name": "Woodland Creatures", "count": 2, "type": "Effect"},
+      {"name": "Bashful", "count": 1, "type": "Hero"},
+      {"name": "Doc", "count": 1, "type": "Hero"},
+      {"name": "Dopey", "count": 1, "type": "Hero"},
+      {"name": "Grumpy", "count": 1, "type": "Hero"},
+      {"name": "Happy", "count": 1, "type": "Hero"},
+      {"name": "Sleepy", "count": 1, "type": "Hero"},
+      {"name": "Sneezy", "count": 1, "type": "Hero"},
+      {"name": "Snow White", "count": 1, "type": "Hero"},
+      {"name": "Wishing Well", "count": 1, "type": "Item"}
+    ]
+  },
+  "Hades": {
+    "villain": [
+      {"name": "Get Ready to Rumble!", "count": 3, "type": "Effect"},
+      {"name": "Mortality Potion", "count": 3, "type": "Item"},
+      {"name": "Planets Align", "count": 3, "type": "Effect"},
+      {"name": "Achilles' Heel", "count": 2, "type": "Effect"},
+      {"name": "Eye of the Fates", "count": 2, "type": "Effect"},
+      {"name": "I Rule!", "count": 2, "type": "Effect"},
+      {"name": "Rage", "count": 2, "type": "Condition"},
+      {"name": "Ruthless", "count": 2, "type": "Condition"},
+      {"name": "Arges", "count": 1, "type": "Titan"},
+      {"name": "Cerberus", "count": 1, "type": "Ally"},
+      {"name": "Chariot", "count": 1, "type": "Item"},
+      {"name": "Hydra", "count": 1, "type": "Ally"},
+      {"name": "Hydros", "count": 1, "type": "Titan"},
+      {"name": "Lythos", "count": 1, "type": "Titan"},
+      {"name": "Nessus", "count": 1, "type": "Ally"},
+      {"name": "Pain", "count": 1, "type": "Ally"},
+      {"name": "Panic", "count": 1, "type": "Ally"},
+      {"name": "Pyros", "count": 1, "type": "Titan"},
+      {"name": "Stratos", "count": 1, "type": "Titan"}
+    ],
+    "fate": [
+      {"name": "Go the Distance", "count": 2, "type": "Effect"},
+      {"name": "Lightning Bolt", "count": 2, "type": "Effect"},
+      {"name": "Medallion", "count": 2, "type": "Item"},
+      {"name": "The Gospel Truth", "count": 2, "type": "Effect"},
+      {"name": "Hera", "count": 1, "type": "Hero"},
+      {"name": "Hercules", "count": 1, "type": "Hero"},
+      {"name": "Hermes", "count": 1, "type": "Hero"},
+      {"name": "Megara", "count": 1, "type": "Hero"},
+      {"name": "Pegasus", "count": 1, "type": "Hero"},
+      {"name": "Phil", "count": 1, "type": "Hero"},
+      {"name": "Zeus", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Ratigan": {
+    "villain": [
+      {"name": "Gears", "count": 5, "type": "Item"},
+      {"name": "Capture", "count": 3, "type": "Effect"},
+      {"name": "Ruffians", "count": 3, "type": "Ally"},
+      {"name": "Devious", "count": 2, "type": "Condition"},
+      {"name": "Extravagant", "count": 2, "type": "Condition"},
+      {"name": "Greatest Criminal Mind", "count": 2, "type": "Effect"},
+      {"name": "Marvelous Trap", "count": 2, "type": "Item"},
+      {"name": "Uniform", "count": 2, "type": "Item"},
+      {"name": "Airship", "count": 1, "type": "Item"},
+      {"name": "Bartholomew", "count": 1, "type": "Ally"},
+      {"name": "Bell", "count": 1, "type": "Item"},
+      {"name": "Felicia", "count": 1, "type": "Ally"},
+      {"name": "Fidget", "count": 1, "type": "Ally"},
+      {"name": "Fidget's List", "count": 1, "type": "Item"},
+      {"name": "Royal Robes", "count": 1, "type": "Item"},
+      {"name": "The Robot Queen", "count": 1, "type": "Item"},
+      {"name": "Tools", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Queen's Guards", "count": 3, "type": "Hero"},
+      {"name": "Call for Help", "count": 2, "type": "Effect"},
+      {"name": "Sabotage", "count": 2, "type": "Effect"},
+      {"name": "Basil", "count": 1, "type": "Hero"},
+      {"name": "Dawson", "count": 1, "type": "Hero"},
+      {"name": "Flaversham", "count": 1, "type": "Hero"},
+      {"name": "Makeshift Balloon", "count": 1, "type": "Item"},
+      {"name": "Mrs. Judson", "count": 1, "type": "Hero"},
+      {"name": "Olivia", "count": 1, "type": "Hero"},
+      {"name": "The Mouse Queen", "count": 1, "type": "Hero"},
+      {"name": "Toby", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Scar": {
+    "villain": [
+      {"name": "Hungry Hyena", "count": 6, "type": "Ally"},
+      {"name": "Long Live the King", "count": 4, "type": "Effect"},
+      {"name": "Be Prepared", "count": 3, "type": "Effect"},
+      {"name": "Stick with Me", "count": 3, "type": "Effect"},
+      {"name": "Whisper", "count": 3, "type": "Effect"},
+      {"name": "Feeding Frenzy", "count": 2, "type": "Effect"},
+      {"name": "Injustice", "count": 2, "type": "Condition"},
+      {"name": "Pride", "count": 2, "type": "Condition"},
+      {"name": "Stampede", "count": 2, "type": "Ally"},
+      {"name": "Banzai the Hyena", "count": 1, "type": "Ally"},
+      {"name": "Ed the Hyena", "count": 1, "type": "Ally"},
+      {"name": "Shenzi the Hyena", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Hakuna Matata", "count": 3, "type": "Effect"},
+      {"name": "Prophecy", "count": 3, "type": "Item"},
+      {"name": "Mufasa", "count": 1, "type": "Hero"},
+      {"name": "Nala", "count": 1, "type": "Hero"},
+      {"name": "Pumbaa", "count": 1, "type": "Hero"},
+      {"name": "Rafiki", "count": 1, "type": "Hero"},
+      {"name": "Rafiki's Stick", "count": 1, "type": "Item"},
+      {"name": "Sarabi", "count": 1, "type": "Hero"},
+      {"name": "Simba", "count": 1, "type": "Hero"},
+      {"name": "Timon", "count": 1, "type": "Hero"},
+      {"name": "Zazu", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Yzma": {
+    "villain": [
+      {"name": "After Them!", "count": 3, "type": "Effect"},
+      {"name": "Eavesdrop", "count": 3, "type": "Effect"},
+      {"name": "Imperial Guards", "count": 3, "type": "Ally"},
+      {"name": "Smash It with a Hammer", "count": 3, "type": "Effect"},
+      {"name": "A Cruel Irony", "count": 2, "type": "Effect"},
+      {"name": "Beauty Sleep", "count": 2, "type": "Effect"},
+      {"name": "Fake Funeral", "count": 2, "type": "Effect"},
+      {"name": "Ferocity", "count": 2, "type": "Condition"},
+      {"name": "Finish the Job", "count": 2, "type": "Effect"},
+      {"name": "Right-Hand Man", "count": 2, "type": "Effect"},
+      {"name": "Superiority", "count": 2, "type": "Condition"},
+      {"name": "The Path That Rocks", "count": 2, "type": "Effect"},
+      {"name": "Dagger", "count": 1, "type": "Item"},
+      {"name": "Kronk", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Beware the Groove", "count": 3, "type": "Effect"},
+      {"name": "Peasant", "count": 2, "type": "Hero"},
+      {"name": "The Path of Righteousness", "count": 2, "type": "Effect"},
+      {"name": "Wrong Lever", "count": 2, "type": "Effect"},
+      {"name": "Bucky", "count": 1, "type": "Hero"},
+      {"name": "Chaca", "count": 1, "type": "Hero"},
+      {"name": "Chicha", "count": 1, "type": "Hero"},
+      {"name": "Kuzco", "count": 1, "type": "Hero"},
+      {"name": "On the Run", "count": 1, "type": "Effect"},
+      {"name": "Pacha", "count": 1, "type": "Hero"},
+      {"name": "Tipo", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Cruella de Vil": {
+    "villain": [
+      {"name": "I Live for Furs", "count": 3, "type": "Effect"},
+      {"name": "Cruel", "count": 2, "type": "Condition"},
+      {"name": "Devilish", "count": 2, "type": "Condition"},
+      {"name": "Fireplace Poker", "count": 2, "type": "Item"},
+      {"name": "Flashlight", "count": 2, "type": "Item"},
+      {"name": "Get the Job Done", "count": 2, "type": "Effect"},
+      {"name": "Here, Puppies", "count": 2, "type": "Effect"},
+      {"name": "Spotted", "count": 2, "type": "Effect"},
+      {"name": "That Devil Woman", "count": 2, "type": "Effect"},
+      {"name": "The Devil Take It", "count": 2, "type": "Effect"},
+      {"name": "Whatever It Takes", "count": 2, "type": "Effect"},
+      {"name": "You Idiots!", "count": 2, "type": "Effect"},
+      {"name": "Bought and Paid For", "count": 1, "type": "Effect"},
+      {"name": "Horace", "count": 1, "type": "Ally"},
+      {"name": "Jasper", "count": 1, "type": "Ally"},
+      {"name": "Roadster", "count": 1, "type": "Item"},
+      {"name": "Telephone", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Flew the Coop", "count": 2, "type": "Effect"},
+      {"name": "Reckless Driving", "count": 2, "type": "Effect"},
+      {"name": "Twilight Bark", "count": 2, "type": "Effect"},
+      {"name": "We're Labradors", "count": 2, "type": "Effect"},
+      {"name": "Anita and Roger", "count": 1, "type": "Hero"},
+      {"name": "Captain", "count": 1, "type": "Hero"},
+      {"name": "Colonel", "count": 1, "type": "Hero"},
+      {"name": "Nanny", "count": 1, "type": "Hero"},
+      {"name": "Perdita", "count": 1, "type": "Hero"},
+      {"name": "Pongo", "count": 1, "type": "Hero"},
+      {"name": "Sergeant Tibbs", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Mother Gothel": {
+    "villain": [
+      {"name": "Royal Guard", "count": 5, "type": "Ally"},
+      {"name": "Duplicity", "count": 2, "type": "Condition"},
+      {"name": "Egomania", "count": 2, "type": "Condition"},
+      {"name": "I Love You Most", "count": 2, "type": "Effect"},
+      {"name": "Let Down Your Hair", "count": 2, "type": "Effect"},
+      {"name": "Misdirection", "count": 2, "type": "Effect"},
+      {"name": "Mother Knows Best", "count": 2, "type": "Effect"},
+      {"name": "Now I'm the Bad Guy", "count": 2, "type": "Effect"},
+      {"name": "Revenge", "count": 2, "type": "Effect"},
+      {"name": "Royal Rider", "count": 2, "type": "Ally"},
+      {"name": "What Once Was Mine", "count": 2, "type": "Effect"},
+      {"name": "Crown", "count": 1, "type": "Item"},
+      {"name": "Hair Brush", "count": 1, "type": "Item"},
+      {"name": "Knife", "count": 1, "type": "Item"},
+      {"name": "Patchy Stabbington", "count": 1, "type": "Ally"},
+      {"name": "Sideburns Stabbington", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Everyone Has a Dream", "count": 3, "type": "Effect"},
+      {"name": "Aging", "count": 2, "type": "Effect"},
+      {"name": "Floating Lights", "count": 2, "type": "Effect"},
+      {"name": "Flynn Rider", "count": 1, "type": "Hero"},
+      {"name": "Frying Pan", "count": 1, "type": "Item"},
+      {"name": "Hook Hand", "count": 1, "type": "Hero"},
+      {"name": "Maximus", "count": 1, "type": "Hero"},
+      {"name": "Pascal", "count": 1, "type": "Hero"},
+      {"name": "Queen and King", "count": 1, "type": "Hero"},
+      {"name": "Shorty", "count": 1, "type": "Hero"},
+      {"name": "Ulf", "count": 1, "type": "Hero"}
+    ],
+    "extra": [
+      {"title": "Tile", "note": "Not in the Fate deck: Rapunzel starts on a tile and is played to Mother Gothel's Realm at the start of the game.", "cards": [
+        {"name": "Rapunzel", "count": 1, "type": "Hero"}
+      ]}
+    ]
+  },
+  "Pete": {
+    "villain": [
+      {"name": "Bandit", "count": 7, "type": "Ally"},
+      {"name": "Play a Game", "count": 4, "type": "Effect"},
+      {"name": "Horse", "count": 3, "type": "Ally"},
+      {"name": "Parrot", "count": 3, "type": "Ally"},
+      {"name": "Sneaky Pete", "count": 3, "type": "Effect"},
+      {"name": "Mischief", "count": 2, "type": "Condition"},
+      {"name": "Outrage", "count": 2, "type": "Condition"},
+      {"name": "Air Strike!", "count": 1, "type": "Effect"},
+      {"name": "Bank Loot", "count": 1, "type": "Item"},
+      {"name": "Cricket", "count": 1, "type": "Ally"},
+      {"name": "Jalopy", "count": 1, "type": "Item"},
+      {"name": "Steamboat Willie", "count": 1, "type": "Item"},
+      {"name": "Stolen Cargo", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Hide", "count": 2, "type": "Effect"},
+      {"name": "Knocked Silly", "count": 2, "type": "Effect"},
+      {"name": "Outlawed", "count": 2, "type": "Effect"},
+      {"name": "Clarabelle Cow", "count": 1, "type": "Hero"},
+      {"name": "Donald Duck", "count": 1, "type": "Hero"},
+      {"name": "Goofy", "count": 1, "type": "Hero"},
+      {"name": "Horace Horsecollar", "count": 1, "type": "Hero"},
+      {"name": "Mickey Mouse", "count": 1, "type": "Hero"},
+      {"name": "Minnie Mouse", "count": 1, "type": "Hero"},
+      {"name": "Oswald the Lucky Rabbit", "count": 1, "type": "Hero"},
+      {"name": "Pluto", "count": 1, "type": "Hero"},
+      {"name": "Tired", "count": 1, "type": "Effect"}
+    ]
+  },
+  "Gaston": {
+    "villain": [
+      {"name": "Wolves", "count": 4, "type": "Ally"},
+      {"name": "Beautiful as Me", "count": 3, "type": "Condition"},
+      {"name": "Swoon", "count": 3, "type": "Effect"},
+      {"name": "Belle Is Mine", "count": 2, "type": "Effect"},
+      {"name": "Come Into the Light", "count": 2, "type": "Effect"},
+      {"name": "Five Dozen Eggs", "count": 2, "type": "Item"},
+      {"name": "Hunter's Instinct", "count": 2, "type": "Effect"},
+      {"name": "Intimidating", "count": 2, "type": "Effect"},
+      {"name": "Take Me Instead", "count": 2, "type": "Effect"},
+      {"name": "Time to Follow Me!", "count": 2, "type": "Effect"},
+      {"name": "Get Out!", "count": 1, "type": "Effect"},
+      {"name": "Lefou", "count": 1, "type": "Ally"},
+      {"name": "Monsieur D'Arque", "count": 1, "type": "Ally"},
+      {"name": "Show Me the Beast!", "count": 1, "type": "Effect"},
+      {"name": "Temper", "count": 1, "type": "Effect"},
+      {"name": "The Mob", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Be Our Guest", "count": 2, "type": "Effect"},
+      {"name": "Beast", "count": 1, "type": "Hero"},
+      {"name": "Belle", "count": 1, "type": "Hero"},
+      {"name": "Cogsworth", "count": 1, "type": "Hero"},
+      {"name": "It Is You", "count": 1, "type": "Effect"},
+      {"name": "I've Never Seen So Many Books", "count": 1, "type": "Effect"},
+      {"name": "Lumiere", "count": 1, "type": "Hero"},
+      {"name": "Magic Mirror", "count": 1, "type": "Effect"},
+      {"name": "Massaging My Feet", "count": 1, "type": "Effect"},
+      {"name": "Maurice", "count": 1, "type": "Hero"},
+      {"name": "Maurice's Invention", "count": 1, "type": "Item"},
+      {"name": "Mrs. Potts and Chip", "count": 1, "type": "Hero"},
+      {"name": "Saving My Life", "count": 1, "type": "Effect"},
+      {"name": "The Rose", "count": 1, "type": "Effect"}
+    ]
+  },
+  "Horned King": {
+    "villain": [
+      {"name": "Ancient Soldiers", "count": 5, "type": "Item"},
+      {"name": "Cauldron Born", "count": 5, "type": "Ally"},
+      {"name": "Horned King's Henchmen", "count": 3, "type": "Ally"},
+      {"name": "Gwythaints", "count": 2, "type": "Ally"},
+      {"name": "Only Moments Away From Victory", "count": 2, "type": "Condition"},
+      {"name": "Our Hour Has Arrived", "count": 2, "type": "Effect"},
+      {"name": "Show Me the Black Cauldron", "count": 2, "type": "Effect"},
+      {"name": "Visions", "count": 2, "type": "Effect"},
+      {"name": "We Got You Now, Pig Keeper", "count": 2, "type": "Effect"},
+      {"name": "We Have Made a Bargain", "count": 2, "type": "Effect"},
+      {"name": "Captured!", "count": 1, "type": "Effect"},
+      {"name": "Creeper", "count": 1, "type": "Ally"},
+      {"name": "Guard Dog", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "I Believe in You", "count": 2, "type": "Effect"},
+      {"name": "Reunited", "count": 2, "type": "Effect"},
+      {"name": "Doli", "count": 1, "type": "Hero"},
+      {"name": "Dyrnwyn", "count": 1, "type": "Item"},
+      {"name": "Fair Folk", "count": 1, "type": "Hero"},
+      {"name": "Fflewddur Fflam", "count": 1, "type": "Hero"},
+      {"name": "Gurgi", "count": 1, "type": "Hero"},
+      {"name": "Gurgi's Happy Day", "count": 1, "type": "Effect"},
+      {"name": "Gurgi's Sacrifice", "count": 1, "type": "Effect"},
+      {"name": "Hen Wen", "count": 1, "type": "Hero"},
+      {"name": "Princess Eilonwy", "count": 1, "type": "Hero"},
+      {"name": "Taran", "count": 1, "type": "Hero"},
+      {"name": "The Witches of Morva", "count": 1, "type": "Hero"}
+    ],
+    "extra": [
+      {"title": "Tile", "note": "Two-sided tile, set aside at the start: The Black Cauldron on one side, The Power of the Black Cauldron on the other. Claim it to put it next to the Villain portrait.", "cards": [
+        {"name": "The Black Cauldron", "count": 1, "type": "Tile"}
+      ]}
+    ]
+  },
+  "Lady Tremaine": {
+    "villain": [
+      {"name": "There's Still a Chance", "count": 4, "type": "Effect"},
+      {"name": "I Said \"If\"", "count": 3, "type": "Effect"},
+      {"name": "Trapped", "count": 3, "type": "Effect"},
+      {"name": "And One More Thing", "count": 2, "type": "Condition"},
+      {"name": "I Never Go Back on My Word", "count": 2, "type": "Effect"},
+      {"name": "Locked Up", "count": 2, "type": "Condition"},
+      {"name": "Vicious Practical Jokes", "count": 2, "type": "Condition"},
+      {"name": "You Little Thief!", "count": 2, "type": "Effect"},
+      {"name": "Anastasia", "count": 1, "type": "Ally"},
+      {"name": "Ball Gown Anastasia", "count": 1, "type": "Ally"},
+      {"name": "Ball Gown Drizella", "count": 1, "type": "Ally"},
+      {"name": "Drizella", "count": 1, "type": "Ally"},
+      {"name": "Invitation from the King", "count": 1, "type": "Item"},
+      {"name": "Lady Tremaine's Cane", "count": 1, "type": "Item"},
+      {"name": "Lucifer", "count": 1, "type": "Ally"},
+      {"name": "Midnight", "count": 1, "type": "Effect"},
+      {"name": "The Key", "count": 1, "type": "Item"},
+      {"name": "Wedding Bells", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Bibbidi-Bobbidi-Boo", "count": 3, "type": "Effect"},
+      {"name": "Sweet Nightingale", "count": 3, "type": "Effect"},
+      {"name": "Glass Slipper", "count": 2, "type": "Item"},
+      {"name": "Ball Gown Cinderella", "count": 1, "type": "Hero"},
+      {"name": "Bruno", "count": 1, "type": "Hero"},
+      {"name": "Cinderella", "count": 1, "type": "Hero"},
+      {"name": "Fairy Godmother", "count": 1, "type": "Hero"},
+      {"name": "Gus", "count": 1, "type": "Hero"},
+      {"name": "Jaq", "count": 1, "type": "Hero"},
+      {"name": "The Prince", "count": 1, "type": "Prince"}
+    ]
+  },
+  "Lotso": {
+    "villain": [
+      {"name": "Locked Up", "count": 3, "type": "Effect"},
+      {"name": "Not Age Appropriate", "count": 3, "type": "Effect"},
+      {"name": "Something Snapped", "count": 3, "type": "Condition"},
+      {"name": "The Bookworm", "count": 3, "type": "Effect"},
+      {"name": "Welcome to Sunnyside", "count": 3, "type": "Effect"},
+      {"name": "Original Factory Settings", "count": 2, "type": "Effect"},
+      {"name": "Patrolling All Night Long", "count": 2, "type": "Effect"},
+      {"name": "Smells Like Strawberries", "count": 2, "type": "Condition"},
+      {"name": "Where's Your Kid Now?", "count": 2, "type": "Condition"},
+      {"name": "Big Baby", "count": 1, "type": "Ally"},
+      {"name": "Chunk", "count": 1, "type": "Ally"},
+      {"name": "New Toys Don't Stand a Chance", "count": 1, "type": "Effect"},
+      {"name": "Sparks", "count": 1, "type": "Ally"},
+      {"name": "Stretch", "count": 1, "type": "Ally"},
+      {"name": "Twitch", "count": 1, "type": "Ally"},
+      {"name": "Woody's Hat", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Bonnie's Toys", "count": 2, "type": "Effect"},
+      {"name": "One Way Out", "count": 2, "type": "Effect"},
+      {"name": "Spanish Mode", "count": 2, "type": "Effect"},
+      {"name": "The Claw", "count": 2, "type": "Effect"},
+      {"name": "Andy's Looking For Us", "count": 1, "type": "Effect"},
+      {"name": "Daisy's Locket", "count": 1, "type": "Effect"},
+      {"name": "Hamm", "count": 1, "type": "Hero"},
+      {"name": "Jessie", "count": 1, "type": "Hero"},
+      {"name": "Lotso Was Special", "count": 1, "type": "Effect"},
+      {"name": "Rex", "count": 1, "type": "Hero"},
+      {"name": "Woody", "count": 1, "type": "Hero"}
+    ],
+    "extra": [
+      {"title": "Tile", "note": "Two-sided tile: Buzz Lightyear, a Guardian that starts at Caterpillar Room, on one side; Demo Mode Buzz Lightyear, an Ally, on the other.", "cards": [
+        {"name": "Buzz Lightyear", "count": 1, "type": "Guardian"}
+      ]}
+    ]
+  },
+  "Madam Mim": {
+    "villain": [
+      {"name": "I'm Not Cheating", "count": 4, "type": "Effect"},
+      {"name": "A Sporting Chance", "count": 3, "type": "Condition"},
+      {"name": "As Big as a House", "count": 3, "type": "Condition"},
+      {"name": "Battle of Wits", "count": 3, "type": "Effect"},
+      {"name": "I'll Make the Rules", "count": 3, "type": "Effect"},
+      {"name": "Magnificent, Marvelous, Mad", "count": 3, "type": "Effect"},
+      {"name": "Wizard's Duel", "count": 3, "type": "Effect"},
+      {"name": "Chicken Mim", "count": 1, "type": "Transformation"},
+      {"name": "Crocodile Mim", "count": 1, "type": "Transformation"},
+      {"name": "Elephant Mim", "count": 1, "type": "Transformation"},
+      {"name": "Fox Mim", "count": 1, "type": "Transformation"},
+      {"name": "Purple Dragon Mim", "count": 1, "type": "Transformation"},
+      {"name": "Rattlesnake Mim", "count": 1, "type": "Transformation"},
+      {"name": "Rhinoceros Mim", "count": 1, "type": "Transformation"},
+      {"name": "Tiger Mim", "count": 1, "type": "Transformation"}
+    ],
+    "fate": [
+      {"name": "Knowledge and Wisdom", "count": 4, "type": "Effect"},
+      {"name": "Archimedes", "count": 1, "type": "Effect"},
+      {"name": "Bird Arthur", "count": 1, "type": "Effect"},
+      {"name": "Germ Merlin", "count": 1, "type": "Effect"},
+      {"name": "Merlin", "count": 1, "type": "Effect"}
+    ],
+    "extra": [
+      {"title": "Merlin's Transformation deck", "cards": [
+        {"name": "Caterpillar Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Crab Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Goat Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Mouse Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Rabbit Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Turtle Merlin", "count": 1, "type": "Transformation"},
+        {"name": "Walrus Merlin", "count": 1, "type": "Transformation"}
+      ]}
+    ]
+  },
+  "Syndrome": {
+    "villain": [
+      {"name": "Major Modifications", "count": 4, "type": "Item"},
+      {"name": "15 Years Later", "count": 3, "type": "Condition"},
+      {"name": "Guards", "count": 3, "type": "Ally"},
+      {"name": "Not a Sidekick", "count": 3, "type": "Condition"},
+      {"name": "Velocipod Patrol", "count": 3, "type": "Ally"},
+      {"name": "Bio Probe", "count": 2, "type": "Condition"},
+      {"name": "Containment Unit", "count": 2, "type": "Effect"},
+      {"name": "Identification Please", "count": 2, "type": "Effect"},
+      {"name": "Security", "count": 2, "type": "Ally"},
+      {"name": "Who's Super Now?", "count": 2, "type": "Condition"},
+      {"name": "Zero-Point Energy", "count": 2, "type": "Item"},
+      {"name": "Mirage", "count": 1, "type": "Ally"},
+      {"name": "Syndrome's Remote", "count": 1, "type": "Remote"}
+    ],
+    "fate": [
+      {"name": "Force Field", "count": 2, "type": "Item"},
+      {"name": "No Capes!", "count": 2, "type": "Effect"},
+      {"name": "Teamwork", "count": 2, "type": "Effect"},
+      {"name": "Dash", "count": 1, "type": "Hero"},
+      {"name": "Elastigirl", "count": 1, "type": "Hero"},
+      {"name": "Frozone", "count": 1, "type": "Hero"},
+      {"name": "Infiltrate", "count": 1, "type": "Effect"},
+      {"name": "Jack-Jack", "count": 1, "type": "Hero"},
+      {"name": "Mr. Incredible", "count": 1, "type": "Hero"},
+      {"name": "Monologuing", "count": 1, "type": "Effect"},
+      {"name": "That Was Totally Wicked", "count": 1, "type": "Effect"},
+      {"name": "Violet", "count": 1, "type": "Hero"}
+    ],
+    "extra": [
+      {"title": "Tiles", "note": "Syndrome starts with Omnidroid v.X8 at Nomanisan Island and upgrades it to v.X9, then v.10. Omnidroid v.10 has a Destroyed side.", "cards": [
+        {"name": "Omnidroid v.X8", "count": 1, "type": "Omnidroid"},
+        {"name": "Omnidroid v.X9", "count": 1, "type": "Omnidroid"},
+        {"name": "Omnidroid v.10", "count": 1, "type": "Omnidroid"}
+      ]}
+    ]
+  },
+  "Oogie Boogie": {
+    "villain": [
+      {"name": "Impostor Sandy Claws", "count": 6, "type": "Effect"},
+      {"name": "Bats", "count": 4, "type": "Ally"},
+      {"name": "Loaded Dice", "count": 3, "type": "Cheat"},
+      {"name": "Making Christmastime", "count": 3, "type": "Effect"},
+      {"name": "Spiders", "count": 2, "type": "Ally"},
+      {"name": "Trick or Treat", "count": 2, "type": "Condition"},
+      {"name": "What Did Santa Bring You?", "count": 2, "type": "Condition"},
+      {"name": "What Have We Here?", "count": 2, "type": "Effect"},
+      {"name": "Barrel", "count": 1, "type": "Ally"},
+      {"name": "Bathtub", "count": 1, "type": "Item"},
+      {"name": "It's a Vacation", "count": 1, "type": "Effect"},
+      {"name": "Lock", "count": 1, "type": "Ally"},
+      {"name": "Shock", "count": 1, "type": "Ally"},
+      {"name": "This Time, We Bagged Him", "count": 1, "type": "Effect"}
+    ],
+    "fate": [
+      {"name": "Citizens of Halloween Town", "count": 4, "type": "Hero"},
+      {"name": "Distraction", "count": 2, "type": "Effect"},
+      {"name": "Hello, Oogie!", "count": 2, "type": "Effect"},
+      {"name": "Doctor Finkelstein", "count": 1, "type": "Hero"},
+      {"name": "Jack Skellington", "count": 1, "type": "Hero/Effect"},
+      {"name": "Sally", "count": 1, "type": "Hero"},
+      {"name": "Sandy Claws", "count": 1, "type": "Prisoner"},
+      {"name": "Set Things Right", "count": 1, "type": "Effect"},
+      {"name": "The Mayor of Halloween Town", "count": 1, "type": "Hero"},
+      {"name": "Zero", "count": 1, "type": "Hero"}
+    ]
+  },
+  "King Candy": {
+    "villain": [
+      {"name": "Candy Cy-Bug", "count": 3, "type": "Ally"},
+      {"name": "Glitch", "count": 3, "type": "Item"},
+      {"name": "Go!", "count": 3, "type": "Effect"},
+      {"name": "Locked Up Memories", "count": 3, "type": "Effect"},
+      {"name": "Racers", "count": 3, "type": "Ally"},
+      {"name": "Turbo-Tastic", "count": 3, "type": "Effect"},
+      {"name": "Have Some Candy", "count": 2, "type": "Effect"},
+      {"name": "Out of Order", "count": 2, "type": "Condition"},
+      {"name": "The Most Powerful Virus in the Arcade", "count": 2, "type": "Condition"},
+      {"name": "Can't Be Allowed to Race", "count": 1, "type": "Effect"},
+      {"name": "Duncan and Wynnchel", "count": 1, "type": "Ally"},
+      {"name": "Pay to Race", "count": 1, "type": "Effect"},
+      {"name": "Ralph's Hero Medal", "count": 1, "type": "Item"},
+      {"name": "Sour Bill", "count": 1, "type": "Ally"},
+      {"name": "Taffyta Muttonfudge", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "I Finally Have a Real Car!", "count": 2, "type": "Effect"},
+      {"name": "Just Glazed Me", "count": 2, "type": "Effect"},
+      {"name": "Princess Vanellope", "count": 2, "type": "Effect"},
+      {"name": "Unfinished Level", "count": 2, "type": "Effect"},
+      {"name": "Fix-It Felix Jr.", "count": 1, "type": "Hero"},
+      {"name": "Sergeant Tamora Jean Calhoun", "count": 1, "type": "Hero"},
+      {"name": "The Beacon", "count": 1, "type": "Effect"},
+      {"name": "Vanellope von Schweetz", "count": 1, "type": "Hero"},
+      {"name": "Vanellope's Medal", "count": 1, "type": "Effect"},
+      {"name": "What's With All the Magic Sparkles?", "count": 1, "type": "Effect"},
+      {"name": "Wreck-It Ralph", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Shere Khan": {
+    "villain": [
+      {"name": "Monkeys", "count": 6, "type": "Ally"},
+      {"name": "Everyone Runs From Shere Khan", "count": 3, "type": "Effect"},
+      {"name": "Young and Helpless", "count": 3, "type": "Effect"},
+      {"name": "Bravo! Bravo!", "count": 2, "type": "Effect"},
+      {"name": "Hey Cuz", "count": 2, "type": "Effect"},
+      {"name": "How Interesting... How Delightful", "count": 2, "type": "Condition"},
+      {"name": "It's Me, Shere Khan", "count": 2, "type": "Effect"},
+      {"name": "Sure to Pick Up His Trail", "count": 2, "type": "Effect"},
+      {"name": "Trust in Me", "count": 2, "type": "Condition"},
+      {"name": "You Will Inform Me First", "count": 2, "type": "Effect"},
+      {"name": "Kaa", "count": 1, "type": "Ally"},
+      {"name": "Kaa's Coils", "count": 1, "type": "Item"},
+      {"name": "Kaa's Eyes", "count": 1, "type": "Item"},
+      {"name": "King Louie", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Man's Red Fire", "count": 5, "type": "Effect"},
+      {"name": "He's My Friend", "count": 2, "type": "Effect"},
+      {"name": "Wolf Pack", "count": 2, "type": "Hero"},
+      {"name": "Bagheera", "count": 1, "type": "Hero"},
+      {"name": "Baloo", "count": 1, "type": "Hero"},
+      {"name": "Mowgli", "count": 1, "type": "Hero"},
+      {"name": "The Jungle Patrol", "count": 1, "type": "Hero"},
+      {"name": "Tiger by the Tail", "count": 1, "type": "Effect"},
+      {"name": "Vultures", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Davy Jones": {
+    "villain": [
+      {"name": "The Crew of the Flying Dutchman", "count": 5, "type": "Ally"},
+      {"name": "Do You Fear Death?", "count": 4, "type": "Effect"},
+      {"name": "The Chase", "count": 3, "type": "Effect"},
+      {"name": "Friends Becoming Enemies", "count": 2, "type": "Effect"},
+      {"name": "I'll Take That As a \"No\"", "count": 2, "type": "Condition"},
+      {"name": "The Black Spot", "count": 2, "type": "Effect"},
+      {"name": "They're Here", "count": 2, "type": "Condition"},
+      {"name": "Wake the Kraken!", "count": 2, "type": "Effect"},
+      {"name": "Wyvern Speaks", "count": 2, "type": "Condition"},
+      {"name": "Bootstrap Bill", "count": 1, "type": "Ally"},
+      {"name": "Clanker", "count": 1, "type": "Ally"},
+      {"name": "First Mate Maccus", "count": 1, "type": "Ally"},
+      {"name": "Hadras", "count": 1, "type": "Ally"},
+      {"name": "The Flying Dutchman", "count": 1, "type": "Item"},
+      {"name": "The Kraken", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Calypso's Love", "count": 3, "type": "Effect"},
+      {"name": "Curse You, Jack Sparrow", "count": 3, "type": "Effect"},
+      {"name": "Where Does It Point?", "count": 3, "type": "Effect"},
+      {"name": "Elizabeth Swann", "count": 1, "type": "Hero"},
+      {"name": "Jack Sparrow", "count": 1, "type": "Hero"},
+      {"name": "James Norrington", "count": 1, "type": "Hero"},
+      {"name": "The Black Pearl", "count": 1, "type": "Item"},
+      {"name": "The Crew of the Black Pearl", "count": 1, "type": "Hero"},
+      {"name": "Will Turner", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Tamatoa": {
+    "villain": [
+      {"name": "Eight-Eyed Bats", "count": 4, "type": "Ally"},
+      {"name": "Not Exactly Maui Time", "count": 4, "type": "Effect"},
+      {"name": "Crustacean With the Power of Creation", "count": 3, "type": "Effect"},
+      {"name": "Bait", "count": 2, "type": "Effect"},
+      {"name": "Fish Are Dumb", "count": 2, "type": "Condition"},
+      {"name": "I'll Tell You in Song", "count": 2, "type": "Effect"},
+      {"name": "Nice and Shiny", "count": 2, "type": "Effect"},
+      {"name": "Not So Tough", "count": 2, "type": "Condition"},
+      {"name": "Trapped", "count": 2, "type": "Effect"},
+      {"name": "You Look Like Seafood", "count": 2, "type": "Effect"},
+      {"name": "Fish Monster", "count": 1, "type": "Ally"},
+      {"name": "Maui's Hook", "count": 1, "type": "Item"},
+      {"name": "Powerless", "count": 1, "type": "Effect"},
+      {"name": "Sloth Monster", "count": 1, "type": "Ally"},
+      {"name": "Tree Monster", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Maui Time", "count": 3, "type": "Effect"},
+      {"name": "Something Shiny", "count": 3, "type": "Item"},
+      {"name": "Escape", "count": 2, "type": "Effect"},
+      {"name": "Still Upside Down", "count": 2, "type": "Effect"},
+      {"name": "Heart of Te Fiti", "count": 1, "type": "Item"},
+      {"name": "Heihei", "count": 1, "type": "Hero"},
+      {"name": "Maui", "count": 1, "type": "Hero"},
+      {"name": "Mini Maui", "count": 1, "type": "Effect"},
+      {"name": "Moana", "count": 1, "type": "Hero"}
+    ],
+    "extra": [
+      {"title": "Maui deck", "note": "Mauis work like Effects.", "cards": [
+        {"name": "Beetle Maui", "count": 1, "type": "Maui"},
+        {"name": "Fish Maui", "count": 1, "type": "Maui"},
+        {"name": "Heihei Maui", "count": 1, "type": "Maui"},
+        {"name": "Lizard Maui", "count": 1, "type": "Maui"},
+        {"name": "Pig Maui", "count": 1, "type": "Maui"},
+        {"name": "Reindeer Maui", "count": 1, "type": "Maui"},
+        {"name": "Sea Star Maui", "count": 1, "type": "Maui"},
+        {"name": "Shark Head Maui", "count": 1, "type": "Maui"},
+        {"name": "Shark Maui", "count": 1, "type": "Maui"},
+        {"name": "Shark Tail Maui", "count": 1, "type": "Maui"}
+      ]}
+    ]
+  },
+  "Ernesto de la Cruz": {
+    "villain": [
+      {"name": "Security Guards", "count": 5, "type": "Ally"},
+      {"name": "I Did All My Own Stunts", "count": 3, "type": "Effect"},
+      {"name": "I Have a Great Great Grandson", "count": 3, "type": "Effect"},
+      {"name": "Poco Loco", "count": 3, "type": "Effect"},
+      {"name": "Extending His Stay", "count": 2, "type": "Effect"},
+      {"name": "Forgetting Me", "count": 2, "type": "Effect"},
+      {"name": "From My Amazing Fans", "count": 2, "type": "Condition"},
+      {"name": "I Would Move Heaven and Earth", "count": 2, "type": "Effect"},
+      {"name": "Most Beloved Musician", "count": 2, "type": "Condition"},
+      {"name": "Seize Your Moment", "count": 2, "type": "Effect"},
+      {"name": "Whatever It Takes", "count": 2, "type": "Effect"},
+      {"name": "Bouncer", "count": 1, "type": "Ally"},
+      {"name": "Ernesto's Guitar", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "...Until 1942", "count": 2, "type": "Effect"},
+      {"name": "Broadcasting", "count": 2, "type": "Effect"},
+      {"name": "Escape Plan", "count": 2, "type": "Effect"},
+      {"name": "Dante", "count": 1, "type": "Hero"},
+      {"name": "Family Blessing", "count": 1, "type": "Item"},
+      {"name": "Héctor Rivera", "count": 1, "type": "Hero"},
+      {"name": "Mamá Imelda", "count": 1, "type": "Hero"},
+      {"name": "Miguel Rivera", "count": 1, "type": "Hero"},
+      {"name": "Pepita", "count": 1, "type": "Hero"},
+      {"name": "Remember Me", "count": 1, "type": "Effect"},
+      {"name": "Rivera Ancestors", "count": 1, "type": "Hero"},
+      {"name": "Rivera Family", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Prince Hans": {
+    "villain": [
+      {"name": "Wolves", "count": 5, "type": "Ally"},
+      {"name": "I Love Crazy", "count": 3, "type": "Effect"},
+      {"name": "Monster!", "count": 3, "type": "Effect"},
+      {"name": "Prince Hans In Charge", "count": 3, "type": "Effect"},
+      {"name": "Sorcery!", "count": 3, "type": "Effect"},
+      {"name": "A Real Howler in July", "count": 2, "type": "Effect"},
+      {"name": "Don't Feel", "count": 2, "type": "Condition"},
+      {"name": "Finish Each Other's Sandwiches", "count": 2, "type": "Condition"},
+      {"name": "So Desperate For Love", "count": 2, "type": "Effect"},
+      {"name": "You Froze Her Heart", "count": 2, "type": "Effect"},
+      {"name": "Duke of Weselton", "count": 1, "type": "Ally"},
+      {"name": "Erik", "count": 1, "type": "Ally"},
+      {"name": "Francis", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Do You Want to Build a Snowman?", "count": 2, "type": "Effect"},
+      {"name": "Let It Go", "count": 2, "type": "Effect"},
+      {"name": "The Love Experts", "count": 2, "type": "Hero"},
+      {"name": "True Love", "count": 2, "type": "Effect"},
+      {"name": "Anna", "count": 1, "type": "Hero"},
+      {"name": "Elsa", "count": 1, "type": "Hero"},
+      {"name": "Kristoff", "count": 1, "type": "Hero"},
+      {"name": "Marshmallow", "count": 1, "type": "Hero"},
+      {"name": "Olaf", "count": 1, "type": "Hero"},
+      {"name": "Sven", "count": 1, "type": "Hero"},
+      {"name": "The Real Frozen Heart", "count": 1, "type": "Effect"}
+    ]
+  },
+  "Sanderson Sisters": {
+    "villain": [
+      {"name": "Dance, Dance, Dance", "count": 3, "type": "Effect"},
+      {"name": "Just Enough Left", "count": 3, "type": "Effect"},
+      {"name": "Pay the Toll", "count": 3, "type": "Effect"},
+      {"name": "Share the Life Force", "count": 3, "type": "Effect"},
+      {"name": "We're Home", "count": 3, "type": "Effect"},
+      {"name": "You Can't Save Your Friends", "count": 3, "type": "Effect"},
+      {"name": "Just a Bunch of Hocus Pocus", "count": 2, "type": "Condition"},
+      {"name": "Master!", "count": 2, "type": "Effect"},
+      {"name": "We're Young... Well, Younger", "count": 2, "type": "Condition"},
+      {"name": "Ice", "count": 1, "type": "Ally"},
+      {"name": "Jay", "count": 1, "type": "Ally"},
+      {"name": "Make Thyself Known", "count": 1, "type": "Effect"},
+      {"name": "Mary Sanderson", "count": 1, "type": "Witch"},
+      {"name": "Sarah Sanderson", "count": 1, "type": "Witch"},
+      {"name": "Winifred Sanderson", "count": 1, "type": "Witch"}
+    ],
+    "fate": [
+      {"name": "Burning Rain of Death", "count": 2, "type": "Effect"},
+      {"name": "Daylight Savings", "count": 2, "type": "Effect"},
+      {"name": "Hallowed Ground", "count": 2, "type": "Item"},
+      {"name": "Salt", "count": 2, "type": "Item"},
+      {"name": "Allison Watts", "count": 1, "type": "Hero"},
+      {"name": "Binx", "count": 1, "type": "Hero"},
+      {"name": "Dani Dennison", "count": 1, "type": "Hero"},
+      {"name": "Fire, It's Hot!", "count": 1, "type": "Effect"},
+      {"name": "Max Dennison", "count": 1, "type": "Hero"},
+      {"name": "Sunrise", "count": 1, "type": "Effect"},
+      {"name": "We Have a Child", "count": 1, "type": "Effect"}
+    ]
+  },
+  "Captain Hook [I2E]": {
+    "villain": [
+      {"name": "Boarding Party", "count": 3, "type": "Ally"},
+      {"name": "Give Them a Scare", "count": 3, "type": "Effect"},
+      {"name": "Swashbuckler", "count": 3, "type": "Ally"},
+      {"name": "Worthy Opponent", "count": 3, "type": "Effect"},
+      {"name": "Aye, Aye, Sir!", "count": 2, "type": "Effect"},
+      {"name": "Cannon", "count": 2, "type": "Item"},
+      {"name": "Cunning", "count": 2, "type": "Condition"},
+      {"name": "Cutlass", "count": 2, "type": "Item"},
+      {"name": "Hook's Case", "count": 2, "type": "Item"},
+      {"name": "Obsession", "count": 2, "type": "Condition"},
+      {"name": "Pirate Brute", "count": 2, "type": "Ally"},
+      {"name": "Ingenious Device", "count": 1, "type": "Item"},
+      {"name": "Mr. Starkey", "count": 1, "type": "Ally"},
+      {"name": "Neverland Map", "count": 1, "type": "Item"},
+      {"name": "Smee", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Pixie Dust", "count": 3, "type": "Item"},
+      {"name": "Lost Boys", "count": 2, "type": "Hero"},
+      {"name": "Splitting Headache", "count": 2, "type": "Effect"},
+      {"name": "Taunt", "count": 2, "type": "Item"},
+      {"name": "John", "count": 1, "type": "Hero"},
+      {"name": "Michael", "count": 1, "type": "Hero"},
+      {"name": "Peter Pan", "count": 1, "type": "Hero"},
+      {"name": "Tick Tock", "count": 1, "type": "Hero"},
+      {"name": "Tinker Bell", "count": 1, "type": "Hero"},
+      {"name": "Wendy", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Maleficent [I2E]": {
+    "villain": [
+      {"name": "Cackling Goon", "count": 3, "type": "Ally"},
+      {"name": "Dragon Form", "count": 3, "type": "Effect"},
+      {"name": "Forest of Thorns", "count": 3, "type": "Curse"},
+      {"name": "Green Fire", "count": 3, "type": "Curse"},
+      {"name": "Savage Goon", "count": 3, "type": "Ally"},
+      {"name": "Sinister Goon", "count": 3, "type": "Ally"},
+      {"name": "Vanish", "count": 3, "type": "Effect"},
+      {"name": "Dreamless Sleep", "count": 2, "type": "Curse"},
+      {"name": "Malice", "count": 2, "type": "Condition"},
+      {"name": "Tyranny", "count": 2, "type": "Condition"},
+      {"name": "Raven", "count": 1, "type": "Ally"},
+      {"name": "Spinning Wheel", "count": 1, "type": "Item"},
+      {"name": "Staff", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Guards", "count": 3, "type": "Hero"},
+      {"name": "Sword of Truth", "count": 3, "type": "Item"},
+      {"name": "Once Upon a Dream", "count": 2, "type": "Effect"},
+      {"name": "Aurora", "count": 1, "type": "Hero"},
+      {"name": "Fauna", "count": 1, "type": "Hero"},
+      {"name": "Flora", "count": 1, "type": "Hero"},
+      {"name": "King Hubert", "count": 1, "type": "Hero"},
+      {"name": "King Stefan", "count": 1, "type": "Hero"},
+      {"name": "Merryweather", "count": 1, "type": "Hero"},
+      {"name": "Prince Phillip", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Prince John [I2E]": {
+    "villain": [
+      {"name": "Beautiful, Lovely Taxes", "count": 3, "type": "Effect"},
+      {"name": "Imprison", "count": 3, "type": "Effect"},
+      {"name": "Rhino Guards", "count": 3, "type": "Ally"},
+      {"name": "Warrant", "count": 3, "type": "Item"},
+      {"name": "Wolf Archers", "count": 3, "type": "Ally"},
+      {"name": "Bow and Arrows", "count": 2, "type": "Item"},
+      {"name": "Cowardice", "count": 2, "type": "Condition"},
+      {"name": "Greed", "count": 2, "type": "Condition"},
+      {"name": "Set a Trap", "count": 2, "type": "Effect"},
+      {"name": "Golden Arrow", "count": 1, "type": "Item"},
+      {"name": "Intimidation", "count": 1, "type": "Effect"},
+      {"name": "King Richard's Crown", "count": 1, "type": "Item"},
+      {"name": "Nutsy", "count": 1, "type": "Ally"},
+      {"name": "Sheriff of Nottingham", "count": 1, "type": "Ally"},
+      {"name": "Sir Hiss", "count": 1, "type": "Ally"},
+      {"name": "Trigger", "count": 1, "type": "Ally"}
+    ],
+    "fate": [
+      {"name": "Clever Disguise", "count": 3, "type": "Item"},
+      {"name": "Steal from the Rich", "count": 3, "type": "Effect"},
+      {"name": "Alan-a-Dale", "count": 1, "type": "Hero"},
+      {"name": "Friar Tuck", "count": 1, "type": "Hero"},
+      {"name": "King Richard", "count": 1, "type": "Hero"},
+      {"name": "Lady Kluck", "count": 1, "type": "Hero"},
+      {"name": "Little John", "count": 1, "type": "Hero"},
+      {"name": "Maid Marian", "count": 1, "type": "Hero"},
+      {"name": "Robin Hood", "count": 1, "type": "Hero"},
+      {"name": "Skippy", "count": 1, "type": "Hero"},
+      {"name": "Toby", "count": 1, "type": "Hero"}
+    ]
+  },
+  "Ursula [I2E]": {
+    "villain": [
+      {"name": "Binding Contract", "count": 6, "type": "Item"},
+      {"name": "Change Form", "count": 3, "type": "Effect"},
+      {"name": "Grow Giant", "count": 3, "type": "Effect"},
+      {"name": "Opportunist", "count": 3, "type": "Effect"},
+      {"name": "Whirlpool", "count": 3, "type": "Effect"},
+      {"name": "Arrogance", "count": 2, "type": "Condition"},
+      {"name": "Divination", "count": 2, "type": "Effect"},
+      {"name": "Trickery", "count": 2, "type": "Condition"},
+      {"name": "Cauldron", "count": 1, "type": "Item"},
+      {"name": "Crown", "count": 1, "type": "Item"},
+      {"name": "Flotsam", "count": 1, "type": "Ally"},
+      {"name": "Jetsam", "count": 1, "type": "Ally"},
+      {"name": "Poor Unfortunate Souls", "count": 1, "type": "Effect"},
+      {"name": "Trident", "count": 1, "type": "Item"}
+    ],
+    "fate": [
+      {"name": "Return to Form", "count": 3, "type": "Effect"},
+      {"name": "Dinglehopper", "count": 2, "type": "Item"},
+      {"name": "Snarfblat", "count": 2, "type": "Item"},
+      {"name": "Ariel", "count": 1, "type": "Hero"},
+      {"name": "Eric", "count": 1, "type": "Hero"},
+      {"name": "Flounder", "count": 1, "type": "Hero"},
+      {"name": "Grimsby", "count": 1, "type": "Hero"},
+      {"name": "King Triton", "count": 1, "type": "Hero"},
+      {"name": "Max", "count": 1, "type": "Hero"},
+      {"name": "Scuttle", "count": 1, "type": "Hero"},
+      {"name": "Sebastian", "count": 1, "type": "Hero"}
+    ]
+  }
+}

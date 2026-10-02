@@ -649,6 +649,25 @@ main {
 .cs-adv-empty { padding: 4px 14px 12px; color: var(--dim); font-size: 13px; }
 .cs-adv-seg .seg-btn { padding: 4px 11px; }
 
+/* Character detail: Villain deck, Fate deck and extras, one column per card
+   type, coloured like the physical cards' type banner. */
+.deck-ally      { --deck-c: #e5484d; }
+.deck-hero      { --deck-c: var(--gold); }
+.deck-effect    { --deck-c: #46a758; }
+.deck-item      { --deck-c: #3e9fe0; }
+.deck-condition { --deck-c: #d6409f; }
+.deck-other     { --deck-c: #8e4ec6; }
+.cs-deck { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.cs-deck-col { border-top: 3px solid var(--deck-c); }
+.cs-deck-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--deck-c); vertical-align: 1px; }
+.cs-deck-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-top: 1px solid var(--border); }
+.cs-deck-name  { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--text); }
+.cs-deck-count { flex-shrink: 0; font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.cs-deck-total { font-size: 12px; color: var(--muted); }
+.cs-deck-note { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.cs-deck-src { margin: 14px 2px 0; font-size: 12px; color: var(--muted); }
+.cs-deck-src a { color: var(--accent); text-decoration: none; }
+
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
 /* One-line description of what a page is for, right under its header. */
 .page-intro { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 0 0 16px; }
@@ -2485,6 +2504,24 @@ select:disabled {
 .home-ack-card a { color: var(--accent); text-decoration: none; }
 
 
+/* F.A.Q. entry on the home page, right under the Tutorial one. */
+.home-faq-link { margin-top: 8px; }
+
+/* ── FAQ PAGE ──────────────────────────────────────────────────────── */
+.faq-back { display: block; width: fit-content; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.faq-general-link { margin-bottom: 2rem; }
+.faq-group { margin-bottom: 2rem; }
+.faq-group-intro { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.faq-identity { margin-bottom: 1rem; }
+.faq-vil { font-weight: 500; color: var(--muted); }
+.faq-src { margin-top: 2px; font-size: 11px; color: var(--dim); }
+.faq-item mark { background: var(--accent-d); color: var(--text); border-radius: 3px; padding: 0 1px; }
+.faq-roster-sub { font-size: 11px; color: var(--muted); }
+.faq-count { margin: 0 0 12px 2px; font-size: 13px; color: var(--muted); }
+.faq-title-link { color: inherit; text-decoration: none; }
+.faq-credit { margin-top: 2rem; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.faq-credit a { color: var(--accent); text-decoration: none; }
+
 /* ── TUTORIAL PAGE ───────────────────────────────────────────────── */
 /* Reuses the home page's steps / FAQ cards; only the inline links are its own. */
 .tut-link { color: var(--accent); text-decoration: none; }
@@ -2673,6 +2710,8 @@ select:disabled {
   .cs-adv-row:hover .cs-adv-name            { text-decoration: underline; }
   .home-ack-card a:hover                    { text-decoration: underline; }
   .tut-link:hover                           { text-decoration: underline; }
+  .faq-back:hover, .faq-title-link:hover,
+  .faq-credit a:hover                       { text-decoration: underline; }
   .acct-nick-link:hover                     { text-decoration: underline; text-underline-offset: 2px; }
   .lb-row:hover                             { background: var(--s2); }
   .pf-identity:hover                        { opacity: 1; }

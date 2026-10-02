@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Villains</title>
+  <title>DiVilytics | F.A.Q.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -41,35 +41,28 @@
 </nav>
 
 <main>
-  <div class="page-header align-top">
-    <div>
-      <h2>Villains</h2>
-    </div>
-    <div class="cs-search" id="csSearchWrap">
-      <input type="text" id="csSearchInput" placeholder="Jump to villain…" autocomplete="off" disabled>
-      <div class="cs-dropdown" id="csDropdown"></div>
+  <div class="page-header has-search-control">
+    <h2>F.A.Q.</h2>
+    <div class="cs-search">
+      <input type="text" id="faqSearchInput" placeholder="Search the FAQ…" autocomplete="off" disabled>
     </div>
   </div>
-  <p class="page-intro">Stats, rivalries and objectives for every villain.</p>
+  <p class="page-intro">Rules clarifications, general and villain by villain.</p>
 
-  <div id="csIdentity"></div>
-
-  <div id="csRoot" class="spinner">Loading…</div>
-  <div id="csDeck"></div>
-  <div id="csFaq"></div>
+  <div id="faqRoot" class="spinner">Loading…</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="db.js"></script>
-  <script src="theme.js"></script>
-  <script src="ui.js"></script>
-  <script src="avatar.js"></script>
-  <script src="achievements.js"></script>
-  <script src="stats-table.js"></script>
-  <script src="search.js"></script>
-  <script src="game-card.js"></script>
-  <script src="shared.js"></script>
-<script src="villains.js"></script>
+<script src="theme.js"></script>
+<script src="ui.js"></script>
+<script src="avatar.js"></script>
+<script src="achievements.js"></script>
+<script src="stats-table.js"></script>
+<script src="search.js"></script>
+<script src="game-card.js"></script>
+<script src="shared.js"></script>
+<script src="faq.js"></script>
 </body>
 </html>
