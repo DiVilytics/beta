@@ -172,6 +172,15 @@ async function loadCardNames() {
   return _cardNames;
 }
 
+// Card texts in the current language, same shape as the names (card-texts.it.json,
+// transcribed from the Italian cards). Empty in English; missing cards stay English.
+let _cardTexts = null;
+async function loadCardTexts() {
+  if (LANG === 'en') return {};
+  if (!_cardTexts) _cardTexts = await _fetchJson(DATA_CARD_TEXTS_URL.replace('{lang}', LANG));
+  return _cardTexts;
+}
+
 let _boxInfo = null;
 async function loadBoxInfo() {
   if (!_boxInfo) _boxInfo = await _fetchJson(DATA_BOX_INFO_URL);

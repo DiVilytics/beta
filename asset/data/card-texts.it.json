@@ -1,0 +1,28 @@
+{
+  "Oogie Boogie": {
+    "Impostor Sandy Claws": "Quando Finto Babbo Nachele viene giocato, lancia i dadi: se il risultato è 7 o maggiore, metti questa carta vicino a Babbo Nachele. Se Jack Skeletron è in gioco, riduci invece la sua Forza di 1. Se il risultato è 6 o meno, scarta questa carta.",
+    "Bats": "Quando usi i Pipistrelli in un'azione Scontro, mettili nella pila degli scarti. Cerca nella pila degli scarti un Alleato e aggiungi quell'Alleato alla mano del Bau Bau.",
+    "Loaded Dice": "Puoi giocare i Dadi Truccati subito dopo un lancio di dadi (non è necessario usare l'azione Giocare una Carta). Rilancia un dado e scarta questa carta.",
+    "Making Christmastime": "Lancia i dadi. Se ottieni 8 o più, usa una qualsiasi delle Azioni non Fato disponibili nel Reame del Bau Bau. Se ottieni 7 o meno, pesca una carta.",
+    "Spiders": "Quando i Ragni sono usati per sconfiggere un Eroe, ottieni 1 Gettone Potere e pesca una carta.",
+    "Trick or Treat": "Durante il suo turno, se un altro giocatore ottiene Gettoni Potere, puoi giocare Dolcetto o Scherzetto. Lancia i dadi. Se ottieni 8 o più, il Bau Bau ottiene la stessa quantità di Potere. Se ottieni 7 o meno, prendi un Gettone Potere da un giocatore qualsiasi.",
+    "What Did Santa Bring You?": "Durante il suo turno, se un altro giocatore usa un'azione Giocare una Carta, puoi giocare Che Ti Ha Portato Babbo Natale? Puoi scartare un qualsiasi numero di carte dalla tua mano e pescare due carte.",
+    "What Have We Here?": "Svolgi un'azione Scontro. Poi, lancia i dadi. Se ottieni 8 o più, non scartare gli Alleati usati per sconfiggere l'Eroe. Se ottieni 7 o meno, riprendi in mano gli Alleati.",
+    "Barrel": "Prendo ottiene +1 Forza fintanto che Vedo è in gioco. Prendo ottiene +1 Forza fintanto che Vado è in gioco. Quando il Bau Bau tira i dadi mentre si trova nello stesso Luogo di Prendo, aggiungi 1 al risultato.",
+    "Bathtub": "Questo Luogo ottiene: azione Attiva.\nAttiva per muovere la Vasca da Bagno in un nuovo Luogo, poi muovi un qualsiasi numero di Alleati in quel Luogo.",
+    "It's a Vacation": "Scarta le prime tre carte del mazzo Fato. Pesca una carta dal mazzo Cattivo per ciascun Eroe così scartato.",
+    "Lock": "Vado ottiene +1 Forza fintanto che Vedo è in gioco. Vado ottiene +1 Forza fintanto che Prendo è in gioco. Gli Alleati costano 1 in meno per essere giocati.",
+    "Shock": "Vedo ottiene +1 Forza fintanto che Vado è in gioco. Vedo ottiene +1 Forza fintanto che Prendo è in gioco. Quando il Bau Bau si muove nello stesso Luogo di Vedo, pesca una carta.",
+    "This Time, We Bagged Him": "Scegli e gioca un Effetto dalla pila degli scarti del Bau Bau senza pagarne il costo. Se devi lanciare i dadi, scegli tu il risultato che vuoi ottenere.",
+    "Doctor Finkelstein": "Quando il Dottor Finkelstein viene sconfitto, mettilo in cima al mazzo Fato e rimescolalo.",
+    "Citizens of Halloween Town": "Devi sconfiggere i Cittadini del Paese di Halloween prima di poter sconfiggere qualsiasi altro Eroe nel loro stesso Luogo.",
+    "Sally": "Quando Sally viene giocata, muovi il Bau Bau nello stesso Luogo. Fintanto che Sally è in gioco, il Bau Bau può muoversi solo in Luoghi a lui adiacenti.",
+    "Distraction": "Muovi un Eroe in un Luogo adiacente. Puoi scartare un Alleato o un Oggetto che si trova nel nuovo Luogo dell'Eroe.",
+    "Hello, Oogie!": "Metti Salve, Bau! sotto la pedina del Bau Bau. La prossima volta che il Bau Bau lancia i dadi, scarta Salve, Bau! e riduci il risultato di 2.",
+    "The Mayor of Halloween Town": "Quando il Sindaco del Paese di Halloween viene sconfitto, rivela carte dal mazzo Fato fino a che non trovi un Eroe. Gioca quell'Eroe in un qualsiasi Luogo.",
+    "Sandy Claws": "Quando vicino a Babbo Nachele sono impilate quattro carte Finto Babbo Nachele, trova Jack Skeletron e mettilo ne La Tana del Bau Bau. Rimuovi Babbo Nachele dal gioco.",
+    "Jack Skellington": "Quando Jack Skeletron viene giocato dal mazzo Fato, Jack Skeletron è un Effetto che fa scartare un Finto Babbo Nachele. In caso contrario, Jack Skeletron è un Eroe senza abilità aggiuntive.",
+    "Set Things Right": "Il Bau Bau deve mostrare la sua mano. Scegli una carta da scartare.",
+    "Zero": "Jack Skeletron ottiene +2 Forza fintanto che Zero è in gioco."
+  }
+}

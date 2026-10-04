@@ -655,6 +655,8 @@ let _deckCards = [];
 // a [TAG] rework uses its base villain's names plus any of its own.
 let _cardNameMap = {};
 const _cardName = name => _cardNameMap[name] || name;
+// Same for card texts: the Italian text when transcribed, else the wiki's English.
+let _cardTextMap = {};
 
 // Row summary of a cost/strength value: Card Guard's "1 (Club and Diamond) |
 // 2 (Spade and Heart)" shortens to "1/2"; the sheet shows the full value.
@@ -685,10 +687,10 @@ function openCardSheet(i) {
       ${stat(t('Cost'), c.cost)}
       ${stat(t('Strength'), c.strength)}
     </div>
-    <div class="cs-card-text">${_cardTextHTML(c.text)}</div>
-    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(c.back.text)}</div></div>` : ''}
+    <div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.name] || c.text)}</div>
+    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.back.name] || c.back.text)}</div></div>` : ''}
     ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}
-    <p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`;
+    ${_cardTextMap[c.name] ? '' : `<p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`}`;
   openOverlay('cardOverlay');
 }
 
@@ -767,10 +769,12 @@ window.addEventListener('resize', () => {
 async function renderDeck(charName) {
   const el = document.getElementById('csDeck');
   if (!el) return;
-  const [decks, names] = await Promise.all([loadVillainDecks(), loadCardNames()]);
+  const [decks, names, texts] = await Promise.all([loadVillainDecks(), loadCardNames(), loadCardTexts()]);
   const deck = decks[charName];
   if (!deck) { el.innerHTML = ''; return; }
-  _cardNameMap = { ...names[charName.replace(/\s*\[[^\]]+\]$/, '')], ...names[charName] };
+  const baseName = charName.replace(/\s*\[[^\]]+\]$/, '');
+  _cardNameMap = { ...names[baseName], ...names[charName] };
+  _cardTextMap = { ...texts[baseName], ...texts[charName] };
   _deckCards = [];
   el.innerHTML = _deckHTML('Villain deck', deck.villain)
     + _deckHTML('Fate deck', deck.fate)
