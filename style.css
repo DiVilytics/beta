@@ -2613,6 +2613,9 @@ select:disabled {
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */
 .back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
 .faq-general-link { margin-bottom: 2rem; }
+.faq-rulebook-link { margin-bottom: 10px; }
+.faq-rulebook-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.faq-rulebook-intro { margin: 0 0 1.5rem; font-size: 14px; color: var(--muted); line-height: 1.5; }
 .faq-group { margin-bottom: 2rem; }
 .faq-group-intro { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
 .faq-identity { margin-bottom: 1rem; }

@@ -1,12 +1,14 @@
 // F.A.Q. page: rules clarifications translated from the Villainous Italia F.A.Q.
-// (asset/data/faq.json). faq.html shows the topic menu, ?topic=general the
-// general rules and ?topic=<villain> one villain's entries. The search box
-// filters every entry across all topics; clearing it goes back to that view.
+// (asset/data/faq.json), plus the official rulebooks summarized. faq.html shows
+// the topic menu, ?topic=<rulebook id> a rulebook (e.g. ?topic=rules),
+// ?topic=general the general rules and ?topic=<villain> one villain's entries.
+// The search box filters every entry across all topics; clearing it goes back
+// to that view.
 
 const FAQ_GENERAL = 'general';
 
 let faqData  = null;
-let faqTopic = null;   // null = menu | FAQ_GENERAL | villain name | undefined = unknown
+let faqTopic = null;   // null = menu | rulebook id | FAQ_GENERAL | villain name | undefined = unknown
 
 function _faqHref(topic) {
   return `faq.html?topic=${encodeURIComponent(topic)}`;
@@ -18,7 +20,17 @@ function _resolveTopic(raw) {
   if (!raw) return null;
   if (raw.toLowerCase() === FAQ_GENERAL) return FAQ_GENERAL;
   const base  = raw.toLowerCase();
-  return Object.keys(faqData.villains).find(v => v.toLowerCase() === base);
+  return Object.keys(_rulebooks()).find(id => id === base)
+    || Object.keys(faqData.villains).find(v => v.toLowerCase() === base);
+}
+
+// The official rulebooks, summarized: { id: { title, desc, intro, groups } }.
+function _rulebooks() {
+  return faqData.rulebooks || {};
+}
+
+function _countItems(groups) {
+  return groups.reduce((n, g) => n + g.items.length, 0);
 }
 
 // ── HIGHLIGHT / MATCH ─────────────────────────────────────────────────────────
@@ -72,8 +84,16 @@ function _villainNames() {
 }
 
 function _menuHTML() {
-  const generalCount = faqData.general.reduce((n, g) => n + g.items.length, 0);
+  const generalCount = _countItems(faqData.general);
   return `
+    ${Object.entries(_rulebooks()).map(([id, rb]) => `
+      <a class="home-section-link faq-rulebook-link" href="${_faqHref(id)}">
+        <span class="home-section-icon">📖</span>
+        <div class="home-section-text">
+          <span class="home-section-name">${_esc(rb.title)}</span>
+          <span class="home-section-desc">${_esc(rb.desc)} (${tn(_countItems(rb.groups), '{n} entry', '{n} entries')})</span>
+        </div>
+      </a>`).join('')}
     <a class="home-section-link faq-general-link" href="${_faqHref(FAQ_GENERAL)}">
       <span class="home-section-icon">⚖️</span>
       <div class="home-section-text">
@@ -95,13 +115,25 @@ function _menuHTML() {
 
 const _BACK_HTML = `<a class="back-link" href="faq.html">${t('← All topics')}</a>`;
 
-function _generalHTML() {
-  return _BACK_HTML + faqData.general.map(g => `
+function _groupsHTML(groups) {
+  return groups.map(g => `
     <div class="faq-group">
       <h2 class="home-faq-title">${_esc(g.title)}</h2>
       ${g.intro ? `<p class="faq-group-intro">${_esc(g.intro)}</p>` : ''}
       ${_listHTML(g.items, null)}
     </div>`).join('');
+}
+
+function _generalHTML() {
+  return _BACK_HTML + _groupsHTML(faqData.general);
+}
+
+function _rulebookHTML(id) {
+  const rb = _rulebooks()[id];
+  return `${_BACK_HTML}
+    <h2 class="faq-rulebook-title">${_esc(rb.title)}</h2>
+    ${rb.intro ? `<p class="faq-rulebook-intro">${_esc(rb.intro)}</p>` : ''}
+    ${_groupsHTML(rb.groups)}`;
 }
 
 function _villainHTML(v) {
@@ -120,6 +152,12 @@ function _resultsHTML(q) {
   const terms = _searchTerms(q);
   const re    = _termsRegex(terms);
   const groups = [];
+  for (const [id, rb] of Object.entries(_rulebooks())) {
+    for (const g of rb.groups) {
+      const items = g.items.filter(it => _matches(it, `${rb.title} ${g.title}`, terms));
+      if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(id)}">${_esc(rb.title)}</a> <span>${_esc(g.title)}</span>`, items });
+    }
+  }
   for (const g of faqData.general) {
     const items = g.items.filter(it => _matches(it, `${t('General')} ${g.title}`, terms));
     if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(FAQ_GENERAL)}">${t('General')}</a> <span>${_esc(g.title)}</span>`, items });
@@ -144,6 +182,7 @@ function render() {
   if (q.trim())                   root.innerHTML = _resultsHTML(q);
   else if (faqTopic === null)     root.innerHTML = _menuHTML();
   else if (faqTopic === FAQ_GENERAL) root.innerHTML = _generalHTML();
+  else if (_rulebooks()[faqTopic])   root.innerHTML = _rulebookHTML(faqTopic);
   else if (faqTopic)              root.innerHTML = _villainHTML(faqTopic);
   else root.innerHTML = `${_BACK_HTML}<div class="empty"><h3>${t('Topic not found')}</h3><p>${_esc(new URLSearchParams(location.search).get('topic') || '')}</p></div>`;
 }
@@ -164,6 +203,7 @@ async function init() {
 
   faqTopic = _resolveTopic((new URLSearchParams(location.search).get('topic') || '').trim());
   if (faqTopic === FAQ_GENERAL) document.title = `DiVilytics | F.A.Q. | ${t('General')}`;
+  else if (_rulebooks()[faqTopic]) document.title = `DiVilytics | F.A.Q. | ${_rulebooks()[faqTopic].title}`;
   else if (faqTopic)            document.title = `DiVilytics | F.A.Q. | ${villainName(faqTopic)}`;
 
   const input = document.getElementById('faqSearchInput');

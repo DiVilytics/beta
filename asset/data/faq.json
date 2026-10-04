@@ -1,4 +1,127 @@
 {
+  "rulebooks": {
+    "rules": {
+      "title": "Official rules",
+      "desc": "The base game rules, summarized",
+      "intro": "The official rules of Disney Villainous, from the base game rulebook (The Worst Takes It All, 2018), summarized in our own words. When a card contradicts these rules, the card wins.",
+      "groups": [
+        {
+          "title": "Game overview",
+          "items": [
+            { "term": "Winning", "text": "Each player is a different Villain with their own Objective, printed on their Board. As soon as a player fulfills their Objective, the game ends and they win. Some Objectives are only checked at the start of that player's turn, as their Board says. At the start of the game, read your Objective aloud so everyone knows what you're after." },
+            { "term": "Your Realm", "text": "Your Board is your Villain's Realm: four locations, and every card at them, at the top or the bottom, is in your Realm. A card's Ability only affects cards in the same Realm: nothing in your Realm ever affects another Villain's Realm, and the other way around." },
+            { "term": "Villain deck and Fate deck", "text": "Each player has two decks. You draw from your Villain deck (colored backs) and play its cards to the bottom of your Board to reach your Objective. Your opponents draw from your Fate deck (white backs) and play its cards to the top of your Board to slow you down." },
+            { "term": "Villain Guide and Reference Card", "text": "Your Villain Guide explains your Objective and your Villain's special rules. The Reference Card sums up how every Villain wins, so you can tell when an opponent is getting close, and its back explains the action symbols." }
+          ]
+        },
+        {
+          "title": "Setup",
+          "items": [
+            { "term": "Your components", "text": "Each player picks a Villain and takes its Board, Villain Mover, Villain deck, Fate deck and Villain Guide, plus a Reference Card. Put your Board in front of you and your Villain Mover on its left-most location." },
+            { "term": "Lock Tokens", "text": "If your right-most location shows a lock symbol in its corner, put a Lock Token on it: that location starts the game locked. Only some Villains have one." },
+            { "term": "Decks", "text": "Shuffle your Villain deck and put it face down to the left of your Board, and your Fate deck face down to the right, leaving room next to each for its discard pile. Then draw four cards from your Villain deck: that's your starting hand, kept secret." },
+            { "term": "Starting Power", "text": "Put the Power Tokens in the Cauldron, within everyone's reach, and choose a first player. The first player starts with no Power, the second takes 1, the third and fourth take 2 each, and the fifth and sixth take 3 each." }
+          ]
+        },
+        {
+          "title": "Your turn",
+          "items": [
+            { "term": "1. Move your Villain", "text": "Move your Villain Mover to a different location in your Realm. It can be any location that isn't locked, but you can't stay where you were." },
+            { "term": "2. Perform actions", "text": "Perform the actions shown at your new location, in any order. Each symbol is one action, and every action is optional." },
+            { "term": "Covered actions", "text": "An action covered by a Fate card can't be performed until that card is moved or defeated. If an action at your location gets uncovered during your turn, you can perform it right away; if it gets covered before you've used it, you lose it." },
+            { "term": "Where actions apply", "text": "Your Villain's location decides which actions you get, but the actions themselves can be used at any unlocked location in your Realm (for example, a Vanquish somewhere else)." },
+            { "term": "3. Draw cards", "text": "At the end of your turn, if you have fewer than four cards, draw from your Villain deck until you have four. If you need to draw and your deck is empty, shuffle your discard pile to make a new deck. Then it's the next player's turn." }
+          ]
+        },
+        {
+          "title": "Actions",
+          "items": [
+            { "term": "Gain Power", "text": "Take as much Power from the Cauldron as the number on the symbol. Power is the game's currency: you spend it to play cards and to activate Abilities." },
+            { "term": "Play a Card", "text": "Play one card from your hand per symbol, paying its Cost (top left) by returning that much Power to the Cauldron. If you can't pay, you can't play it. Items and Allies go below any unlocked location in your Realm." },
+            { "term": "Activate", "text": "Choose one Item or Ally in your Realm with the Activate symbol, pay its Activation Cost if it has one, and use its Activated Ability. The card stays in your Realm." },
+            { "term": "Move an Item or Ally", "text": "Move one Item or one Ally to an adjacent location. Nothing can be moved into or out of a locked location, and an Item attached to an Ally or a Hero can't be moved on its own." },
+            { "term": "Move a Hero", "text": "Move one Hero to an adjacent location, never into or out of a locked location." },
+            { "term": "Vanquish", "text": "Defeat one Hero using Allies that are already at the same location, with a total Strength equal to or higher than the Hero's. Use only the Allies you need: they go to your Villain discard pile, the Hero goes to your Fate discard pile, and any other Allies stay where they are." },
+            { "term": "Fate", "text": "Choose an opponent and reveal the top two cards of their Fate deck. Play one of them against that opponent, however you like, and discard the other to their Fate discard pile. A Hero goes to the top of any unlocked location in their Realm." },
+            { "term": "Fate Token", "text": "With four or more players, when you're targeted by a Fate action, take the Fate Token from the last player who was targeted. While you have it, nobody can target you." },
+            { "term": "Discard Cards", "text": "Discard as many cards from your hand as you like, face up to your Villain discard pile. You don't draw right away: you draw back up to four at the end of your turn." }
+          ]
+        },
+        {
+          "title": "Card types",
+          "items": [
+            { "term": "Allies", "text": "Your henchmen, only in the Villain deck. Pay the Cost and put the Ally below any unlocked location. Allies Vanquish Heroes at their location, and most have an Ability, so you'll often weigh keeping one against spending it." },
+            { "term": "Heroes", "text": "The do-gooders, only in the Fate deck. A Hero is played covering the top of any unlocked location in an opponent's Realm, and the actions it covers stay unavailable until it's moved or defeated. If the Hero covering a location's actions is defeated, slide another Hero at that location down to cover them." },
+            { "term": "Effects", "text": "One-time events, in both decks. Pay the Cost if there is one, do what the card says, then discard it." },
+            { "term": "Items", "text": "In both decks. An Item from the Villain deck goes below any unlocked location, unless it says to attach it to an Ally (then you need an Ally to attach it to). An Item from the Fate deck is always attached to a Hero, so it can't be played if there's no Hero. Attached Items move and are discarded with their card." },
+            { "term": "Conditions", "text": "Played during an opponent's turn, as soon as the requirement on the card is met, without a Play a Card action. Do what it says and discard it. You don't draw a replacement until the end of your own turn, and the opponent's turn goes on." },
+            { "term": "Activated Abilities", "text": "Some Items and Allies have an Ability that only works when activated, shown by the Activate symbol. Each use takes an Activate action and the Activation Cost, if any, with no limit on how many times. An Ally with an Activated Ability that is used to Vanquish is discarded as usual." },
+            { "term": "Cards at a location", "text": "There's no limit to how many cards can be at a location: overlap them so all are visible. A card's Ability is in effect for as long as the card is in the Realm. Some Villains have card types of their own, explained in their Villain Guide." }
+          ]
+        },
+        {
+          "title": "Key rules",
+          "items": [
+            { "term": "Locked locations", "text": "A location with a Lock Token is locked. Your Villain can't move there, and cards can't be played to it, moved to it or moved out of it. A card that was already there when the location got locked keeps its Ability." },
+            { "term": "Playing vs. moving", "text": "Playing a card means adding it to a Realm, from a hand or a deck; moving means taking a card already in the Realm to another location. An Ability that triggers when a card is played doesn't trigger when it's moved, and the other way around." },
+            { "term": "Revealing vs. looking", "text": "Revealed cards are shown to everyone; cards you look at, only you see. If you need to reveal or look at a card from an empty deck, first shuffle its discard pile to make a new deck." },
+            { "term": "Finding a Hero", "text": "When a card tells you to find a Hero and play them, take them from wherever they are: first check the Realm (if they're there, pick them up and play them where the card says), then the Fate discard pile, then the Fate deck, which you then reshuffle." }
+          ]
+        },
+        {
+          "title": "Questions from the rulebook",
+          "items": [
+            { "term": "Card vs. rules", "text": "When a card's Ability conflicts with the rules, the card wins." },
+            { "term": "Unplayable Fate cards", "text": "A Fate card that can't be played (such as an Item with no Hero to attach it to) is discarded, and you don't reveal another one. If neither revealed card can be played, both are discarded." },
+            { "term": "Several Heroes at one location", "text": "You choose which one to defeat." },
+            { "term": "Which Strength counts", "text": "Always the current one: the printed Strength plus or minus every Ability in effect in the Realm. A Hero printed at 5 who gets -1 Strength is a 4 for all purposes." },
+            { "term": "Heroes at 0 Strength", "text": "They aren't removed on their own: you still need a Vanquish action or a card Ability. With a Vanquish, no Allies are discarded, and you don't even need an Ally at that location." },
+            { "term": "Heroes at the bottom", "text": "Fate cards are always played and moved along the top of the Board, unless a card says to move one to the bottom." }
+          ]
+        }
+      ]
+    },
+    "rules-i2e": {
+      "title": "Introduction to Evil rules",
+      "desc": "What changes in Introduction to Evil",
+      "intro": "Introduction to Evil (2023) plays by the official rules, with the differences below, from its rulebook and summarized in our own words. Anything not listed here works as in the official rules.",
+      "groups": [
+        {
+          "title": "Setup",
+          "items": [
+            { "term": "Starting Power", "text": "Every player starts with 2 Power, whatever their place in turn order." },
+            { "term": "Villain Mover", "text": "Your Villain Mover starts on your Villain's portrait, not on a location, so on your first turn you can move to any of your four locations." },
+            { "term": "Decks", "text": "Both decks go to the left of your Realm: the Fate deck above the Villain deck, each with room for its discard pile." },
+            { "term": "No locked locations", "text": "There are no Lock Tokens: every location is open from the start." },
+            { "term": "Other versions", "text": "The rulebook notes that other versions of Disney Villainous add a small setup variant (different starting Power by turn order, locked locations). The players decide which one to use." }
+          ]
+        },
+        {
+          "title": "Actions",
+          "items": [
+            { "term": "No Activate action", "text": "The boards and cards have no Activate symbol, so there's no Activate action and no Activated Ability. The other seven actions work as in the official rules." },
+            { "term": "One or more actions", "text": "On your turn you perform one or more of the actions at your Villain's location. As usual, all of them are optional and each symbol is one action." }
+          ]
+        },
+        {
+          "title": "Winning",
+          "items": [
+            { "term": "Completing your Objective", "text": "As soon as a player completes their whole Objective, as described in their Villain Guide, the game ends and they win. It doesn't matter where their Villain Mover is or which Heroes are in their Realm. None of the four Objectives waits for the start of the turn." }
+          ]
+        },
+        {
+          "title": "Clarifications",
+          "items": [
+            { "term": "Effects", "text": "An Effect is in your Realm only while it's being resolved, and leaves it as soon as it's discarded. If you can't do what an Effect says, you can't play it." },
+            { "term": "Discarding through a card", "text": "When a card tells you to discard, you don't need a Discard Cards action." },
+            { "term": "Defeating or removing through a card", "text": "Card Abilities that let you defeat or remove a Hero don't need a Vanquish action and don't make you discard Allies." },
+            { "term": "Finding a card", "text": "When a card tells you to find a specific card, follow the card first. Otherwise look in this order: among the cards in play, in the discard pile, then in the deck (Villain or Fate), which you reshuffle after searching it." },
+            { "term": "Attached Items", "text": "There's no limit to how many Items can be attached to an Ally or a Hero. When the Ally or Hero moves or is discarded, its Items go with it." }
+          ]
+        }
+      ]
+    }
+  },
   "general": [
     {
       "title": "Core rules",

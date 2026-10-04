@@ -150,9 +150,11 @@ async function loadObjectives() {
   return _objectives;
 }
 
-// Rules F.A.Q.: { general: [{ title, intro?, items }], villains: { name: items } },
-// each item { term, text, villain?, source? }. Shown on faq.html. In Italian,
-// faq.it.json (same shape) replaces what it covers; villains it lacks stay English.
+// Rules F.A.Q.: { rulebooks: { id: { title, desc, intro, groups } },
+// general: [{ title, intro?, items }], villains: { name: items } }, each group
+// { title, intro?, items } and each item { term, text, villain?, source? }.
+// Shown on faq.html. In Italian, faq.it.json (same shape) replaces what it
+// covers, a rulebook or a villain at a time; what it lacks stays English.
 let _faq = null;
 async function loadFaq() {
   if (!_faq) _faq = await _fetchJsonLocalized(DATA_FAQ_URL, 2);

@@ -1,4 +1,283 @@
 {
+  "rulebooks": {
+    "rules": {
+      "title": "Regolamento ufficiale",
+      "desc": "Le regole del gioco base, riassunte",
+      "intro": "Le regole ufficiali di Disney Villainous, dal regolamento del gioco base (The Worst Takes It All, 2018), riassunte con parole nostre. Quando una carta contraddice queste regole, vale la carta.",
+      "groups": [
+        {
+          "title": "Panoramica",
+          "items": [
+            {
+              "term": "Vincere",
+              "text": "Ogni giocatore interpreta un Cattivo diverso, con il proprio Obiettivo stampato sulla Plancia. Appena un giocatore raggiunge il suo Obiettivo, la partita finisce e quel giocatore vince. Alcuni Obiettivi si verificano solo all'inizio del turno di quel giocatore, come indicato sulla sua Plancia. All'inizio della partita, leggi ad alta voce il tuo Obiettivo, così tutti sanno a cosa punti."
+            },
+            {
+              "term": "Il tuo Reame",
+              "text": "La tua Plancia è il Reame del tuo Cattivo: quattro Luoghi, e ogni carta che vi si trova, nella parte alta o in quella bassa, è nel tuo Reame. L'Abilità di una carta influenza solo le carte nello stesso Reame: niente nel tuo Reame influenza mai il Reame di un altro Cattivo, e viceversa."
+            },
+            {
+              "term": "Mazzo Cattivo e Mazzo Fato",
+              "text": "Ogni giocatore ha due mazzi. Dal tuo Mazzo Cattivo (dorso colorato) peschi e giochi carte nella parte bassa della tua Plancia per raggiungere l'Obiettivo. Dal tuo Mazzo Fato (dorso bianco) pescano i tuoi avversari, che ne giocano le carte nella parte alta della tua Plancia per rallentarti."
+            },
+            {
+              "term": "Guida del Cattivo e carta di riferimento",
+              "text": "La Guida del Cattivo spiega il tuo Obiettivo e le regole speciali del tuo Cattivo. La carta di riferimento riassume come vince ogni Cattivo, così puoi capire quando un avversario si sta avvicinando alla vittoria, e sul retro spiega i simboli delle azioni."
+            }
+          ]
+        },
+        {
+          "title": "Preparazione",
+          "items": [
+            {
+              "term": "Il tuo materiale",
+              "text": "Ogni giocatore sceglie un Cattivo e prende la sua Plancia, la Pedina, il Mazzo Cattivo, il Mazzo Fato e la Guida del Cattivo, più una carta di riferimento. Metti la Plancia davanti a te e la Pedina sul Luogo più a sinistra."
+            },
+            {
+              "term": "Segnalini Lucchetto",
+              "text": "Se il Luogo più a destra ha il simbolo di un lucchetto nell'angolo, mettici sopra un Segnalino Lucchetto: quel Luogo inizia la partita bloccato. Solo alcuni Cattivi ce l'hanno."
+            },
+            {
+              "term": "I mazzi",
+              "text": "Mescola il Mazzo Cattivo e mettilo coperto a sinistra della Plancia, e il Mazzo Fato coperto a destra, lasciando accanto a ciascuno lo spazio per la sua pila degli scarti. Poi pesca quattro carte dal Mazzo Cattivo: è la tua mano iniziale, da tenere segreta."
+            },
+            {
+              "term": "Potere iniziale",
+              "text": "Metti i Gettoni Potere nel Calderone, alla portata di tutti, e scegli il primo giocatore. Il primo giocatore inizia senza Potere, il secondo prende 1 Gettone, il terzo e il quarto 2 ciascuno, il quinto e il sesto 3 ciascuno."
+            }
+          ]
+        },
+        {
+          "title": "Il tuo turno",
+          "items": [
+            {
+              "term": "1. Muovi il tuo Cattivo",
+              "text": "Muovi la tua Pedina in un Luogo diverso del tuo Reame. Può essere qualsiasi Luogo non bloccato, ma non puoi restare dove eri."
+            },
+            {
+              "term": "2. Svolgi le azioni",
+              "text": "Svolgi le azioni indicate nel nuovo Luogo, nell'ordine che preferisci. Ogni simbolo vale un'azione, e tutte le azioni sono facoltative."
+            },
+            {
+              "term": "Azioni coperte",
+              "text": "Un'azione coperta da una carta Fato non può essere svolta finché quella carta non viene mossa o sconfitta. Se durante il tuo turno un'azione nel tuo Luogo viene scoperta, puoi svolgerla subito; se viene coperta prima che tu l'abbia usata, la perdi."
+            },
+            {
+              "term": "Dove valgono le azioni",
+              "text": "Il Luogo del tuo Cattivo decide quali azioni puoi svolgere, ma le azioni stesse possono riguardare qualsiasi Luogo non bloccato del tuo Reame (per esempio, uno Scontro altrove)."
+            },
+            {
+              "term": "3. Pesca",
+              "text": "Alla fine del turno, se hai meno di quattro carte, pesca dal Mazzo Cattivo fino ad averne quattro. Se devi pescare e il mazzo è vuoto, mescola la pila degli scarti per formare un nuovo mazzo. Poi tocca al giocatore successivo."
+            }
+          ]
+        },
+        {
+          "title": "Le azioni",
+          "items": [
+            {
+              "term": "Ottenere Potere",
+              "text": "Prendi dal Calderone tanti Gettoni Potere quanti ne indica il simbolo. Il Potere è la valuta del gioco: serve per giocare le carte e attivare le Abilità."
+            },
+            {
+              "term": "Giocare una Carta",
+              "text": "Gioca una carta dalla mano per ogni simbolo, pagandone il Costo (in alto a sinistra) con altrettanti Gettoni Potere da rimettere nel Calderone. Se non puoi pagare, non puoi giocarla. Oggetti e Alleati vanno sotto un qualsiasi Luogo non bloccato del tuo Reame."
+            },
+            {
+              "term": "Attivare",
+              "text": "Scegli un Oggetto o un Alleato del tuo Reame con il simbolo Attivare, paga il suo Costo di attivazione se ne ha uno e usa la sua Abilità attivata. La carta resta nel tuo Reame."
+            },
+            {
+              "term": "Muovere un Oggetto o un Alleato",
+              "text": "Muovi un Oggetto o un Alleato in un Luogo adiacente. Niente può essere mosso dentro o fuori da un Luogo bloccato, e un Oggetto assegnato a un Alleato o a un Eroe non può essere mosso da solo."
+            },
+            {
+              "term": "Muovere un Eroe",
+              "text": "Muovi un Eroe in un Luogo adiacente, mai dentro o fuori da un Luogo bloccato."
+            },
+            {
+              "term": "Scontro",
+              "text": "Sconfiggi un Eroe usando Alleati che si trovano già nel suo stesso Luogo, con una Forza totale pari o superiore a quella dell'Eroe. Usa solo gli Alleati necessari: vanno nella pila degli scarti del Mazzo Cattivo, l'Eroe in quella del Mazzo Fato, e gli altri Alleati restano dove sono."
+            },
+            {
+              "term": "Fato",
+              "text": "Scegli un avversario e rivela le prime due carte del suo Mazzo Fato. Giocane una contro di lui, come preferisci, e scarta l'altra nella pila degli scarti del suo Mazzo Fato. Un Eroe va nella parte alta di un qualsiasi Luogo non bloccato del suo Reame."
+            },
+            {
+              "term": "Segnalino Fato",
+              "text": "In quattro o più giocatori, quando sei il bersaglio di un'azione Fato prendi il Segnalino Fato dall'ultimo giocatore che è stato bersagliato. Finché lo hai tu, nessuno può bersagliarti."
+            },
+            {
+              "term": "Scartare Carte",
+              "text": "Scarta quante carte vuoi dalla mano, scoperte nella pila degli scarti del Mazzo Cattivo. Non peschi subito: torni a quattro carte alla fine del turno."
+            }
+          ]
+        },
+        {
+          "title": "Tipi di carte",
+          "items": [
+            {
+              "term": "Alleati",
+              "text": "I tuoi scagnozzi, solo nel Mazzo Cattivo. Paga il Costo e metti l'Alleato sotto un qualsiasi Luogo non bloccato. Gli Alleati sconfiggono gli Eroi nel loro Luogo con lo Scontro, e quasi tutti hanno un'Abilità: spesso dovrai scegliere se tenerli o sacrificarli."
+            },
+            {
+              "term": "Eroi",
+              "text": "I paladini del bene, solo nel Mazzo Fato. Un Eroe si gioca coprendo la parte alta di un qualsiasi Luogo non bloccato nel Reame di un avversario, e le azioni che copre restano non disponibili finché non viene mosso o sconfitto. Se viene sconfitto l'Eroe che copre le azioni di un Luogo, fai scendere un altro Eroe di quel Luogo per coprirle."
+            },
+            {
+              "term": "Effetti",
+              "text": "Eventi da usare una volta, in entrambi i mazzi. Paga il Costo se c'è, fai quello che dice la carta, poi scartala."
+            },
+            {
+              "term": "Oggetti",
+              "text": "In entrambi i mazzi. Un Oggetto del Mazzo Cattivo va sotto un qualsiasi Luogo non bloccato, a meno che non dica di assegnarlo a un Alleato (e allora serve un Alleato a cui assegnarlo). Un Oggetto del Mazzo Fato va sempre assegnato a un Eroe, quindi non si può giocare se non ci sono Eroi. Gli Oggetti assegnati si muovono e vengono scartati insieme alla loro carta."
+            },
+            {
+              "term": "Condizioni",
+              "text": "Si giocano durante il turno di un avversario, appena si verifica il requisito scritto sulla carta, senza un'azione Giocare una Carta. Fai quello che dice e scartala. Non peschi una carta al suo posto fino alla fine del tuo turno, e il turno dell'avversario continua."
+            },
+            {
+              "term": "Abilità attivate",
+              "text": "Alcuni Oggetti e Alleati hanno un'Abilità che funziona solo se attivata, indicata dal simbolo Attivare. Ogni uso richiede un'azione Attivare e il Costo di attivazione, se c'è, senza limite al numero di attivazioni. Un Alleato con un'Abilità attivata usato in uno Scontro viene scartato come al solito."
+            },
+            {
+              "term": "Carte in un Luogo",
+              "text": "Non c'è limite al numero di carte in un Luogo: sovrapponile in modo che siano tutte visibili. L'Abilità di una carta è attiva finché la carta resta nel Reame. Alcuni Cattivi hanno tipi di carte tutti loro, spiegati nella loro Guida."
+            }
+          ]
+        },
+        {
+          "title": "Regole chiave",
+          "items": [
+            {
+              "term": "Luoghi bloccati",
+              "text": "Un Luogo con un Segnalino Lucchetto è bloccato. Il tuo Cattivo non può andarci, e le carte non possono esservi giocate, mosse dentro o mosse fuori. Una carta che si trovava già lì quando il Luogo è stato bloccato mantiene la sua Abilità."
+            },
+            {
+              "term": "Giocare e muovere",
+              "text": "Giocare una carta significa aggiungerla a un Reame, dalla mano o da un mazzo; muoverla significa spostare in un altro Luogo una carta che è già nel Reame. Un'Abilità che si attiva quando una carta viene giocata non si attiva quando viene mossa, e viceversa."
+            },
+            {
+              "term": "Rivelare e guardare",
+              "text": "Le carte rivelate vengono mostrate a tutti; quelle che guardi, le vedi solo tu. Se devi rivelare o guardare una carta da un mazzo vuoto, prima mescola la sua pila degli scarti per formare un nuovo mazzo."
+            },
+            {
+              "term": "Trovare un Eroe",
+              "text": "Quando una carta ti dice di trovare un Eroe e giocarlo, prendilo ovunque si trovi: prima controlla il Reame (se è lì, toglilo dal suo Luogo e giocalo dove dice la carta), poi la pila degli scarti del Mazzo Fato, poi il Mazzo Fato, che va poi rimescolato."
+            }
+          ]
+        },
+        {
+          "title": "Domande dal regolamento",
+          "items": [
+            {
+              "term": "Carta contro regole",
+              "text": "Quando l'Abilità di una carta contraddice le regole, vale la carta."
+            },
+            {
+              "term": "Carte Fato non giocabili",
+              "text": "Una carta Fato che non si può giocare (per esempio un Oggetto senza Eroi a cui assegnarlo) viene scartata, e non se ne rivela un'altra. Se nessuna delle due carte rivelate si può giocare, vengono scartate entrambe."
+            },
+            {
+              "term": "Più Eroi nello stesso Luogo",
+              "text": "Scegli tu quale sconfiggere."
+            },
+            {
+              "term": "Quale Forza conta",
+              "text": "Sempre quella attuale: la Forza stampata, più o meno ogni Abilità attiva nel Reame. Un Eroe con Forza 5 stampata che riceve -1 Forza vale 4 a tutti gli effetti."
+            },
+            {
+              "term": "Eroi con Forza 0",
+              "text": "Non vengono rimossi da soli: serve comunque un'azione Scontro o l'Abilità di una carta. Con uno Scontro non si scartano Alleati, e non serve nemmeno avere un Alleato in quel Luogo."
+            },
+            {
+              "term": "Eroi nella parte bassa",
+              "text": "Le carte Fato si giocano e si muovono sempre nella parte alta della Plancia, a meno che una carta non dica di spostarne una nella parte bassa."
+            }
+          ]
+        }
+      ]
+    },
+    "rules-i2e": {
+      "title": "Regolamento di Introduction to Evil",
+      "desc": "Cosa cambia in Introduction to Evil",
+      "intro": "Introduction to Evil (2023) segue il regolamento ufficiale, con le differenze qui sotto, prese dal suo regolamento e riassunte con parole nostre. Tutto ciò che non è elencato funziona come nel regolamento ufficiale.",
+      "groups": [
+        {
+          "title": "Preparazione",
+          "items": [
+            {
+              "term": "Potere iniziale",
+              "text": "Ogni giocatore inizia con 2 gettoni Potere, qualunque sia il suo posto nell'ordine di turno."
+            },
+            {
+              "term": "Pedina Cattivo",
+              "text": "La tua Pedina Cattivo parte dal ritratto del tuo Cattivo, non da un Luogo, quindi al primo turno puoi muoverti in uno qualsiasi dei tuoi quattro Luoghi."
+            },
+            {
+              "term": "I mazzi",
+              "text": "Entrambi i mazzi vanno a sinistra del tuo Reame: il mazzo Fato sopra il mazzo Cattivo, ciascuno con lo spazio per la sua pila degli scarti."
+            },
+            {
+              "term": "Nessun Luogo bloccato",
+              "text": "Non ci sono Segnalini Lucchetto: tutti i Luoghi sono disponibili fin dall'inizio."
+            },
+            {
+              "term": "Altre versioni",
+              "text": "Il regolamento ricorda che le altre versioni di Disney Villainous aggiungono una piccola variante nella preparazione (Potere iniziale diverso secondo l'ordine di turno, Luoghi bloccati). Sono i giocatori a decidere quale usare."
+            }
+          ]
+        },
+        {
+          "title": "Le azioni",
+          "items": [
+            {
+              "term": "Nessuna azione Attivare",
+              "text": "Plance e carte non hanno il simbolo Attivare, quindi non ci sono l'azione Attivare né le Abilità attivate. Le altre sette azioni funzionano come nel regolamento ufficiale."
+            },
+            {
+              "term": "Una o più azioni",
+              "text": "Nel tuo turno svolgi una o più delle azioni presenti nel Luogo del tuo Cattivo. Come sempre, sono tutte facoltative e ogni simbolo vale un'azione."
+            }
+          ]
+        },
+        {
+          "title": "Come vincere",
+          "items": [
+            {
+              "term": "Completare l'Obiettivo",
+              "text": "Appena un giocatore completa l'intero Obiettivo, come descritto nella sua Guida al Cattivo, la partita termina e quel giocatore vince. Non importa dove si trovi la sua Pedina Cattivo né quali Eroi ci siano nel suo Reame. Nessuno dei quattro Obiettivi aspetta l'inizio del turno."
+            }
+          ]
+        },
+        {
+          "title": "Chiarimenti",
+          "items": [
+            {
+              "term": "Effetti",
+              "text": "Un Effetto è nel tuo Reame solo mentre viene risolto, e lo lascia appena viene scartato. Se non puoi fare quello che dice un Effetto, non puoi giocarlo."
+            },
+            {
+              "term": "Scartare tramite una carta",
+              "text": "Quando una carta ti dice di scartare, non serve l'azione Scartare Carte."
+            },
+            {
+              "term": "Sconfiggere o rimuovere tramite una carta",
+              "text": "Le Abilità delle carte che ti fanno sconfiggere o rimuovere un Eroe non richiedono un'azione Scontro e non ti fanno scartare Alleati."
+            },
+            {
+              "term": "Trovare una carta",
+              "text": "Quando una carta ti dice di trovare una carta specifica, segui prima le istruzioni della carta. Altrimenti cerca in quest'ordine: tra le carte in gioco, nella pila degli scarti, poi nel mazzo (Cattivo o Fato), che va rimescolato dopo averci cercato."
+            },
+            {
+              "term": "Oggetti assegnati",
+              "text": "Non c'è limite al numero di Oggetti assegnati a un Alleato o a un Eroe. Quando l'Alleato o l'Eroe viene mosso o scartato, i suoi Oggetti vanno con lui."
+            }
+          ]
+        }
+      ]
+    }
+  },
   "general": [
     {
       "title": "Regole generali",

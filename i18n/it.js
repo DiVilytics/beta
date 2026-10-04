@@ -310,7 +310,7 @@ window.I18N.it = {
     "Charts": "Grafici",
     "Interactive charts across every recorded game.": "Grafici interattivi su tutte le partite registrate.",
     "DiVilytics | F.A.Q.": "DiVilytics | F.A.Q.",
-    "Rules clarifications, general and villain by villain.": "Chiarimenti sulle regole, generali e cattivo per cattivo.",
+    "The official rules, plus clarifications, general and villain by villain.": "Il regolamento ufficiale e i chiarimenti sulle regole, generali e cattivo per cattivo.",
     "DiVilytics | Game Log": "DiVilytics | Registro partite",
     "Game Log": "Registro partite",
     "Every recorded game, newest first.": "Tutte le partite registrate, dalla più recente.",
