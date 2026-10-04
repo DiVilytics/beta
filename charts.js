@@ -61,7 +61,8 @@ async function _playerStats() {
 const TIME_CHART_FROM = '2024-12';
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
-// Each: { id, icon, label, desc, render() -> SVG/HTML string }.
+// Each: { id, icon, label, desc, render() -> SVG/HTML string }. label and desc
+// are English keys, translated where they are shown.
 
 const CHARTS = [
   {
@@ -74,15 +75,15 @@ const CHARTS = [
         return {
           x: c.games,
           y: pct,
-          label: c.name,
+          label: villainName(c.name),
           color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           box: c.box || null,
           boxHref: c.box ? `villains.html?box=${boxAnchorId(c.box)}` : null,
-          meta: `${c.games} games | ${pct}% win rate`,
+          meta: `${tn(c.games, '{n} game', '{n} games')} | ${t('{pct}% win rate', { pct })}`,
         };
       });
-      return Charts.scatter(points, { xLabel: 'Games played', ySuffix: '%', yMax: 100 });
+      return Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100 });
     },
   },
   {
@@ -96,7 +97,7 @@ const CHARTS = [
         const games = rows.reduce((a, c) => a + c.games, 0);
         const wins  = rows.reduce((a, c) => a + c.wins,  0);
         const pct   = games ? Math.round(wins / games * 100) : 0;
-        return { label: b[0].toUpperCase() + b.slice(1), value: pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${pct}% win rate | ${games} games | ${rows.length} villains` };
+        return { label: t(b[0].toUpperCase() + b.slice(1)), value: pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}` };
       }).filter(d => d.games > 0);
       return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
     },
@@ -124,7 +125,7 @@ const CHARTS = [
             value: pct,
             games: v.games,
             href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: `${year ? year + ' | ' : ''}${pct}% win rate | ${v.games} games | ${v.villains} villains`,
+            meta: `${year ? year + ' | ' : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
           };
         })
         .sort((a, b) => b.value - a.value);
@@ -153,7 +154,7 @@ const CHARTS = [
             label: box,
             value: v.games,
             href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: `${year ? year + ' | ' : ''}${v.games} picks | ${Math.round(v.games / (total || 1) * 100)}% of all picks | ${v.villains} villains`,
+            meta: `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / (total || 1) * 100) })} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
           };
         })
         .sort((a, b) => b.value - a.value);
@@ -171,7 +172,7 @@ const CHARTS = [
       const n = Math.floor(max / SIZE) + 1;
       const buckets = Array.from({ length: n }, (_, b) => ({ lo: b * SIZE, hi: (b + 1) * SIZE, value: 0 }));
       for (const v of vals) buckets[Math.min(n - 1, Math.floor(v / SIZE))].value++;
-      for (const b of buckets) { b.name = `${b.lo}-${b.hi} min`; b.meta = `${b.value} game${b.value === 1 ? '' : 's'}`; }
+      for (const b of buckets) { b.name = `${b.lo}-${b.hi} min`; b.meta = tn(b.value, '{n} game', '{n} games'); }
       return Charts.barsV(buckets, {
         fmt: (v, d) => `${d.lo}-${d.hi} min: ${v}`,
         xTick: i => buckets[i].lo,
@@ -192,7 +193,7 @@ const CHARTS = [
           label: `${size}p`,
           value: m,
           has,
-          meta: has ? `${m} min average | ${s.games} games` : (s && s.games > 0 ? 'no duration recorded' : 'no games recorded'),
+          meta: has ? `${t('{n} min average', { n: m })} | ${tn(s.games, '{n} game', '{n} games')}` : t(s && s.games > 0 ? 'no duration recorded' : 'no games recorded'),
         };
       });
       return Charts.barsH(data, { labelW: 48 });
@@ -210,9 +211,9 @@ const CHARTS = [
       const buckets = [];
       for (let b = lo0; b <= hi0; b += SIZE) buckets.push({ lo: b, hi: b + SIZE - 1, value: 0 });
       for (const v of vals) buckets[Math.floor((v - lo0) / SIZE)].value++;
-      for (const b of buckets) { b.name = `${b.lo}-${b.hi} rounds`; b.meta = `${b.value} game${b.value === 1 ? '' : 's'}`; }
+      for (const b of buckets) { b.name = t('{lo}-{hi} rounds', b); b.meta = tn(b.value, '{n} game', '{n} games'); }
       return Charts.barsV(buckets, {
-        fmt: (v, d) => `${d.lo}-${d.hi} rounds: ${v}`,
+        fmt: (v, d) => `${t('{lo}-{hi} rounds', d)}: ${v}`,
         xTick: i => buckets[i].lo,
         xEvery: 1,
       });
@@ -224,7 +225,7 @@ const CHARTS = [
     async render() {
       const ss = (await _sizeStats()).filter(s => s.games > 0);
       const total = ss.reduce((a, s) => a + s.games, 0) || 1;
-      const segs = ss.map(s => ({ label: `${s.size}p`, value: s.games, meta: `${s.games} games | ${Math.round(s.games / total * 100)}%` }));
+      const segs = ss.map(s => ({ label: `${s.size}p`, value: s.games, meta: `${tn(s.games, '{n} game', '{n} games')} | ${Math.round(s.games / total * 100)}%` }));
       return Charts.donut(segs);
     },
   },
@@ -240,8 +241,8 @@ const CHARTS = [
       const buckets = Array.from({ length: n }, (_, b) => ({ lo: b * SIZE + 1, hi: (b + 1) * SIZE, value: 0 }));
       for (const p of vals) buckets[Math.min(n - 1, Math.floor((p - 1) / SIZE))].value++;
       for (const b of buckets) {
-        b.name = `${b.lo}-${b.hi} games`;
-        b.meta = `${b.value} player${b.value === 1 ? '' : 's'}`;
+        b.name = t('{lo}-{hi} games', b);
+        b.meta = tn(b.value, '{n} player', '{n} players');
       }
       return Charts.barsV(buckets, { xTick: i => buckets[i].lo, xEvery: Math.max(1, Math.ceil(n / 12)) });
     },
@@ -266,7 +267,7 @@ const CHARTS = [
         const last = months[months.length - 1];
         for (let k = months[0]; k <= last; ) {
           const c = byMonth[k] || 0;
-          pts.push({ label: k.replace('-', '/'), value: c, meta: `${c} game${c === 1 ? '' : 's'}` });   // YYYY/MM
+          pts.push({ label: k.replace('-', '/'), value: c, meta: tn(c, '{n} game', '{n} games') });   // YYYY/MM
           m++; if (m > 12) { m = 1; y++; }
           k = `${y}-${String(m).padStart(2, '0')}`;
         }
@@ -284,9 +285,11 @@ const CHARTS = [
         counts[new Date(g.played_at).getDay()]++;
       }
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
-      const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      const full   = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${counts[d]} game${counts[d] === 1 ? '' : 's'}` }));
+      // Weekday names in the current language (5 Jan 2025 was a Sunday).
+      const day    = (d, weekday) => new Date(2025, 0, 5 + d).toLocaleDateString(LOCALE, { weekday });
+      const labels = order.map(d => day(d, 'short').replace('.', ''));
+      const full   = order.map(d => { const s = day(d, 'long'); return s[0].toUpperCase() + s.slice(1); });
+      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: tn(counts[d], '{n} game', '{n} games') }));
       return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1 });
     },
   },
@@ -304,19 +307,19 @@ const CHARTS = [
       const sizes = [2, 3, 4, 5, 6];              // always render the full grid; cells with no data show grayed
       const maxSeat = 6;
       const rowLabels = sizes.map(s => `${s}p`);
-      const colLabels = Array.from({ length: maxSeat }, (_, i) => `Seat ${i + 1}`);
+      const colLabels = Array.from({ length: maxSeat }, (_, i) => t('Seat {n}', { n: i + 1 }));
       return Charts.heatmap(rowLabels, colLabels, (ri, ci) => {
         const s = sizes[ri], seat = ci + 1;       // seats are 1-based (ranked play order)
         if (seat > s) return null;                // that seat does not exist for this size
         const cell = bySize[s] && bySize[s][seat];
         if (!cell || !cell.games) return null;
         const pct = cell.wins / cell.games, fair = 1 / s;
-        const t = (pct / fair - 0.5) / 1.5;       // 0.5x..2x of fair -> 0..1 on the ramp
+        const heat = (pct / fair - 0.5) / 1.5;    // 0.5x..2x of fair -> 0..1 on the ramp
         return {
-          value: t,
+          value: heat,
           label: `${Math.round(pct * 100)}%`,
-          name:  `${s}p, seat ${seat}`,
-          meta:  `${Math.round(pct * 100)}% win | fair ${Math.round(fair * 100)}% | ${cell.games} games`,
+          name:  t('{size}p, seat {seat}', { size: s, seat }),
+          meta:  `${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
         };
       });
     },
@@ -324,7 +327,7 @@ const CHARTS = [
 ];
 
 function _needRpc(name) {
-  return `<div class="chart-note">This chart needs the <code>${_esc(name)}</code> function in Supabase. Add it, then refresh.</div>`;
+  return `<div class="chart-note">${t('This chart needs the {name} function in Supabase. Add it, then refresh.', { name: `<code>${_esc(name)}</code>` })}</div>`;
 }
 
 // ── PICKER + RENDER ────────────────────────────────────────────────────────────
@@ -333,8 +336,8 @@ let _selected = null;
 let _lastPanEnd = 0;   // timestamp of the last scatter pan/pinch; suppresses the click that ends it
 function _renderPicker() {
   document.getElementById('chartPicker').innerHTML =
-    `<div class="chart-select-wrap"><select class="chart-select" aria-label="Choose a chart" onchange="selectChart(this.value)">` +
-    CHARTS.map(c => `<option value="${c.id}"${c.id === _selected ? ' selected' : ''}>${c.icon} ${_esc(c.label)}</option>`).join('') +
+    `<div class="chart-select-wrap"><select class="chart-select" aria-label="${t('Choose a chart')}" onchange="selectChart(this.value)">` +
+    CHARTS.map(c => `<option value="${c.id}"${c.id === _selected ? ' selected' : ''}>${c.icon} ${_esc(t(c.label))}</option>`).join('') +
     `</select><span class="chart-chevron">▾</span></div>`;
 }
 
@@ -343,11 +346,11 @@ async function selectChart(id) {
   if (!c) return;
   _selected = id;
   _renderPicker();
-  document.getElementById('chartDesc').textContent = c.desc;
+  document.getElementById('chartDesc').textContent = t(c.desc);
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
   const stage = document.getElementById('chartStage');
-  stage.innerHTML = `<div class="chart-note">Loading…</div>`;
+  stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
   try {
     stage.innerHTML = await c.render();
     const z = stage.querySelector('.ch-zoomable');
@@ -356,7 +359,7 @@ async function selectChart(id) {
     if (lp) _attachLinePan(lp);
   } catch (e) {
     console.error('chart render failed:', e);
-    stage.innerHTML = `<div class="chart-note">Could not load this chart.</div>`;
+    stage.innerHTML = `<div class="chart-note">${t('Could not load this chart.')}</div>`;
   }
 }
 

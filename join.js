@@ -14,7 +14,7 @@ async function init() {
   const gameId = params.get('game');
 
   if (!gameId) {
-    return showClaimError('No game specified.');
+    return showClaimError(t('No game specified.'));
   }
 
   const { data: game, error: gameErr } = await db
@@ -24,7 +24,7 @@ async function init() {
     .maybeSingle();
 
   if (gameErr || !game) {
-    return showClaimError('Game not found.');
+    return showClaimError(t('Game not found.'));
   }
 
   const { data: players, error: playersErr } = await db
@@ -57,9 +57,9 @@ function render() {
     root.innerHTML = `
       <div class="empty">
         <div class="empty-icon">🔒</div>
-        <h3>Sign in to claim</h3>
-        <p>You need to be signed in to claim your villain.</p>
-        <button class="btn btn-primary" onclick="goToSignIn()">Sign in</button>
+        <h3>${t('Sign in to claim')}</h3>
+        <p>${t('You need to be signed in to claim your villain.')}</p>
+        <button class="btn btn-primary" onclick="goToSignIn()">${t('Sign in')}</button>
       </div>`;
     return;
   }
@@ -68,9 +68,9 @@ function render() {
     root.innerHTML = `
       <div class="empty">
         <div class="empty-icon">👤</div>
-        <h3>Set a nickname first</h3>
-        <p>You need a nickname before you can claim a villain.</p>
-        <button class="btn btn-primary" onclick="_openNicknameModal()">Set nickname</button>
+        <h3>${t('Set a nickname first')}</h3>
+        <p>${t('You need a nickname before you can claim a villain.')}</p>
+        <button class="btn btn-primary" onclick="_openNicknameModal()">${t('Set nickname')}</button>
       </div>`;
     return;
   }
@@ -80,7 +80,7 @@ function render() {
 
   const meta = [
     fmtDuration(claimGame.duration_minutes),
-    claimGame.num_turns ? `${claimGame.num_turns} rounds` : null,
+    claimGame.num_turns ? tn(claimGame.num_turns, '{n} round', '{n} rounds') : null,
     claimGame.location  ? claimGame.location             : null,
   ].filter(Boolean).join(' | ');
 
@@ -90,19 +90,19 @@ function render() {
     const isMine = p.user_id === user.id;
     let nickHTML = '', actionHTML = '';
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
-    else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">Unclaimed</div>`;
+    else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
     if (isMine) {
       // Your own claim: let you release it (e.g. if you picked the wrong one).
-      actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">Release</button>`;
+      actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">${t('Release')}</button>`;
     } else if (!p.nickname && !myClaim) {
-      actionHTML = `<button class="btn btn-ghost btn-sm" onclick="claimCharacter('${p.id}')">Claim</button>`;
+      actionHTML = `<button class="btn btn-ghost btn-sm" onclick="claimCharacter('${p.id}')">${t('Claim')}</button>`;
     }
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
           <span class="chip-seat">${i + 1}</span>
           ${charImgHTML(p.character)}
-          <div class="claim-who"><div class="claim-name">${_esc(p.character)}</div>${nickHTML}</div>
+          <div class="claim-who"><div class="claim-name">${_esc(villainName(p.character))}</div>${nickHTML}</div>
           ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
         </div>
         ${actionHTML}
@@ -115,12 +115,12 @@ function render() {
       ${meta ? `<div class="claim-meta">${meta}</div>` : ''}
     </div>
     <div class="claim-share-row">
-      ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">Edit details</button>` : ''}
-      <button class="btn btn-ghost btn-sm" onclick="shareGame()">Share QR</button>
+      ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>
     </div>
-    <div class="section-label">Players</div>
+    <div class="section-label">${t('Players')}</div>
     <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">You are playing as <strong>${charImgHTML(myClaim.character)} ${_esc(myClaim.character)}</strong> in this game.</p>` : ''}`;
+    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${_esc(villainName(myClaim.character))}</strong>` })}</p>` : ''}`;
 }
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
@@ -148,7 +148,7 @@ function editGameDetails() {
   clearError('editDetailsErr');
   const btn = document.getElementById('editDetailsSaveBtn');
   btn.disabled    = false;
-  btn.textContent = 'Save Changes';
+  btn.textContent = t('Save Changes');
   openOverlay('editDetailsOverlay');
 }
 
@@ -177,14 +177,14 @@ async function saveGameDetails() {
   const btn   = document.getElementById('editDetailsSaveBtn');
   const errEl = document.getElementById('editDetailsErr');
   btn.disabled    = true;
-  btn.textContent = 'Saving…';
+  btn.textContent = t('Saving…');
 
   const { error } = await db.from('games').update(patch).eq('id', claimGame.id);
 
   if (error) {
     showError(errEl, error.message);
     btn.disabled    = false;
-    btn.textContent = 'Save Changes';
+    btn.textContent = t('Save Changes');
     return;
   }
 
@@ -208,10 +208,10 @@ function claimCharacter(playerId) {
 
   openConfirmSheet({
     id:           'claimConfirmOverlay',
-    title:        'Confirm your villain',
-    bodyHTML:     `<p class="confirm-text">You're about to claim <strong class="text-emph">${charImgHTML(player.character)}${_esc(player.character)}</strong> in this game. Picked the wrong one? You can release it afterwards.</p>`,
-    confirmLabel: 'Claim villain',
-    busyLabel:    'Claiming…',
+    title:        t('Confirm your villain'),
+    bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${_esc(villainName(player.character))}</strong>` })}</p>`,
+    confirmLabel: t('Claim villain'),
+    busyLabel:    t('Claiming…'),
     onConfirm:    () => _doClaim(playerId),
   });
 }
@@ -242,10 +242,10 @@ function releaseCharacter(playerId) {
 
   openConfirmSheet({
     id:           'releaseConfirmOverlay',
-    title:        'Release this villain?',
-    bodyHTML:     `<p class="confirm-text">This frees up <strong class="text-emph">${charImgHTML(player.character)}${_esc(player.character)}</strong> so it can be claimed again, by you or another player.</p>`,
-    confirmLabel: 'Release',
-    busyLabel:    'Releasing…',
+    title:        t('Release this villain?'),
+    bodyHTML:     `<p class="confirm-text">${t('This frees up {villain} so it can be claimed again, by you or another player.', { villain: `<strong class="text-emph">${charImgHTML(player.character)}${_esc(villainName(player.character))}</strong>` })}</p>`,
+    confirmLabel: t('Release'),
+    busyLabel:    t('Releasing…'),
     danger:       true,
     onConfirm:    () => _doRelease(playerId),
   });
@@ -282,9 +282,9 @@ function showClaimError(msg) {
   root.innerHTML = `
     <div class="empty">
       <div class="empty-icon">⚠️</div>
-      <h3>Oops</h3>
+      <h3>${t('Oops')}</h3>
       <p>${msg}</p>
-      <a class="btn btn-ghost btn-sm" href="index.html">Back to Games</a>
+      <a class="btn btn-ghost btn-sm" href="index.html">${t('Back to home')}</a>
     </div>`;
 }
 

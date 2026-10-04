@@ -29,14 +29,14 @@ function statValueDisplay(r, mode) {
   if (mode === 'games') return r.games;
   return (r.games ? Math.round((r.wins / r.games) * 100) : 0) + '%';
 }
-function statValueLabel(mode)        { return mode === 'count' ? '# Wins' : mode === 'games' ? '# Games' : '% Wins'; }
+function statValueLabel(mode)        { return mode === 'count' ? t('# Wins') : mode === 'games' ? t('# Games') : t('% Wins'); }
 function statSecondaryValue(r, mode) { return mode === 'games' ? r.wins : r.games; }
-function statSecondaryLabel(mode)    { return mode === 'games' ? '# Wins' : '# Games'; }
+function statSecondaryLabel(mode)    { return mode === 'games' ? t('# Wins') : t('# Games'); }
 
 function statModeSegHTML(mode, fn) {
   const btn = (m, label) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg">${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg">${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {
@@ -77,7 +77,8 @@ function boxAnchorId(box) {
 // Required opts:
 //   mode          : 'pct' | 'count' | 'games'
 //   headLabel     : column header for the identity column ("Character" | "Player")
-//   getKey(r)     : returns the row's display name (string)
+//   getKey(r)     : returns the row's key (villain name or nickname)
+//   getName(key)  : optional, the name shown for a key (villainName for villains)
 //   getHref(key)  : returns the link target
 //   getIdentity(key): returns the inline HTML for the row's avatar/portrait
 //   getSub(key)   : optional, returns small gray sub-text under the name
@@ -87,7 +88,7 @@ function boxAnchorId(box) {
 //                   `limit`, pin it at the bottom under a "Your position" divider
 //                   so the viewer always sees their standing for the current sort.
 function renderStatTableHTML(rows, opts) {
-  const { mode, headLabel, getKey, getHref, getIdentity, getSub, getSubHref,
+  const { mode, headLabel, getKey, getName = k => k, getHref, getIdentity, getSub, getSubHref,
           wrapClass = '', limit = Infinity, selfKey = null } = opts;
   const sorted = sortStatRows(rows, mode);
 
@@ -113,9 +114,9 @@ function renderStatTableHTML(rows, opts) {
         <div class="row-identity">
           ${getIdentity(key, r)}
           <div class="row-id-text">
-            <a class="row-name row-name-link" href="${getHref(key, r)}">${_esc(key)}</a>
+            <a class="row-name row-name-link" href="${getHref(key, r)}">${_esc(getName(key))}</a>
             ${sub ? (subHref
-              ? `<a class="row-sub row-sub-link" href="${_esc(subHref)}" title="View ${_esc(sub)} villains">${_esc(sub)}</a>`
+              ? `<a class="row-sub row-sub-link" href="${_esc(subHref)}" title="${_esc(t('View {box} villains', { box: sub }))}">${_esc(sub)}</a>`
               : `<div class="row-sub">${_esc(sub)}</div>`) : ''}
           </div>
         </div>
@@ -132,7 +133,7 @@ function renderStatTableHTML(rows, opts) {
   // Pin the viewer's row if it ranks below the visible cut.
   const selfIdx = selfKey != null ? sorted.findIndex(r => getKey(r) === selfKey) : -1;
   if (selfIdx >= limit) {
-    body += `<div class="lb-row-sep">Your position</div>${rowHTML(sorted[selfIdx], selfIdx)}`;
+    body += `<div class="lb-row-sep">${t('Your position')}</div>${rowHTML(sorted[selfIdx], selfIdx)}`;
   }
 
   return `

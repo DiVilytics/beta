@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Sign in</title>
+  <title data-i18n>DiVilytics | Sign in</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -42,13 +44,13 @@
 
 <main>
   <div class="page-header">
-    <h2>Sign in</h2>
+    <h2 data-i18n>Sign in</h2>
   </div>
 
   <div class="signin-card">
-    <p class="signin-intro">Sign in to record games, claim villains, and appear on the leaderboard.</p>
+    <p class="signin-intro" data-i18n>Sign in to record games, claim villains, and appear on the leaderboard.</p>
 
-    <p class="signin-hint">
+    <p class="signin-hint" data-i18n>
       <strong>Already have an account?</strong>
       Pick the provider you used before to land on the same profile. If you sign in with a different one and end up on a new profile, you can link them later from your Account page.
     </p>
@@ -56,11 +58,11 @@
     <div class="signin-providers">
       <button class="signin-btn signin-btn-discord" type="button" onclick="signinWithProvider('discord')">
         <img src="asset/signin/discord.png" alt="" class="signin-btn-logo">
-        <span>Continue with Discord</span>
+        <span data-i18n>Continue with Discord</span>
       </button>
       <button class="signin-btn signin-btn-google" type="button" onclick="signinWithProvider('google')">
         <img src="asset/signin/google.png" alt="" class="signin-btn-logo">
-        <span>Continue with Google</span>
+        <span data-i18n>Continue with Google</span>
       </button>
     </div>
 

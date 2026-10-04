@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Players</title>
+  <title data-i18n>DiVilytics | Players</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -43,20 +45,20 @@
 <main>
   <div class="page-header align-top">
     <div>
-      <h2>Players</h2>
+      <h2 data-i18n>Players</h2>
     </div>
     <div class="cs-search">
-      <input type="text" id="pfJumpInput" placeholder="Search player…" maxlength="30" autocomplete="off">
+      <input type="text" id="pfJumpInput" placeholder="Search player…" maxlength="30" autocomplete="off" data-i18n-attr="placeholder">
       <div class="cs-dropdown" id="pfDropdown"></div>
     </div>
   </div>
-  <p class="page-intro">Any player's stats, achievements and games.</p>
+  <p class="page-intro" data-i18n>Any player's stats, achievements and games.</p>
 
   <div id="pfIdentity"></div>
 
   <div class="controls hidden" id="pfControls">
     <div class="pill-group" id="pfFilterPills">
-      <button class="pill on" onclick="pfSetFilter('all')" type="button">All</button>
+      <button class="pill on" onclick="pfSetFilter('all')" type="button" data-i18n>All</button>
       <button class="pill"    onclick="pfSetFilter(2)"     type="button">2p</button>
       <button class="pill"    onclick="pfSetFilter(3)"     type="button">3p</button>
       <button class="pill"    onclick="pfSetFilter(4)"     type="button">4p</button>
@@ -65,7 +67,7 @@
     </div>
   </div>
 
-  <div id="pfRoot" class="spinner">Loading…</div>
+  <div id="pfRoot" class="spinner" data-i18n>Loading…</div>
 </main>
 
 <!-- Achievement detail sheet -->
@@ -73,7 +75,7 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 id="achTitle">Achievement</h3>
+      <h3 id="achTitle" data-i18n>Achievement</h3>
       <button class="sheet-close" onclick="_closeAchOverlay()">×</button>
     </div>
     <div class="sheet-body" id="achBody"></div>
@@ -86,21 +88,21 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 id="pfQrTitle">Share profile</h3>
+      <h3 id="pfQrTitle" data-i18n>Share profile</h3>
       <button class="sheet-close" onclick="closeProfileQR()">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint">Others can scan this to view this player profile.</p>
+      <p class="modal-hint" data-i18n>Others can scan this to view this player profile.</p>
       <div class="qr-wrap">
         <div id="pfQrCode"></div>
       </div>
       <div class="qr-url-row">
         <div class="qr-url" id="qrUrlText"></div>
-        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link">⎘</button>
+        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
       </div>
     </div>
     <div class="sheet-footer">
-      <button class="btn btn-primary" onclick="closeProfileQR()">Done</button>
+      <button class="btn btn-primary" onclick="closeProfileQR()" data-i18n>Done</button>
     </div>
   </div>
 </div>

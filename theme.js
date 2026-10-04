@@ -121,7 +121,7 @@ function _updateThemeBtn() {
   const current = localStorage.getItem('theme') || 'auto';
   const next    = _nextTheme(current);
   const icons   = { dark: '🌙', light: '☀️', auto: '🌗' };
-  const titles  = { dark: 'Force dark', light: 'Force light', auto: 'Follow system' };
+  const titles  = { dark: t('Force dark'), light: t('Force light'), auto: t('Follow system') };
   btn.textContent = icons[current];
   btn.title       = titles[next];
 }

@@ -655,7 +655,7 @@
       {"name": "Merlin", "count": 1, "type": "Effect", "text": "Randomly choose one card from the Merlin Transformation discard pile and put it back into the Merlin Transformation deck. Shuffle the Merlin Transformation deck."}
     ],
     "extra": [
-      {"title": "Merlin's Transformation deck", "cards": [
+      {"title": "Merlin's Transformation deck", "banner": "hero", "cards": [
         {"name": "Caterpillar Merlin", "count": 1, "type": "Transformation", "text": "Caterpillar Merlin can only be defeated in a Vanquish action by Chicken Mim."},
         {"name": "Crab Merlin", "count": 1, "type": "Transformation", "text": "Crab Merlin can only be defeated in a Vanquish action by Rhinoceros Mim."},
         {"name": "Goat Merlin", "count": 1, "type": "Transformation", "text": "Goat Merlin can only be defeated in a Vanquish action by Purple Dragon Mim."},

@@ -123,8 +123,8 @@ function createPaceFilter({
   }
 
   function toggleMine() {
-    if (!getCurrentUser()) { onError('Sign in to filter by owned boxes.'); return; }
-    if (!ownedBoxes.size)  { onError('Mark which boxes you own on the account page first.'); return; }
+    if (!getCurrentUser()) { onError(t('Sign in to filter by owned boxes.')); return; }
+    if (!ownedBoxes.size)  { onError(t('Mark which boxes you own on the account page first.')); return; }
     mineOn = !mineOn;
     applyPaceSelection();
   }

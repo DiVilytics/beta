@@ -120,7 +120,7 @@ function showAvatarLightbox(value, fallback) {
     // Any click anywhere on the overlay (image, backdrop, close button) dismisses.
     overlay.onclick = () => closeAvatarLightbox();
     overlay.innerHTML = `
-      <button class="avatar-lightbox-close" type="button" aria-label="Close">×</button>
+      <button class="avatar-lightbox-close" type="button" aria-label="${t('Close')}">×</button>
       <div id="avatarLightboxContent"></div>
     `;
     document.body.appendChild(overlay);

@@ -65,36 +65,36 @@ function _renderPage() {
 
   setAchievementsContext({
     ach: _acctAch, chars: _acctChars, boxInfo: _acctBoxInfo, global: _acctGlobal,
-    title: _acctNick ? `Achievements | ${_acctNick}` : 'Achievements',
+    title: _acctNick ? `${t('Achievements')} | ${_acctNick}` : t('Achievements'),
   });
 
-  const metaLn = profile?.created_at ? `Since ${fmtDateShort(profile.created_at)}` : null;
+  const metaLn = profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : null;
 
   const root = document.getElementById('acctRoot');
   root.className = '';
   root.innerHTML = `
     <div class="acct-section">
-      <div class="section-label">My Profile</div>
+      <div class="section-label">${t('My Profile')}</div>
       <div class="err" id="avatarErr"></div>
       <div class="acct-identity">
         <span id="acctAvatarPreviewWrap"></span>
         <div class="acct-identity-info">
           <div class="acct-nick">${_acctNick
-            ? `<a class="acct-nick-link" href="players.html?nick=${encodeURIComponent(_acctNick)}" title="View my player page">${_esc(_acctNick)}</a>`
+            ? `<a class="acct-nick-link" href="players.html?nick=${encodeURIComponent(_acctNick)}" title="${t('View my player page')}">${_esc(_acctNick)}</a>`
             : '-'}</div>
           ${metaLn ? `<div class="pf-since">${_esc(metaLn)}</div>` : ''}
-          <button class="btn btn-ghost btn-sm acct-change-nick" onclick="changeNickname()">Change nickname</button>
+          <button class="btn btn-ghost btn-sm acct-change-nick" onclick="changeNickname()">${t('Change nickname')}</button>
         </div>
       </div>
       <div class="avatar-tab-row">
         <div class="seg" role="tablist">
-          <button class="seg-btn on" id="avatarTabPhotos"  type="button" onclick="_showAvatarTab('photos')">Photos</button>
-          <button class="seg-btn"    id="avatarTabBuilder" type="button" onclick="_showAvatarTab('builder')">Build</button>
+          <button class="seg-btn on" id="avatarTabPhotos"  type="button" onclick="_showAvatarTab('photos')">${t('Photos')}</button>
+          <button class="seg-btn"    id="avatarTabBuilder" type="button" onclick="_showAvatarTab('builder')">${t('Build')}</button>
         </div>
         <div class="avatar-actions">
-          <button class="btn btn-ghost btn-sm" id="removeAvatarBtn" onclick="removeAvatar()" ${(_pendingAvatar || _acctAvatar) ? '' : 'disabled'}>Default</button>
-          <button class="btn btn-ghost btn-sm" type="button" onclick="randomizeAvatar()">Random</button>
-          <button class="btn btn-primary btn-sm" id="commitAvatarBtn" onclick="commitAvatar()" disabled>Apply</button>
+          <button class="btn btn-ghost btn-sm" id="removeAvatarBtn" onclick="removeAvatar()" ${(_pendingAvatar || _acctAvatar) ? '' : 'disabled'}>${t('Default')}</button>
+          <button class="btn btn-ghost btn-sm" type="button" onclick="randomizeAvatar()">${t('Random')}</button>
+          <button class="btn btn-primary btn-sm" id="commitAvatarBtn" onclick="commitAvatar()" disabled>${t('Apply')}</button>
         </div>
       </div>
       <div class="avatar-pane" id="avatarPanePhotos">
@@ -104,7 +104,7 @@ function _renderPage() {
     </div>
 
     <div class="acct-section">
-      <div class="section-label">My boxes</div>
+      <div class="section-label">${t('My boxes')}</div>
       <div class="err" id="boxesErr"></div>
       <div class="box-picker" id="boxPicker"></div>
     </div>
@@ -114,23 +114,23 @@ function _renderPage() {
         ach: _acctAch, chars: _acctChars, boxInfo: _acctBoxInfo, global: _acctGlobal,
         // The account page shows every achievement, earned or not.
         onlyEarned: false,
-        header: (earned, total) => `<div class="section-label">My Achievements | ${earned} / ${total}</div>`,
+        header: (earned, total) => `<div class="section-label">${t('My Achievements')} | ${earned} / ${total}</div>`,
       })}
     </div>
 
     <div class="acct-section">
-      <div class="section-label">Account</div>
+      <div class="section-label">${t('Account')}</div>
       <div class="err" id="identitiesErr"></div>
       <div id="identitiesList" class="acct-identities">${_renderIdentitiesHTML()}</div>
       <div class="acct-actions">
-        <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">Download my data</button>
-        <button class="btn btn-ghost" onclick="signOut()">Sign out</button>
+        <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
+        <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
     </div>
 
     <div class="acct-section acct-danger">
-      <div class="section-label">Danger zone</div>
-      <button class="btn btn-danger" onclick="openDeleteAccount()">Delete profile</button>
+      <div class="section-label">${t('Danger zone')}</div>
+      <button class="btn btn-danger" onclick="openDeleteAccount()">${t('Delete profile')}</button>
     </div>
   `;
 
@@ -232,7 +232,7 @@ async function exportMyData() {
   if (!user) return;
   const btn = document.getElementById('exportDataBtn');
   btn.disabled    = true;
-  btn.textContent = 'Preparing…';
+  btn.textContent = t('Preparing…');
 
   try {
     const gpAll = await _fetchAllRows(() => db.from('game_players').select('*').eq('user_id', user.id));
@@ -276,12 +276,12 @@ async function exportMyData() {
     a.remove();
     URL.revokeObjectURL(url);
 
-    btn.textContent = 'Downloaded ✓';
-    setTimeout(() => { btn.disabled = false; btn.textContent = 'Download my data'; }, 1500);
+    btn.textContent = t('Downloaded ✓');
+    setTimeout(() => { btn.disabled = false; btn.textContent = t('Download my data'); }, 1500);
   } catch (e) {
     console.error('exportMyData failed:', e);
     btn.disabled    = false;
-    btn.textContent = 'Download failed. Retry';
+    btn.textContent = t('Download failed. Retry');
   }
 }
 
@@ -294,7 +294,7 @@ function _buildAvatarPicker() {
     const img   = document.createElement('img');
     img.className = 'avatar-option' + (value === _acctAvatar ? ' selected' : '');
     img.src   = value;
-    img.alt   = `Player ${i}`;
+    img.alt   = t('Player {n}', { n: i });
     img.dataset.value = value;
     img.onerror = () => { img.src = 'asset/players/default.svg'; };
     img.onclick = () => _previewAvatar(value);
@@ -361,7 +361,7 @@ async function commitAvatar() {
 
   const value = _pendingAvatar;
   const btn   = document.getElementById('commitAvatarBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  if (btn) { btn.disabled = true; btn.textContent = t('Saving…'); }
   clearError('avatarErr');
 
   const previous = _acctAvatar;
@@ -378,12 +378,12 @@ async function commitAvatar() {
     _updateAuthUI();
     _syncRemoveBtn();
     showError('avatarErr', error.message);
-    if (btn) { btn.textContent = 'Apply'; btn.disabled = false; }
+    if (btn) { btn.textContent = t('Apply'); btn.disabled = false; }
     return;
   }
   if (btn) {
-    btn.textContent = 'Saved ✓';
-    setTimeout(() => { btn.textContent = 'Apply'; _syncCommitBtn(); }, 1500);
+    btn.textContent = t('Saved ✓');
+    setTimeout(() => { btn.textContent = t('Apply'); _syncCommitBtn(); }, 1500);
   }
 }
 
@@ -445,12 +445,12 @@ async function confirmDeleteAccount() {
 
   const btn = document.getElementById('delAccountBtn');
   btn.disabled    = true;
-  btn.textContent = 'Deleting…';
+  btn.textContent = t('Deleting…');
 
   const fail = msg => {
     showError(errEl, msg);
     btn.disabled    = false;
-    btn.textContent = 'Delete my profile';
+    btn.textContent = t('Delete my profile');
   };
 
   const { error: gpErr } = await db.from('game_players').update({ nickname: null }).eq('user_id', user.id);
@@ -481,12 +481,12 @@ function _renderIdentitiesHTML() {
     let actionHTML;
     if (isLinked) {
       actionHTML = `
-        <span class="identity-linked-badge">Linked</span>
-        <button class="btn btn-ghost btn-sm" ${canUnlink ? '' : 'disabled'} title="${canUnlink ? 'Unlink this provider' : 'You need at least one sign-in method'}"
-                onclick="unlinkIdentity('${_esc(p.key)}')">Unlink</button>
+        <span class="identity-linked-badge">${t('Linked')}</span>
+        <button class="btn btn-ghost btn-sm" ${canUnlink ? '' : 'disabled'} title="${t(canUnlink ? 'Unlink this provider' : 'You need at least one sign-in method')}"
+                onclick="unlinkIdentity('${_esc(p.key)}')">${t('Unlink')}</button>
       `;
     } else {
-      actionHTML = `<button class="btn btn-primary btn-sm" onclick="linkIdentity('${_esc(p.key)}')">Link</button>`;
+      actionHTML = `<button class="btn btn-primary btn-sm" onclick="linkIdentity('${_esc(p.key)}')">${t('Link')}</button>`;
     }
 
     return `
@@ -521,7 +521,7 @@ async function unlinkIdentity(provider) {
 
   // Safety: never unlink the last identity (would leave the user stranded).
   if (_acctIdentities.length <= 1) {
-    showError('identitiesErr', 'You need at least one sign-in method.');
+    showError('identitiesErr', t('You need at least one sign-in method.'));
     return;
   }
 

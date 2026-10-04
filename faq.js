@@ -38,9 +38,16 @@ function _hl(str, re) {
   return str.split(re).map((part, i) => i % 2 ? `<mark>${_esc(part)}</mark>` : _esc(part)).join('');
 }
 
-// Every term must appear somewhere in the entry or its section's name.
+// An entry's villain field, shown in the current language. It can list several
+// villains ("Prince John, Evil Queen"), each translated on its own.
+function _entryVillains(item) {
+  return item.villain ? item.villain.split(', ').map(villainName).join(', ') : '';
+}
+
+// Every term must appear somewhere in the entry or its section's name, as shown
+// in the current language (so "bau bau" only finds Oogie Boogie in Italian).
 function _matches(item, section, terms) {
-  const hay = [item.term, item.villain, item.text, section].filter(Boolean).join(' ').toLowerCase();
+  const hay = [item.term, _entryVillains(item), item.text, section].filter(Boolean).join(' ').toLowerCase();
   return terms.every(t => hay.includes(t));
 }
 
@@ -49,9 +56,9 @@ function _matches(item, section, terms) {
 function _entryHTML(item, re) {
   return `
     <div class="home-faq-item faq-item">
-      <strong>${_hl(item.term, re)}${item.villain ? `<span class="faq-vil"> | ${_hl(item.villain, re)}</span>` : ''}</strong>
+      <strong>${_hl(item.term, re)}${item.villain ? `<span class="faq-vil"> | ${_hl(_entryVillains(item), re)}</span>` : ''}</strong>
       <span>${_hl(item.text, re)}</span>
-      ${item.source ? `<span class="faq-src">Source: ${_esc(item.source)}</span>` : ''}
+      ${item.source ? `<span class="faq-src">${_esc(t('Source: {source}', { source: item.source }))}</span>` : ''}
     </div>`;
 }
 
@@ -59,8 +66,9 @@ function _listHTML(items, re) {
   return `<div class="home-faq-list">${items.map(it => _entryHTML(it, re)).join('')}</div>`;
 }
 
+// The villains with entries, sorted by their name in the current language.
 function _villainNames() {
-  return Object.keys(faqData.villains).sort((a, b) => a.localeCompare(b));
+  return Object.keys(faqData.villains).sort((a, b) => villainName(a).localeCompare(villainName(b), LOCALE));
 }
 
 function _menuHTML() {
@@ -69,23 +77,23 @@ function _menuHTML() {
     <a class="home-section-link faq-general-link" href="${_faqHref(FAQ_GENERAL)}">
       <span class="home-section-icon">⚖️</span>
       <div class="home-section-text">
-        <span class="home-section-name">General</span>
-        <span class="home-section-desc">Core rules and cards that work the same way across villains (${generalCount} entries)</span>
+        <span class="home-section-name">${t('General')}</span>
+        <span class="home-section-desc">${t('Core rules and cards that work the same way across villains ({n} entries)', { n: generalCount })}</span>
       </div>
     </a>
-    <h2 class="home-faq-title">Villains</h2>
+    <h2 class="home-faq-title">${t('Villains')}</h2>
     <div class="char-roster">
       ${_villainNames().map(v => `
         <a class="char-roster-item" href="${_faqHref(v)}">
           <img class="char-roster-portrait" src="${charImgSrc(v)}" alt="" onerror="this.src='asset/players/default.svg'">
-          <div class="char-roster-name">${_esc(v)}</div>
-          <div class="faq-roster-sub">${faqData.villains[v].length} ${faqData.villains[v].length === 1 ? 'entry' : 'entries'}</div>
+          <div class="char-roster-name">${_esc(villainName(v))}</div>
+          <div class="faq-roster-sub">${tn(faqData.villains[v].length, '{n} entry', '{n} entries')}</div>
         </a>`).join('')}
     </div>
-    <p class="faq-credit">Translated from the F.A.Q. by <a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a> (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.</p>`;
+    <p class="faq-credit">${t('Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.', { link: '<a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>' })}</p>`;
 }
 
-const _BACK_HTML = `<a class="back-link" href="faq.html">← All topics</a>`;
+const _BACK_HTML = `<a class="back-link" href="faq.html">${t('← All topics')}</a>`;
 
 function _generalHTML() {
   return _BACK_HTML + faqData.general.map(g => `
@@ -101,8 +109,8 @@ function _villainHTML(v) {
     <div class="pf-identity faq-identity">
       <img class="char-portrait identity-portrait" src="${charImgSrc(v)}" alt="" onerror="this.src='asset/players/default.svg'">
       <span class="pf-name-block">
-        <span class="pf-nick">${_esc(v)}</span>
-        <a class="pf-since pf-since-link" href="villains.html?vil=${encodeURIComponent(v)}">View stats</a>
+        <span class="pf-nick">${_esc(villainName(v))}</span>
+        <a class="pf-since pf-since-link" href="villains.html?vil=${encodeURIComponent(v)}">${t('View stats')}</a>
       </span>
     </div>
     ${_listHTML(faqData.villains[v], null)}`;
@@ -113,16 +121,16 @@ function _resultsHTML(q) {
   const re    = _termsRegex(terms);
   const groups = [];
   for (const g of faqData.general) {
-    const items = g.items.filter(it => _matches(it, `General ${g.title}`, terms));
-    if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(FAQ_GENERAL)}">General</a> <span>${_esc(g.title)}</span>`, items });
+    const items = g.items.filter(it => _matches(it, `${t('General')} ${g.title}`, terms));
+    if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(FAQ_GENERAL)}">${t('General')}</a> <span>${_esc(g.title)}</span>`, items });
   }
   for (const v of _villainNames()) {
-    const items = faqData.villains[v].filter(it => _matches(it, v, terms));
-    if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(v)}">${_hl(v, re)}</a>`, items });
+    const items = faqData.villains[v].filter(it => _matches(it, villainName(v), terms));
+    if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(v)}">${_hl(villainName(v), re)}</a>`, items });
   }
   const total = groups.reduce((n, g) => n + g.items.length, 0);
-  if (!total) return `<div class="empty"><h3>No results</h3><p>Nothing in the FAQ matches “${_esc(q.trim())}”.</p></div>`;
-  return `<p class="faq-count">${total} ${total === 1 ? 'result' : 'results'}</p>` + groups.map(g => `
+  if (!total) return `<div class="empty"><h3>${t('No results')}</h3><p>${t('Nothing in the FAQ matches “{query}”.', { query: _esc(q.trim()) })}</p></div>`;
+  return `<p class="faq-count">${tn(total, '{n} result', '{n} results')}</p>` + groups.map(g => `
     <div class="faq-group">
       <h2 class="home-faq-title">${g.title}</h2>
       ${_listHTML(g.items, re)}
@@ -137,7 +145,7 @@ function render() {
   else if (faqTopic === null)     root.innerHTML = _menuHTML();
   else if (faqTopic === FAQ_GENERAL) root.innerHTML = _generalHTML();
   else if (faqTopic)              root.innerHTML = _villainHTML(faqTopic);
-  else root.innerHTML = `${_BACK_HTML}<div class="empty"><h3>Topic not found</h3><p>${_esc(new URLSearchParams(location.search).get('topic') || '')}</p></div>`;
+  else root.innerHTML = `${_BACK_HTML}<div class="empty"><h3>${t('Topic not found')}</h3><p>${_esc(new URLSearchParams(location.search).get('topic') || '')}</p></div>`;
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
@@ -150,13 +158,13 @@ async function init() {
   if (!faqData.general || !faqData.villains) {
     const root = document.getElementById('faqRoot');
     root.className = '';
-    root.innerHTML = `<div class="empty"><h3>Couldn't load the FAQ</h3><p>Try reloading the page.</p></div>`;
+    root.innerHTML = `<div class="empty"><h3>${t("Couldn't load the FAQ")}</h3><p>${t('Try reloading the page.')}</p></div>`;
     return;
   }
 
   faqTopic = _resolveTopic((new URLSearchParams(location.search).get('topic') || '').trim());
-  if (faqTopic === FAQ_GENERAL) document.title = 'DiVilytics | F.A.Q. | General';
-  else if (faqTopic)            document.title = `DiVilytics | F.A.Q. | ${faqTopic}`;
+  if (faqTopic === FAQ_GENERAL) document.title = `DiVilytics | F.A.Q. | ${t('General')}`;
+  else if (faqTopic)            document.title = `DiVilytics | F.A.Q. | ${villainName(faqTopic)}`;
 
   const input = document.getElementById('faqSearchInput');
   input.disabled = false;

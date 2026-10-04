@@ -658,6 +658,11 @@ main {
 .deck-effect    { --deck-c: #46a758; }
 .deck-item      { --deck-c: #3e9fe0; }
 .deck-condition { --deck-c: #d6409f; }
+.deck-curse     { --deck-c: #8e4ec6; }
+.deck-ingredient { --deck-c: #ab72ae; }
+.deck-titan     { --deck-c: #a18fd1; }
+.deck-witch     { --deck-c: #ee5b00; }
+.deck-gray      { --deck-c: #8b8d98; }
 .deck-other     { --deck-c: #8e4ec6; }
 .cs-deck { display: flex; gap: 12px; align-items: flex-start; }
 .cs-deck-stack { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }   /* gap = DECK_STACK_GAP in villains.js */
@@ -2407,6 +2412,15 @@ select:disabled {
 }
 
 .home-share-btn { flex-shrink: 0; }
+/* EN | IT language switch, next to Share. On phones both go on their own line
+   under the title so it isn't squeezed. */
+.home-title-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .home-title-row { flex-wrap: wrap; }
+  .home-title-row .home-title { flex-basis: 100%; }
+}
+.lang-seg { flex-shrink: 0; padding: 2px; gap: 2px; }
+.lang-seg .seg-btn { padding: 2px 7px; font-size: 11px; border-radius: 4px; }
 
 .home-steps-title {
   font-size: 13px;

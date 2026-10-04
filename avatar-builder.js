@@ -60,16 +60,16 @@ const avatarBuilder = (() => {
 
     const rows = AVATAR_BUILDER.parts.map(part => `
       <div class="builder-row" data-key="${part.key}">
-        <span class="builder-row-label">${part.label}</span>
+        <span class="builder-row-label">${t(part.label)}</span>
         <div class="builder-stepper">
-          <button class="cs-month-nav" type="button" onclick="avatarBuilder.cyclePart('${part.key}', -1)" ${part.count < 2 ? 'disabled' : ''} aria-label="Previous ${part.label}">‹</button>
+          <button class="cs-month-nav" type="button" onclick="avatarBuilder.cyclePart('${part.key}', -1)" ${part.count < 2 ? 'disabled' : ''} aria-label="${t('Previous')}: ${t(part.label)}">‹</button>
           <span class="builder-count"><span class="builder-num">${sel[part.key]}</span> / ${part.count}</span>
-          <button class="cs-month-nav" type="button" onclick="avatarBuilder.cyclePart('${part.key}', 1)" ${part.count < 2 ? 'disabled' : ''} aria-label="Next ${part.label}">›</button>
+          <button class="cs-month-nav" type="button" onclick="avatarBuilder.cyclePart('${part.key}', 1)" ${part.count < 2 ? 'disabled' : ''} aria-label="${t('Next')}: ${t(part.label)}">›</button>
         </div>
       </div>`).join('');
 
     const swatches = BG_SWATCHES.map(c =>
-      `<button class="builder-swatch${c === bg ? ' selected' : ''}" type="button" data-color="${c}" style="background:${c}" onclick="avatarBuilder.setBg('${c}')" aria-label="Background ${c}"></button>`
+      `<button class="builder-swatch${c === bg ? ' selected' : ''}" type="button" data-color="${c}" style="background:${c}" onclick="avatarBuilder.setBg('${c}')" aria-label="${t('Background')} ${c}"></button>`
     ).join('');
 
     pane.innerHTML = `
@@ -77,10 +77,10 @@ const avatarBuilder = (() => {
         <div class="builder-controls">
           ${rows}
           <div class="builder-row builder-row-bg">
-            <span class="builder-row-label">Background</span>
+            <span class="builder-row-label">${t('Background')}</span>
             <div class="builder-swatches">
               ${swatches}
-              <label class="builder-swatch builder-swatch-custom" title="Custom color">
+              <label class="builder-swatch builder-swatch-custom" title="${t('Custom color')}">
                 <input type="color" id="builderBgInput" value="${bg}" oninput="avatarBuilder.setBg(this.value)">
               </label>
             </div>

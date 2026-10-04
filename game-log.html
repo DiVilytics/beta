@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Game Log</title>
+  <title data-i18n>DiVilytics | Game Log</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -42,20 +44,20 @@
 
 <main>
   <div class="page-header has-search-control">
-    <h2>Game Log</h2>
+    <h2 data-i18n>Game Log</h2>
     <div class="cs-search" id="locationSearch">
-      <input type="text" id="locationSearchInput" placeholder="Filter by location…" autocomplete="off" disabled>
+      <input type="text" id="locationSearchInput" placeholder="Filter by location…" autocomplete="off" disabled data-i18n-attr="placeholder">
       <div class="cs-dropdown" id="locationDropdown"></div>
     </div>
   </div>
-  <p class="page-intro">Every recorded game, newest first.</p>
+  <p class="page-intro" data-i18n>Every recorded game, newest first.</p>
 
   <div class="err" id="err"></div>
 
   <!-- Filters -->
   <div class="filter-bar">
     <div class="pill-group" id="countPills">
-      <button class="pill on" onclick="setCountFilter('all')">All</button>
+      <button class="pill on" onclick="setCountFilter('all')" data-i18n>All</button>
       <button class="pill" onclick="setCountFilter(2)">2p</button>
       <button class="pill" onclick="setCountFilter(3)">3p</button>
       <button class="pill" onclick="setCountFilter(4)">4p</button>
@@ -63,7 +65,7 @@
       <button class="pill" onclick="setCountFilter(6)">6p</button>
     </div>
     <button class="filter-char-toggle" onclick="toggleCharFilter()" id="charFilterToggle">
-      <span>Included villains</span>
+      <span data-i18n>Included villains</span>
       <div class="toggle-right">
         <span class="badge" id="charBadge"></span>
         <span class="chevron" id="charChevron">▼</span>
@@ -71,26 +73,26 @@
     </button>
     <div class="filter-char-panel" id="charFilterPanel">
       <div class="filter-actions">
-        <button class="txt-btn" onclick="glExcludeAll()">Exclude all</button>
+        <button class="txt-btn" onclick="glExcludeAll()" data-i18n>Exclude all</button>
         <span class="sep">|</span>
-        <button class="txt-btn owned-toggle" id="glMineBtn" type="button" onclick="glToggleMine()">My boxes</button>
+        <button class="txt-btn owned-toggle" id="glMineBtn" type="button" onclick="glToggleMine()" data-i18n>My boxes</button>
         <span class="sep">|</span>
-        <button class="txt-btn" onclick="glClearExcluded()">Clear</button>
-        <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyCharFilter()">Done</button>
+        <button class="txt-btn" onclick="glClearExcluded()" data-i18n>Clear</button>
+        <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyCharFilter()" data-i18n>Done</button>
       </div>
       <div class="filter-bulk-row">
         <div class="seg pace-mode" id="glPaceMode">
-          <button class="seg-btn on" type="button" onclick="glSetPaceMode(false)" title="Select only the chosen color">Pace</button>
-          <button class="seg-btn"    type="button" onclick="glSetPaceMode(true)"  title="Also select the neighboring colors">Pace+</button>
+          <button class="seg-btn on" type="button" onclick="glSetPaceMode(false)" title="Select only the chosen color" data-i18n data-i18n-attr="title">Pace</button>
+          <button class="seg-btn"    type="button" onclick="glSetPaceMode(true)"  title="Also select the neighboring colors" data-i18n data-i18n-attr="title">Pace+</button>
         </div>
         <div class="pace-colors" id="glPaceColors">
-          <button class="pace-color green"  data-pace="green"  onclick="glSelectPace('green')"  type="button" title="Only green villains"></button>
-          <button class="pace-color yellow" data-pace="yellow" onclick="glSelectPace('yellow')" type="button" title="Only yellow villains"></button>
-          <button class="pace-color orange" data-pace="orange" onclick="glSelectPace('orange')" type="button" title="Only orange villains"></button>
-          <button class="pace-color red"    data-pace="red"    onclick="glSelectPace('red')"    type="button" title="Only red villains"></button>
+          <button class="pace-color green"  data-pace="green"  onclick="glSelectPace('green')"  type="button" title="Only green villains" data-i18n-attr="title"></button>
+          <button class="pace-color yellow" data-pace="yellow" onclick="glSelectPace('yellow')" type="button" title="Only yellow villains" data-i18n-attr="title"></button>
+          <button class="pace-color orange" data-pace="orange" onclick="glSelectPace('orange')" type="button" title="Only orange villains" data-i18n-attr="title"></button>
+          <button class="pace-color red"    data-pace="red"    onclick="glSelectPace('red')"    type="button" title="Only red villains" data-i18n-attr="title"></button>
         </div>
       </div>
-      <p class="gl-filter-hint">Click to exclude villains; games using any excluded villain are hidden.</p>
+      <p class="gl-filter-hint" data-i18n>Click to exclude villains; games using any excluded villain are hidden.</p>
       <div id="charGrid"></div>
     </div>
   </div>
@@ -98,9 +100,9 @@
   <div class="list-header">
     <div class="results-hint" id="resultsHint"></div>
     <div id="locationPillArea"></div>
-    <a class="btn btn-primary btn-sm" href="new-game.html">+ New Game</a>
+    <a class="btn btn-primary btn-sm" href="new-game.html" data-i18n>+ New Game</a>
   </div>
-  <div id="root" class="spinner">Loading…</div>
+  <div id="root" class="spinner" data-i18n>Loading…</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

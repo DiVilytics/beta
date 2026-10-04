@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | New Game</title>
+  <title data-i18n>DiVilytics | New Game</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -42,97 +44,97 @@
 
 <main>
   <div class="page-header">
-    <h2>New Game</h2>
+    <h2 data-i18n>New Game</h2>
     <div class="header-actions">
-      <button class="btn btn-primary btn-sm hidden" id="resumeBtn" onclick="startLive()">Resume</button>
-      <button class="btn btn-ghost btn-sm hidden"   id="discardBtn" onclick="discardLiveGame()">Discard</button>
+      <button class="btn btn-primary btn-sm hidden" id="resumeBtn" onclick="startLive()" data-i18n>Resume</button>
+      <button class="btn btn-ghost btn-sm hidden"   id="discardBtn" onclick="discardLiveGame()" data-i18n>Discard</button>
     </div>
   </div>
-  <p class="page-intro">Draw villains, time the game, save and share it.</p>
+  <p class="page-intro" data-i18n>Draw villains, time the game, save and share it.</p>
 
   <div class="err" id="err"></div>
 
   <!-- LIVE PANEL, shown only while a live game is running -->
   <div id="liveContent" class="hidden">
-    <div class="live-status">Game in progress</div>
+    <div class="live-status" data-i18n>Game in progress</div>
     <div class="live-info" id="liveInfo"></div>
     <div class="live-time" id="liveTime">00:00</div>
     <div class="live-turns">
       <button class="live-btn" type="button" onclick="bumpTurn(-1)">−</button>
-      <div class="live-turn-count"><span id="liveTurnCount">0</span><span class="live-turn-lbl">rounds</span></div>
+      <div class="live-turn-count"><span id="liveTurnCount">0</span><span class="live-turn-lbl" data-i18n>rounds</span></div>
       <button class="live-btn" type="button" onclick="bumpTurn(1)">+</button>
     </div>
-    <p class="live-hint">Tap + once every player has taken their turn (one full round). When you're done, press Pause Game. The duration and the number of rounds will be filled in.</p>
+    <p class="live-hint" data-i18n>Tap + once every player has taken their turn (one full round). When you're done, press Pause Game. The duration and the number of rounds will be filled in.</p>
   </div>
 
   <!-- FORM CONTENT, hidden while a live game is running -->
   <div id="formContent">
     <div class="form-row">
       <div class="field">
-        <label>Date &amp; Time</label>
+        <label data-i18n>Date &amp; Time</label>
         <input type="datetime-local" id="fDate">
       </div>
       <div class="field">
-        <label>Location <span class="optional"></span></label>
+        <label data-i18n>Location <span class="optional"></span></label>
         <div class="ac-wrap">
-          <input type="text" id="fLocation" maxlength="60" placeholder="optional" autocomplete="off">
+          <input type="text" id="fLocation" maxlength="60" placeholder="optional" autocomplete="off" data-i18n-attr="placeholder">
           <div class="cs-dropdown" id="fLocationDropdown"></div>
         </div>
       </div>
     </div>
     <div class="form-row">
       <div class="field">
-        <label>Duration <span class="optional">(min)</span></label>
-        <input type="number" id="fDur" min="1" max="999" placeholder="optional">
+        <label data-i18n>Duration <span class="optional">(min)</span></label>
+        <input type="number" id="fDur" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
       </div>
       <div class="field">
-        <label>Rounds <span class="optional"></span></label>
-        <input type="number" id="fTurns" min="1" max="999" placeholder="optional">
+        <label data-i18n>Rounds <span class="optional"></span></label>
+        <input type="number" id="fTurns" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
       </div>
     </div>
 
-    <div class="section-label"><span>Villains and Players</span></div>
+    <div class="section-label"><span data-i18n>Villains and Players</span></div>
     <div class="draw-mode-row">
       <button class="exclude-toggle exclude-toggle-inline" type="button" onclick="toggleExclude()">
-        <span class="exclude-toggle-label">Draw pool</span>
+        <span class="exclude-toggle-label" data-i18n>Draw pool</span>
         <div class="toggle-right">
           <span class="badge" id="exBadge"></span>
           <span class="chevron" id="exChevron">▼</span>
         </div>
       </button>
       <div class="draw-mode-actions">
-        <button class="btn btn-primary btn-sm" id="drawAllEmptyBtn" type="button" onclick="drawAllEmpty()">Draw empty</button>
-        <button class="btn btn-primary btn-sm" id="drawAllBtn" type="button" onclick="drawAll()">Draw all</button>
+        <button class="btn btn-primary btn-sm" id="drawAllEmptyBtn" type="button" onclick="drawAllEmpty()" data-i18n>Draw empty</button>
+        <button class="btn btn-primary btn-sm" id="drawAllBtn" type="button" onclick="drawAll()" data-i18n>Draw all</button>
       </div>
     </div>
     <div class="exclude-body" id="excludeBody">
       <div class="filter-actions">
-        <button class="txt-btn" onclick="excludeAll()">Exclude all</button>
+        <button class="txt-btn" onclick="excludeAll()" data-i18n>Exclude all</button>
         <span class="sep">|</span>
-        <button class="txt-btn owned-toggle" id="ownedOnlyBtn" type="button" onclick="toggleMine()">My boxes</button>
+        <button class="txt-btn owned-toggle" id="ownedOnlyBtn" type="button" onclick="toggleMine()" data-i18n>My boxes</button>
         <span class="sep">|</span>
-        <button class="txt-btn" onclick="clearExcluded()">Clear</button>
-        <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyExclude()">Done</button>
+        <button class="txt-btn" onclick="clearExcluded()" data-i18n>Clear</button>
+        <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyExclude()" data-i18n>Done</button>
       </div>
       <div class="filter-bulk-row">
         <div class="seg pace-mode" id="paceMode">
-          <button class="seg-btn on" type="button" onclick="setPaceMode(false)" title="Draw only the selected color">Pace</button>
-          <button class="seg-btn"    type="button" onclick="setPaceMode(true)"  title="Also include the neighboring colors">Pace+</button>
+          <button class="seg-btn on" type="button" onclick="setPaceMode(false)" title="Draw only the selected color" data-i18n data-i18n-attr="title">Pace</button>
+          <button class="seg-btn"    type="button" onclick="setPaceMode(true)"  title="Also include the neighboring colors" data-i18n data-i18n-attr="title">Pace+</button>
         </div>
         <div class="pace-colors" id="paceColors">
-          <button class="pace-color green"  data-pace="green"  onclick="selectPace('green')"  type="button" title="Draw only green villains"></button>
-          <button class="pace-color yellow" data-pace="yellow" onclick="selectPace('yellow')" type="button" title="Draw only yellow villains"></button>
-          <button class="pace-color orange" data-pace="orange" onclick="selectPace('orange')" type="button" title="Draw only orange villains"></button>
-          <button class="pace-color red"    data-pace="red"    onclick="selectPace('red')"    type="button" title="Draw only red villains"></button>
+          <button class="pace-color green"  data-pace="green"  onclick="selectPace('green')"  type="button" title="Draw only green villains" data-i18n-attr="title"></button>
+          <button class="pace-color yellow" data-pace="yellow" onclick="selectPace('yellow')" type="button" title="Draw only yellow villains" data-i18n-attr="title"></button>
+          <button class="pace-color orange" data-pace="orange" onclick="selectPace('orange')" type="button" title="Draw only orange villains" data-i18n-attr="title"></button>
+          <button class="pace-color red"    data-pace="red"    onclick="selectPace('red')"    type="button" title="Draw only red villains" data-i18n-attr="title"></button>
         </div>
       </div>
       <div id="excludeGrid"></div>
     </div>
 
     <div class="section-label">
-      <span class="players-legend" id="playersLegend"><span class="sep-item">🎲 = draw</span> | <span class="sep-item">❌ = remove</span> | <span class="sep-item">👤 = you</span> | <span class="sep-item">👑 = winner</span></span>
+      <span class="players-legend" id="playersLegend"><span class="sep-item" data-i18n>🎲 = draw</span> | <span class="sep-item" data-i18n>❌ = remove</span> | <span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>👑 = winner</span></span>
       <div class="header-actions">
-        <button class="btn btn-primary btn-sm" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled>Shuffle order</button>
+        <button class="btn btn-primary btn-sm" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled data-i18n>Shuffle order</button>
         <select id="playerCountSel" class="players-count-select" onchange="setPlayerCount(this.value)">
           <option value="2">2p</option>
           <option value="3">3p</option>
@@ -143,17 +145,17 @@
       </div>
     </div>
     <div id="orderSlots"></div>
-    <button class="add-row-btn" id="orderAddBtn" onclick="addOrderSlot()">+ Add player</button>
+    <button class="add-row-btn" id="orderAddBtn" onclick="addOrderSlot()" data-i18n>+ Add player</button>
 
   </div>
 
   <!-- FOOTER actions -->
   <div id="footerDefault" class="new-game-footer">
-    <button class="btn btn-primary" id="startBtn"  onclick="startLive()">Start Game</button>
-    <button class="btn btn-save" id="submitBtn" onclick="submitForm()">Save Game</button>
+    <button class="btn btn-primary" id="startBtn"  onclick="startLive()" data-i18n>Start Game</button>
+    <button class="btn btn-save" id="submitBtn" onclick="submitForm()" data-i18n>Save Game</button>
   </div>
   <div id="footerLive" class="new-game-footer hidden">
-    <button class="btn btn-danger" onclick="stopLive()">Pause Game</button>
+    <button class="btn btn-danger" onclick="stopLive()" data-i18n>Pause Game</button>
   </div>
 </main>
 
@@ -162,21 +164,21 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3>Share with players</h3>
+      <h3 data-i18n>Share with players</h3>
       <button class="sheet-close" onclick="closeQR()">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint">Other players can scan this QR code to claim their villain and appear in the game record.</p>
+      <p class="modal-hint" data-i18n>Other players can scan this QR code to claim their villain and appear in the game record.</p>
       <div class="qr-wrap">
         <div id="qrCode"></div>
       </div>
       <div class="qr-url-row">
         <div class="qr-url" id="qrUrlText"></div>
-        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link">⎘</button>
+        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
       </div>
     </div>
     <div class="sheet-footer">
-      <button class="btn btn-primary" onclick="closeQR()">Done</button>
+      <button class="btn btn-primary" onclick="closeQR()" data-i18n>Done</button>
     </div>
   </div>
 </div>

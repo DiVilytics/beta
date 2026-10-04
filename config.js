@@ -20,6 +20,8 @@ const LIVE_GAME_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const DATA_OBJECTIVES_URL    = 'asset/data/objectives.json';
 const DATA_FAQ_URL           = 'asset/data/faq.json';
 const DATA_DECKS_URL         = 'asset/data/villain-decks.json';
+// Card names per language; English has no file (the deck data is English).
+const DATA_CARD_NAMES_URL    = 'asset/data/card-names.{lang}.json';
 const DATA_BOX_INFO_URL      = 'asset/data/box-info.json';
 // A character reprinted into another box (identical rules, not a [TAG]
 // rework) without fragmenting its stats: name -> array of additional box

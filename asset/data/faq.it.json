@@ -1,0 +1,895 @@
+{
+  "general": [
+    {
+      "title": "Regole generali",
+      "items": [
+        {
+          "term": "Inizio del turno",
+          "text": "Una volta mossa la propria pedina in un nuovo luogo, il turno è ufficialmente iniziato. Per garantire un regolare svolgimento del torneo, è possibile ritrattare la propria mossa (e quindi recarsi in un luogo diverso da quello inizialmente scelto) solo se NON si è ancora svolta alcuna azione nel luogo di arrivo. Se si è svolta anche solo un'azione nel luogo di arrivo, bisogna rimanere per forza lì e continuare con le azioni restanti."
+        },
+        {
+          "term": "Giocare una Condizione",
+          "text": "Non è possibile giocare una Condizione se non si può fare esattamente ciò che descrive il testo."
+        },
+        {
+          "term": "Eroi con Forza 0",
+          "text": "Un Eroe con Forza 0 può essere sconfitto con un'azione Scontro senza necessariamente impiegare Alleati. Se lo si desidera, però, si possono comunque impiegare degli Alleati. In quel caso, gli Alleati non vengono scartati dopo l'azione Scontro."
+        },
+        {
+          "term": "Luoghi bloccati",
+          "text": "Oggetti, Alleati ed Eroi non possono essere giocati né mossi in luoghi bloccati. Non si possono assegnare Oggetti ad Eroi o Alleati in luoghi bloccati. Non si possono attivare Oggetti in luoghi bloccati."
+        },
+        {
+          "term": "Niente sotto lo zero",
+          "text": "Qualunque tipo di valore presente nel gioco non può andare sotto allo zero."
+        },
+        {
+          "term": "Trovare una carta",
+          "text": "Quando una carta istruisce di TROVARE un'altra carta bisogna nell'ordine cercare prima nel Reame, poi nella relativa pila degli scarti, poi nel relativo mazzo."
+        },
+        {
+          "term": "Mostrare le carte recuperate",
+          "text": "Per correttezza nei confronti degli avversari, quando si deve recuperare una carta di una categoria specifica (Effetto, Alleato, ecc.) da una pila degli scarti o da un mazzo, bisogna mostrarla agli avversari per dimostrare che si sia presa proprio una carta della categoria designata. Se, invece, si deve recuperare una carta qualunque, non è necessario mostrarla agli avversari."
+        },
+        {
+          "term": "Ricerche infinite",
+          "text": "Nel caso di carte che fanno rivelare da un mazzo finché non si trova una carta di un tipo specifico, può verificarsi un loop infinito se non esistono più copie di quelle carte nel mazzo o negli scarti. In quel caso, la carta in questione può essere comunque giocata, ma con l'unico effetto di rimescolare tutto il mazzo in questione, scarti compresi.",
+          "source": "Lord of the Board, playtester"
+        },
+        {
+          "term": "Condizioni legate agli scarti",
+          "text": "Le Condizioni che si attivano quando un avversario scarta delle carte si possono usare solo quando un avversario scarta carte dalla mano, che sia tramite l'apposita azione o per effetto di altre carte (come, ad esempio, i Tomi Magici della Regina Cattiva). Scartare carte in qualunque altro modo non fa attivare quelle Condizioni."
+        }
+      ]
+    },
+    {
+      "title": "Carte che fanno perdere valuta",
+      "intro": "Le carte dell'era Prospero Hall sono da considerarsi con i seguenti effetti per specifica di Stephanie Straw, designer. Le carte dell'era Ravensburger sono da considerarsi con i seguenti effetti, causa mancanza di specifiche da parte di Mike Mulvihill, designer.",
+      "items": [
+        {
+          "term": "Spiriti ombra",
+          "villain": "Dr. Facilier",
+          "text": "Perdi (fino a) 2 gettoni Potere.",
+          "source": "Stephanie Straw, designer"
+        },
+        {
+          "term": "Primo bacio d'amore",
+          "villain": "Evil Queen",
+          "text": "Perde (fino a) 1 segnalino Veleno.",
+          "source": "Stephanie Straw, designer"
+        },
+        {
+          "term": "Chicha",
+          "villain": "Yzma",
+          "text": "Perde (fino a) 2 gettoni Potere.",
+          "source": "Stephanie Straw, designer"
+        },
+        {
+          "term": "Flynn Rider",
+          "villain": "Mother Gothel",
+          "text": "Perde (fino a) 2 segnalini Fiducia.",
+          "source": "Stephanie Straw, designer"
+        },
+        {
+          "term": "Le streghe di Morva",
+          "villain": "Horned King",
+          "text": "Perdere 2 (e necessariamente 2) gettoni Potere.",
+          "source": "In mancanza di specifiche di Mike Mulvihill, designer"
+        },
+        {
+          "term": "Maui suino",
+          "villain": "Tamatoa",
+          "text": "Perde 3 (e necessariamente 3) gettoni Potere.",
+          "source": "In mancanza di specifiche di Mike Mulvihill, designer"
+        }
+      ]
+    },
+    {
+      "title": "Carte formulate con “any” nel testo originale",
+      "intro": "Le seguenti carte che hanno effetto su carte o luoghi, accomunate dal fatto di avere “any” nel testo originale, sono da interpretarsi con queste specifiche.",
+      "items": [
+        {
+          "term": "La Bestia",
+          "villain": "Gaston",
+          "text": "“any Allies to any other location” → muove un qualsiasi numero di Alleati in uno ed un solo luogo."
+        },
+        {
+          "term": "Mrs. Bric e Chicco",
+          "villain": "Gaston",
+          "text": "“all Heroes” → muove tutti gli Eroi."
+        },
+        {
+          "term": "La pentola magica",
+          "villain": "Horned King",
+          "text": "“any location” → scarta un Nati dalla Pentola da uno ed un solo luogo."
+        },
+        {
+          "term": "Doli",
+          "villain": "Horned King",
+          "text": "“each Hero to any other location” → muove ciascun Eroe in uno ed un solo luogo."
+        },
+        {
+          "term": "La chiave",
+          "villain": "Lady Tremaine",
+          "text": "“any Hero” → muove uno ed un solo Eroe."
+        },
+        {
+          "term": "Non adatti a quell'età",
+          "villain": "Lotso",
+          "text": "“any Hero” → muove uno ed un solo Eroe (o Buzz Lightyear, che sia Guardiano o Alleato)."
+        },
+        {
+          "term": "Jessie",
+          "villain": "Lotso",
+          "text": "“any Ally” → scarta uno ed un solo Alleato."
+        },
+        {
+          "term": "Woody",
+          "villain": "Lotso",
+          "text": "“all Heroes to any other locations” → muove tutti gli Eroi, anche ciascuno in luoghi diversi."
+        },
+        {
+          "term": "Detterò io le regole",
+          "villain": "Madam Mim",
+          "text": "“any Transformation” → sconfigge una ed una sola Trasformazione."
+        },
+        {
+          "term": "Il sapere e la saggezza",
+          "villain": "Madam Mim",
+          "text": "“any Transformation” → muove una ed una sola Trasformazione."
+        },
+        {
+          "term": "Flash",
+          "villain": "Syndrome",
+          "text": "“any Hero” → muove uno ed un solo Eroe."
+        },
+        {
+          "term": "Far Natale",
+          "villain": "Oogie Boogie",
+          "text": "“any action” → fa svolgere una ed una sola azione."
+        },
+        {
+          "term": "Vasca da bagno",
+          "villain": "Oogie Boogie",
+          "text": "“any number of Allies” → muove un qualsiasi numero di Alleati."
+        },
+        {
+          "term": "Cittadini del Paese di Halloween",
+          "villain": "Oogie Boogie",
+          "text": "“any other Hero” → prima di sconfiggere uno ed un solo altro Eroe."
+        },
+        {
+          "term": "Turbastico",
+          "villain": "King Candy",
+          "text": "“any of three... actions” → possono essere svolte tutte, nessuna o solo alcune."
+        },
+        {
+          "term": "Non le permetterò di correre",
+          "villain": "King Candy",
+          "text": "“any number” → muove un qualsiasi numero di Alleati."
+        },
+        {
+          "term": "Bagheera",
+          "villain": "Shere Khan",
+          "text": "“all… to any other locations” → muove tutti gli Eroi e gli Alleati, anche ciascuno in luoghi diversi."
+        },
+        {
+          "term": "La caccia",
+          "villain": "Davy Jones",
+          "text": "“any Hero” → muove uno ed un solo Eroe."
+        },
+        {
+          "term": "Mostro albero",
+          "villain": "Tamatoa",
+          "text": "“any card” → muove una ed una sola carta."
+        }
+      ]
+    },
+    {
+      "title": "Carte che danno accesso ad azioni non disponibili",
+      "intro": "L'effetto di alcune carte dà modo di poter svolgere azioni normalmente non disponibili, perché coperte da Eroi, segnalini, bloccate, già svolte o presenti in altri luoghi. Alcune di queste carte permettono di accedere alle azioni direttamente, ignorando ciò che le tiene bloccate. Altre carte permettono di svolgere direttamente le azioni, per effetto delle carte stesse.",
+      "items": [
+        {
+          "term": "Corvo",
+          "villain": "Maleficent",
+          "text": "Permette di svolgere un'azione in un altro luogo. Malefica può svolgerla nuovamente, se si muove in quello stesso luogo."
+        },
+        {
+          "term": "Diventare gigantesca",
+          "villain": "Ursula",
+          "text": "Permette di svolgere un'azione in un luogo adiacente. Quella stessa azione può essere svolta nuovamente con una seconda copia di Diventare Gigantesca."
+        },
+        {
+          "term": "Nero della notte",
+          "villain": "Evil Queen",
+          "text": "Permette di svolgere un'azione nel luogo in cui si trova la Regina Cattiva, anche se è già stata svolta."
+        },
+        {
+          "term": "Bravi! Bravi!",
+          "villain": "Shere Khan",
+          "text": "Permette di svolgere un'azione coperta. La stessa azione può essere nuovamente svolta con un'altra copia di Bravi! Bravi!."
+        },
+        {
+          "term": "Sir Biss, A qualunque costo, Vi schiaccerò!, In trappola",
+          "villain": "Prince John, Cruella de Vil, Evil Queen, Tamatoa",
+          "text": "Permettono di accedere ad un'azione coperta da un Eroe, come se quell'Eroe non ci fosse. Pertanto, l'azione viene considerata svolta e non la si può svolgere nuovamente se l'Eroe che la copriva viene mosso o sconfitto."
+        }
+      ]
+    }
+  ],
+  "villains": {
+    "Captain Hook": [
+      {
+        "term": "Peter Pan",
+        "text": "Se Peter Pan è la prima carta rivelata durante un'azione Fato, anche l'altra va necessariamente rivelata perché vengono rivelate allo stesso tempo.",
+        "source": "Regolamento di gioco"
+      }
+    ],
+    "Maleficent": [
+      {
+        "term": "Fauna & Sonno senza sogni",
+        "text": "Se Fauna viene giocata in un luogo in cui ci sono due Sonno Senza Sogni ne va scartata una copia sola.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Foresta di rovi & Sonno senza sogni",
+        "text": "Se Foresta di Rovi e Sonno Senza Sogni si trovano nello stesso luogo, quando un Eroe con Forza 4 o superiore viene giocato in quello stesso luogo Foresta di Rovi viene scartata. Dopodiché l'Eroe prende -2 Forza per via di Sonno Senza Sogni.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      }
+    ],
+    "Jafar": [
+      {
+        "term": "Inganno",
+        "text": "Il requisito di attivazione (un avversario ha nel suo Reame due o più Oggetti) considera anche gli Oggetti del Fato. Non scatena un'azione Fato, quindi non innesca le Condizioni azionate da un'azione Fato.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Ipnotizzare",
+        "text": "Ogni Eroe ipnotizzato conta come Alleato ai fini dell'attivazione delle Condizioni altrui. Per coerenza con le altre meccaniche di gioco simili, gli Eroi ipnotizzati vanno spostati nella parte inferiore della plancia nello stesso luogo in cui si trovavano.",
+        "source": "Guida al cattivo"
+      },
+      {
+        "term": "Potere dello stregone",
+        "text": "Le due azioni sono opzionali. È possibile giocare la carta anche senza svolgere nessuna delle due azioni.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Abu & Aladdin",
+        "text": "Se Abu viene giocato nello stesso luogo di Aladdin (e viceversa), Abu NON può prendere un Oggetto già assegnato ad Aladdin (e viceversa).",
+        "source": "Servizio clienti Ravensburger Italia"
+      }
+    ],
+    "Prince John": [
+      {
+        "term": "Tendere una trappola",
+        "text": "Muovere un Alleato è opzionale, ma l'azione Scontro è obbligatoria. Non è necessario utilizzare l'Alleato mosso nell'azione Scontro (localizzazione italiana imprecisa).",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Sir Biss",
+        "text": "Sir Biss consente di svolgere un'azione coperta una sola volta. Non si può eseguire nuovamente quell'azione anche se l'Eroe che la copriva viene sconfitto.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Rubare ai ricchi",
+        "text": "Quando l'Eroe bersaglio viene sconfitto, il Potere “ritorna” al Principe Giovanni, non viene “ottenuto”, quindi non conta ai fini dell'attivazione di carte innescate dal guadagnare Potere.",
+        "source": "Aaron Donogh, designer del gioco"
+      },
+      {
+        "term": "Lady Marian",
+        "text": "Se Robin Hood è già nel Reame quando Lady Marian viene sconfitta e Robin Hood ha del Potere rubato da Rubare ai Ricchi, il Potere viene restituito al Calderone e non al Principe Giovanni. Se Lady Marian viene sconfitta da un Alleato con la Freccia Dorata, Robin Hood viene trovato prima di ottenere Potere con la Freccia, quindi si otterrebbe 1 solo gettone Potere.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Freccia dorata",
+        "text": "Se la Freccia Dorata è assegnata ad un Alleato usato per sconfiggere Robin Hood, si ottengono 2 gettoni Potere, perché Robin Hood sparisce dal Reame prima che si inneschi l'effetto della Freccia Dorata.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Robin Hood",
+        "text": "Il Potere “ritornato” al Principe Giovanni da un Eroe su cui è stato giocato Rubare ai Ricchi NON viene influenzato da Robin Hood, quindi non si riceve un gettone Potere in meno. Stessa cosa vale per il Potere rubato da Little John.",
+        "source": "Aaron Donogh, designer del gioco"
+      }
+    ],
+    "Queen of Hearts": [
+      {
+        "term": "Eroi Rimpiccioliti",
+        "text": "Se c'è più di un Eroe nello stesso luogo di un Eroe rimpicciolito, questi è l'unico Eroe a coprire un'azione. Gli altri Eroi non coprono alcuna azione finché l'Eroe rimpicciolito non viene sconfitto o mosso.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Priorità delle dimensioni",
+        "text": "La priorità degli effetti delle dimensioni è INGRANDITO → RIMPICCIOLITO → NORMALE.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Scelta dell'azione coperta",
+        "text": "Quando un Eroe viene Rimpicciolito o Ingrandito il giocatore che lo sta facendo (che sia la Regina di Cuori o un avversario con il Fato) sceglie quale azione coprire. I simboli azione coperti non possono essere cambiati finché l'Eroe non viene riportato alla normalità e poi nuovamente Rimpicciolito o Ingrandito.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Eroi Alterati",
+        "text": "Eroi Rimpiccioliti ed Eroi Ingranditi hanno SEMPRE effetto e possono CONTEMPORANEAMENTE coinvolgere lo stesso luogo, anche più di uno alla volta. In generale, un Eroe “Alterato” copre SEMPRE l'azione che deve coprire (1 per gli Eroi Rimpiccioliti, 3 per gli Eroi Ingranditi).",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Eroi Ingranditi e Normali",
+        "text": "Eroi Ingranditi ed Eroi Normali POSSONO coinvolgere lo stesso luogo e, quindi, coprire entrambi le azioni contemporaneamente. Per esempio, se c'è un Eroe al Giardino e un Eroe al Labirinto di Siepi, se l'Eroe al Giardino viene Ingrandito entrambe le azioni del Labirinto di Siepi vengono coperte (una dall'Eroe Ingrandito ed entrambe dall'Eroe Normale).",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Eroi Rimpiccioliti e Normali",
+        "text": "Eroi Rimpiccioliti ed Eroi Normali NON POSSONO coinvolgere contemporaneamente lo stesso luogo. Se ci sono uno o più Eroi Rimpiccioliti in un luogo, qualsiasi Eroe Normale in quello stesso luogo non copre azioni finché gli Eroi Rimpiccioliti non vengono mossi o sconfitti. Se già ci sono due Eroi in uno stesso luogo e uno di questi viene Rimpicciolito, sposta verso l'alto l'Eroe Normale in modo che NON copra entrambe le azioni e rimanga scoperta quella liberata dall'Eroe Rimpicciolito.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Furia",
+        "text": "Può solo rimpicciolire Eroi in dimensioni normali, non può riportare alla normalità Eroi ingranditi.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Dr. Facilier": [
+      {
+        "term": "Disperazione",
+        "text": "Si attiva quando un avversario scarta due o più carte dalla mano, tramite l'azione Scartare o tramite l'effetto di altre carte. Non deve scartarle necessariamente tutte insieme. Giocare un Effetto non conta come scartare una carta, come anche scartare Alleati usati in uno Scontro.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Terrore",
+        "text": "Il Potere necessario per azionare questa Condizione non deve essere necessariamente guadagnato tutto insieme.",
+        "source": "Regolamento di gioco"
+      }
+    ],
+    "Evil Queen": [
+      {
+        "term": "Vi schiaccerò!",
+        "text": "Può essere usata anche se c'è più di un Eroe in quel luogo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Specchio magico & Polvere di mummia",
+        "text": "La carta Fato e il segnalino Veleno vanno pescate/ottenute solo al termine dell'azione Fato, non prima. Pescare una carta con lo Specchio Magico, nonostante il testo della carta, rimane un'azione opzionale, come specificato nella Guida al cattivo.",
+        "source": "Ruby Wishnietsky, designer del gioco"
+      },
+      {
+        "term": "Primo bacio d'amore",
+        "text": "Può essere giocata se la Regina non ha Veleno, ma non se non ci sono Eroi nella pila degli scarti.",
+        "source": "Stephanie Straw, designer del gioco"
+      }
+    ],
+    "Hades": [
+      {
+        "term": "Prepariamoci al primo round!",
+        "text": "Quando mossi di due luoghi, i Titani scavalcano qualunque luogo intermedio (quindi evitano le abilità di Eroi posizionati nel mezzo) e possono usare la loro abilità solo una volta, perché il movimento è unico.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Pegaso",
+        "text": "Muovere un Titano con Pegaso innesca la sua abilità.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Titani",
+        "text": "I Titani non sono Alleati, quindi non azionano le Condizioni altrui che si riferiscono ad Alleati.",
+        "source": "Regolamento di gioco"
+      }
+    ],
+    "Scar": [
+      {
+        "term": "Sarò re",
+        "text": "Non può essere messa nella propria mano perché finisce nella pila degli scarti solo dopo che il suo Effetto è terminato.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Ingiustizia",
+        "text": "Le carte Fato guardate possono essere scartate entrambe, tenute entrambe o scartata una e tenuta l'altra. Se si hanno due copie di Ingiustizia in mano e si desidera giocarle, bisogna giocarle entrambe allo stesso tempo e risolverne una per una.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Banzai la iena",
+        "text": "La sua abilità entra in funzione solo quando sono scartate altre Iene dal suo stesso luogo. Se Banzai stesso viene scartato, non si ottiene alcun gettone Potere.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Bastone di Rafiki",
+        "text": "Se viene sconfitto un Eroe con il Bastone di Rafiki assegnato, questo NON attiva le Condizioni altrui basate sullo sconfiggere Eroi (come Arroganza di Ursula) perché, da regolamento, un Eroe è considerato sconfitto quando viene scartato dal Reame in seguito ad un'azione Scontro o all'effetto di una carta.",
+        "source": "Regolamento di gioco"
+      }
+    ],
+    "Ratigan": [
+      {
+        "term": "Dirigibile",
+        "text": "L'Oggetto o l'Alleato da muovere deve trovarsi nello stesso luogo del Dirigibile.",
+        "source": "Nella traduzione italiana manca la specifica “at its location”, presente in lingua originale"
+      }
+    ],
+    "Yzma": [
+      {
+        "term": "Sonno di bellezza",
+        "text": "Yzma può scegliere di svolgere una, tutte o nessuna delle azioni di Sonno di Bellezza all'inizio del suo turno successivo. Una Crudele Ironia può giocare questa carta se è la prima ed unica azione del turno.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Ferocia",
+        "text": "Attenzione all'errore nella carta in alcune versioni. È 3 o superiore per sconfiggere un Eroe con 3 o meno.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Pugnale",
+        "text": "Se Kronk diventa un Eroe e ha già il Pugnale assegnato, il Pugnale rimane assegnato a lui anche nella parte superiore del Reame. Quando Kronk viene scartato dal Reame, il Pugnale torna in mano al giocatore.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Chicha",
+        "text": "Il testo di Chicha è da intendersi come “perde FINO A 2 gettoni Potere”, quindi se Yzma ha meno di 2 gettoni Potere quando si muove nel luogo di Chicha, deve perderli tutti quanti.",
+        "source": "Stephanie Straw, designer del gioco"
+      },
+      {
+        "term": "Kronk & La via dello sballo",
+        "text": "Quando Kronk raggiunge 3 gettoni Potere su di sé e viene spostato nella parte alta del Reame, il Potere rimane su di lui perché può essere recuperato in ogni momento con la Via dello Sballo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Occhio al ritmo",
+        "text": "Se è l'unica carta rimasta dei mazzi Fato, seguire questa procedura: scegliere un Eroe dalla pila degli scarti; mescolare, senza la carta scelta e Occhio al Ritmo, gli scarti per formare quattro nuovi mazzi; mescolare l'Eroe scelto in fino a due mazzi; scartare Occhio al Ritmo (il suo effetto è risolto).",
+        "source": "Ruby & Karla, designer del gioco"
+      },
+      {
+        "term": "Mazzi Fato",
+        "text": "Le carte Fato che hanno come abilità di rimescolare uno o più mazzi possono avere come bersaglio anche i mazzi da cui la carta Fato è stata pescata. Se nessuna carta di un mazzo Fato può essere giocata, il mazzo viene rimescolato e rimesso a posto. Nessuna carta viene scartata.",
+        "source": "Regolamento di gioco"
+      }
+    ],
+    "Pete": [
+      {
+        "term": "Bandito",
+        "text": "Se si gioca più di un Bandito grazie alla sua abilità, bisogna comunque pagare il costo di ogni singolo Bandito.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Pappagallo",
+        "text": "Recuperare una carta dalla pila degli scarti è opzionale.",
+        "source": "Stephanie Straw, designer del gioco"
+      },
+      {
+        "term": "Pippo",
+        "text": "La sua abilità fa il cambio di due segnalini Obiettivo adiacenti l'uno all'altro.",
+        "source": "Errore di adattamento italiano in alcune versioni"
+      },
+      {
+        "term": "Gioco di forza & Topolino",
+        "text": "Se Gambadilegno spende 6 gettoni Potere con Topolino nel Reame, Gioco di Forza non può essere risolto. Ma se Gambadilegno spende parte dei 6 gettoni, sconfigge Topolino e dopo spende i gettoni rimanenti, allora Gioco di Forza può essere risolto.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Mother Gothel": [
+      {
+        "term": "Egocentrica",
+        "text": "Attivabile anche se viene mosso un Oggetto o un Alleato durante un'azione Fato, come anche un Eroe con un Oggetto assegnato.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Nel mio cuore un sogno c'è & Ora mi trasformo nella cattiva",
+        "text": "Vale la regola del poter svolgere le azioni sulla carta per poterla giocare. Se non si ha almeno un segnalino Fiducia da perdere, non possono essere giocate.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Flynn Rider",
+        "text": "Può essere giocata anche se Madre Gothel ha meno di due segnalini Fiducia. Se viene sconfitto, Madre Gothel guadagna comunque 2 segnalini Fiducia.",
+        "source": "Stephanie Straw, designer del gioco"
+      }
+    ],
+    "Gaston": [
+      {
+        "term": "Avvenente quanto me!",
+        "text": "Tutte le azioni extra fornite da carte di altri avversari contano al numero minimo di quattro richiesto per attivare Avvenente Quanto Me. Nel caso in cui l'ultima delle quattro azioni avversarie sia un'azione Fato (che sia contro Gaston o contro un altro giocatore), bisogna attendere che questa sia conclusa per poter giocare Avvenente Quanto Me.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Prenda me al suo posto",
+        "text": "Le carte rivelate dal mazzo Fato, che non siano Eroi, non vanno scartate, ma vanno rimescolate nel mazzo Fato. Nel caso in cui l'Eroe giocato da Prenda Me al Suo Posto sia Belle non è possibile rimuovere un Ostacolo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Se ne vada!",
+        "text": "La formulazione del suo testo non recita “fino a”, come accade in Venga Sotto alla Luce. Per questo motivo, con Se ne Vada è possibile rimuovere 3 e solo 3 Ostacoli.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Le Tont",
+        "text": "L'abilità di Le Tont è obbligatoria, quindi gli Alleati usati nello Scontro tornano in mano al giocatore, compreso Le Tont se ha partecipato allo Scontro.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Mrs. Bric e Chicco",
+        "text": "Se l'Invenzione di Maurice è assegnata ad un Eroe, quando Mrs. Bric e Chicco vengono giocati può essere assegnata ad un qualunque altro Eroe.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "La rosa",
+        "text": "Se l'altra carta Fato rivelata non può essere giocata, oppure la Rosa è stata rivelata tramite Inganno di Jafar e Ursula, si può comunque risolvere il testo de la Rosa nella sua interezza. La Rosa viene scartata dopo aver giocato l'altra carta Fato rivelata. Quindi, se c'è bisogno di rimescolare gli scarti per pescare altre due carte Fato, la Rosa viene rimescolata insieme agli scarti e, quindi, può essere pescata nuovamente.",
+        "source": "Canale YouTube di Ravensburger America"
+      },
+      {
+        "term": "La Bestia",
+        "text": "La sua abilità è obbligatoria, anche se è stato Gaston a giocarla tramite Prenda Me al Suo Posto. Quindi un qualsiasi numero di Alleati presenti nel luogo in cui viene giocata la Bestia devono essere mossi in uno e un solo luogo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Sei proprio tu",
+        "text": "Può essere giocata SOLO e SOLTANTO se manca almeno un Ostacolo da ogni luogo. Se anche solo un luogo ha ancora tutti e due gli Ostacoli, Sei Proprio Tu non può essere giocata.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Maurice",
+        "text": "Quando Maurice viene giocato e l'Invenzione di Maurice viene trovata, l'Invenzione può essere assegnata a lui o a qualunque altro Eroe nel suo stesso luogo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "L'invenzione di Maurice",
+        "text": "È un Oggetto da assegnare ad un Eroe. Se non ci sono Eroi nel Reame, non può essere giocata. Ignorare il valore in Forza presente nell'angolo inferiore sinistro, è da considerarsi un errore di stampa.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Mostrami la bestia!",
+        "text": "L'esatto scopo di questa carta è ancora oscuro. Consigliamo di utilizzarla per rimuovere un Ostacolo, se la Bestia è in gioco, o per rimpiazzarne uno, se Belle è in gioco, così da potersi preparare ad usare carte che rimuovono un determinato numero di Ostacoli in un colpo solo. Se giocata quando sono in gioco sia la Bestia che Belle non si farebbe altro che recuperare il Potere speso per giocarla.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Mi hai salvato la vita",
+        "text": "Può essere usata per riposizionare anche un solo Ostacolo in un singolo luogo, dovuto al fatto che il testo originale recita “all”.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Lady Tremaine": [
+      {
+        "term": "Ho Detto Se",
+        "text": "Non viene rimischiata nel mazzo rimescolato.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Stupidi scherzi",
+        "text": "Può essere scelta una carta che non può essere giocata, annullando il Fato. Se si sceglie un Effetto, il giocatore che scaglia il Fato decide come applicarlo. Se si sceglie un Eroe, la Matrigna sceglie dove giocarlo, ma il giocatore che scaglia il Fato ne risolve gli Effetti. Questa carta non può annullare le restrizioni del Principe, delle Scarpette e di Cenerentola col Vestito da Ballo.",
+        "source": "Mike Mulvihill, designer del gioco"
+      },
+      {
+        "term": "Lucifero",
+        "text": "Ogni Eroe che condivide in un qualunque momento lo stesso luogo di Lucifero, che sia perché Eroe e/o Lucifero vengono mossi o giocati nello stesso luogo, viene intrappolato. Il segnalino Trappola rimane sull'Eroe anche quando Lucifero viene mosso o scartato dal luogo dell'Eroe intrappolato.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "La chiave",
+        "text": "Può essere giocata anche se Cenerentola non è in gioco. Cenerentola col Vestito da Ballo può essere mossa, ma non intrappolata.",
+        "source": "Specifiche di Mike Mulvihill, designer del gioco, e confermate da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Giac",
+        "text": "Non può scartare le Scarpette di Cristallo.",
+        "source": "Lord of the Board, playtester, e altri playtester"
+      },
+      {
+        "term": "Sala da Ballo",
+        "text": "Le uniche carte che possono essere mosse o giocate nella Sala da Ballo sono il Principe, Cenerentola con il Vestito da Ballo, Anastasia con il Vestito da Ballo, Genoveffa con il Vestito da Ballo. Non possono neanche essere giocati Oggetti nella Sala da Ballo, perché altrimenti sfuggirebbero alla protezione di Lucifero e agli effetti di Giac.",
+        "source": "Guida al cattivo"
+      },
+      {
+        "term": "Il principe",
+        "text": "Quando il Principe viene rivelato durante un'azione Fato, deve essere immediatamente giocato e l'altra carta Fato rivelata deve essere scartata.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Cenerentola col vestito da ballo",
+        "text": "Se Cenerentola col Vestito da Ballo viene giocata in sostituzione di Cenerentola e Cenerentola è intrappolata, perde il segnalino Trappola dato che Cenerentola col Vestito da Ballo non può essere intrappolata.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Horned King": [
+      {
+        "term": "Nati dalla pentola",
+        "text": "Possono essere giocati solo sostituendo i Soldati Antichi prima dell'inizio del turno di Re Cornelius se è visibile il Potere della Pentola Magica. Il loro costo zero segnalato in alto a sinistra NON significa che possono essere giocati gratuitamente tramite un'azione Giocare una carta.",
+        "source": "Guida al cattivo"
+      },
+      {
+        "term": "Noi abbiamo fatto un patto",
+        "text": "Non viene rimischiata insieme alla pila degli scarti del mazzo Fato.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Le streghe di Morva",
+        "text": "Il giocatore che scaglia il Fato decide cosa deve fare Re Cornelius. In caso sia stato deciso che Re Cornelius deve scartare carte, Re Cornelius decide quali. Re Cornelius non può perdere i gettoni Potere se ne ha meno di 2.",
+        "source": "Traduzione italiana imprecisa"
+      }
+    ],
+    "Madam Mim": [
+      {
+        "term": "Detterò io le regole",
+        "text": "Può essere usata per sconfiggere UNA qualunque trasformazione di Merlino, non tutte le trasformazioni di Merlino.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "La magnifica, splendida, Maga Magò",
+        "text": "Non va rimescolata insieme alle altre carte nella pila degli scarti del mazzo Cattivo.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Anacleto",
+        "text": "Non può essere giocato se il mazzo delle Trasformazioni di Merlino è vuoto.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Lotso": [
+      {
+        "term": "Benvenuti al Sunnyside",
+        "text": "Vedi “Ricerche infinite” nelle regole generali.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Profuma di fragole",
+        "text": "Bisogna attendere la fine dell'azione Fato per usare questa Condizione. Non viene rimescolata insieme al resto della pila degli scarti del mazzo.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Bimbo",
+        "text": "Le altre carte rivelate vanno rimischiate nel mazzo Fato.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Il ciondolo di Daisy",
+        "text": "Può essere giocata anche se Bimbo non è nel Reame di Lotso.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Woody",
+        "text": "Gli Eroi possono essere mossi anche in luoghi diversi fuori dall'Aula Bruco.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Il cappello di Woody",
+        "text": "Ricordatevi di piazzare un gettone -1 Forza su ogni Eroe quando giocherete il Cappello, ad eccezione di Woody. Per quanto riguarda Rex, ottiene -1 dal Cappello di Woody nei seguenti casi: quando è l'unico Eroe in un luogo (e lo mantiene anche quando altri Eroi vengono successivamente giocati dove si trova lui); quando tutti gli altri Eroi si muovono in un luogo diverso dal suo; quando viene giocato in un luogo dove già si trovano altri Eroi. Se I Giocattoli di Bonnie viene giocata in presenza del Cappello di Woody, bisogna aggiungere un gettone -1 Forza dopo aver applicato l'effetto de I Giocattoli di Bonnie, tranne su Rex se si trova in un luogo con altri Eroi. Quando il Cappello di Woody viene scartato, bisogna rimuovere un gettone -1 Forza da ogni Eroe nel Reame.",
+        "source": "Regole condivise stabilite con la community americana (presumibilmente con l'approvazione dei playtester)"
+      }
+    ],
+    "Syndrome": [
+      {
+        "term": "Identificarsi prego",
+        "text": "Non può muovere l'Omnidroide v.10 quando è in cima al Reame.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Chi è super adesso?",
+        "text": "Fa riferimento al costo effettivo di una carta pagata dall'avversario, non al costo stampato sulla carta.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Omnidroide v.10",
+        "text": "Va sempre giocato al Centro di Metroville. Se il Telecomando non è presente o è sotto il controllo di Sindrome, va giocato nella parte alta del Reame. Se il Telecomando di Sindrome è assegnato ad un Eroe, va giocato nella parte bassa del Reame. Ogni volta in cui viene giocato un Eroe e il Telecomando gli viene assegnato, l'Omnidroide v.10 viene mosso nello stesso luogo, in basso. Quando l'Eroe con il Telecomando viene sconfitto, l'Omnidroide v.10 si muove in alto nello stesso luogo e il Telecomando ricade in basso. Tecnicamente, attivare il Telecomando e capovolgere la tessera dell'Omnidroide v.10 sul lato Distrutto dovrebbe essere l'ultima azione per ottenere la vittoria. È possibile attivare il Telecomando e capovolgere la tessera PRIMA e POI sconfiggere tutti gli Eroi rimanenti, ma noi sconsigliamo di agire così. In questo modo, l'Omnidroide distrutto rimarrebbe permanentemente nella parte alta del Reame, a bloccare azioni, e non potrà più essere mosso (come specificato nella Guida al cattivo) né utilizzato per sconfiggere Eroi rimanenti.",
+        "source": "Meccanica confermata da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Lavoro di squadra",
+        "text": "Va scartato prima di guardare le sei carte in cima al mazzo. Se l'altra carta Fato rivelata non può essere giocata, Lavoro di Squadra può comunque essere giocata. Se vengono rivelate due copie di Lavoro di Squadra, il loro effetto si annulla a vicenda e dovrà esserne giocata una copia sola. Se c'è bisogno di rimescolare gli scarti del mazzo per rivelare sei carte, Lavoro di Squadra NON viene rimescolata insieme agli scarti, perché il suo effetto non ha ancora finito di risolversi.",
+        "source": "Regolamento di gioco + presumibili specifiche di playtester"
+      }
+    ],
+    "Oogie Boogie": [
+      {
+        "term": "È una vacanza",
+        "text": "Se È una Vacanza dovesse scartare Jack Skeletron, è considerato un Eroe, dato che non è stato giocato dal mazzo Fato.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Pipistrelli & Chi abbiamo qui?",
+        "text": "Se usate Chi Abbiamo Qui? e il lancio dei dadi risulta in un 8 o più i Pipistrelli non vengono scartati, dato che l'Effetto di Chi Abbiamo Qui? è in funzione e finisce di risolversi prima di quello dei Pipistrelli.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Che ti ha portato Babbo Natale?",
+        "text": "È possibile decidere anche di non scartare alcuna carta, ma di pescarne comunque due.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Salve, Bau",
+        "text": "Ricordatevi sempre di effettuare la riduzione di 2 alla somma del lancio di dadi solo dopo aver considerato altre eventuali variazioni fornite da abilità di altre carte, inclusi i Dadi Truccati. In altre parole, il -2 inflitto da Salve, Bau sarà l'ultimissimo calcolo da fare per ottenere il risultato finale.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Sally",
+        "text": "Può essere giocata anche nello stesso luogo dove si trova già il Bau Bau, nonostante la sua abilità imponga di muovere la pedina dove si trova Sally. Gli Eroi possono sempre essere giocati in un luogo che non sia bloccato, a prescindere da che le loro abilità possano essere o meno risolte completamente.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Il sindaco del Paese di Halloween",
+        "text": "Quando il Sindaco viene sconfitto, è il Bau Bau che rivela carte dal mazzo Fato e decide dove giocare l'Eroe pescato. Le carte Fato non utilizzate vanno rimescolate nel mazzo. Se viene pescato Jack Skeletron, avendo la dicitura Eroe, deve essere giocato, ma come Effetto perché viene giocato dal mazzo Fato. Se, una volta sconfitto il Sindaco, dovesse venir fuori Sally e il Bau Bau dovesse giocarla in un luogo diverso dal suo, la pedina del Bau Bau dovrà comunque muoversi nel luogo di Sally e il giocatore dovrà proseguire il turno svolgendo le azioni lì disponibili.",
+        "source": "Regolamento di gioco + testo della carta"
+      },
+      {
+        "term": "Dottor Finkelstein",
+        "text": "Una volta sconfitto, va rimescolato all'interno del mazzo, senza che ci sia bisogno di metterlo in cima.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      }
+    ],
+    "Shere Khan": [
+      {
+        "term": "Bravi! Bravi!",
+        "text": "Due copie di Bravi! Bravi! possono essere giocate per svolgere la stessa azione nello stesso turno, dato che è l'Effetto della carta che consente di svolgere l'azione; non la si sta svolgendo direttamente.",
+        "source": "Regole condivise stabilite con la community americana (presumibilmente con l'approvazione dei playtester)"
+      },
+      {
+        "term": "Ehi cugino",
+        "text": "Se decidete di non giocare la carta Alleato rivelata, questa viene scartata insieme alle altre carte.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Spera in me",
+        "text": "Potete decidere di rimescolare nel mazzo un numero qualunque di carte, da 0 a 3, quindi anche nessuna, il che rende Spera in Me giocabile anche se non si ha una pila degli scarti.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Bagheera",
+        "text": "Se decidete di sfruttare l'abilità di Bagheera, dovete necessariamente muovere tutti gli Eroi e tutti gli Alleati nel luogo di Bagheera in altri luoghi, non solo alcuni.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "È mio amico",
+        "text": "Questa carta può sempre essere scelta per un'azione Fato. In questo caso, scegliereste semplicemente un luogo e tutti gli eventuali Eroi lì presenti otterrebbero un +1 di Forza. Se non ci sono Eroi, giocate e scartate semplicemente la carta.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Il micio di casa",
+        "text": "Potete sempre scegliere questa carta e decidere di non svolgere nessuno dei suoi due effetti o solo uno dei due.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Segnalini Fuoco",
+        "text": "Più di un segnalino Fuoco può essere impilato su una stessa azione.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      }
+    ],
+    "King Candy": [
+      {
+        "term": "Scarafoidi canditi",
+        "text": "Se gli Scarafoidi Canditi sono bersaglio dell'effetto di Non le Permetterò di Correre non si muovono in un altro luogo e non ottengono +1 Forza, perché questo accade solo quando vengono effettivamente utilizzati in un'azione Scontro che li scarterebbe come risultato.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Via!",
+        "text": "Questo Effetto può essere giocato anche se non si hanno Alleati in campo o se non li si desidera muovere.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Turbastico",
+        "text": "Ai fini dell'utilizzo di Turbastico sono considerate coperte anche le azioni sulle quali si trova il segnalino Corsa.",
+        "source": "Lord of the Board, playtester"
+      },
+      {
+        "term": "Non le permetterò di correre",
+        "text": "Potete decidere di non muovere alcun Alleato per giocare questa carta (un qualsiasi numero implica anche 0), ma dovete comunque poter svolgere un'azione Scontro per poterla giocare.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Tassa d'iscrizione alla corsa",
+        "text": "Il testo della carta può trarre in inganno, ma, come specificato nella Guida al cattivo, la Tassa d'Iscrizione alla Corsa va giocata PRIMA di muovere la pedina di Re Candito. Tuttavia, può essere giocata solo DOPO aver risolto il movimento del segnalino Corsa. Quindi, nell'ordine: 1) muovere il segnalino Corsa, 2) giocare Tassa d'Iscrizione, 3) dichiarare il movimento della pedina e muoverla.",
+        "source": "Guida al cattivo"
+      },
+      {
+        "term": "La corsa",
+        "text": "Se l'effetto di alcune carte farà arretrare la pedina di Re Candito o il segnalino Corsa prima della Grande Corsa, avranno entrambi bisogno di compiere un giro completo della pista per poter vincere. Il segnalino Corsa copre le azioni su cui si trova e impedisce di svolgerle. Il segnalino Corsa rimane fermo nel Reame se tutti i Glitch dovessero essere rimossi da Vanellope.",
+        "source": "Specifiche confermate da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Glitch",
+        "text": "A prescindere che Vanellope abbia o no già un Glitch assegnato, nel momento in cui viene giocata una carta Glitch il turno di Re Candito termina sempre. Nel caso in cui, per effetto di un Glitch, Re Candito e il segnalino Corsa si trovino a tagliare il traguardo nello stesso momento, la vittoria va a Re Candito, dato che sul testo della carta il suo nome viene prima di quello del segnalino Corsa.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "La medaglia dell'eroe di Ralph",
+        "text": "Vanellope Von Schweetz potrà essere giocata nello stesso luogo di Ralph solo se sconfiggerete Ralph con la Medaglia assegnata. Sconfiggere Ralph Spaccatutto senza Medaglia assegnata non avrà alcun effetto.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Principessa Vanellope",
+        "text": "Il testo è formulato con “fino a quattro spazi azione”, il che significa che potete scegliere di giocare questa carta e di non muovere affatto Re Candito.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Il faro",
+        "text": "Potete giocare questa carta anche se non ci sono Scarafoidi Canditi in gioco, in quanto vi chiede di scegliere un luogo e di muovere lì tutti gli Scarafoidi eventualmente presenti in luoghi adiacenti. La seconda parte della carta è opzionale, quindi non vi impedisce di giocarla.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "La medaglia di Vanellope",
+        "text": "Questa carta può essere giocata anche se non ci sono Eroi nella pila degli scarti dato che il testo è formulato con il “puoi”. Quindi potete scegliere questa carta, tra le due opzioni di Fato, ma decidere di non sfruttarne l'abilità.",
+        "source": "Testo della carta"
+      }
+    ],
+    "Davy Jones": [
+      {
+        "term": "La ciurma dell'Olandese Volante & L'equipaggio",
+        "text": "Le loro modifiche in Forza sono dinamiche. Bisogna ricordarsi di aggiungere o togliere di volta in volta i gettoni Forza in base alla presenza di Alleati o Eroi.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Temi tu la morte?",
+        "text": "Può essere giocata anche se non ci sono più Eroi nel mazzo Fato, con il risultato di ricomporre tutto il mazzo Fato, rimescolando gli scarti.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Primo ufficiale Maccus",
+        "text": "L'Alleato da scartare al posto del Primo Ufficiale Maccus non deve essere stato coinvolto nell'azione Scontro.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "L'Olandese Volante",
+        "text": "Può essere usato per svolgere un'azione coperta.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "E dove punta?",
+        "text": "Entrambe le frasi sono formulate con il “puoi”, quindi si può decidere di giocare questa carta, ma non risolverne gli effetti.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Elizabeth Swann",
+        "text": "La sua modifica in Forza è cumulativa per ogni Eroe che viene giocato successivamente a lei, quindi non perde Forza se altri Eroi abbandonano il Reame.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "James Norrington",
+        "text": "Nel caso in cui abbia il Cuore come segnalino assegnato, bisogna prima risolvere gli effetti di James Norrington quando viene sconfitto e poi quelli del Cuore. Quindi bisogna prima ottenere 2 gettoni Potere e poi perdere tutto il Potere raccolto.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "Segnalini Tesoro",
+        "text": "Un Eroe non può avere più di un segnalino Tesoro assegnato. Quando viene sconfitto un Eroe con un segnalino Tesoro assegnato non rivelato, il segnalino ritorna a faccia in giù nella riserva.",
+        "source": "Guida al cattivo"
+      }
+    ],
+    "Tamatoa": [
+      {
+        "term": "Il potere della creazione ai crostacei",
+        "text": "Nonostante nell'edizione italiana la carta sia formulata con “rimescola”, è da intendersi con “puoi rimescolare” a causa della mancata stampa dell'ultima revisione inviata negli USA.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Si confondono in tanti, lattanti",
+        "text": "Può essere giocata solo al termine del turno di un avversario, se questi ha svolto due o meno azioni.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Con una bella canzone",
+        "text": "Può essere giocata solo se si hanno almeno tre carte nella pila degli scarti del mazzo Cattivo.",
+        "source": "Testo della carta"
+      },
+      {
+        "term": "Non sei così forte",
+        "text": "Ai fini dell'attivazione di questa Condizione, contare la Forza degli Alleati avversari già modificata da altri effetti passivi non appena entrano nel Reame, come ad esempio le Iene Affamate di Scar (entrano con Forza già modificata nel Reame se vengono giocate nello stesso luogo di altre Iene) o la Ciurma dell'Olandese Volante di Davy Jones (entra nel Reame con Forza 4 se c'è almeno un Alleato negli altri luoghi).",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "In trappola",
+        "text": "Se un'azione è coperta da un Eroe e da Qualcosa che Splende in contemporanea, In Trappola non può comunque permettere a Tamatoa di svolgerla. Dev'essere coperta solo da un Eroe. Se l'azione coperta si trova nello stesso luogo di Tamatoa e l'Eroe che la copriva viene sconfitto nello stesso turno, Tamatoa NON può svolgere una seconda volta quell'azione (se già l'aveva svolta con In Trappola).",
+        "source": "Regolamento di gioco + testo della carta"
+      },
+      {
+        "term": "L'amo di Maui",
+        "text": "Quando è sotto al controllo di Tamatoa e si è bersaglio di un'azione Fato occorre attendere che questa sia terminata per ottenere 2 gettoni Potere. Se viene giocata l'Ora di Maui e si perde il controllo dell'Amo, non si possono ottenere i 2 gettoni Potere.",
+        "source": "Regolamento di gioco"
+      },
+      {
+        "term": "L'ora di Maui",
+        "text": "Per forza di cose, se l'Amo di Maui si trova nella mano di Tamatoa, va comunque preso e assegnato a Maui. Se Maui ha dei gettoni Forza con sé, quando viene trovato, questi vanno scartati.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Maui insetto",
+        "text": "I gettoni Forza eventualmente assegnati agli Alleati non vengono scartati. In caso ci siano Alleati con lo stesso nome, ma con segnalini Forza diversi, è necessario ridistribuirli casualmente.",
+        "source": "Confermato da Lord of the Board, playtester, a Villainous Italia"
+      },
+      {
+        "term": "Maui Hei Hei",
+        "text": "Se viene rivelata tramite Non è Proprio l'Ora di Maui, deve essere obbligatoriamente giocata.",
+        "source": "Testo della carta"
+      }
+    ]
+  }
+}

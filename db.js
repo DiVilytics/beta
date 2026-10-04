@@ -119,6 +119,27 @@ async function _fetchJson(url) {
   }
 }
 
+// Merge a translation over the English data: objects merge key by key (so a
+// missing villain or entry falls back to English), anything else is replaced.
+function _mergeLocalized(base, over) {
+  if (!over || typeof over !== 'object' || Array.isArray(over)
+      || !base || typeof base !== 'object' || Array.isArray(base)) return over ?? base;
+  const out = { ...base };
+  for (const k of Object.keys(over)) out[k] = k in base ? _mergeLocalized(base[k], over[k]) : over[k];
+  return out;
+}
+
+// A data file in the current language: `faq.json` plus `faq.it.json` merged
+// over it when the site is in Italian. No translation file → English as is.
+async function _fetchJsonLocalized(url) {
+  const base = await _fetchJson(url);
+  if (LANG === 'en') return base;
+  try {
+    const r = await fetch(url.replace(/\.json$/, `.${LANG}.json`));
+    return r.ok ? _mergeLocalized(base, await r.json()) : base;
+  } catch (_) { return base; }
+}
+
 let _objectives = null;
 async function loadObjectives() {
   if (!_objectives) _objectives = await _fetchJson(DATA_OBJECTIVES_URL);
@@ -126,10 +147,11 @@ async function loadObjectives() {
 }
 
 // Rules F.A.Q.: { general: [{ title, intro?, items }], villains: { name: items } },
-// each item { term, text, villain?, source? }. Shown on faq.html.
+// each item { term, text, villain?, source? }. Shown on faq.html. In Italian,
+// faq.it.json (same shape) replaces what it covers; villains it lacks stay English.
 let _faq = null;
 async function loadFaq() {
-  if (!_faq) _faq = await _fetchJson(DATA_FAQ_URL);
+  if (!_faq) _faq = await _fetchJsonLocalized(DATA_FAQ_URL);
   return _faq;
 }
 
@@ -138,6 +160,16 @@ let _decks = null;
 async function loadVillainDecks() {
   if (!_decks) _decks = await _fetchJson(DATA_DECKS_URL);
   return _decks;
+}
+
+// Card names in the current language: { villain: { 'English name': 'translated' } }
+// (card-names.it.json, from the Villainous Italia card list). Empty in English;
+// any name or villain it lacks is shown in English.
+let _cardNames = null;
+async function loadCardNames() {
+  if (LANG === 'en') return {};
+  if (!_cardNames) _cardNames = await _fetchJson(DATA_CARD_NAMES_URL.replace('{lang}', LANG));
+  return _cardNames;
 }
 
 let _boxInfo = null;

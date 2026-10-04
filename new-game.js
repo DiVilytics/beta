@@ -17,7 +17,7 @@ let _resumeTickId   = null;        // resume-banner ticker (set in _checkResume)
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
-const LEGEND_ITEMS = ['🎲 = draw', '❌ = remove', '👤 = you', '👑 = winner'];
+const LEGEND_ITEMS = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -28,10 +28,10 @@ const pace = createPaceFilter({
   paceModeId:   'paceMode',
   mineBtnId:    'ownedOnlyBtn',
   mineTitles: {
-    signIn:  'Sign in to filter by owned boxes',
-    noBoxes: 'Mark which boxes you own on the account page first',
-    on:      'Pool limited to your boxes',
-    off:     'Limit the pool to your boxes',
+    signIn:  t('Sign in to filter by owned boxes'),
+    noBoxes: t('Mark which boxes you own on the account page first'),
+    on:      t('Pool limited to your boxes'),
+    off:     t('Limit the pool to your boxes'),
   },
   onChange: () => { updateExcludeUI(); _updateActionBtns(); },
   onError:  showErr,
@@ -252,7 +252,7 @@ function removeOrderSlot(id) {
 
 function toggleMe(id) {
   if (!getCurrentUser()) {
-    showErr('Sign in first to mark your villain.');
+    showErr(t('Sign in first to mark your villain.'));
     return;
   }
   for (const s of orderSlots) s.isMe = (s.id === id ? !s.isMe : false);
@@ -411,7 +411,7 @@ function shuffleOrder() {
       const nameEl   = el.querySelector('.order-slot-name');
       const numEl    = el.querySelector('.row-num');
       if (portrait) portrait.src = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-      if (nameEl)   nameEl.textContent = s.char || 'Villain';
+      if (nameEl)   nameEl.textContent = s.char ? villainName(s.char) : t('Villain');
       if (numEl)    numEl.textContent = origPos.get(s.id) + '.';
     });
   }, FRAME_MS);
@@ -430,8 +430,8 @@ function renderOrderSlots() {
     const taken     = new Set(orderSlots.filter(o => o.id !== s.id && o.char).map(o => o.char));
     const available = chars.filter(c => !taken.has(c.name));
     const src       = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-    const nameTxt   = s.char ? _esc(s.char) : '<span class="order-slot-empty">Villain</span>';
-    const meTitle   = isAuthed ? 'My villain' : 'Sign in to mark your villain';
+    const nameTxt   = s.char ? _esc(villainName(s.char)) : `<span class="order-slot-empty">${t('Villain')}</span>`;
+    const meTitle   = isAuthed ? t('My villain') : t('Sign in to mark your villain');
     return `
       <div class="order-slot" data-id="${s.id}">
         <div class="drag-handle">
@@ -439,17 +439,17 @@ function renderOrderSlots() {
           <img class="order-slot-portrait" src="${src}" onerror="this.src='asset/players/default.svg'" alt="">
         </div>
         <div class="order-slot-info">
-          <select class="order-slot-select" onchange="updateOrderSlot(${s.id}, this.value)" title="Pick manually">
+          <select class="order-slot-select" onchange="updateOrderSlot(${s.id}, this.value)" title="${t('Pick manually')}">
             ${charSelectHTML(available, s.char, boxInfo)}
           </select>
           <div class="order-slot-name">${nameTxt}</div>
           <span class="order-slot-chevron" aria-hidden="true">▾</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="Draw">🎲</button>
-          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? 'title="Remove"' : 'title="A game needs at least 2 players" disabled'}>❌</button>
+          <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" title="${meTitle}">👤</button>
-          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" title="Winner">👑</button>
+          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" title="${t('Winner')}">👑</button>
         </div>
       </div>`;
   }).join('');
@@ -478,7 +478,7 @@ function _updateActionBtns() {
 
   if (drawAllEmptyBtn) {
     drawAllEmptyBtn.disabled = animating || empties === 0;
-    drawAllEmptyBtn.title    = animating ? '' : (empties === 0 ? 'All slots are filled' : '');
+    drawAllEmptyBtn.title    = animating ? '' : (empties === 0 ? t('All slots are filled') : '');
   }
   if (drawAllBtn) {
     drawAllBtn.disabled = animating;
@@ -486,7 +486,7 @@ function _updateActionBtns() {
   }
   if (shuffleBtn) {
     shuffleBtn.disabled = animating || filled < 2;
-    shuffleBtn.title    = animating ? '' : (filled < 2 ? 'Pick at least 2 villains first' : '');
+    shuffleBtn.title    = animating ? '' : (filled < 2 ? t('Pick at least 2 villains first') : '');
   }
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
@@ -494,7 +494,7 @@ function _updateActionBtns() {
   // still validated in the handlers.
   const lineupErr = _validateLineup();                     // null = ready to start
   const hasWinner = orderSlots.some(s => s.isWinner);
-  const saveErr   = lineupErr || (hasWinner ? null : 'Mark the winner with 👑.');
+  const saveErr   = lineupErr || (hasWinner ? null : t('Mark the winner with 👑.'));
   if (startBtn)  { startBtn.disabled  = animating || !!lineupErr; startBtn.title  = animating ? '' : (lineupErr || ''); }
   if (submitBtn) { submitBtn.disabled = animating || !!saveErr;   submitBtn.title = animating ? '' : (saveErr   || ''); }
 }
@@ -552,7 +552,7 @@ function _initDrag() {
 function _renderLiveInfo() {
   const infoEl   = document.getElementById('liveInfo');
   const location = document.getElementById('fLocation').value.trim();
-  if (infoEl) infoEl.textContent = [`${orderSlots.length} players`, location ? `Playing at ${location}` : null].filter(Boolean).join(' | ');
+  if (infoEl) infoEl.textContent = [tn(orderSlots.length, '{n} player', '{n} players'), location ? t('Playing at {location}', { location }) : null].filter(Boolean).join(' | ');
 }
 
 function setLiveUI(on) {
@@ -591,11 +591,11 @@ function showErr(msg) {
 }
 
 function _validateLineup() {
-  if (orderSlots.length < 2) return 'A game must have at least 2 players.';
-  if (orderSlots.some(s => !s.char)) return 'Choose a villain for each player.';
+  if (orderSlots.length < 2) return t('A game must have at least 2 players.');
+  if (orderSlots.some(s => !s.char)) return t('Choose a villain for each player.');
   const names = orderSlots.map(s => s.char);
-  if (new Set(names).size !== names.length) return 'Each player must use a different villain.';
-  if (!orderSlots.some(s => s.isMe)) return 'Mark which villain you played with 👤.';
+  if (new Set(names).size !== names.length) return t('Each player must use a different villain.');
+  if (!orderSlots.some(s => s.isMe)) return t('Mark which villain you played with 👤.');
   return null;
 }
 
@@ -635,7 +635,7 @@ function stopLive() {
 
   setLiveUI(false);
   const sb = document.getElementById('startBtn');
-  sb.textContent = 'Resume Game';   // stays purple (btn-primary)
+  sb.textContent = t('Resume Game');   // stays purple (btn-primary)
   _updateDiscardBtn();
   liveGame.emit('stop');
   _saveLiveState();
@@ -689,9 +689,9 @@ function _updateDiscardBtn() {
 function _confirmDiscard(onConfirm) {
   openConfirmSheet({
     id:           'discardGameOverlay',
-    title:        'Discard this game?',
-    bodyHTML:     '<p class="confirm-text">This resets the form (villains, players and details) and clears any saved progress. Your draw pool stays as it is.</p>',
-    confirmLabel: 'Discard',
+    title:        t('Discard this game?'),
+    bodyHTML:     `<p class="confirm-text">${t('This resets the form (villains, players and details) and clears any saved progress. Your draw pool stays as it is.')}</p>`,
+    confirmLabel: t('Discard'),
     danger:       true,
     onConfirm,
   });
@@ -706,7 +706,7 @@ function _doDiscard() {
   liveGame.emit('close');
 
   const sbD = document.getElementById('startBtn');
-  sbD.textContent = 'Start Game';   // stays purple (btn-primary)
+  sbD.textContent = t('Start Game');   // stays purple (btn-primary)
   clearError('err');
   document.getElementById('fLocation').value = '';
   document.getElementById('fDur').value = '';
@@ -739,12 +739,12 @@ function _checkResume() {
   banner.className = 'resume-banner';
   banner.innerHTML = `
     <div class="resume-banner-text">
-      <strong>Game in progress</strong>
-      <span>${state.slots.length} players | Round ${state.liveTurns}<span id="resumeElapsed"></span></span>
+      <strong>${t('Game in progress')}</strong>
+      <span>${tn(state.slots.length, '{n} player', '{n} players')} | ${t('Round {n}', { n: state.liveTurns })}<span id="resumeElapsed"></span></span>
     </div>
     <div class="resume-banner-btns">
-      <button class="btn btn-primary btn-sm" onclick="_doResume()">Resume</button>
-      <button class="btn btn-ghost btn-sm" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">Discard</button>
+      <button class="btn btn-primary btn-sm" onclick="_doResume()">${t('Resume')}</button>
+      <button class="btn btn-ghost btn-sm" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">${t('Discard')}</button>
     </div>`;
   document.querySelector('main').prepend(banner);
 
@@ -774,7 +774,7 @@ function _doResume() {
   if (!getCurrentProfile()) { _openNicknameModal(); return; }
 
   const sbR = document.getElementById('startBtn');
-  sbR.textContent = 'Resume Game';   // stays purple (btn-primary)
+  sbR.textContent = t('Resume Game');   // stays purple (btn-primary)
   clearError('err');
 
   document.getElementById('fDate').value     = state.fDate     || '';
@@ -817,17 +817,17 @@ async function submitForm() {
   const location = document.getElementById('fLocation').value.trim() || null;
   const btn      = document.getElementById('submitBtn');
 
-  if (!date) return showErr('Date and time is required.');
-  if (new Date(date) > new Date()) return showErr('Date cannot be in the future.');
+  if (!date) return showErr(t('Date and time is required.'));
+  if (new Date(date) > new Date()) return showErr(t('Date cannot be in the future.'));
 
   const user    = getCurrentUser();
   const profile = getCurrentProfile();
-  if (!user)    return showErr('Sign in to save the game.');
+  if (!user)    return showErr(t('Sign in to save the game.'));
   if (!profile) { _openNicknameModal(); return; }
 
   const lineupErr = _validateLineup();
   if (lineupErr) return showErr(lineupErr);
-  if (!orderSlots.some(s => s.isWinner)) return showErr('Mark the winner with 👑.');
+  if (!orderSlots.some(s => s.isWinner)) return showErr(t('Mark the winner with 👑.'));
 
   const ps = orderSlots.map((s, i) => ({
     position:  i,
@@ -838,7 +838,7 @@ async function submitForm() {
   }));
 
   btn.disabled    = true;
-  btn.textContent = 'Saving…';
+  btn.textContent = t('Saving…');
 
   const gameData = {
     played_at:        new Date(date).toISOString(),
@@ -852,14 +852,14 @@ async function submitForm() {
   const { data: g, error } = await db.from('games').insert(gameData).select().single();
   if (error) {
     btn.disabled    = false;
-    btn.textContent = 'Save Game';
+    btn.textContent = t('Save Game');
     return showErr(error.message);
   }
 
   await db.from('game_players').insert(ps.map(p => ({ game_id: g.id, ...p })));
 
   btn.disabled    = false;
-  btn.textContent = 'Save Game';
+  btn.textContent = t('Save Game');
 
   // Clear live state (we just saved the game) and notify hooks
   _clearLiveState();

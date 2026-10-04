@@ -247,9 +247,9 @@ function _updateAuthUI() {
   const el = document.getElementById('navAuth');
   if (!el) return;
 
-  const themeBtn = `<button class="nav-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Theme"></button>`;
+  const themeBtn = `<button class="nav-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="${t('Theme')}"></button>`;
   const avatarLink = src =>
-    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="Account">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
+    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${t('Account')}">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
 
   // Before the session check resolves, fall back to the cached avatar (if any) so
   // a returning user sees their icon immediately rather than a guest flash.
@@ -263,7 +263,7 @@ function _updateAuthUI() {
     el.innerHTML = avatarLink(cached);
   } else {
     if (_authResolved) _setCachedNavAvatar(null);   // confirmed signed out, drop the cache
-    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="Sign in"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
+    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="${t('Sign in')}"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
   }
   _updateThemeBtn();
   _updateThemeIcons();
@@ -286,20 +286,20 @@ function _injectNicknameModal() {
       <div class="sheet">
         <div class="sheet-handle"></div>
         <div class="sheet-header">
-          <h3 id="nickModalTitle">Choose your nickname</h3>
+          <h3 id="nickModalTitle">${t('Choose your nickname')}</h3>
         </div>
         <div class="sheet-body">
           <p id="nickModalHint" class="modal-hint">
-            This nickname identifies you on game records and the leaderboard. You can't change it later.
+            ${t("This nickname identifies you on game records and the leaderboard. You can't change it later.")}
           </p>
           <div class="err" id="nickErr"></div>
           <div class="field">
-            <label>Nickname</label>
-            <input type="text" id="nickInput" maxlength="30" placeholder="e.g. emilio" autocomplete="off">
+            <label>${t('Nickname')}</label>
+            <input type="text" id="nickInput" maxlength="30" placeholder="${t('e.g. emilio')}" autocomplete="off">
           </div>
         </div>
         <div class="sheet-footer">
-          <button class="btn btn-primary" onclick="_saveNickname()">Save Nickname</button>
+          <button class="btn btn-primary" onclick="_saveNickname()">${t('Save Nickname')}</button>
         </div>
       </div>
     </div>`;
@@ -310,8 +310,8 @@ function _openNicknameModal(onSuccess) {
   _nickMode = 'create';
   _nickOnSuccess = onSuccess || null;
   if (!document.getElementById('nicknameOverlay')) return;
-  document.getElementById('nickModalTitle').textContent = 'Choose your nickname';
-  document.getElementById('nickModalHint').textContent  = "This nickname identifies you on game records and the leaderboard. You can't change it later.";
+  document.getElementById('nickModalTitle').textContent = t('Choose your nickname');
+  document.getElementById('nickModalHint').textContent  = t("This nickname identifies you on game records and the leaderboard. You can't change it later.");
   document.getElementById('nickInput').value = '';
   clearError('nickErr');
   openOverlay('nicknameOverlay');
@@ -322,8 +322,8 @@ function openChangeNicknameModal(onSuccess) {
   _nickMode = 'update';
   _nickOnSuccess = onSuccess || null;
   if (!document.getElementById('nicknameOverlay')) return;
-  document.getElementById('nickModalTitle').textContent = 'Change your nickname';
-  document.getElementById('nickModalHint').textContent  = 'Your nickname will be updated on all past and future game records.';
+  document.getElementById('nickModalTitle').textContent = t('Change your nickname');
+  document.getElementById('nickModalHint').textContent  = t('Your nickname will be updated on all past and future game records.');
   document.getElementById('nickInput').value = _currentProfile?.nickname || '';
   clearError('nickErr');
   openOverlay('nicknameOverlay');
@@ -344,13 +344,13 @@ async function _saveNickname() {
   clearError(errEl);
 
   if (nick.length < 2) {
-    showError(errEl, 'Nickname must be at least 2 characters.');
+    showError(errEl, t('Nickname must be at least 2 characters.'));
     return;
   }
 
   const friendlyDupMsg = err =>
     err.message.includes('unique') || err.message.includes('duplicate')
-      ? 'That nickname is already taken. Try another.'
+      ? t('That nickname is already taken. Try another.')
       : err.message;
 
   if (_nickMode === 'update') {

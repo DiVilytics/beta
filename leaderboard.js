@@ -118,14 +118,14 @@ function render({ rows, summary }) {
   const avgTurns = avg_turns    != null ? Math.round(avg_turns)    : null;
 
   document.getElementById('summary').innerHTML = statBoxesHTML([
-    { val: games,                                  lbl: 'Games' },
-    { val: avgDur   != null ? avgDur + 'm' : '-',  lbl: 'Avg duration' },
-    { val: avgTurns != null ? avgTurns      : '-', lbl: 'Avg rounds' },
+    { val: games,                                  lbl: t('Games') },
+    { val: avgDur   != null ? avgDur + 'm' : '-',  lbl: t('Avg duration') },
+    { val: avgTurns != null ? avgTurns      : '-', lbl: t('Avg rounds') },
   ]);
 
   if (!rows.length) {
     document.getElementById('lb').innerHTML =
-      `<div class="empty-state">No games match this filter.</div>`;
+      `<div class="empty-state">${t('No games match this filter.')}</div>`;
     return;
   }
 
@@ -136,7 +136,7 @@ function render({ rows, summary }) {
   if (!rankRows.length) {
     document.getElementById('lb').innerHTML = `
       ${statModeSegHTML(lbMode, 'setMode')}
-      <div class="empty-state">Nobody has played at least ${MIN_GAMES_FOR_PCT} games yet.</div>`;
+      <div class="empty-state">${t('Nobody has played at least {n} games yet.', { n: MIN_GAMES_FOR_PCT })}</div>`;
     return;
   }
 
@@ -149,7 +149,8 @@ function render({ rows, summary }) {
     ${statModeSegHTML(lbMode, 'setMode')}
     ${renderStatTableHTML(rankRows, {
       mode:        lbMode,
-      headLabel:   isChar ? 'Villain' : 'Player',
+      headLabel:   isChar ? t('Villain') : t('Player'),
+      getName:     key => isChar ? villainName(key) : key,
       limit:       lbDisplayLimit,
       selfKey,
       getKey:      r   => isChar ? r.character : r.nickname,
@@ -160,7 +161,7 @@ function render({ rows, summary }) {
       getSub:      key => isChar ? lbCharBoxMap[key] : '',
       getSubHref:  key => (isChar && lbCharBoxMap[key]) ? `villains.html?box=${boxAnchorId(lbCharBoxMap[key])}` : '',
     })}
-    ${hasMore ? `<button class="btn-load-more" onclick="lbLoadMore()">Load more</button>` : ''}`;
+    ${hasMore ? `<button class="btn-load-more" onclick="lbLoadMore()">${t('Load more')}</button>` : ''}`;
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

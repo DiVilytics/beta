@@ -17,7 +17,7 @@ let csReportMonth = (() => {
 async function _loadMonthCharacterStats(monthStart) {
   const start = new Date(monthStart.getFullYear(), monthStart.getMonth(),     1);
   const end   = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
-  const label = start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const label = start.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' });
   const iso   = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-01`;
 
   const [{ data: stats }, { count }] = await Promise.all([
@@ -104,12 +104,12 @@ function _renderMonthPickerPanel() {
   const curM     = csReportMonth.getMonth();
   const nextYDis = _csPickerYear >= now.getFullYear();
   const prevYDis = _csPickerYear <= REPORT_FIRST_MONTH.getFullYear();
-  const months   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const months   = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString(LOCALE, { month: 'short' }).replace('.', ''));
   panel.innerHTML = `
     <div class="cs-mp-year">
-      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(-1, event)" title="Previous year"${prevYDis ? ' disabled' : ''}>‹</button>
+      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(-1, event)" title="${t('Previous year')}"${prevYDis ? ' disabled' : ''}>‹</button>
       <span class="cs-mp-year-text">${_csPickerYear}</span>
-      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(1, event)" title="Next year"${nextYDis ? ' disabled' : ''}>›</button>
+      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(1, event)" title="${t('Next year')}"${nextYDis ? ' disabled' : ''}>›</button>
     </div>
     <div class="cs-mp-grid">
       ${months.map((mn, i) => {
@@ -127,7 +127,7 @@ async function _renderMonthlyReport() {
   const host = document.getElementById('csSummary');
   if (!host) return;
 
-  const label = csReportMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const label = csReportMonth.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' });
   const token = ++_csLoadToken;
 
   // On a month change the cards already exist, keep them in place (dimmed) and
@@ -153,8 +153,8 @@ function _setReportHeader(label, gameCount) {
   if (!host) return;
   const btn = host.querySelector('.cs-month-text');
   if (btn) {
-    const countTxt = gameCount == null ? '…' : `${gameCount} ${gameCount === 1 ? 'game' : 'games'}`;
-    btn.textContent = `Monthly report: ${label} (${countTxt})`;
+    const countTxt = gameCount == null ? '…' : tn(gameCount, '{n} game', '{n} games');
+    btn.textContent = t('Monthly report: {month} ({count})', { month: label, count: countTxt });
   }
   const navs = host.querySelectorAll('.cs-summary-header .cs-month-nav');
   if (navs[0]) navs[0].disabled = _isBeforeFirstMonth(_prevMonth());
@@ -170,21 +170,21 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
   const prevDisabled = _isBeforeFirstMonth(_prevMonth());
   const countTxt = gameCount == null
     ? '…'
-    : `${gameCount} ${gameCount === 1 ? 'game' : 'games'}`;
+    : tn(gameCount, '{n} game', '{n} games');
   const header = monthLabel
     ? `<div class="cs-summary-header">
-         <button class="cs-month-nav" type="button" onclick="csShiftMonth(-1)" title="Previous month"${prevDisabled ? ' disabled' : ''}>‹</button>
+         <button class="cs-month-nav" type="button" onclick="csShiftMonth(-1)" title="${t('Previous month')}"${prevDisabled ? ' disabled' : ''}>‹</button>
          <span class="cs-month-picker-wrap">
-           <button class="cs-month-text" type="button" onclick="csOpenMonthPicker(event)" title="Pick month">Monthly report: ${_esc(monthLabel)} (${countTxt})</button>
-           <div class="cs-month-picker-panel" id="csMonthPickerPanel" role="dialog" aria-label="Pick month"></div>
+           <button class="cs-month-text" type="button" onclick="csOpenMonthPicker(event)" title="${t('Pick month')}">${_esc(t('Monthly report: {month} ({count})', { month: monthLabel, count: countTxt }))}</button>
+           <div class="cs-month-picker-panel" id="csMonthPickerPanel" role="dialog" aria-label="${t('Pick month')}"></div>
          </span>
-         <button class="cs-month-nav" type="button" onclick="csShiftMonth(1)" title="Next month"${nextDisabled ? ' disabled' : ''}>›</button>
+         <button class="cs-month-nav" type="button" onclick="csShiftMonth(1)" title="${t('Next month')}"${nextDisabled ? ' disabled' : ''}>›</button>
        </div>`
     : '';
 
   // Loaded month with no games: keep the header, drop the cards for a short note.
   if (!loading && !rows.length) {
-    return `${header}<div class="cs-summary-empty">No games recorded this month.</div>`;
+    return `${header}<div class="cs-summary-empty">${t('No games recorded this month.')}</div>`;
   }
 
   const withPct = rows.map(r => ({
@@ -205,7 +205,7 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
   // While loading, the body is a skeleton with the same structure (Top/Bottom +
   // three rows each) so the card is already the right height, no first-load jump.
   const skelRow  = `<div class="cs-mini-row cs-skel"><span class="cs-skel-dot"></span><span class="cs-skel-bar"></span></div>`;
-  const skelBody = `<div class="cs-mini-section-lbl">Top</div>${skelRow.repeat(3)}<div class="cs-mini-section-lbl">Bottom</div>${skelRow.repeat(3)}`;
+  const skelBody = `<div class="cs-mini-section-lbl">${t('Top')}</div>${skelRow.repeat(3)}<div class="cs-mini-section-lbl">${t('Bottom')}</div>${skelRow.repeat(3)}`;
 
   const card = (title, sortedRows, fmt) => {
     let body;
@@ -215,14 +215,14 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
       const top    = sortedRows.slice(0, 3);
       const bottom = sortedRows.slice(-3).reverse();
       const row = r => `
-        <a class="cs-mini-row" href="villains.html?vil=${encodeURIComponent(r.name)}" title="${_esc(r.name)}">
-          <img class="char-portrait" src="${charImgSrc(r.name)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(r.name)}">
+        <a class="cs-mini-row" href="villains.html?vil=${encodeURIComponent(r.name)}" title="${_esc(villainName(r.name))}">
+          <img class="char-portrait" src="${charImgSrc(r.name)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(villainName(r.name))}">
           <span class="cs-mini-val">${fmt(r)}</span>
         </a>`;
       body = `
-        <div class="cs-mini-section-lbl">Top</div>
+        <div class="cs-mini-section-lbl">${t('Top')}</div>
         ${top.map(row).join('')}
-        ${bottom.length ? `<div class="cs-mini-section-lbl">Bottom</div>${bottom.map(row).join('')}` : ''}`;
+        ${bottom.length ? `<div class="cs-mini-section-lbl">${t('Bottom')}</div>${bottom.map(row).join('')}` : ''}`;
     }
     return `
       <div class="cs-summary-card">
@@ -233,9 +233,9 @@ function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
 
   return `${header}
     <div class="cs-summary">
-      ${card('% Wins',  sortedPct,   fmtPct)}
-      ${card('# Wins',  sortedWins,  fmtWins)}
-      ${card('# Games', sortedGames, fmtGames)}
+      ${card(t('% Wins'),  sortedPct,   fmtPct)}
+      ${card(t('# Wins'),  sortedWins,  fmtWins)}
+      ${card(t('# Games'), sortedGames, fmtGames)}
     </div>`;
 }
 
@@ -287,7 +287,7 @@ async function init() {
 let csRosterView = 'box';
 
 async function renderRosterPage(scrollBox) {
-  document.title = 'DiVilytics | Villains';
+  document.title = `DiVilytics | ${t('Villains')}`;
 
   [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   document.getElementById('csSearchInput').disabled = false;
@@ -298,7 +298,7 @@ async function renderRosterPage(scrollBox) {
   root.innerHTML =
     `<div id="csSummary"></div>
      <div class="cs-roster-controls">
-       <span class="cs-roster-controls-lbl">Group by</span>
+       <span class="cs-roster-controls-lbl">${t('Group by')}</span>
        ${_rosterViewSegHTML()}
      </div>
      <div id="csGroups">${_rosterGroupsHTML(csAllChars)}</div>`;
@@ -313,7 +313,7 @@ async function renderRosterPage(scrollBox) {
 
 function _rosterViewSegHTML() {
   const btn = (v, label) => `<button class="seg-btn ${csRosterView === v ? 'on' : ''}" type="button" data-view="${v}" onclick="csSetRosterView('${v}')">${label}</button>`;
-  return `<div class="seg cs-roster-seg">${btn('box', 'Box')}${btn('pace', 'Pace')}</div>`;
+  return `<div class="seg cs-roster-seg">${btn('box', t('Box'))}${btn('pace', t('Pace'))}</div>`;
 }
 
 // Flip the grouping without reloading: re-render only the groups + seg state.
@@ -346,7 +346,7 @@ function _rosterBoxGroups(chars) {
 // Group by the four paces (in pace order); any character without a recognized
 // pace falls into a trailing "Gray" group rather than vanishing.
 function _rosterPaceGroups(chars) {
-  const paces = [['green', 'Green'], ['yellow', 'Yellow'], ['orange', 'Orange'], ['red', 'Red']];
+  const paces = [['green', t('Green')], ['yellow', t('Yellow')], ['orange', t('Orange')], ['red', t('Red')]];
   const groups = paces.map(([pace, name]) => ({
     id: `pace-${pace}`,
     header: `<span class="pace-dot ${pace}"></span>${name}`,
@@ -354,7 +354,7 @@ function _rosterPaceGroups(chars) {
   })).filter(g => g.chars.length);
   const known = new Set(paces.map(p => p[0]));
   const rest = chars.filter(c => !known.has(c.pace));
-  if (rest.length) groups.push({ id: 'pace-gray', header: `<span class="pace-dot gray"></span>Gray`, chars: rest });
+  if (rest.length) groups.push({ id: 'pace-gray', header: `<span class="pace-dot gray"></span>${t('Gray')}`, chars: rest });
   return groups;
 }
 
@@ -362,7 +362,7 @@ function _rosterItemHTML(c) {
   return `
     <a class="char-roster-item" href="villains.html?vil=${encodeURIComponent(c.name)}">
       <img class="char-roster-portrait" src="${charImgSrc(c.name)}" alt="" onerror="this.src='asset/players/default.svg'">
-      <div class="char-roster-name">${_esc(c.name)}</div>
+      <div class="char-roster-name">${_esc(villainName(c.name))}</div>
     </a>`;
 }
 
@@ -373,13 +373,13 @@ function _showCsEmpty(html) {
 }
 
 async function renderDetailPage(charName) {
-  document.title = `DiVilytics | ${charName}`;
+  document.title = `DiVilytics | ${villainName(charName)}`;
 
   [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   csChar     = csAllChars.find(c => c.name === charName);
 
   if (!csChar) {
-    _showCsEmpty(`<div class="empty"><h3>Villain not found</h3><p>${_esc(charName)}</p></div>`);
+    _showCsEmpty(`<div class="empty"><h3>${t('Villain not found')}</h3><p>${_esc(charName)}</p></div>`);
     return;
   }
 
@@ -401,14 +401,14 @@ async function renderDetailPage(charName) {
 
   if (error) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><p>Error: ${_esc(error.message)}</p></div>`);
+    _showCsEmpty(`<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`);
     renderExtras();
     return;
   }
 
   if (!buckets || !buckets.length) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><div class="empty-icon">🎭</div><h3>No games yet</h3><p>${_esc(csChar.name)} hasn't been played in any recorded games.</p></div>`);
+    _showCsEmpty(`<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })}</p></div>`);
     renderExtras();
     return;
   }
@@ -441,10 +441,10 @@ async function _renderCharIdentity() {
   const objectives = await loadObjectives();
   const objective  = objectives[csChar.name];
   const paceDot    = csChar.pace
-    ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="View ${_esc(csChar.pace)}-pace villains"></a>`
-    : `<a class="pace-dot gray" href="villains.html?pace=gray" title="Pace not yet set"></a>`;
+    ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="${_esc(t('View {pace} pace villains', { pace: t(csChar.pace[0].toUpperCase() + csChar.pace.slice(1)) }))}"></a>`
+    : `<a class="pace-dot gray" href="villains.html?pace=gray" title="${t('Pace not yet set')}"></a>`;
   document.getElementById('csIdentity').innerHTML =
-    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="View ${_esc(csChar.box)} villains">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
+    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(villainName(csChar.name))}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
 }
 
 function _foldBuckets(buckets) {
@@ -486,13 +486,14 @@ function _attachCharSearch() {
     inputId:    'csSearchInput',
     dropdownId: 'csDropdown',
     fetchOptions: q => {
+      // Matches the names shown in the current language only.
       const lower = q.toLowerCase();
-      return csAllChars.filter(c => c.name.toLowerCase().includes(lower)).slice(0, 8);
+      return csAllChars.filter(c => villainName(c.name).toLowerCase().includes(lower)).slice(0, 8);
     },
     renderOption: c => `
       <div class="cs-option" data-name="${_esc(c.name)}">
         <img class="char-portrait" src="${charImgSrc(c.name)}" alt="">
-        <span>${_esc(c.name)}</span>
+        <span>${_esc(villainName(c.name))}</span>
         <span class="cs-option-box">${_esc(c.box)}</span>
       </div>`,
     onSelect: opt => { location.href = `villains.html?vil=${encodeURIComponent(opt.dataset.name)}`; },
@@ -506,7 +507,7 @@ function render() {
   root.className = '';
 
   const rows = [
-    { label: 'Overall', key: 'all' },
+    { label: t('Overall'), key: 'all' },
     { label: '2p', key: 2 },
     { label: '3p', key: 3 },
     { label: '4p', key: 4 },
@@ -523,17 +524,17 @@ function render() {
   root.innerHTML = `
     <div class="summary">
       ${statBoxesHTML([
-        { val: v(overall.games), lbl: 'Games' },
-        { val: csAvgDur   != null ? Math.round(csAvgDur) + 'm' : '-', lbl: 'Avg duration' },
-        { val: csAvgTurns != null ? Math.round(csAvgTurns)     : '-', lbl: 'Avg rounds' },
-        { val: v(csWinPct + '%'), lbl: 'Win rate' },
-        { val: v(overall.wins),   lbl: 'Wins' },
+        { val: v(overall.games), lbl: t('Games') },
+        { val: csAvgDur   != null ? Math.round(csAvgDur) + 'm' : '-', lbl: t('Avg duration') },
+        { val: csAvgTurns != null ? Math.round(csAvgTurns)     : '-', lbl: t('Avg rounds') },
+        { val: v(csWinPct + '%'), lbl: t('Win rate') },
+        { val: v(overall.wins),   lbl: t('Wins') },
       ])}
     </div>
     ${statModeSegHTML(csMode, 'csSetMode')}
     <div class="lb-table cs-table mb-1-25">
       <div class="lb-head">
-        <span>Players</span>
+        <span>${t('Players')}</span>
         <span></span>
         <span class="text-right">${statValueLabel(csMode)}</span>
         <span class="text-right">${statSecondaryLabel(csMode)}</span>
@@ -587,18 +588,18 @@ function _adversariesSectionHTML() {
 
   // Rows show only the opponent's portrait and the selected value, like the
   // monthly report; the name and both values are in the tooltip.
-  const winsCol  = a => ({ val: isPct ? `${pct(a.wins, a.games)}%`   : a.wins,   tip: `${a.wins} ${a.wins === 1 ? 'win' : 'wins'} in ${a.games} games (${pct(a.wins, a.games)}%)` });
-  const lossCol  = a => ({ val: isPct ? `${pct(a.losses, a.games)}%` : a.losses, tip: `${a.losses} ${a.losses === 1 ? 'loss' : 'losses'} in ${a.games} games (${pct(a.losses, a.games)}%)` });
-  const gamesCol = a => ({ val: isPct ? `${pct(a.games, total)}%`    : a.games,  tip: `${a.games} of ${total} games (${pct(a.games, total)}%)` });
+  const winsCol  = a => ({ val: isPct ? `${pct(a.wins, a.games)}%`   : a.wins,   tip: t('{wins} in {games} games ({pct}%)', { wins: tn(a.wins, '{n} win', '{n} wins'), games: a.games, pct: pct(a.wins, a.games) }) });
+  const lossCol  = a => ({ val: isPct ? `${pct(a.losses, a.games)}%` : a.losses, tip: t('{wins} in {games} games ({pct}%)', { wins: tn(a.losses, '{n} loss', '{n} losses'), games: a.games, pct: pct(a.losses, a.games) }) });
+  const gamesCol = a => ({ val: isPct ? `${pct(a.games, total)}%`    : a.games,  tip: t('{games} of {total} games ({pct}%)', { games: a.games, total, pct: pct(a.games, total) }) });
   const seg = `<div class="seg cs-adv-seg">
-    <button class="seg-btn ${isPct  ? 'on' : ''}" type="button" onclick="csSetRivalMode('pct')" title="Show and rank by %">%</button>
-    <button class="seg-btn ${!isPct ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="Show and rank by count">#</button>
+    <button class="seg-btn ${isPct  ? 'on' : ''}" type="button" onclick="csSetRivalMode('pct')" title="${t('Show and rank by %')}">%</button>
+    <button class="seg-btn ${!isPct ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="${t('Show and rank by count')}">#</button>
   </div>`;
   const row = (a, fmt) => {
     const { val, tip } = fmt(a);
     return `
-      <a class="cs-adv-row" href="villains.html?vil=${encodeURIComponent(a.opponent)}" title="${_esc(`${a.opponent}: ${tip}`)}">
-        <img class="char-portrait" src="${charImgSrc(a.opponent)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(a.opponent)}">
+      <a class="cs-adv-row" href="villains.html?vil=${encodeURIComponent(a.opponent)}" title="${_esc(`${villainName(a.opponent)}: ${tip}`)}">
+        <img class="char-portrait" src="${charImgSrc(a.opponent)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(villainName(a.opponent))}">
         <span class="cs-adv-count">${val}</span>
       </a>`;
   };
@@ -610,31 +611,50 @@ function _adversariesSectionHTML() {
 
   return `
     <div class="pf-games-header">
-      <span class="pf-games-title">Rivalries</span>
+      <span class="pf-games-title">${t('Rivalries')}</span>
       ${seg}
     </div>
     <div class="cs-adv">
-      ${col('Beaten most',  byWins,  winsCol)}
-      ${col('Lost to most', byLoss,  lossCol)}
-      ${col('Faced most',   byGames, gamesCol)}
+      ${col(t('Beaten most'),  byWins,  winsCol)}
+      ${col(t('Lost to most'), byLoss,  lossCol)}
+      ${col(t('Faced most'),   byGames, gamesCol)}
     </div>`;
 }
 
 // ── DECKS ─────────────────────────────────────────────────────────────────────
 
-// Card types in display order, colored like the cards' type banner; anything
-// else (Titan, Curse, Witch, Maui, ...) follows in purple.
+// Card types in display order; any other type (Titan, Curse, Witch, ...) follows.
 const DECK_TYPES  = ['Ally', 'Hero', 'Effect', 'Item', 'Condition'];
+// Each type's banner color on the physical cards (as the wiki colors them),
+// a deck-<color> class. Unlisted types fall back to purple. An extra deck can
+// override it with its `banner` (Merlin's Transformations are gold like Heroes,
+// while Mim's own are red).
+const DECK_TYPE_COLOR = {
+  Ally: 'ally', 'Ally/Item': 'ally', Transformation: 'ally',
+  Hero: 'hero', 'Hero/Effect': 'hero', Guardian: 'hero',
+  Effect: 'effect', Maui: 'effect',
+  Item: 'item', Omnidroid: 'item', Remote: 'item',
+  Condition: 'condition', Prince: 'condition', Relic: 'condition',
+  Curse: 'curse', Ingredient: 'ingredient', Titan: 'titan', Witch: 'witch',
+  Cheat: 'gray', Prisoner: 'gray',
+};
 const DECK_PLURAL = { Ally: 'Allies', Hero: 'Heroes', Witch: 'Witches', 'Ally/Item': 'Ally/Item', 'Hero/Effect': 'Hero/Effect' };
+// A card type's label for a count, in the current language: Ally / Allies.
+const _typeLabel = (type, n) => t(n === 1 ? type : (DECK_PLURAL[type] || `${type}s`));
 
-function _deckTypeClass(type) {
-  return DECK_TYPES.includes(type) ? `deck-${type.toLowerCase()}` : 'deck-other';
+function _deckTypeClass(type, banner) {
+  return `deck-${banner || DECK_TYPE_COLOR[type] || 'other'}`;
 }
 
 const _cardTotal = cards => cards.reduce((n, c) => n + c.count, 0);
 
 // Cards of the rendered decks, indexed by the rows' openCardSheet(i).
 let _deckCards = [];
+
+// The shown villain's card names in the current language (loadCardNames);
+// a [TAG] rework uses its base villain's names plus any of its own.
+let _cardNameMap = {};
+const _cardName = name => _cardNameMap[name] || name;
 
 // Row summary of a cost/strength value: Card Guard's "1 (Club and Diamond) |
 // 2 (Spade and Heart)" shortens to "1/2"; the sheet shows the full value.
@@ -644,38 +664,38 @@ function _shortStat(v) {
 
 function _cardMetaHTML(c) {
   const parts = [];
-  if (c.cost     != null) parts.push(`Cost ${_esc(_shortStat(c.cost))}`);
-  if (c.strength != null) parts.push(`Strength ${_esc(_shortStat(c.strength))}`);
+  if (c.cost     != null) parts.push(`${t('Cost')} ${_esc(_shortStat(c.cost))}`);
+  if (c.strength != null) parts.push(`${t('Strength')} ${_esc(_shortStat(c.strength))}`);
   return parts.length ? `<span class="cs-deck-meta">${parts.join(' | ')}</span>` : '';
 }
 
-const _cardTextHTML = t => t
-  ? t.split('\n\n').map(p => `<p>${_esc(p).replace(/\n/g, '<br>')}</p>`).join('')
-  : '<p class="cs-card-empty">No ability text.</p>';
+const _cardTextHTML = text => text
+  ? text.split('\n\n').map(p => `<p>${_esc(p).replace(/\n/g, '<br>')}</p>`).join('')
+  : `<p class="cs-card-empty">${t('No ability text.')}</p>`;
 
 function openCardSheet(i) {
   const c = _deckCards[i];
   if (!c) return;
   const stat = (lbl, v) => v != null ? `<div class="cs-card-stat"><span>${lbl}</span><strong>${_esc(v.replace(/ \| /g, ', '))}</strong></div>` : '';
-  document.getElementById('cardTitle').textContent = c.name;
+  document.getElementById('cardTitle').textContent = _cardName(c.name);
   document.getElementById('cardBody').innerHTML = `
     <div class="cs-card-stats">
-      <div class="cs-card-stat"><span>Type</span><strong class="${_deckTypeClass(c.type)} cs-deck-type">${_esc(c.type)}</strong></div>
-      <div class="cs-card-stat"><span>Copies</span><strong>${c.count}</strong></div>
-      ${stat('Cost', c.cost)}
-      ${stat('Strength', c.strength)}
+      <div class="cs-card-stat"><span>${t('Type')}</span><strong class="${_deckTypeClass(c.type, c.banner)} cs-deck-type">${_esc(_typeLabel(c.type, 1))}</strong></div>
+      <div class="cs-card-stat"><span>${t('Copies')}</span><strong>${c.count}</strong></div>
+      ${stat(t('Cost'), c.cost)}
+      ${stat(t('Strength'), c.strength)}
     </div>
     <div class="cs-card-text">${_cardTextHTML(c.text)}</div>
-    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">Other side: ${_esc(c.back.name)}</div><div class="cs-card-text">${_cardTextHTML(c.back.text)}</div></div>` : ''}
+    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(c.back.text)}</div></div>` : ''}
     ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}
-    <p class="cs-card-src">Card text from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>.</p>`;
+    <p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`;
   openOverlay('cardOverlay');
 }
 
 // One deck: a header with its total, an optional note, then one column per
-// card type. Main decks sort by copies then name; extras (`keepOrder`) keep the
+// card type. Main decks sort by copies then shown name; extras (`keepOrder`) keep the
 // wiki's order (e.g. Omnidroid v.X8, v.X9, v.10). Tiles count as tiles.
-function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false } = {}) {
+function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false, banner = null } = {}) {
   const byType = new Map();
   for (const c of cards) {
     if (!byType.has(c.type)) byType.set(c.type, []);
@@ -686,23 +706,23 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false }
   const total = _cardTotal(cards);
   return `
     <div class="pf-games-header mt-1-5">
-      <span class="pf-games-title">${_esc(title)}</span>
-      <span class="cs-deck-total">${total} ${unit}${total === 1 ? '' : 's'}</span>
+      <span class="pf-games-title">${_esc(t(title))}</span>
+      <span class="cs-deck-total">${unit === 'tile' ? tn(total, '{n} tile', '{n} tiles') : tn(total, '{n} card', '{n} cards')}</span>
     </div>
-    ${note ? `<p class="cs-deck-note">${_esc(note)}</p>` : ''}
+    ${note ? `<p class="cs-deck-note">${_esc(t(note))}</p>` : ''}
     <div class="cs-deck">
       <div class="cs-deck-stack">
-      ${types.map((t, i) => {
-        const list = keepOrder ? byType.get(t) : byType.get(t).slice().sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+      ${types.map((type, i) => {
+        const list = keepOrder ? byType.get(type) : byType.get(type).slice().sort((a, b) => b.count - a.count || _cardName(a.name).localeCompare(_cardName(b.name), LOCALE));
         const n    = _cardTotal(list);
-        const lbl  = n === 1 ? t : (DECK_PLURAL[t] || `${t}s`);
+        const lbl  = _typeLabel(type, n);
         return `
-          <div class="cs-adv-col cs-deck-col ${_deckTypeClass(t)}" data-i="${i}">
+          <div class="cs-adv-col cs-deck-col ${_deckTypeClass(type, banner)}" data-i="${i}">
             <div class="cs-adv-title cs-deck-title"><span class="cs-deck-type">${_esc(lbl)}</span><span>×${n}</span></div>
             ${list.map(c => `
-              <button class="cs-deck-row" type="button" onclick="openCardSheet(${_deckCards.push(c) - 1})">
+              <button class="cs-deck-row" type="button" onclick="openCardSheet(${_deckCards.push({ ...c, banner }) - 1})">
                 <span class="cs-deck-card">
-                  <span class="cs-deck-name">${_esc(c.name)}</span>
+                  <span class="cs-deck-name">${_esc(_cardName(c.name))}</span>
                   ${_cardMetaHTML(c)}
                 </span>
                 <span class="cs-deck-count">×${c.count}</span>
@@ -747,15 +767,17 @@ window.addEventListener('resize', () => {
 async function renderDeck(charName) {
   const el = document.getElementById('csDeck');
   if (!el) return;
-  const deck = (await loadVillainDecks())[charName];
+  const [decks, names] = await Promise.all([loadVillainDecks(), loadCardNames()]);
+  const deck = decks[charName];
   if (!deck) { el.innerHTML = ''; return; }
+  _cardNameMap = { ...names[charName.replace(/\s*\[[^\]]+\]$/, '')], ...names[charName] };
   _deckCards = [];
   el.innerHTML = _deckHTML('Villain deck', deck.villain)
     + _deckHTML('Fate deck', deck.fate)
     + (deck.extra || []).map(e => _deckHTML(e.title, e.cards, {
-        note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true,
+        note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true, banner: e.banner,
       })).join('')
-    + `<p class="cs-deck-src">Card lists and texts from the <a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>. Tap a card to read it.</p>`;
+    + `<p class="cs-deck-src">${t('Card lists and texts from the {link}. Tap a card to read it.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`;
   _balanceDecks(el);
 }
 
@@ -773,8 +795,8 @@ async function renderFaqLink(charName) {
     <a class="home-section-link mt-1-5" href="faq.html?topic=${encodeURIComponent(base)}">
       <span class="home-section-icon">📜</span>
       <div class="home-section-text">
-        <span class="home-section-name">Rules FAQ</span>
-        <span class="home-section-desc">${rules.length} ${rules.length === 1 ? 'clarification' : 'clarifications'} for ${_esc(base)}</span>
+        <span class="home-section-name">${t('Rules FAQ')}</span>
+        <span class="home-section-desc">${_esc(tn(rules.length, '{n} clarification for {villain}', '{n} clarifications for {villain}', { villain: villainName(base) }))}</span>
       </div>
     </a>`;
 }

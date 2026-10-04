@@ -49,9 +49,9 @@ function _updateMediaMetadata() {
   // const icon = new URL(dark ? 'asset/logos/logo-b.png' : 'asset/logos/logo-w.png', location.href).href;  // not working for some reason!
   const location = document.getElementById('fLocation')?.value.trim();
   navigator.mediaSession.metadata = new MediaMetadata({
-    title:  `Round ${liveGame.turns}`,
-    artist: 'Update Timer and Rounds',
-    album:  location ? `DiVilytics | Playing at ${location}` : 'DiVilytics | New Game',
+    title:  t('Round {n}', { n: liveGame.turns }),
+    artist: t('Update Timer and Rounds'),
+    album:  location ? `DiVilytics | ${t('Playing at {location}', { location })}` : `DiVilytics | ${t('New Game')}`,
     artwork: [
       { src: icon, sizes: '96x96',  type: 'image/png' },
       { src: icon, sizes: '512x512', type: 'image/png' },

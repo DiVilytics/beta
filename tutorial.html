@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Tutorial</title>
+  <title data-i18n>DiVilytics | Tutorial</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -42,153 +44,153 @@
 
 <main class="tutorial">
   <div class="home-hero">
-    <h1 class="home-title">Tutorial</h1>
-    <p class="home-tagline">How to record a game around the table, link it to every player's profile, and find your stats afterwards. It takes a couple of minutes per game, most of it while you're already playing.</p>
+    <h1 class="home-title" data-i18n>Tutorial</h1>
+    <p class="home-tagline" data-i18n>How to record a game around the table, link it to every player's profile, and find your stats afterwards. It takes a couple of minutes per game, most of it while you're already playing.</p>
   </div>
 
-  <h2 class="home-steps-title">Before you start</h2>
+  <h2 class="home-steps-title" data-i18n>Before you start</h2>
   <div class="home-steps">
     <div class="home-step">
       <span class="home-step-num">1</span>
       <div class="home-step-body">
-        <strong>Open it on your phone</strong>
-        <span>DiVilytics is made to be used at the table: it works in any phone browser, nothing to install. For quicker access, use your browser's <em>Add to Home Screen</em> and it opens full screen, like an app.</span>
+        <strong data-i18n>Open it on your phone</strong>
+        <span data-i18n>DiVilytics is made to be used at the table: it works in any phone browser, nothing to install. For quicker access, use your browser's <em>Add to Home Screen</em> and it opens full screen, like an app.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">2</span>
       <div class="home-step-body">
-        <strong>Sign in</strong>
-        <span>Use <a class="tut-link" href="sign-in.html">Discord or Google</a>, then pick a nickname. It must be unique: it's how other players and the leaderboard know you. You can browse everything without an account, but you need one to record or claim a game.</span>
+        <strong data-i18n>Sign in</strong>
+        <span data-i18n>Use <a class="tut-link" href="sign-in.html">Discord or Google</a>, then pick a nickname. It must be unique: it's how other players and the leaderboard know you. You can browse everything without an account, but you need one to record or claim a game.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">3</span>
       <div class="home-step-body">
-        <strong>Pick an avatar</strong>
-        <span>Open your <a class="tut-link" href="account.html">Account</a> page (your avatar, top right). Choose one of the <em>Photos</em>, or design your own on <em>Build</em>: body, face, eyes, hair and more over a background color. <em>Random</em> shuffles one for you, <em>Apply</em> saves it.</span>
+        <strong data-i18n>Pick an avatar</strong>
+        <span data-i18n>Open your <a class="tut-link" href="account.html">Account</a> page (your avatar, top right). Choose one of the <em>Photos</em>, or design your own on <em>Build</em>: body, face, eyes, hair and more over a background color. <em>Random</em> shuffles one for you, <em>Apply</em> saves it.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">4</span>
       <div class="home-step-body">
-        <strong>Mark your boxes</strong>
-        <span>Also on the Account page, tick the expansion boxes you own. Then the <em>My boxes</em> filter can limit random draws to villains you actually have.</span>
+        <strong data-i18n>Mark your boxes</strong>
+        <span data-i18n>Also on the Account page, tick the expansion boxes you own. Then the <em>My boxes</em> filter can limit random draws to villains you actually have.</span>
       </div>
     </div>
   </div>
 
-  <h2 class="home-steps-title">Record a game</h2>
+  <h2 class="home-steps-title" data-i18n>Record a game</h2>
   <div class="home-steps">
     <div class="home-step">
       <span class="home-step-num">1</span>
       <div class="home-step-body">
-        <strong>Open New Game</strong>
-        <span>Tap <span class="tut-ico">🎲</span> in the top bar. Date and time are set to now: change them if you're recording a game played earlier. Location is optional, and places already used are suggested as you type.</span>
-        <a class="tut-link tut-open" href="new-game.html">Open New Game</a>
+        <strong data-i18n>Open New Game</strong>
+        <span data-i18n>Tap <span class="tut-ico">🎲</span> in the top bar. Date and time are set to now: change them if you're recording a game played earlier. Location is optional, and places already used are suggested as you type.</span>
+        <a class="tut-link tut-open" href="new-game.html" data-i18n>Open New Game</a>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">2</span>
       <div class="home-step-body">
-        <strong>Pick the villains</strong>
-        <span>Set the number of players, then choose each villain from its menu, or tap <span class="tut-ico">🎲</span> on a row to draw one at random (<em>Draw empty</em> and <em>Draw all</em> do every row at once). Open <em>Draw pool</em> to leave villains out, draw only one pace color (<em>Pace+</em> also allows the neighboring colors), or use <em>My boxes</em>.</span>
+        <strong data-i18n>Pick the villains</strong>
+        <span data-i18n>Set the number of players, then choose each villain from its menu, or tap <span class="tut-ico">🎲</span> on a row to draw one at random (<em>Draw empty</em> and <em>Draw all</em> do every row at once). Open <em>Draw pool</em> to leave villains out, draw only one pace color (<em>Pace+</em> also allows the neighboring colors), or use <em>My boxes</em>.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">3</span>
       <div class="home-step-body">
-        <strong>Set the play order</strong>
-        <span>Row 1 goes first. Tap <em>Shuffle order</em> to randomize it, or drag a row by its <span class="tut-ico">⠿</span> handle. Remove a row with <span class="tut-ico">❌</span>.</span>
+        <strong data-i18n>Set the play order</strong>
+        <span data-i18n>Row 1 goes first. Tap <em>Shuffle order</em> to randomize it, or drag a row by its <span class="tut-ico">⠿</span> handle. Remove a row with <span class="tut-ico">❌</span>.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">4</span>
       <div class="home-step-body">
-        <strong>Mark yourself</strong>
-        <span>Tap <span class="tut-ico">👤</span> on the villain you're playing. The game can't start until you do.</span>
+        <strong data-i18n>Mark yourself</strong>
+        <span data-i18n>Tap <span class="tut-ico">👤</span> on the villain you're playing. The game can't start until you do.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">5</span>
       <div class="home-step-body">
-        <strong>Play</strong>
-        <span>Tap <em>Start Game</em> and the timer runs. Tap + when all players have finished a round and the first player is up again.<br><br>No timer, or a game played earlier? Skip <em>Start Game</em>, type the duration and rounds yourself and go to step 7.</span>
+        <strong data-i18n>Play</strong>
+        <span data-i18n>Tap <em>Start Game</em> and the timer runs. Tap + when all players have finished a round and the first player is up again.<br><br>No timer, or a game played earlier? Skip <em>Start Game</em>, type the duration and rounds yourself and go to step 7.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">6</span>
       <div class="home-step-body">
-        <strong>Control it from the lock screen</strong>
-        <span>The timer keeps running with the screen locked, and the lock screen's media controls drive the game: <em>Play</em> and <em>Pause</em> start and pause the timer, <em>Next</em> and <em>Previous</em> add or remove a round. No need to unlock the phone every turn.</span>
+        <strong data-i18n>Control it from the lock screen</strong>
+        <span data-i18n>The timer keeps running with the screen locked, and the lock screen's media controls drive the game: <em>Play</em> and <em>Pause</em> start and pause the timer, <em>Next</em> and <em>Previous</em> add or remove a round. No need to unlock the phone every turn.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">7</span>
       <div class="home-step-body">
-        <strong>Declare the winner and save</strong>
-        <span>When someone wins, tap <em>Pause Game</em>: duration and rounds are filled in. Tap <span class="tut-ico">👑</span> on the winner, then <em>Save Game</em>.</span>
+        <strong data-i18n>Declare the winner and save</strong>
+        <span data-i18n>When someone wins, tap <em>Pause Game</em>: duration and rounds are filled in. Tap <span class="tut-ico">👑</span> on the winner, then <em>Save Game</em>.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">8</span>
       <div class="home-step-body">
-        <strong>Show the QR code</strong>
-        <span>After saving, a QR code appears. Pass the phone around so the other players can scan it and claim their villain. Need it again later? On your <a class="tut-link" href="players.html">Player</a> page, tap <em>Open</em> on the game, then <em>Share QR</em>.</span>
+        <strong data-i18n>Show the QR code</strong>
+        <span data-i18n>After saving, a QR code appears. Pass the phone around so the other players can scan it and claim their villain. Need it again later? On your <a class="tut-link" href="players.html">Player</a> page, tap <em>Open</em> on the game, then <em>Share QR</em>.</span>
       </div>
     </div>
   </div>
 
-  <h2 class="home-steps-title">Claim your villain</h2>
+  <h2 class="home-steps-title" data-i18n>Claim your villain</h2>
   <div class="home-steps">
     <div class="home-step">
       <span class="home-step-num">1</span>
       <div class="home-step-body">
-        <strong>Scan and claim</strong>
-        <span>Scanning the QR opens the game's claim page. Sign in, then tap <em>Claim</em> next to the villain you played. The game now shows up in your profile and stats.</span>
+        <strong data-i18n>Scan and claim</strong>
+        <span data-i18n>Scanning the QR opens the game's claim page. Sign in, then tap <em>Claim</em> next to the villain you played. The game now shows up in your profile and stats.</span>
       </div>
     </div>
     <div class="home-step">
       <span class="home-step-num">2</span>
       <div class="home-step-body">
-        <strong>Fix mistakes</strong>
-        <span>Claimed the wrong villain? Tap <em>Release</em> and claim the right one. Players of the game can also use <em>Edit details</em> to fix the location, duration or rounds, and <em>Share QR</em> to show the code again.</span>
+        <strong data-i18n>Fix mistakes</strong>
+        <span data-i18n>Claimed the wrong villain? Tap <em>Release</em> and claim the right one. Players of the game can also use <em>Edit details</em> to fix the location, duration or rounds, and <em>Share QR</em> to show the code again.</span>
       </div>
     </div>
   </div>
 
   <div class="home-faq">
-    <h2 class="home-faq-title">Explore the stats</h2>
+    <h2 class="home-faq-title" data-i18n>Explore the stats</h2>
     <div class="home-faq-list">
       <div class="home-faq-item">
-        <strong><span class="tut-ico">🕒</span> Game Log</strong>
-        <span>Every recorded game, newest first. Filter by number of players, tap a location on a card to see only games played there, or use <em>Included villains</em> to hide games with villains you exclude.</span>
-        <a class="tut-link tut-open" href="game-log.html">Open Game Log</a>
+        <strong data-i18n><span class="tut-ico">🕒</span> Game Log</strong>
+        <span data-i18n>Every recorded game, newest first. Filter by number of players, tap a location on a card to see only games played there, or use <em>Included villains</em> to hide games with villains you exclude.</span>
+        <a class="tut-link tut-open" href="game-log.html" data-i18n>Open Game Log</a>
       </div>
       <div class="home-faq-item">
-        <strong><span class="tut-ico">🏆</span> Leaderboard</strong>
-        <span>Villains and players ranked by % Wins, # Wins or # Games, overall or by table size. The % Wins ranking only includes entries with at least 5 games, so one lucky win can't top it.</span>
-        <a class="tut-link tut-open" href="leaderboard.html">Open Leaderboard</a>
+        <strong data-i18n><span class="tut-ico">🏆</span> Leaderboard</strong>
+        <span data-i18n>Villains and players ranked by % Wins, # Wins or # Games, overall or by table size. The % Wins ranking only includes entries with at least 5 games, so one lucky win can't top it.</span>
+        <a class="tut-link tut-open" href="leaderboard.html" data-i18n>Open Leaderboard</a>
       </div>
       <div class="home-faq-item">
-        <strong><span class="tut-ico">🎭</span> Villains</strong>
-        <span>Browse villains by box or by pace and check the monthly report. Open a villain for its objective, win rate by table size, rivalries (opponents faced in at least 5 games) and a link to its rules FAQ.</span>
-        <a class="tut-link tut-open" href="villains.html">Open Villains</a>
+        <strong data-i18n><span class="tut-ico">🎭</span> Villains</strong>
+        <span data-i18n>Browse villains by box or by pace and check the monthly report. Open a villain for its objective, win rate by table size, rivalries (opponents faced in at least 5 games) and a link to its rules FAQ.</span>
+        <a class="tut-link tut-open" href="villains.html" data-i18n>Open Villains</a>
       </div>
       <div class="home-faq-item">
-        <strong><span class="tut-ico">👤</span> Player</strong>
-        <span>Your profile, or any player's via search: win rate, longest win streak (in gold while you're still on it), results per villain, who you play with most, achievements and game history.</span>
-        <a class="tut-link tut-open" href="players.html">Open Player</a>
+        <strong data-i18n><span class="tut-ico">👤</span> Player</strong>
+        <span data-i18n>Your profile, or any player's via search: win rate, longest win streak (in gold while you're still on it), results per villain, who you play with most, achievements and game history.</span>
+        <a class="tut-link tut-open" href="players.html" data-i18n>Open Player</a>
       </div>
       <div class="home-faq-item">
-        <strong><span class="tut-ico">📊</span> Charts</strong>
-        <span>Win rates, popularity, game length, play times and more, one chart at a time from the menu. Charts are interactive: tap a bar, dot or slice for its numbers and a link to it, and some can be zoomed or dragged to explore further.</span>
-        <a class="tut-link tut-open" href="charts.html">Open Charts</a>
+        <strong data-i18n><span class="tut-ico">📊</span> Charts</strong>
+        <span data-i18n>Win rates, popularity, game length, play times and more, one chart at a time from the menu. Charts are interactive: tap a bar, dot or slice for its numbers and a link to it, and some can be zoomed or dragged to explore further.</span>
+        <a class="tut-link tut-open" href="charts.html" data-i18n>Open Charts</a>
       </div>
       <div class="home-faq-item">
-        <strong><span class="tut-ico">⚙️</span> Account</strong>
-        <span>Through your avatar, top right: pick a photo avatar or build your own piece by piece, mark your boxes, see your achievements (global, per box and per villain), change your nickname, link another sign-in (Discord or Google), download all your games as a CSV, or delete your profile.</span>
-        <a class="tut-link tut-open" href="account.html">Open Account</a>
+        <strong data-i18n><span class="tut-ico">⚙️</span> Account</strong>
+        <span data-i18n>Through your avatar, top right: pick a photo avatar or build your own piece by piece, mark your boxes, see your achievements (global, per box and per villain), change your nickname, link another sign-in (Discord or Google), download all your games as a CSV, or delete your profile.</span>
+        <a class="tut-link tut-open" href="account.html" data-i18n>Open Account</a>
       </div>
     </div>
   </div>

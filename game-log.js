@@ -17,10 +17,10 @@ const pace = createPaceFilter({
   paceModeId:   'glPaceMode',
   mineBtnId:    'glMineBtn',
   mineTitles: {
-    signIn:  'Sign in to use your boxes',
-    noBoxes: 'Mark which boxes you own on the account page first',
-    on:      'Limited to your boxes',
-    off:     'Limit to villains in your boxes',
+    signIn:  t('Sign in to use your boxes'),
+    noBoxes: t('Mark which boxes you own on the account page first'),
+    on:      t('Limited to your boxes'),
+    off:     t('Limit to villains in your boxes'),
   },
   onChange: () => updateFilterUI(),
   onError:  showErr,
@@ -86,7 +86,7 @@ async function load(reset = true) {
 
   if (error) {
     document.getElementById('root').innerHTML =
-      `<div class="empty"><p>Error: ${error.message}</p></div>`;
+      `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
     return;
   }
 
@@ -231,19 +231,19 @@ function render() {
       root.innerHTML = `
         <div class="empty">
           <div class="empty-icon">🕒</div>
-          <h3>No games yet</h3>
-          <p>Record your first game to get started.</p>
-          <a class="btn btn-primary btn-sm" href="new-game.html">+ New Game</a>
+          <h3>${t('No games yet')}</h3>
+          <p>${t('Record your first game to get started.')}</p>
+          <a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>
         </div>`;
     } else {
-      root.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No matches</h3><p>Try adjusting the filters.</p></div>`;
+      root.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No matches')}</h3><p>${t('Try adjusting the filters.')}</p></div>`;
     }
     return;
   }
 
   hint.textContent = glGames.length < _totalGames
-    ? `Showing ${glGames.length} of ${_totalGames} games`
-    : `${_totalGames} game${_totalGames !== 1 ? 's' : ''}`;
+    ? t('Showing {shown} of {total} games', { shown: glGames.length, total: _totalGames })
+    : tn(_totalGames, '{n} game', '{n} games');
 
   // Pre-group glPlayers by game_id to avoid O(n²) scans in the render loop
   const byGame = {};

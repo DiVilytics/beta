@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Claim Villain</title>
+  <title data-i18n>DiVilytics | Claim Villain</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -42,10 +44,10 @@
 
 <main>
   <div class="page-header">
-    <h2>Claim your villain</h2>
+    <h2 data-i18n>Claim your villain</h2>
   </div>
-  <a class="back-link" href="players.html" onclick="claimGoBack(); return false;">← Back</a>
-  <div id="claimRoot" class="spinner">Loading…</div>
+  <a class="back-link" href="players.html" onclick="claimGoBack(); return false;" data-i18n>← Back</a>
+  <div id="claimRoot" class="spinner" data-i18n>Loading…</div>
 </main>
 
 <!-- QR share sheet -->
@@ -53,21 +55,21 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 id="qrTitle">Share with players</h3>
+      <h3 id="qrTitle" data-i18n>Share with players</h3>
       <button class="sheet-close" onclick="closeOverlay('qrOverlay')">×</button>
     </div>
     <div class="sheet-body">
-      <p id="qrBlurb" class="modal-hint">Other players can scan this to claim their villain in this game.</p>
+      <p id="qrBlurb" class="modal-hint" data-i18n>Other players can scan this to claim their villain in this game.</p>
       <div class="qr-wrap">
         <div id="qrCode"></div>
       </div>
       <div class="qr-url-row">
         <div class="qr-url" id="qrUrlText"></div>
-        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link">⎘</button>
+        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
       </div>
     </div>
     <div class="sheet-footer">
-      <button class="btn btn-primary" onclick="closeOverlay('qrOverlay')">Done</button>
+      <button class="btn btn-primary" onclick="closeOverlay('qrOverlay')" data-i18n>Done</button>
     </div>
   </div>
 </div>
@@ -77,32 +79,32 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3>Edit Game</h3>
+      <h3 data-i18n>Edit Game</h3>
       <button class="sheet-close" onclick="closeEditDetails()">×</button>
     </div>
     <div class="sheet-body">
       <div class="err" id="editDetailsErr"></div>
       <div class="field">
-        <label>Location <span class="optional"></span></label>
+        <label data-i18n>Location <span class="optional"></span></label>
         <div class="ac-wrap">
-          <input type="text" id="editLocation" maxlength="60" placeholder="optional" autocomplete="off">
+          <input type="text" id="editLocation" maxlength="60" placeholder="optional" autocomplete="off" data-i18n-attr="placeholder">
           <div class="cs-dropdown" id="editLocationDropdown"></div>
         </div>
       </div>
       <div class="form-row">
         <div class="field">
-          <label>Duration <span class="optional">(min)</span></label>
-          <input type="number" id="editDur" min="1" max="999" placeholder="optional">
+          <label data-i18n>Duration <span class="optional">(min)</span></label>
+          <input type="number" id="editDur" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
         </div>
         <div class="field">
-          <label>Rounds <span class="optional"></span></label>
-          <input type="number" id="editTurns" min="1" max="999" placeholder="optional">
+          <label data-i18n>Rounds <span class="optional"></span></label>
+          <input type="number" id="editTurns" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
         </div>
       </div>
     </div>
     <div class="sheet-footer sheet-footer-row">
-      <button class="btn btn-ghost"   onclick="closeEditDetails()">Cancel</button>
-      <button class="btn btn-primary" id="editDetailsSaveBtn" onclick="saveGameDetails()">Save Changes</button>
+      <button class="btn btn-ghost"   onclick="closeEditDetails()" data-i18n>Cancel</button>
+      <button class="btn btn-primary" id="editDetailsSaveBtn" onclick="saveGameDetails()" data-i18n>Save Changes</button>
     </div>
   </div>
 </div>

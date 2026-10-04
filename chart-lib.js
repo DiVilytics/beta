@@ -11,7 +11,7 @@ const Charts = (() => {
     return `<svg class="chart-svg${cls ? ' ' + cls : ''}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img">${inner}</svg>`;
   }
   function empty() {
-    return wrap(`<text x="${W / 2}" y="${H / 2}" class="ch-empty" text-anchor="middle" dominant-baseline="middle">No data</text>`);
+    return wrap(`<text x="${W / 2}" y="${H / 2}" class="ch-empty" text-anchor="middle" dominant-baseline="middle">${t('No data')}</text>`);
   }
 
   // Interactive shape attributes: a class + data-* the page reads to pin a

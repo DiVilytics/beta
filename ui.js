@@ -51,11 +51,11 @@ function groupByBox(chars, boxInfo, includeExtra = false) {
 
 function charSelectHTML(chars, selected = '', boxInfo) {
   const byBox = groupByBox(chars, boxInfo);
-  let html = '<option value="">Villain</option>';
+  let html = `<option value="">${t('Villain')}</option>`;
   for (const [box, cs] of Object.entries(byBox)) {
     html += `<optgroup label="${box}">`;
     for (const c of cs) {
-      html += `<option value="${c.name}"${c.name === selected ? ' selected' : ''}>${c.name}</option>`;
+      html += `<option value="${c.name}"${c.name === selected ? ' selected' : ''}>${_esc(villainName(c.name))}</option>`;
     }
     html += '</optgroup>';
   }
@@ -100,7 +100,7 @@ function buildCharPillGrid(container, chars, set, { activeClass = 'on', onToggle
   for (const [box, cs] of Object.entries(byBox)) {
     const group = document.createElement('div');
     group.className = 'box-group';
-    group.innerHTML = `<button type="button" class="box-name" title="Toggle all ${_esc(box)} villains">${_esc(box)}</button><div class="box-pills"></div>`;
+    group.innerHTML = `<button type="button" class="box-name" title="${_esc(t('Toggle all {box} villains', { box }))}">${_esc(box)}</button><div class="box-pills"></div>`;
     container.appendChild(group);
     const pillsEl = group.querySelector('.box-pills');
 
@@ -109,7 +109,7 @@ function buildCharPillGrid(container, chars, set, { activeClass = 'on', onToggle
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'char-pill' + (set.has(c.name) ? ` ${activeClass}` : '');
-      btn.innerHTML = charImgHTML(c.name) + _esc(c.name);
+      btn.innerHTML = charImgHTML(c.name) + _esc(villainName(c.name));
       btn.dataset.name = c.name;
       btn.dataset.box  = box;   // which box THIS pill represents, for per-box ownership checks (pace-filter.js)
       btn.onclick = () => applyPill(btn, !isActive(btn));
@@ -139,9 +139,9 @@ function buildExcludeGrid(container, chars, excludedSet, onChange, boxInfo) {
 function fmtDateTime(iso) {
   const d = new Date(iso);
   return (
-    d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) +
+    d.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short', year: 'numeric' }) +
     ', ' +
-    d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+    d.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' })
   );
 }
 
@@ -272,7 +272,7 @@ function showQRModal(url, codeElId, overlayId) {
 //   onConfirm()  – sync/async; the sheet closes when it resolves. The button
 //                  shows busyLabel meanwhile; if onConfirm throws, the sheet stays
 //                  open with the button reset so the user can retry.
-function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = 'Confirm', busyLabel = 'Working…', danger = false, onConfirm }) {
+function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'), busyLabel = t('Working…'), danger = false, onConfirm }) {
   let overlay = document.getElementById(id);
   if (!overlay) {
     overlay = document.createElement('div');
@@ -283,11 +283,11 @@ function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = 'Confirm', 
         <div class="sheet-handle"></div>
         <div class="sheet-header">
           <h3 class="confirm-sheet-title"></h3>
-          <button class="sheet-close" type="button" aria-label="Close">×</button>
+          <button class="sheet-close" type="button" aria-label="${t('Close')}">×</button>
         </div>
         <div class="sheet-body confirm-sheet-body"></div>
         <div class="sheet-footer sheet-footer-row">
-          <button class="btn btn-ghost confirm-sheet-cancel" type="button">Cancel</button>
+          <button class="btn btn-ghost confirm-sheet-cancel" type="button">${t('Cancel')}</button>
           <button class="btn confirm-sheet-ok" type="button"></button>
         </div>
       </div>`;
@@ -332,7 +332,7 @@ function updateFilterPills(selector, value) {
 // The active location-filter pill ("<loc> | Clear"), shared by the game log and
 // the player profile. `onClear` is the global handler name the button calls.
 function locationFilterPillHTML(loc, onClear) {
-  return `<button class="pill on" type="button" onclick="${onClear}()">${_esc(loc)} | Clear</button>`;
+  return `<button class="pill on" type="button" onclick="${onClear}()">${_esc(loc)} | ${t('Clear')}</button>`;
 }
 
 // The stat table (renderStatTableHTML + statBoxesHTML + sort/rank/bar helpers)

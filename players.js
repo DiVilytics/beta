@@ -35,20 +35,20 @@ async function init() {
       pfNick = loggedProfile.nickname;
       history.replaceState(null, '', `players.html?nick=${encodeURIComponent(pfNick)}`);
     } else if (loggedUser && !loggedProfile) {
-      document.title = 'DiVilytics | Player';
+      document.title = `DiVilytics | ${t('Player')}`;
       document.getElementById('pfRoot').className = '';
       document.getElementById('pfRoot').innerHTML = `
         <div class="empty">
           <div class="empty-icon">👤</div>
-          <h3>Welcome!</h3>
-          <p>Choose a nickname before you can record games.</p>
-          <button class="btn btn-primary btn-sm" onclick="_openNicknameModal(newNick => { location.href = 'players.html?nick=' + encodeURIComponent(newNick); })">Set Nickname</button>
+          <h3>${t('Welcome!')}</h3>
+          <p>${t('Choose a nickname before you can record games.')}</p>
+          <button class="btn btn-primary btn-sm" onclick="_openNicknameModal(newNick => { location.href = 'players.html?nick=' + encodeURIComponent(newNick); })">${t('Set nickname')}</button>
         </div>`;
       return;
     } else {
       document.getElementById('pfRoot').className = '';
       document.getElementById('pfRoot').innerHTML =
-        `<div class="empty"><div class="empty-icon">👤</div><h3>No player selected</h3><p>Open a profile by clicking a nickname on the leaderboard or a game card.</p></div>`;
+        `<div class="empty"><div class="empty-icon">👤</div><h3>${t('No player selected')}</h3><p>${t('Open a profile by clicking a nickname on the leaderboard or a game card.')}</p></div>`;
       return;
     }
   }
@@ -64,7 +64,7 @@ async function init() {
   pfBoxInfo   = boxInfo || {};
   pfAvatarUrl = resolveAvatar(viewedProfile);
   const sinceHTML = viewedProfile?.created_at
-    ? `<span class="pf-since">Since ${fmtDateShort(viewedProfile.created_at)}</span>`
+    ? `<span class="pf-since">${t('Since {date}', { date: fmtDateShort(viewedProfile.created_at) })}</span>`
     : '';
   pfCharBoxMap  = Object.fromEntries(chars.map(c => [c.name, c.box]));
 
@@ -80,7 +80,7 @@ async function init() {
   identityEl.innerHTML =
     `<div class="pf-identity-row">
       <span class="pf-identity">${avatarHTML(pfAvatarUrl, { cls: 'player-avatar-lg', extraClass: 'zoomable', id: 'pfAvatar', lightbox: true })}${nameBlock}</span>
-      <button class="btn btn-ghost btn-sm pf-share-btn" onclick="showProfileQR()">Share</button>
+      <button class="btn btn-ghost btn-sm pf-share-btn" onclick="showProfileQR()">${t('Share')}</button>
     </div>`;
 
   await load();
@@ -94,7 +94,7 @@ async function load() {
   if (error) {
     document.getElementById('pfRoot').className = '';
     document.getElementById('pfRoot').innerHTML =
-      `<div class="empty"><p>Error: ${error.message}</p></div>`;
+      `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
     return;
   }
 
@@ -165,10 +165,10 @@ function _friendsSectionHTML() {
       <span class="pf-friend-rank">${i + 1}</span>
       ${playerAvatarHTML(f.avatar)}
       <span class="pf-friend-nick">${_esc(f.nick)}</span>
-      <span class="pf-friend-count">${f.games} game${f.games !== 1 ? 's' : ''}</span>
+      <span class="pf-friend-count">${tn(f.games, '{n} game', '{n} games')}</span>
     </a>`).join('');
   return `
-    <div class="pf-games-header"><span class="pf-games-title">Most played with</span></div>
+    <div class="pf-games-header"><span class="pf-games-title">${t('Most played with')}</span></div>
     <div class="pf-friends">${rows}</div>`;
 }
 
@@ -253,7 +253,7 @@ function render() {
   if (!pfGames.length) {
     setVisible('pfControls', false);
     root.innerHTML =
-      `<div class="empty"><div class="empty-icon">🎭</div><h3>No games yet</h3><p>${_esc(pfNick)} hasn't played any recorded games.</p></div>`;
+      `<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
     return;
   }
 
@@ -284,7 +284,7 @@ function render() {
 
   if (!nGames) {
     root.innerHTML =
-      `<div class="empty"><div class="empty-icon">🔍</div><h3>No games for this filter</h3><p>Try adjusting the player count.</p></div>`;
+      `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the player count.')}</p></div>`;
     return;
   }
 
@@ -299,18 +299,18 @@ function render() {
 
   setAchievementsContext({
     ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
-    title: pfNick ? `Achievements | ${pfNick}` : 'Achievements',
+    title: pfNick ? `${t('Achievements')} | ${pfNick}` : t('Achievements'),
   });
 
   root.innerHTML = `
     <div class="summary">
       ${statBoxesHTML([
-        { val: nGames,       lbl: 'Games' },
-        { val: avgDur   != null ? Math.round(avgDur) + 'm' : '-', lbl: 'Avg duration' },
-        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: 'Avg rounds' },
-        { val: winPct + '%', lbl: 'Win rate' },
-        { val: wins,         lbl: 'Wins' },
-        { val: bestStreak,   lbl: 'Max streak', hot: onBestStreak, title: onBestStreak ? 'Currently on this streak' : '' },
+        { val: nGames,       lbl: t('Games') },
+        { val: avgDur   != null ? Math.round(avgDur) + 'm' : '-', lbl: t('Avg duration') },
+        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: t('Avg rounds') },
+        { val: winPct + '%', lbl: t('Win rate') },
+        { val: wins,         lbl: t('Wins') },
+        { val: bestStreak,   lbl: t('Max streak'), hot: onBestStreak, title: onBestStreak ? t('Currently on this streak') : '' },
       ])}
     </div>
 
@@ -318,8 +318,9 @@ function render() {
 
     ${renderStatTableHTML(charRows, {
       mode:        pfMode,
-      headLabel:   'Villain',
+      headLabel:   t('Villain'),
       getKey:      r   => r.character,
+      getName:     villainName,
       getHref:     key => `villains.html?vil=${encodeURIComponent(key)}`,
       getIdentity: key => charImgHTML(key),
       getSub:      key => pfCharBoxMap[key],
@@ -335,14 +336,14 @@ function render() {
       onlyEarned: true,
       header: (earned, total) => `
         <div class="pf-games-header">
-          <span class="pf-games-title">Achievements | ${earned} / ${total}</span>
+          <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
         </div>`,
     })}
 
     <div class="pf-games-header">
-      <span class="pf-games-title">Games</span>
+      <span class="pf-games-title">${t('Games')}</span>
       ${pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : ''}
-      <button class="pill" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">Wins only</button>
+      <button class="pill" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
     </div>
     <div class="games-list" id="pfGamesList"></div>
   `;
@@ -402,8 +403,8 @@ function buildProfileCard(g, gp) {
   const role    = gameUserRole(g, gp, getCurrentUser());
   const actions = role.isParticipant ? `
     <div class="card-actions">
-      <a class="btn btn-ghost btn-sm" href="join.html?game=${g.id}" onclick="pfRememberReturn('${g.id}')">Open</a>
-      ${role.isCreator ? `<button class="btn btn-danger btn-sm" onclick="pfDeleteGame('${g.id}')">Delete</button>` : ''}
+      <a class="btn btn-ghost btn-sm" href="join.html?game=${g.id}" onclick="pfRememberReturn('${g.id}')">${t('Open')}</a>
+      ${role.isCreator ? `<button class="btn btn-danger btn-sm" onclick="pfDeleteGame('${g.id}')">${t('Delete')}</button>` : ''}
     </div>` : '';
   const me = getCurrentUser();
   const card = buildGameCard(g, gp, { isSelf: p => me && p.user_id === me.id, actions, onLocationClick: pfSetLocationFilter, layout: 'rows' });
@@ -421,10 +422,10 @@ function pfRememberReturn(id) {
 function pfDeleteGame(id) {
   openConfirmSheet({
     id:           'pfDeleteGameOverlay',
-    title:        'Delete Game?',
-    bodyHTML:     `<p class="confirm-text">This will permanently delete the game and all player records. This action cannot be undone.</p>`,
-    confirmLabel: 'Delete Game',
-    busyLabel:    'Deleting…',
+    title:        t('Delete Game?'),
+    bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the game and all player records. This action cannot be undone.')}</p>`,
+    confirmLabel: t('Delete Game'),
+    busyLabel:    t('Deleting…'),
     danger:       true,
     onConfirm:    () => _pfDeleteGame(id),
   });
@@ -441,7 +442,7 @@ async function _pfDeleteGame(id) {
 function showProfileQR() {
   if (!pfNick) return;
   const title = document.getElementById('pfQrTitle');
-  if (title) title.textContent = `Share ${pfNick}`;
+  if (title) title.textContent = t('Share {nick}', { nick: pfNick });
   showQRModal(new URL(`players.html?nick=${encodeURIComponent(pfNick)}`, location.href).href, 'pfQrCode', 'pfQrOverlay');
 }
 

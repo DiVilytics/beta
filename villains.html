@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>DiVilytics | Villains</title>
+  <title data-i18n>DiVilytics | Villains</title>
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -29,12 +31,12 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game">🎲</a>
-      <a href="game-log.html" title="Game Log">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="villains.html" title="Villains">🎭</a>
-      <a href="players.html" id="navProfile" title="Player">👤</a>
-      <a href="charts.html" title="Charts">📊</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </div>
@@ -43,19 +45,19 @@
 <main>
   <div class="page-header align-top">
     <div>
-      <h2>Villains</h2>
+      <h2 data-i18n>Villains</h2>
     </div>
     <div class="cs-search" id="csSearchWrap">
-      <input type="text" id="csSearchInput" placeholder="Jump to villain…" autocomplete="off" disabled>
+      <input type="text" id="csSearchInput" placeholder="Jump to villain…" autocomplete="off" disabled data-i18n-attr="placeholder">
       <div class="cs-dropdown" id="csDropdown"></div>
     </div>
   </div>
-  <p class="page-intro">Stats, rivalries and objectives for every villain.</p>
-  <a class="back-link hidden" id="csBack" href="villains.html">← All villains</a>
+  <p class="page-intro" data-i18n>Stats, rivalries and objectives for every villain.</p>
+  <a class="back-link hidden" id="csBack" href="villains.html" data-i18n>← All villains</a>
 
   <div id="csIdentity"></div>
 
-  <div id="csRoot" class="spinner">Loading…</div>
+  <div id="csRoot" class="spinner" data-i18n>Loading…</div>
   <div id="csDeck"></div>
   <div id="csFaq"></div>
 </main>
@@ -65,7 +67,7 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 id="cardTitle">Card</h3>
+      <h3 id="cardTitle" data-i18n>Card</h3>
       <button class="sheet-close" onclick="closeOverlay('cardOverlay')">×</button>
     </div>
     <div class="sheet-body" id="cardBody"></div>

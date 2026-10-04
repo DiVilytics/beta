@@ -27,7 +27,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     : null;
   const meta = [
     fmtDuration(g.duration_minutes),
-    g.num_turns ? `${g.num_turns} rounds` : null,
+    g.num_turns ? tn(g.num_turns, '{n} round', '{n} rounds') : null,
     locationPart,
     `${gp.length}p`,
   ].filter(Boolean);
@@ -44,7 +44,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
       ${rows ? `<span class="chip-seat">${i + 1}</span>` : star}
       <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
-        <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${_esc(p.character)}</a></div>
+        <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${_esc(villainName(p.character))}</a></div>
         ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>` : ''}
       </div>
       ${rows ? star : ''}
@@ -97,7 +97,7 @@ function sortGamePlayers(rows) {
 function appendLoadMore(container, onLoadMore) {
   const btn = document.createElement('button');
   btn.className = 'btn-load-more';
-  btn.textContent = 'Load more';
+  btn.textContent = t('Load more');
   btn.onclick = () => { btn.disabled = true; onLoadMore(); };
   container.appendChild(btn);
 }
