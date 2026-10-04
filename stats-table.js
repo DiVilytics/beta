@@ -29,9 +29,16 @@ function statValueDisplay(r, mode) {
   if (mode === 'games') return r.games;
   return (r.games ? Math.round((r.wins / r.games) * 100) : 0) + '%';
 }
-function statValueLabel(mode)        { return mode === 'count' ? t('# Wins') : mode === 'games' ? t('# Games') : t('% Wins'); }
+// Table header text: the full label, plus a short form for narrow screens when
+// the language has one ('% Wins (short)' in the dictionary); CSS shows one.
+function _headLabel(key) {
+  const full = t(key), short = t(`${key} (short)`);
+  return short === `${key} (short)` || short === full ? full
+    : `<span class="lbl-full">${full}</span><span class="lbl-short">${short}</span>`;
+}
+function statValueLabel(mode)        { return _headLabel(mode === 'count' ? '# Wins' : mode === 'games' ? '# Games' : '% Wins'); }
 function statSecondaryValue(r, mode) { return mode === 'games' ? r.wins : r.games; }
-function statSecondaryLabel(mode)    { return mode === 'games' ? t('# Wins') : t('# Games'); }
+function statSecondaryLabel(mode)    { return _headLabel(mode === 'games' ? '# Wins' : '# Games'); }
 
 function statModeSegHTML(mode, fn) {
   const btn = (m, label) =>

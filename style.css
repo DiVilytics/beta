@@ -2848,3 +2848,19 @@ select:disabled {
   .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 5px 6px; font-size: 11px; }
   .box-picker { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
 }
+
+/* Table headers with a short form (Italian "% Vitt."): full text, the short
+   one on narrow phones so the names column keeps its room. */
+.lbl-short { display: none; }
+@media (max-width: 400px) {
+  .lbl-full  { display: none; }
+  .lbl-short { display: inline; }
+}
+/* Above that width the full Italian headers ("N. Partite") need wider number
+   columns than the English ones. */
+@media (min-width: 401px) {
+  html:lang(it) .lb-head,
+  html:lang(it) .lb-row { grid-template-columns: 28px 1fr 84px 84px; }
+  html:lang(it) .cs-table .lb-head,
+  html:lang(it) .cs-table .lb-row { grid-template-columns: 80px 1fr 84px 84px; }
+}
