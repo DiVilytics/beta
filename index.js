@@ -6,6 +6,3 @@ function shareApp() {
 
 initAuth();
 
-// Language switch (right of Share): highlight the language in use.
-document.querySelectorAll('.lang-seg [data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
-

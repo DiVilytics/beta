@@ -247,7 +247,7 @@ function _updateAuthUI() {
   const el = document.getElementById('navAuth');
   if (!el) return;
 
-  const themeBtn = `<button class="nav-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="${t('Theme')}"></button>`;
+  const themeBtn = `<button class="nav-icon-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${t('Settings')}" aria-haspopup="true" aria-expanded="false">⚙️</button>`;
   const avatarLink = src =>
     `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${t('Account')}">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
 
@@ -268,6 +268,65 @@ function _updateAuthUI() {
   _updateThemeBtn();
   _updateThemeIcons();
 }
+
+// ── SETTINGS PANEL ───────────────────────────────────────────────────────────
+// The ⚙️ in the nav opens a small panel with the theme (Auto / Light / Dark,
+// theme.js) and the language (EN / IT, lang.js; switching reloads the page).
+// It lives in the nav itself (not in #navAuth, which is repainted on sign-in),
+// and closes after a choice, on a tap outside it, or on Escape.
+function _settingsPanel() {
+  let panel = document.getElementById('settingsPanel');
+  if (panel) return panel;
+  const nav = document.querySelector('nav');
+  if (!nav) return null;
+  const btn = (attr, val, label, title) =>
+    `<button class="seg-btn" type="button" ${attr}="${val}"${title ? ` title="${title}"` : ''}>${label}</button>`;
+  panel = document.createElement('div');
+  panel.id = 'settingsPanel';
+  panel.className = 'settings-panel';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-label', t('Settings'));
+  panel.innerHTML = `
+    <div class="settings-row">
+      <span class="settings-lbl">${t('Theme')}</span>
+      <div class="seg">${btn('data-theme-opt', 'auto', `<span class="settings-ico">🌗</span>${t('Auto')}`)}${btn('data-theme-opt', 'light', `<span class="settings-ico">☀️</span>${t('Light')}`)}${btn('data-theme-opt', 'dark', `<span class="settings-ico">🌙</span>${t('Dark')}`)}</div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-lbl">${t('Language')}</span>
+      <div class="seg">${btn('data-lang', 'en', 'EN', 'English')}${btn('data-lang', 'it', 'IT', 'Italiano')}</div>
+    </div>`;
+  panel.addEventListener('click', e => {
+    const b = e.target.closest('.seg-btn');
+    if (!b) return;
+    if (b.dataset.themeOpt) setTheme(b.dataset.themeOpt);
+    if (b.dataset.lang)     setLang(b.dataset.lang);   // reloads, unless it's already the language
+    _closeSettings();
+  });
+  panel.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  nav.appendChild(panel);
+  _updateThemeBtn();
+  return panel;
+}
+
+function toggleSettings(e) {
+  e?.stopPropagation();
+  const panel = _settingsPanel();
+  if (!panel) return;
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  document.getElementById('settingsBtn')?.setAttribute('aria-expanded', String(open));
+}
+
+function _closeSettings() {
+  const panel = document.getElementById('settingsPanel');
+  if (!panel || !panel.classList.contains('open')) return;
+  panel.classList.remove('open');
+  document.getElementById('settingsBtn')?.setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#settingsPanel, #settingsBtn')) _closeSettings();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') _closeSettings(); });
 
 // Paint the nav immediately, the cached avatar for a returning user, else the
 // sign-in button, before the async session check, so nothing flickers in.

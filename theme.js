@@ -2,7 +2,8 @@
 // Light / dark / auto theme: applied before first paint, persisted in
 // localStorage, and reflected into the nav logo, favicon and mobile address-bar
 // color. `_updateThemeBtn` / `_updateThemeIcons` are called by shared.js when it
-// (re)paints the nav, so theme.js must load before shared.js.
+// (re)paints the nav, so theme.js must load before shared.js. The theme is
+// chosen in the nav's settings panel (shared.js) via `setTheme`.
 
 (function () {
   const saved = localStorage.getItem('theme');
@@ -104,24 +105,12 @@ function _updateFavicon() {
 _updateFavicon();
 _updateThemeColor();
 
-function _nextTheme(current) {
-  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (current === 'auto') return systemDark ? 'light' : 'dark';
-  if (systemDark)         return current === 'light' ? 'dark' : 'auto';
-  return                         current === 'dark'  ? 'light' : 'auto';
-}
+// Theme choice from the settings panel (shared.js): 'auto' | 'light' | 'dark'.
+function setTheme(state) { _applyTheme(state); }
 
-function toggleTheme() {
-  _applyTheme(_nextTheme(localStorage.getItem('theme') || 'auto'));
-}
-
+// Highlight the current choice in the settings panel, if it's on the page.
 function _updateThemeBtn() {
-  const btn = document.getElementById('themeToggleBtn');
-  if (!btn) return;
   const current = localStorage.getItem('theme') || 'auto';
-  const next    = _nextTheme(current);
-  const icons   = { dark: '🌙', light: '☀️', auto: '🌗' };
-  const titles  = { dark: t('Force dark'), light: t('Force light'), auto: t('Follow system') };
-  btn.textContent = icons[current];
-  btn.title       = titles[next];
+  document.querySelectorAll('#settingsPanel [data-theme-opt]').forEach(b =>
+    b.classList.toggle('on', b.dataset.themeOpt === current));
 }
