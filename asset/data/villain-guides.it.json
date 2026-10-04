@@ -204,5 +204,30 @@
         "text": "Ursula è unica nel fatto che non ha l'azione Scontro sulla sua plancia. In compenso, sconfigge gli Eroi utilizzando i Contratti Vincolanti.\n\nQuando giochi un Contratto Vincolante, assegnalo a un Eroe. (I Contratti Vincolanti sono uno dei rari casi in cui è possibile assegnare un Oggetto dal Mazzo Cattivo a un Eroe.)\n\nOgni Contratto Vincolante è legato a uno dei Luoghi del Reame di Ursula. Un Eroe con un Contratto Vincolante viene sconfitto quando è mosso sul Luogo indicato dalla carta.\n\nScarta l'Eroe nella pila degli scarti del Mazzo Fato, e il Contratto Vincolante nella pila degli scarti del Mazzo Cattivo.\n\nEsempio: Un Eroe con il Contratto Vincolante della Riva assegnato viene sconfitto quando lo muovi sulla Riva."
       }
     ]
+  },
+  "Prince John": {
+    "objective": "Il Principe Giovanni è estremamente avido, quindi ha bisogno di accumulare Potere. Tuttavia, per quanto ti possa tentare, giocare al risparmio con i Gettoni potrebbe non essere la strada giusta per raggiungere la vittoria. Il Potere va anche usato!\n\nMolti Eroi possono ostacolare la capacità del Principe Giovanni di ottenere Potere. Giocare Alleati è quindi sempre una buona idea, anche prima che gli Eroi vengano giocati dai tuoi avversari. Facendo così, sarai preparato a sconfiggere un Eroe che ti sta rallentando non appena ne avrai bisogno.",
+    "sections": [
+      {
+        "title": "La Prigione",
+        "text": "Nel Reame del Principe Giovanni c'è un Luogo che può essere usato a suo vantaggio. La Prigione infatti non ha alcun simbolo che possa essere coperto da un Eroe, rendendo quindi gli Eroi in quel Luogo meno problematici. Il Principe Giovanni ha a disposizione delle carte Imprigionare, che gli consentono di spostare gli Eroi nella Prigione, per riottenere la disponibilità di azioni in altri Luoghi.\n\nNota: Anche nella Prigione, le abilità degli Eroi continuano ad avere effetto."
+      },
+      {
+        "title": "È bello essere il Re!",
+        "text": "Nonostante gli Eroi possano essere particolarmente fastidiosi, il Principe Giovanni ha diversi assi nella manica per fronteggiarli. Le carte come Taglia, Sceriffo di Nottingham e Bellissime, Adorabili Tasse gli permettono di trarre guadagno dalla presenza degli Eroi nel suo Reame. A volte conviene tenersi i nemici il più vicino possibile!"
+      },
+      {
+        "title": "Carte Fato Speciali",
+        "text": "Quando Rubare ai Ricchi viene giocata, si possono prendere fino a 4 Gettoni Potere al Principe Giovanni che vanno messi sopra ad un Eroe nel suo Reame. Quando un Eroe che trasporta dei Gettoni Potere viene sconfitto, il Principe Giovanni li riprende tutti per sé.\n\nLo stesso Eroe può essere usato più volte in combinazione con Rubare ai Ricchi, cosa che può portare a delle grandi ricompense una volta sconfitto l'Eroe!"
+      },
+      {
+        "title": "Robin Hood",
+        "text": "Finché Robin Hood è nel Reame del Principe Giovanni, ogni volta che quest'ultimo ottiene Potere attraverso un'azione o una carta, ottiene 1 Gettone Potere in meno di quelli che otterrebbe normalmente. È una buona idea liberarsi di Robin Hood il prima possibile!"
+      },
+      {
+        "title": "Little John",
+        "text": "Quando Little John viene giocato, si possono prendere fino a 4 Gettoni Potere al Principe Giovanni, che finiscono sulla carta di Little John. Quando Little John viene sconfitto, il Principe Giovanni si riprende tutti i Gettoni. Aspettare il momento giusto per sconfiggere Little John può essere la chiave per una vittoria improvvisa!"
+      }
+    ]
   }
 }
