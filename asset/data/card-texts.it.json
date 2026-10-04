@@ -111,7 +111,10 @@
     "Fury": "Durante il suo turno, se un altro giocatore sconfigge un Eroe con forza 4 o superiore, puoi giocare Furia. Rimpicciolisci fino a due Eroi.",
     "Stopwatch": "Attiva: Ottieni 1 Gettone Potere per ogni Archetto nel tuo Reame.",
     "By Order of the Queen": "Trasforma fino a due Guardie di Carta in Archetti.",
-    "Take the Shot": "Se c'è un Archetto in ogni Luogo, rivela le prime cinque carte del tuo mazzo. Se il costo totale è inferiore alla Forza totale di tutti i tuoi Archetti, riesci a Tirare con successo e vinci la partita. In caso contrario scarta le carte rivelate."
+    "Take the Shot": "Se c'è un Archetto in ogni Luogo, rivela le prime cinque carte del tuo mazzo. Se il costo totale è inferiore alla Forza totale di tutti i tuoi Archetti, riesci a Tirare con successo e vinci la partita. In caso contrario scarta le carte rivelate.",
+    "Card Guard (versions)": "4 semi, 2 copie ciascuno: Fiori e Quadri costano 1 con Forza 2; Picche e Cuori costano 2 con Forza 3.",
+    "Card Guard (cost)": "1 (Fiori e Quadri) | 2 (Picche e Cuori)",
+    "Card Guard (strength)": "2 (Fiori e Quadri) | 3 (Picche e Cuori)"
   },
   "Jafar": {
     "Abu": "Quando Abu viene giocato, scegli un qualsiasi Oggetto nel suo stesso Luogo e assegnaglielo. Jafar non può usare quell'Oggetto. Quando Abu viene sconfitto, l'Oggetto va restituito a Jafar nello stesso Luogo.",
@@ -193,5 +196,33 @@
     "Splitting Headache": "Scarta un Oggetto dal Reame di Capitan Uncino.",
     "Pixie Dust": "Quando la Polvere di Fata viene giocata, assegnala a un Eroe. Questo Eroe ottiene +2 Forza.",
     "John": "Gianni ottiene +1 Forza se ha un qualsiasi Oggetto assegnato a sé."
+  },
+  "Ursula": {
+    "Jetsam": "Attiva: Muovi un Eroe dal Luogo in cui si trova Jetsam a un Luogo adiacente non bloccato.",
+    "Flotsam": "Attiva: Muovi un Eroe dal Luogo in cui si trova Flotsam a un Luogo adiacente non bloccato.",
+    "Poor Unfortunate Souls": "Puoi muovere ogni Eroe in un Luogo adiacente non bloccato.",
+    "Opportunist": "Scegli un Oggetto o un Effetto dalla tua pila degli scarti e aggiungilo alla tua mano.",
+    "Divination": "Rivela carte dalla cima del tuo mazzo finché non trovi un Contratto Vincolante. Aggiungilo alla tua mano e scarta il resto.",
+    "Whirlpool": "Muovi un Eroe in un Luogo sbloccato a tua scelta.",
+    "Grow Giant": "Svolgi una delle azioni disponibili in un Luogo adiacente a quello in cui si trova Ursula, anche se bloccato.",
+    "Change Form": "Muovi il segnalino Lucchetto dal Palazzo al Covo di Ursula, o viceversa.",
+    "Binding Contract": "Quando il Contratto Vincolante viene giocato, assegnalo a un Eroe che non sia in [luogo]. Quell'Eroe è sconfitto se mosso in [luogo].",
+    "Trident": "Quando il Tridente viene giocato, trova il Re Tritone e giocalo nello stesso Luogo. Assegnagli il Tridente. Quando il Re Tritone viene sconfitto, riporta il Tridente dalla parte di Ursula, restando nel Luogo in cui il Re Tritone è stato sconfitto.",
+    "Crown": "Attiva: Guarda le prime due carte del tuo Mazzo Fato. Scartale entrambe o rimettile in cima nell'ordine che preferisci.",
+    "Trickery": "Durante il suo turno, se un altro giocatore ha 6 o più Gettoni Potere, puoi giocare Inganno. Rivela e gioca la prima carta del Mazzo Fato di quel giocatore.",
+    "Arrogance": "Durante il suo turno, se un altro giocatore sconfigge un Eroe con Forza 4 o superiore, puoi giocare Arroganza. Pesca tre carte dal mazzo, poi scarta tre carte a scelta dalla tua mano.",
+    "Cauldron": "Attiva: Ottieni 2 Gettoni Potere per ogni Contratto Vincolante nel tuo Reame.",
+    "Max": "Se Max viene giocato nel Luogo in cui si trova Ursula, puoi muovere Ursula in un qualsiasi Luogo non bloccato.",
+    "Ariel": "Quando Ariel viene giocata, puoi muovere un Oggetto non assegnato da un Luogo non bloccato al Luogo in cui lei si trova. Finché Ariel non viene sconfitta, Ursula non può svolgere l'azione Muovere un Oggetto o un Alleato.",
+    "Scuttle": "Quando Scuttle viene giocato, puoi scegliere un Oggetto dalla pila degli scarti del Mazzo Fato di Ursula e assegnarlo a Scuttle.",
+    "Return to Form": "Scegli un Eroe con Forza 4 o inferiore dalla pila degli scarti del Mazzo Fato di Ursula. Gioca quell'Eroe nel Luogo in cui si trova Ursula.",
+    "Eric": "Quando Eric viene giocato, puoi muovere un Eroe in un qualsiasi Luogo non bloccato.",
+    "Grimsby": "Quando Grimsby viene giocato, puoi spostare il Segnalino Lucchetto o nel Covo di Ursula o nel Palazzo.",
+    "Flounder": "Quando Flounder viene giocato, puoi rimescolare la pila degli scarti di Ursula nel suo Mazzo Cattivo.",
+    "Snarfblat": "Quando il Soffiablabla viene giocato, assegnalo a un Eroe. Il costo per giocare un Contratto Vincolante su quell'Eroe aumenta di 3.",
+    "Sebastian": "Quando Sebastian viene giocato, puoi scegliere un Contratto Vincolante assegnato a un Eroe in un Luogo non bloccato e assegnarlo invece a Sebastian.",
+    "King Triton": "Il costo per giocare i Contratti Vincolanti o gli Effetti che hanno come bersaglio il Re Tritone aumenta di 1.",
+    "Dinglehopper": "Quando l'Arricciaspiccia viene giocato, assegnalo a un Eroe. Ogni volta che Ursula si muove in questo Luogo, perde 1 Gettone Potere.",
+    "Binding Contract (versions)": "Una versione per Luogo: La Nave di Eric ×2, La Riva ×2, Il Covo di Ursula ×1, Il Palazzo ×1. [luogo] nel testo è quel Luogo."
   }
 }

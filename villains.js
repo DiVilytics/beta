@@ -658,6 +658,8 @@ let _deckCards = [];
 let _cardNameMap = {};
 const _cardName = name => _cardNameMap[name] || name;
 // Same for card texts: the Italian text when transcribed, else the wiki's English.
+// "<name> (versions)", "(cost)" and "(strength)" translate a card's versions note
+// and per-version values (Binding Contract, Card Guard's suits).
 let _cardTextMap = {};
 
 // Row summary of a cost/strength value: Card Guard's "1 (Club and Diamond) |
@@ -686,12 +688,12 @@ function openCardSheet(i) {
     <div class="cs-card-stats">
       <div class="cs-card-stat"><span>${t('Type')}</span><strong class="${_deckTypeClass(c.type, c.banner)} cs-deck-type">${_esc(_typeLabel(c.type, 1))}</strong></div>
       <div class="cs-card-stat"><span>${t('Copies')}</span><strong>${c.count}</strong></div>
-      ${stat(t('Cost'), c.cost)}
-      ${stat(t('Strength'), c.strength)}
+      ${stat(t('Cost'), _cardTextMap[`${c.name} (cost)`] ?? c.cost)}
+      ${stat(t('Strength'), _cardTextMap[`${c.name} (strength)`] ?? c.strength)}
     </div>
     <div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.name] ?? c.text)}</div>
     ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.back.name] ?? c.back.text)}</div></div>` : ''}
-    ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}`;
+    ${c.versions ? `<p class="cs-card-versions">${_esc(_cardTextMap[`${c.name} (versions)`] ?? c.versions)}</p>` : ''}`;
   openOverlay('cardOverlay');
 }
 
