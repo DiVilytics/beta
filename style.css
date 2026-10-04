@@ -317,7 +317,12 @@ a.chip {
 .guide-title { margin: 18px 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .guide-title:first-child { margin-top: 0; }
 #guideBody p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
-#guideBody .guide-objective { font-weight: 600; }
+/* The villain's objective, the line that matters most: a gold box, like the
+   winner's crown, a size up from the guide text. */
+#guideBody .guide-objective {
+  padding: 10px 12px; border-left: 3px solid var(--gold); border-radius: var(--rs);
+  background: var(--gold-d); color: var(--text); font-size: 15px; font-weight: 600; line-height: 1.45;
+}
 #guideBody .guide-item { margin-bottom: 6px; padding-left: 12px; border-left: 2px solid var(--border); }
 #guideBody .guide-note { padding: 8px 10px; background: var(--s2); border-radius: var(--r); font-size: 13px; }
 .guide-card {
