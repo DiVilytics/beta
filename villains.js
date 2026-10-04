@@ -694,7 +694,11 @@ const _reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function _setCardKeywords(deck) {
   const types = new Set(BASE_CARD_TYPES);
   const cards = [...(deck.villain || []), ...(deck.fate || []), ...(deck.extra || []).flatMap(e => e.cards)];
-  for (const c of cards) if (!c.type.includes('/')) types.add(c.type);
+  // A special type with a single card ("Syndrome's Remote", "The Prince") names
+  // that card even on its own ("…rispetto al Telecomando"), so it stays plain.
+  const perType = {};
+  for (const c of cards) perType[c.type] = (perType[c.type] || 0) + 1;
+  for (const c of cards) if (!c.type.includes('/') && (BASE_CARD_TYPES.includes(c.type) || perType[c.type] > 1)) types.add(c.type);
   _keywordClass = {};
   for (const type of types) {
     const plural = DECK_PLURAL[type] || `${type}s`;
