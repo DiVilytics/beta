@@ -16,8 +16,11 @@ function statBoxesHTML(boxes) {
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
-// the formatted primary cell; *Label → column headers; statSecondary* → the
-// trailing "# Games" / "# Wins" column. statModeSegHTML renders the toggle
+// the formatted value; statCellHTML → the table cell, "40% (12)" / "5 (12)" with
+// the games played in parentheses (two right-aligned sub-columns, so the digits
+// line up row to row), or just "12" when ranking by games; statGamesWidth → the
+// width of the "(games)" sub-column for a table, from its largest count;
+// statValueLabel → its column header. statModeSegHTML renders the toggle
 // control (`fn` is the global handler name the buttons call, e.g. 'setMode').
 function statValue(r, mode) {
   if (mode === 'count') return r.wins;
@@ -36,9 +39,19 @@ function _headLabel(key) {
   return short === `${key} (short)` || short === full ? full
     : `<span class="lbl-full">${full}</span><span class="lbl-short">${short}</span>`;
 }
-function statValueLabel(mode)        { return _headLabel(mode === 'count' ? '# Wins' : mode === 'games' ? '# Games' : '% Wins'); }
-function statSecondaryValue(r, mode) { return mode === 'games' ? r.wins : r.games; }
-function statSecondaryLabel(mode)    { return _headLabel(mode === 'games' ? '# Wins' : '# Games'); }
+function statValueLabel(mode) {
+  if (mode === 'games') return _headLabel('# Games');
+  return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
+}
+function statCellHTML(r, mode) {
+  const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
+  return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${r.games})</span>`}</span>`;
+}
+// Tabular digits are 0.6em wide in the app font, the two parentheses 0.6em together.
+function statGamesWidth(rows) {
+  const digits = String(Math.max(0, ...rows.map(r => r.games))).length;
+  return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
+}
 
 function statModeSegHTML(mode, fn) {
   const btn = (m, label) =>
@@ -108,8 +121,7 @@ function renderStatTableHTML(rows, opts) {
     const rank    = ranks[i];
     const key     = getKey(r);
     const barW    = statBarWidth(r, mode, maxVal);
-    const dispVal = statValueDisplay(r, mode);
-    const dispSub = statSecondaryValue(r, mode);
+    const dispVal = statCellHTML(r, mode);
     const sub     = getSub ? (getSub(key, r) || '') : '';
     const subHref = (sub && getSubHref) ? (getSubHref(key, r) || '') : '';
     const selfCls = (selfKey != null && key === selfKey) ? ' lb-row-self' : '';
@@ -128,10 +140,9 @@ function renderStatTableHTML(rows, opts) {
           </div>
         </div>
         <div class="row-val row-val-stack">
-          <span>${dispVal}</span>
+          ${dispVal}
           <div class="bar-bg"><div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div></div>
         </div>
-        <div class="row-games">${dispSub}</div>
       </div>`;
   };
 
@@ -144,12 +155,11 @@ function renderStatTableHTML(rows, opts) {
   }
 
   return `
-    <div class="lb-table${wrapClass ? ' ' + wrapClass : ''}">
+    <div class="lb-table${wrapClass ? ' ' + wrapClass : ''}" style="${statGamesWidth(sorted)}">
       <div class="lb-head">
         <span>#</span>
         <span>${headLabel}</span>
         <span class="text-right">${statValueLabel(mode)}</span>
-        <span class="text-right">${statSecondaryLabel(mode)}</span>
       </div>
       ${body}
     </div>`;

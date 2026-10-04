@@ -536,18 +536,16 @@ function render() {
       ])}
     </div>
     ${statModeSegHTML(csMode, 'csSetMode')}
-    <div class="lb-table cs-table mb-1-25">
+    <div class="lb-table cs-table mb-1-25" style="${statGamesWidth(rows.map(r => csBuckets[r.key]))}">
       <div class="lb-head">
         <span>${t('Players')}</span>
         <span></span>
         <span class="text-right">${statValueLabel(csMode)}</span>
-        <span class="text-right">${statSecondaryLabel(csMode)}</span>
       </div>
       ${rows.map(r => {
         const b         = csBuckets[r.key];
         const barW      = b.games ? statBarWidth(b, csMode, maxVal) : 0;
-        const dispVal   = b.games ? statValueDisplay(b, csMode) : '-';
-        const secondary = statSecondaryValue(b, csMode);
+        const dispVal   = b.games ? statCellHTML(b, csMode) : '-';
         return `
           <div class="lb-row">
             <div class="row-label">${r.label}</div>
@@ -556,8 +554,7 @@ function render() {
                 <div class="bar-fill" style="width:${barW}%"></div>
               </div>
             </div>
-            <div class="row-val">${dispVal}</div>
-            <div class="row-games">${v(secondary)}</div>
+            <div class="row-val">${csLoading ? '-' : dispVal}</div>
           </div>`;
       }).join('')}
     </div>

@@ -159,6 +159,7 @@ window.I18N.it = {
     "Oops": "Ops",
     "Back to home": "Torna alla home",
     "Games": "Partite",
+    "Games (short)": "Part.",
     "Avg duration": "Durata media",
     "Avg rounds": "Round medi",
     "No games match this filter.": "Nessuna partita corrisponde a questo filtro.",

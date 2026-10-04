@@ -1245,13 +1245,14 @@ select:disabled {
 .stat-box.hot .stat-val { color: var(--gold); }
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
-/* Rank | name | value with its bar underneath | secondary value. The last column
-   is wider than its numbers need so its header ("# Games") has clear space from
-   the one before it ("% Wins") instead of running into it. */
+/* Rank | name | value with its bar underneath: "40% (12)", the games played in
+   parentheses (just the games when ranking by games). The value column grows
+   smoothly with the table, so its bar says more on large screens: 92px on
+   phones (names keep their room) up to 220px at the widest table. */
 .lb-head,
 .lb-row {
   display: grid;
-  grid-template-columns: 28px 1fr 72px 72px;
+  grid-template-columns: 28px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
   padding: 9px 14px;
   align-items: center;
 }
@@ -1324,10 +1325,23 @@ select:disabled {
 .row-identity .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .row-identity .player-avatar { width: 28px; height: 28px; flex-shrink: 0; }
 
-.row-val   { font-size: 14px; font-weight: 700; text-align: right; }
+.row-val   { font-size: 14px; font-weight: 700; text-align: right; white-space: nowrap; }
 /* Leaderboard / player tables: the value sits on top of its bar, which spans the column. */
 .row-val-stack { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
 .row-games { font-size: 12px; color: var(--muted); text-align: right; }
+/* Value cell: the value and "(games)" as two right-aligned sub-columns. The games
+   part has the table's fixed width (--sv-games, from its largest count) and the
+   digits are tabular, so values and games each line up from row to row. */
+.sv { display: flex; justify-content: flex-end; align-items: baseline; gap: 3px; font-variant-numeric: tabular-nums; }
+.sv-games { min-width: var(--sv-games, 3.5em); text-align: right; font-size: 12px; font-weight: 400; color: var(--muted); }
+/* The value header ("% Wins (Games)", longer in Italian) is wider than its
+   column: it spans from the second column to the end, right-aligned, so it uses
+   the empty header space over the names/bars instead of being cut off. */
+.lb-head > *               { grid-row: 1; }
+.lb-head > :nth-child(1)   { grid-column: 1; }
+.lb-head > :nth-child(2)   { grid-column: 2; }
+.lb-head > .text-right     { grid-column: 2 / -1; justify-self: end; }
+.lb-head-sub { color: var(--dim); }
 
 .bar-cell { padding: 0 4px; }
 .bar-bg { height: 4px; background: var(--s4); border-radius: 2px; overflow: hidden; }
@@ -2126,7 +2140,7 @@ select:disabled {
 /* ── CHARACTER STATS PAGE ─────────────────────────────────────────── */
 .cs-table .lb-head,
 .cs-table .lb-row {
-  grid-template-columns: 80px 1fr 64px 72px;
+  grid-template-columns: 80px 1fr 96px;
 }
 
 .row-label {
@@ -2835,8 +2849,8 @@ select:disabled {
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
   .home-faq-list { grid-template-columns: 1fr; }
-  .lb-head, .lb-row                     { grid-template-columns: 24px 1fr 56px 68px; }
-  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 56px 68px; }
+  .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
+  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }
   .form-row input { font-size: 13px; }
   .filter-bulk-row .pace-color    { width: 22px; height: 22px; }
   /* Tighter box picker: lets 3 columns fit instead of 2, keeping cover art
@@ -2865,12 +2879,4 @@ select:disabled {
 @media (max-width: 400px) {
   .lbl-full  { display: none; }
   .lbl-short { display: inline; }
-}
-/* Above that width the full Italian headers ("N. Partite") need wider number
-   columns than the English ones. */
-@media (min-width: 401px) {
-  html:lang(it) .lb-head,
-  html:lang(it) .lb-row { grid-template-columns: 28px 1fr 84px 84px; }
-  html:lang(it) .cs-table .lb-head,
-  html:lang(it) .cs-table .lb-row { grid-template-columns: 80px 1fr 84px 84px; }
 }
