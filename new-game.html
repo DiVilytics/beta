@@ -50,7 +50,7 @@
       <button class="btn btn-ghost btn-sm hidden"   id="discardBtn" onclick="discardLiveGame()" data-i18n>Discard</button>
     </div>
   </div>
-  <p class="page-intro" data-i18n>Draw villains, time the game, save and share it.</p>
+  <p class="page-intro" data-i18n>Pick or draw villains, time the game, save and share it.</p>
 
   <div class="err" id="err"></div>
 
@@ -102,10 +102,13 @@
           <span class="chevron" id="exChevron">▼</span>
         </div>
       </button>
-      <div class="draw-mode-actions">
-        <button class="btn btn-primary btn-sm" id="drawAllEmptyBtn" type="button" onclick="drawAllEmpty()" data-i18n>Draw empty</button>
-        <button class="btn btn-primary btn-sm" id="drawAllBtn" type="button" onclick="drawAll()" data-i18n>Draw all</button>
-      </div>
+      <select id="playerCountSel" class="players-count-select draw-mode-count" onchange="setPlayerCount(this.value)">
+        <option value="2">2p</option>
+        <option value="3">3p</option>
+        <option value="4">4p</option>
+        <option value="5">5p</option>
+        <option value="6">6p</option>
+      </select>
     </div>
     <div class="exclude-body" id="excludeBody">
       <div class="filter-actions">
@@ -131,18 +134,12 @@
       <div id="excludeGrid"></div>
     </div>
 
-    <div class="section-label">
-      <span class="players-legend" id="playersLegend"><span class="sep-item" data-i18n>🎲 = draw</span> | <span class="sep-item" data-i18n>❌ = remove</span> | <span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>👑 = winner</span></span>
+    <div class="section-label lineup-label">
       <div class="header-actions">
-        <button class="btn btn-primary btn-sm" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled data-i18n>Shuffle order</button>
-        <select id="playerCountSel" class="players-count-select" onchange="setPlayerCount(this.value)">
-          <option value="2">2p</option>
-          <option value="3">3p</option>
-          <option value="4">4p</option>
-          <option value="5">5p</option>
-          <option value="6">6p</option>
-        </select>
+        <button class="btn btn-sm btn-lineup" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled title="Random order" data-i18n-attr="title" data-i18n>Random order</button>
+        <button class="btn btn-sm btn-lineup" id="drawAllBtn" type="button" onclick="drawAll()" title="Draw villains" data-i18n-attr="title" data-i18n>Draw villains</button>
       </div>
+      <span class="players-legend" id="playersLegend"><span class="sep-item" data-i18n>🎲 = draw</span> | <span class="sep-item" data-i18n>❌ = remove</span> | <span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>👑 = winner</span></span>
     </div>
     <div id="orderSlots"></div>
     <button class="add-row-btn" id="orderAddBtn" onclick="addOrderSlot()" data-i18n>+ Add player</button>

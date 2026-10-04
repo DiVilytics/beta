@@ -105,13 +105,15 @@ function appendLoadMore(container, onLoadMore) {
 // Rows layout: split each card's details into lines that fit beside the date,
 // a "|" never ending or starting a line (same logic as the New Game legend).
 // Call after the cards are in the page; it re-runs by itself when the window
-// width changes.
+// width changes and once the web font has loaded.
 let _cardMetaResize = null;
 function layoutGameCardMeta(root = document) {
   if (!_cardMetaResize) {
     _cardMetaResize = true;
     let t = null;
     window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => layoutGameCardMeta(), 150); });
+    // A first pass may measure the fallback font: redo it once the web font is in.
+    document.fonts?.ready.then(() => layoutGameCardMeta());
   }
   for (const top of root.querySelectorAll('.card-top-wrap')) {
     const date = top.querySelector('.card-date');

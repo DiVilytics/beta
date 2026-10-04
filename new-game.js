@@ -54,6 +54,7 @@ async function init() {
     { id: orderNextId++, char: '', isMe: false, isWinner: false },
   ];
   renderOrderSlots();
+  _initLegend();   // before the network awaits too: until it runs, the legend wraps 3 + 1
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
     for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, _updateDiscardBtn);
   }
@@ -95,8 +96,6 @@ async function init() {
   _initDrag();
   _checkResume();
   attachLocationAutocomplete('fLocation', 'fLocationDropdown');
-  _layoutLegend();
-  window.addEventListener('resize', _onLegendResize);
 }
 
 // Pending-state survives the OAuth round-trip (sessionStorage = same tab only)
@@ -214,6 +213,24 @@ let _legendResizeId = null;
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
   if (host) layoutSeparatedRows(host, LEGEND_ITEMS);   // hidden (live game): keeps the current markup
+}
+
+// Lays out the legend now, again once the web font is in (a first pass may
+// measure the fallback font), and whenever the legend's width changes (window
+// resize, rotation, a browser that settles sizes after load).
+function _initLegend() {
+  _layoutLegend();
+  document.fonts?.ready.then(_layoutLegend);
+  const legend = document.getElementById('playersLegend');
+  if (legend && window.ResizeObserver) {
+    let lastW = 0;
+    new ResizeObserver(([e]) => {
+      const w = Math.round(e.contentRect.width);
+      if (w && w !== lastW) { lastW = w; _layoutLegend(); }
+    }).observe(legend);
+  } else {
+    window.addEventListener('resize', _onLegendResize);
+  }
 }
 
 function _onLegendResize() {
@@ -342,18 +359,14 @@ function drawSlot(id) {
   _updateActionBtns();   // freeze the draw/shuffle/start buttons while spinning
 }
 
-function drawAllEmpty() {
-  const empties = orderSlots.filter(s => !s.char);
-  empties.forEach((s, i) => setTimeout(() => drawSlot(s.id), i * 60));
-}
-
+// Draw villains: clear every slot, then draw each one in turn.
 function drawAll() {
   _cancelShuffle();
   for (const id of Object.keys(slotTimers)) { clearInterval(slotTimers[id]); }
   slotTimers = {};
   for (const s of orderSlots) s.char = '';
   renderOrderSlots();
-  drawAllEmpty();
+  orderSlots.forEach((s, i) => setTimeout(() => drawSlot(s.id), i * 60));
 }
 
 function shuffleOrder() {
@@ -422,6 +435,10 @@ function shuffleOrder() {
 function renderOrderSlots() {
   const container = document.getElementById('orderSlots');
 
+  // Only a row with a villain can be the winner: a row that lost its villain
+  // (cleared, redrawn) loses the crown too.
+  for (const s of orderSlots) if (!s.char) s.isWinner = false;
+
   // Use the cached/likely sign-in status so the "Me" lock paints correctly on
   // the first synchronous render (before the session check resolves). It self-
   // corrects on the post-auth re-render if the cache turns out to be wrong.
@@ -449,7 +466,7 @@ function renderOrderSlots() {
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" title="${meTitle}">👤</button>
-          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" title="${t('Winner')}">👑</button>
+          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
       </div>`;
   }).join('');
@@ -468,25 +485,19 @@ function _updateActionBtns() {
   const animating = !!_shuffleTimer || Object.keys(slotTimers).length > 0;
 
   const filled     = orderSlots.filter(s => s.char).length;
-  const empties    = orderSlots.length - filled;
 
-  const drawAllEmptyBtn = document.getElementById('drawAllEmptyBtn');
   const drawAllBtn      = document.getElementById('drawAllBtn');
   const shuffleBtn      = document.getElementById('shuffleOrderBtn');
   const startBtn        = document.getElementById('startBtn');
   const submitBtn       = document.getElementById('submitBtn');
 
-  if (drawAllEmptyBtn) {
-    drawAllEmptyBtn.disabled = animating || empties === 0;
-    drawAllEmptyBtn.title    = animating ? '' : (empties === 0 ? t('All slots are filled') : '');
-  }
   if (drawAllBtn) {
     drawAllBtn.disabled = animating;
-    drawAllBtn.title    = '';
+    drawAllBtn.title    = t('Draw villains');
   }
   if (shuffleBtn) {
     shuffleBtn.disabled = animating || filled < 2;
-    shuffleBtn.title    = animating ? '' : (filled < 2 ? t('Pick at least 2 villains first') : '');
+    shuffleBtn.title    = filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
   }
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.

@@ -455,6 +455,17 @@ main {
 }
 
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
+/* New Game lineup buttons (Draw all, Random order): neutral like the row
+   buttons (🎲 ❌ 👤 👑), so Start/Save stay the only colored buttons. */
+/* Lineup buttons have a fixed width, the same in every language, and the Draw
+   pool toggle spans two of them (see below). One line on wide screens; on
+   phones they narrow and the label wraps to two lines. */
+:root { --lineup-btn-w: 112px; }
+.btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: 12px; line-height: 1.15;
+  width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
+  background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
+/* New Game: the player count sits on the Draw pool row, at its right end. */
+.players-count-select.draw-mode-count { margin-left: auto; height: 30px; min-height: 30px; max-height: 30px; }
 
 /* ── BUTTONS ──────────────────────────────────────────────────────── */
 .btn {
@@ -1094,6 +1105,10 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 #formContent .section-label > .players-count-select,
 #formContent .section-label .header-actions .btn-sm,
 #formContent .section-label .header-actions .players-count-select { margin: -2px 0; }
+/* The lineup row (Random order / Draw villains + legend): the same 8px above
+   (from the Draw pool row) and below (to the first player row). */
+#formContent .section-label.lineup-label { margin: 8px 0; min-height: 0; }
+#formContent .section-label.lineup-label .header-actions .btn-sm { margin: 0; }
 
 .players-count-select {
   width: auto;
@@ -1115,8 +1130,9 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   letter-spacing: 0;
   /* font-style: italic; */
   color: var(--dim);
-  font-size: 9px;
+  font-size: 10px;
   margin-left: 10px;
+  text-align: right;
   /* Take the row's free width so _layoutLegend() can measure how much fits and
      split the legend into balanced rows. */
   flex: 1 1 auto;
@@ -1869,8 +1885,11 @@ select:disabled {
 .pace-color.sel-out     { opacity: 0.2; }
 
 /* Inline variant, sits in the same row as the mode select */
+/* Spans exactly the two lineup buttons below it (Random order + Draw
+   villains, plus the 6px gap between them), in every language. */
 .exclude-toggle.exclude-toggle-inline {
-  width: auto;
+  width: calc(2 * var(--lineup-btn-w) + 6px);
+  justify-content: space-between;
   padding: 5px 10px;
   font-size: 12px;
   font-weight: 600;
@@ -1879,7 +1898,6 @@ select:disabled {
   gap: 6px;
 }
 .exclude-toggle.exclude-toggle-inline .toggle-right { gap: 6px; }
-.draw-mode-actions { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
 .owned-toggle.disabled { opacity: 0.45; }
 .exclude-toggle-inline ~ .exclude-body,
 .draw-mode-row + .exclude-body {
@@ -2835,6 +2853,7 @@ select:disabled {
   .txt-btn:hover                            { color: var(--text); }
   .sheet-close:hover                        { color: var(--text); background: var(--s3); }
   .pf-btn.rand:hover                        { background: var(--s4); border-color: var(--dim); color: var(--text); }
+  .btn.btn-lineup:hover                     { background: var(--s4); border-color: var(--dim); }
   .pf-btn.me:hover                          { background: var(--accent-d); border-color: rgba(124, 106, 247, 0.35); color: var(--accent); }
   .pf-btn.win:hover                         { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.35); color: var(--gold); }
   .pf-btn.del:hover                         { color: var(--red); border-color: rgba(224, 84, 84, 0.35); background: var(--red-d); }
@@ -2861,6 +2880,8 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
+  :root { --lineup-btn-w: 76px; }
+  .btn.btn-lineup { font-size: 11px; white-space: normal; }
   .home-faq-list { grid-template-columns: 1fr; }
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }

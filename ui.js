@@ -207,15 +207,21 @@ function clearError(target) {
 // event listeners survive. Returns false (markup untouched) when the host has
 // no width yet, e.g. while hidden. Used by the New Game legend and the game
 // cards' details line.
-function layoutSeparatedRows(host, items, maxW = host.clientWidth) {
+function layoutSeparatedRows(host, items, maxW = host.getBoundingClientRect().width) {
   if (!maxW || !items.length) return false;
   const html = it => typeof it === 'string' ? it : it.outerHTML;
-  const cs   = getComputedStyle(host);
+  // Measure inside the host itself (out of the flow), with the same markup as a
+  // real row, so the font, emoji and spacing are exactly the ones shown: a probe
+  // elsewhere in the page can come out narrower on some browsers (Safari), and
+  // the browser then wraps the "fitting" row by itself, unevenly (3 + 1).
   const meas = document.createElement('span');
-  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'
-    + `font:${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily};letter-spacing:${cs.letterSpacing};`;
-  document.body.appendChild(meas);
-  const fits = arr => { meas.innerHTML = arr.map(html).join(' | '); return meas.offsetWidth <= maxW; };
+  meas.className = 'sep-row';
+  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0;';
+  host.appendChild(meas);
+  const rowHTML = arr => arr.map(it => `<span class="sep-item">${html(it)}</span>`).join('<span class="sep-sep"> | </span>');
+  // Sub-pixel widths, with 1px to spare: rounded ones can call a row that's a
+  // fraction too wide a fit.
+  const fits = arr => { meas.innerHTML = rowHTML(arr); return meas.getBoundingClientRect().width + 1 <= maxW; };
   const split = arr => {
     if (arr.length <= 1 || fits(arr)) return [arr];
     const mid = Math.ceil(arr.length / 2);
