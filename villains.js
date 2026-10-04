@@ -687,10 +687,10 @@ function openCardSheet(i) {
       ${stat(t('Cost'), c.cost)}
       ${stat(t('Strength'), c.strength)}
     </div>
-    <div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.name] || c.text)}</div>
-    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.back.name] || c.back.text)}</div></div>` : ''}
+    <div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.name] ?? c.text)}</div>
+    ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.back.name] ?? c.back.text)}</div></div>` : ''}
     ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}
-    ${_cardTextMap[c.name] ? '' : `<p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`}`;
+    ${c.name in _cardTextMap ? '' : `<p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`}`;
   openOverlay('cardOverlay');
 }
 

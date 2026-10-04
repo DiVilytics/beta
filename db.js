@@ -142,7 +142,7 @@ async function _fetchJsonLocalized(url) {
 
 let _objectives = null;
 async function loadObjectives() {
-  if (!_objectives) _objectives = await _fetchJson(DATA_OBJECTIVES_URL);
+  if (!_objectives) _objectives = await _fetchJsonLocalized(DATA_OBJECTIVES_URL);
   return _objectives;
 }
 
