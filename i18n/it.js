@@ -321,6 +321,7 @@ window.I18N.it = {
     "Pace+": "Velocità+",
     "Click to exclude villains; games using any excluded villain are hidden.": "Tocca per escludere dei cattivi; le partite con un cattivo escluso vengono nascoste.",
     "DiVilytics": "DiVilytics",
+    "DiVilytics | Disney Villainous stats": "DiVilytics | Statistiche di Disney Villainous",
     "DiVilytics | Disney Villainous Analytics": "DiVilytics | Disney Villainous Analytics",
     "Archive, track, and analyze your Disney Villainous sessions. Every game you record joins a shared community database, turning one evening around the table into win rates, leaderboards, and per-villain stats for you and everyone you play with.": "Archivia, segui e analizza le tue partite a Disney Villainous. Ogni partita che registri entra in un archivio condiviso dalla community, e una serata attorno al tavolo diventa percentuali di vittoria, classifiche e statistiche per cattivo, per te e per chi gioca con te.",
     "Tutorial": "Tutorial",
