@@ -625,7 +625,8 @@
     ],
     "extra": [
       {"title": "Tile", "note": "Two-sided tile: Buzz Lightyear, a Guardian that starts at Caterpillar Room, on one side; Demo Mode Buzz Lightyear, an Ally, on the other.", "cards": [
-        {"name": "Buzz Lightyear", "count": 1, "type": "Guardian", "text": "Neither Buzz Lightyear nor any Heroes in his location can be targeted by Vanquish actions."}
+        {"name": "Buzz Lightyear", "count": 1, "type": "Guardian", "text": "Neither Buzz Lightyear nor any Heroes in his location can be targeted by Vanquish actions."},
+        {"name": "Demo Mode Buzz Lightyear", "count": 1, "type": "Ally", "cost": "1", "strength": "1", "text": "Demo Mode Buzz Lightyear can only be used in a Vanquish action with at least one other Ally. Demo Mode Buzz Lightyear is not discarded when used to defeat a Hero. Heroes defeated in a Vanquish action using Demo Mode Buzz Lightyear are moved to the Caterpillar Room."}
       ]}
     ]
   },

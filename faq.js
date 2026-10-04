@@ -12,12 +12,12 @@ function _faqHref(topic) {
   return `faq.html?topic=${encodeURIComponent(topic)}`;
 }
 
-// ?topic= is case-insensitive, and [TAG] reworks (e.g. "Ursula [I2E]") share
-// their base villain's entries.
+// ?topic= is case-insensitive. [TAG] reworks (e.g. "Ursula [I2E]") are separate
+// villains and only match entries filed under their own full name.
 function _resolveTopic(raw) {
   if (!raw) return null;
   if (raw.toLowerCase() === FAQ_GENERAL) return FAQ_GENERAL;
-  const base  = raw.replace(/\s*\[[^\]]+\]$/, '').toLowerCase();
+  const base  = raw.toLowerCase();
   return Object.keys(faqData.villains).find(v => v.toLowerCase() === base);
 }
 

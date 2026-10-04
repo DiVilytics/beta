@@ -868,11 +868,12 @@ document.addEventListener('click', e => {
 // ── RULES FAQ LINK ────────────────────────────────────────────────────────────
 
 // The villain's rules clarifications live on faq.html; link there when it has
-// any. [TAG] reworks (e.g. "Ursula [I2E]") share their base villain's entries.
+// any. [TAG] reworks (e.g. "Ursula [I2E]") are separate villains: they only
+// get entries filed under their own full name.
 async function renderFaqLink(charName) {
   const el = document.getElementById('csFaq');
   if (!el) return;
-  const base  = charName.replace(/\s*\[[^\]]+\]$/, '');
+  const base  = charName;
   const rules = (await loadFaq()).villains?.[base] || [];
   if (!rules.length) { el.innerHTML = ''; return; }
   el.innerHTML = `
