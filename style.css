@@ -288,11 +288,25 @@ a.chip {
 .pf-since { font-size: 12px; font-weight: 400; color: var(--dim); letter-spacing: 0; }
 .pf-since-link { color: inherit; text-decoration: none; cursor: pointer; }
 
-.char-objective {
-  margin: 10px 0 0;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
+/* Under the villain's name: "Pace: ● | Villain guide ›". */
+.char-meta { margin: 10px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.char-meta .pace-dot { margin: 0 0 0 2px; }
+.char-meta-sep { margin: 0 3px; color: var(--dim); }
+.char-guide-link {
+  padding: 0; border: none; background: none;
+  font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; white-space: nowrap;
+}
+
+/* Villain Guide sheet: a heading per section, card names in their type color. */
+.guide-title { margin: 18px 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.guide-title:first-child { margin-top: 0; }
+#guideBody p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
+#guideBody .guide-objective { font-weight: 600; }
+#guideBody .guide-note { padding: 8px 10px; background: var(--s2); border-radius: var(--r); font-size: 13px; }
+.guide-card {
+  display: inline; padding: 0; border: none; background: none;
+  font: inherit; font-weight: 600; color: var(--deck-c); cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 3px;
 }
 
 .pace-dot {
@@ -683,8 +697,6 @@ main {
 .cs-deck-count { flex-shrink: 0; font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
 .cs-deck-total { font-size: 12px; color: var(--muted); }
 .cs-deck-note { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
-.cs-deck-src { margin: 14px 2px 0; font-size: 12px; color: var(--muted); }
-.cs-deck-src a { color: var(--accent); text-decoration: none; }
 
 /* Card detail sheet. */
 .cs-card-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
@@ -697,8 +709,6 @@ main {
 .cs-card-back { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 .cs-card-sub { margin-bottom: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .cs-card-versions { margin: 12px 0 0; padding: 10px 12px; background: var(--s2); border-radius: var(--r); font-size: 13px; color: var(--muted); line-height: 1.5; }
-.cs-card-src { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
-.cs-card-src a { color: var(--accent); text-decoration: none; }
 
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
 /* One-line description of what a page is for, right under its header. */

@@ -242,7 +242,8 @@ function layoutSeparatedRows(host, items, maxW = host.clientWidth) {
 
 function closeOverlay(id) {
   document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
+  // Another sheet may still be open underneath (a card opened from the guide).
+  if (!document.querySelector('.overlay.open')) document.body.style.overflow = '';
 }
 
 function openOverlay(id) {

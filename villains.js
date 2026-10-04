@@ -438,13 +438,17 @@ async function renderDetailPage(charName) {
 }
 
 async function _renderCharIdentity() {
-  const objectives = await loadObjectives();
-  const objective  = objectives[csChar.name];
+  const [objectives, guides] = await Promise.all([loadObjectives(), loadVillainGuides()]);
+  // The objective lives in the guide sheet; every villain with an objective or a
+  // guide gets the link, even if the sheet holds only the objective for now.
+  const guideLink  = objectives[csChar.name] || guides[csChar.name]
+    ? `<span class="char-meta-sep"> | </span><button class="char-guide-link" type="button" onclick="openGuide()">${t('Villain guide')} ›</button>`
+    : '';
   const paceDot    = csChar.pace
     ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="${_esc(t('View {pace} pace villains', { pace: t(csChar.pace[0].toUpperCase() + csChar.pace.slice(1)) }))}"></a>`
     : `<a class="pace-dot gray" href="villains.html?pace=gray" title="${t('Pace not yet set')}"></a>`;
   document.getElementById('csIdentity').innerHTML =
-    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(villainName(csChar.name))}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div>${objective ? `<p class="char-objective">${paceDot}${_esc(objective)}</p>` : ''}`;
+    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${_esc(villainName(csChar.name))}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div><p class="char-meta">${t('Pace')}: ${paceDot}${guideLink}</p>`;
 }
 
 function _foldBuckets(buckets) {
@@ -689,8 +693,7 @@ function openCardSheet(i) {
     </div>
     <div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.name] ?? c.text)}</div>
     ${c.back ? `<div class="cs-card-back"><div class="cs-card-sub">${t('Other side: {name}', { name: _esc(_cardName(c.back.name)) })}</div><div class="cs-card-text">${_cardTextHTML(_cardTextMap[c.back.name] ?? c.back.text)}</div></div>` : ''}
-    ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}
-    ${c.name in _cardTextMap ? '' : `<p class="cs-card-src">${t('Card text from the {link}.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`}`;
+    ${c.versions ? `<p class="cs-card-versions">${_esc(c.versions)}</p>` : ''}`;
   openOverlay('cardOverlay');
 }
 
@@ -780,10 +783,80 @@ async function renderDeck(charName) {
     + _deckHTML('Fate deck', deck.fate)
     + (deck.extra || []).map(e => _deckHTML(e.title, e.cards, {
         note: e.note, unit: /^Tiles?$/.test(e.title) ? 'tile' : 'card', keepOrder: true, banner: e.banner,
-      })).join('')
-    + `<p class="cs-deck-src">${t('Card lists and texts from the {link}. Tap a card to read it.', { link: '<a href="https://disney-villainous.fandom.com/wiki/Villain" target="_blank" rel="noopener">Disney Villainous Wiki</a>' })}</p>`;
+      })).join('');
   _balanceDecks(el);
 }
+
+// ── VILLAIN GUIDE ─────────────────────────────────────────────────────────────
+
+// The Villain Guide of the shown villain in a sheet: the objective first
+// (objectives.json, then the guide's explanation of it), then one heading per
+// guide section (villain-guides.json). Card names in the text open that card's sheet: the first
+// mention per section, as the shown name or the English one (an English guide
+// in the Italian site), plurals included, possessives ("Sultan's Palace") not.
+async function openGuide() {
+  const [guides, objectives, decks] = await Promise.all([loadVillainGuides(), loadObjectives(), loadVillainDecks()]);
+  const guide     = guides[csChar.name] || {};
+  const objective = objectives[csChar.name];
+  if (!objective && !guide.sections) return;
+  const deck  = decks[csChar.name] || {};
+  const cards = [...(deck.villain || []), ...(deck.fate || []), ...(deck.extra || []).flatMap(e => e.cards)];
+  const byShown = new Map();
+  // Matched ignoring case, since guides capitalize names freely ("Dadi Truccati"
+  // for "Dadi truccati"), but only mentions starting with a capital count, so
+  // plain words ("greed") are never linked.
+  // Names also match without an Italian article ("il Genio" for "Il genio").
+  for (const c of cards) for (const n of [c.name, _cardName(c.name)]) {
+    for (const k of [n, n.replace(/^(il|lo|la|i|gli|le) |^l'/i, '')]) {
+      if (!byShown.has(k.toLowerCase())) byShown.set(k.toLowerCase(), c);
+    }
+  }
+  const names = [...byShown.keys()].sort((a, b) => b.length - a.length)
+    .map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  // Not after "del/della…": that's a place ("Palazzo del Sultano"), like the
+  // English possessive.
+  const re = names.length ? new RegExp(`(?<![\\p{L}\\p{N}])(?<!\\b(?:del|della|dello|dei|degli|delle) )(${names.join('|')})((?:e?s)?)(?![\\p{L}\\p{N}'’])`, 'giu') : null;
+  const NOTE = /^(Note|Important|Beware|Example|Nota|Importante|Attenzione|Esempio):\s*/;
+
+  const paraHTML = (p, linked) => {
+    const m = NOTE.exec(p);
+    const body = m ? p.slice(m[0].length) : p;
+    let html = '', last = 0, hit;
+    if (re) re.lastIndex = 0;
+    while (re && (hit = re.exec(body))) {
+      const c = byShown.get(hit[1].toLowerCase());
+      // A lowercase start ("il Genio") retries one letter later, to find "Genio".
+      if (!/^\p{Lu}/u.test(hit[1])) { re.lastIndex = hit.index + 1; continue; }
+      if (linked.has(c.name)) continue;
+      linked.add(c.name);
+      html += _esc(body.slice(last, hit.index))
+        + `<button class="guide-card ${_deckTypeClass(c.type)}" type="button" data-card="${_esc(c.name)}">${_esc(hit[0])}</button>`;
+      last = hit.index + hit[0].length;
+    }
+    html += _esc(body.slice(last));
+    return m ? `<p class="guide-note"><strong>${_esc(m[1])}:</strong> ${html}</p>` : `<p>${html}</p>`;
+  };
+
+  document.getElementById('guideTitle').textContent = `${t('Villain guide')} | ${villainName(csChar.name)}`;
+  const body = document.getElementById('guideBody');
+  const sectionHTML = (title, text, lead = '') => {
+    const linked = new Set();
+    return `<h4 class="guide-title">${_esc(title)}</h4>${lead}${text ? text.split('\n\n').map(p => paraHTML(p, linked)).join('') : ''}`;
+  };
+  body.innerHTML =
+    (objective ? sectionHTML(t('Objective'), guide.objective, `<p class="guide-objective">${_esc(objective)}</p>`) : '')
+    + (guide.sections || []).map(sec => sectionHTML(sec.title, sec.text)).join('');
+  body.scrollTop = 0;
+  openOverlay('guideOverlay');
+}
+
+// A card name in the guide opens its sheet on top (once the decks are drawn).
+document.addEventListener('click', e => {
+  const b = e.target.closest('.guide-card');
+  if (!b) return;
+  const i = _deckCards.findIndex(c => c.name === b.dataset.card);
+  if (i >= 0) openCardSheet(i);
+});
 
 // ── RULES FAQ LINK ────────────────────────────────────────────────────────────
 

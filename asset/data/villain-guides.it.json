@@ -1,0 +1,130 @@
+{
+  "Oogie Boogie": {
+    "objective": "Il Bau Bau vuole diventare il nuovo sovrano del Paese di Halloween. Con Jack Skeletron impegnato a cercare di conquistare il Natale, la strada per la scalata al potere del Bau Bau è libera. Ma presto Jack si renderà conto che è lui il vero Re delle Zucche e tornerà a reclamare ciò che gli spetta. Il Bau Bau deve prepararsi allo scontro.",
+    "sections": [
+      {
+        "title": "Preparazione speciale",
+        "text": "Metti la carta di Babbo Nachele a faccia in su ne La Tana del Bau Bau. Piazza i dadi del Bau Bau vicino alla plancia del tuo Reame."
+      },
+      {
+        "title": "Come vincere",
+        "text": "Il Bau Bau sa che l'unico modo di diventare il sovrano del Paese di Halloween è sconfiggere Jack Skeletron, ma Jack è un Finto Babbo Nachele. Il Bau Bau deve giocare le carte Finto Babbo Nachele dal suo mazzo Cattivo. Più carte Finto Babbo Nachele vengono giocate con successo, più sarà vicino il momento in cui Jack si ricorderà chi è e sarà pronto a sfidare il Bau Bau."
+      },
+      {
+        "title": "Jack l'impostore",
+        "text": "Dopo che il Bau Bau ha rimosso con successo quattro carte Finto Babbo Nachele dal suo mazzo e le ha messe in una pila accanto a Babbo Nachele, rimuovi Babbo Nachele dal gioco. Trova Jack Skeletron e mettilo ne La Tana del Bau Bau. Metti i quattro Finti Babbo Nachele nella pila degli scarti del mazzo Cattivo del Bau Bau."
+      },
+      {
+        "title": "Lanciare i dadi",
+        "text": "Alcune carte del Bau Bau gli permettono di lanciare i suoi dadi. Gioca la carta normalmente, poi lancia i dadi. I risultati del lancio sono spiegati sulla carta. Il Bau Bau potrà non vincere ogni lancio, ma perde raramente. Anche i tiri sfortunati possono essere utili al piano del Bau Bau per sconfiggere Jack."
+      },
+      {
+        "title": "Scherzetti con i dadi",
+        "text": "Il Bau Bau imbroglia, specialmente quando si tratta di dadi. Ha anche diverse carte che lo confermano! Dopo un qualunque lancio di dadi, il Bau Bau può immediatamente giocare la carta Dadi Truccati (non è necessario usare l'azione Gioca una Carta). I Dadi Truccati permettono al Bau Bau di ritirare uno dei dadi appena lanciati.\n\nPer cercare di rallentare quell'imbroglione del Bau Bau, piazza la carta Fato Salve, Bau! sotto la pedina del Bau Bau. Salve, Bau! riduce di 2 il successivo lancio di dadi, dopo eventuali rilanci. Puoi piazzare più di una carta Salve, Bau! e sottrarre dal lancio la somma di tutte le carte. Scarta Salve, Bau! dopo il lancio dei dadi."
+      },
+      {
+        "title": "Modifiche alla Forza",
+        "text": "Usa i gettoni Forza +1/-1 per indicare i cambiamenti alla Forza degli Eroi e degli Alleati."
+      }
+    ]
+  },
+  "Tamatoa": {
+    "objective": "Tamatoa non è solo il mostro più intelligente del mare, ma anche il più splendente. Il suo potere e il suo ego sono illimitati e si accaparra ciò che tutti vogliono, compreso l'Amo del semidio Maui. Deve impedire a Maui di riprendersi l'Amo e cercare di prendere il Cuore di Te Fiti da Vaiana. Se riuscirà a superare questi Eroi e i loro piani, potrà diventare il crostaceo con il potere della creazione e il mostro più temuto di sempre!",
+    "sections": [
+      {
+        "title": "Preparazione speciale",
+        "text": "Tamatoa utilizza un terzo mazzo chiamato Mazzo Maui. Posizionalo vicino al tuo Mazzo Cattivo."
+      },
+      {
+        "title": "Il Mazzo Maui",
+        "text": "Il Mazzo Maui è un misterioso insieme di effetti. Tamatoa pesca una carta Maui mentre Maui è in gioco e prima che Tamatoa si muova in un nuovo Luogo. Gli effetti delle carte Maui sono immediati e possono cambiare ciò che accade durante quel turno. Tamatoa può anche giocare Non è Proprio l'Ora di Maui per rivelare una carta e giocarla o scartarla."
+      },
+      {
+        "title": "Amo di Maui",
+        "text": "L'Amo di Maui si trova nel Mazzo Cattivo di Tamatoa. Tamatoa può giocarlo come carta Oggetto non assegnata a un Alleato. Finché l'Amo di Maui è sul lato di Tamatoa del Reame questo ottiene 2 gettoni Potere ogni volta che è bersaglio di un'azione Fato. La carta Fato L'Ora di Maui trova Maui e immediatamente trova l'Amo di Maui e glielo assegna. Se Maui viene sconfitto mentre l'Amo di Maui è assegnato a lui, sposta l'Amo di Maui sul lato di Tamatoa del Reame in quello stesso luogo."
+      },
+      {
+        "title": "Cuore di Te Fiti",
+        "text": "Quando viene pescata la carta Fato Cuore di Te Fiti, Vaiana viene trovata e il Cuore di Te Fiti assegnato a lei. Tamatoa deve sconfiggere Vaiana mentre il Cuore di Te Fiti è assegnato a lei per ottenere l'Oggetto e vincere la partita. Il Cuore di Te Fiti può essere mosso usando un'azione Muovere Oggetto o Alleato quando si trova sul lato di Tamatoa del Reame."
+      },
+      {
+        "title": "...ma è un falso!",
+        "text": "Qualcosa che Splende è il trucco finale con cui Vaiana inganna Tamatoa. L'Oggetto non viene assegnato a un Eroe, ma viene giocato alla stregua di un Eroe che copre le azioni. Un Eroe che si trova nello stesso Luogo in cui si trova Qualcosa che Splende non può essere sconfitto. Qualcosa che Splende viene scartato quando Tamatoa termina il suo turno nello stesso Luogo dove si trova Qualcosa che Splende."
+      },
+      {
+        "title": "Heihei",
+        "text": "La carta Fato Heihei non ha abilità aggiuntive."
+      }
+    ]
+  },
+  "Queen of Hearts": {
+    "sections": [
+      {
+        "title": "Abilità Attivate",
+        "text": "La Regina di Cuori ha a disposizione alcune carte con Abilità Attivate. Vedi il regolamento per i dettagli su come si usano le carte con Abilità Attivate."
+      },
+      {
+        "title": "Guardie di Carta/Archetti",
+        "text": "Le Guardie di Carta vanno giocate come delle normali carte Alleato, e possono essere usate per sconfiggere gli Eroi. Tuttavia, se attivi l'Abilità di una Guardia di Carta, questa viene trasformata in un Archetto e non è più considerata come una Guardia di Carta. Ruota la carta di 90 gradi per indicare che è diventata un Archetto.\n\nGli Archetti non possono essere usati per sconfiggere gli Eroi, ma possono essere trasformati nuovamente in Guardie di Carta, attivando di nuovo la loro Abilità.\n\nNota: Gli archetti sono comunque considerati come Alleati. Possono essere mossi normalmente e la loro Forza è comunque influenzata dalle altre carte nel tuo Reame. In più, è possibile assegnare le Lance agli Archetti, per aumentarne la Forza e quindi anche la possibilità di Tirare con successo."
+      },
+      {
+        "title": "Fare il Tiro",
+        "text": "Se c'è almeno un Archetto in ogni Luogo del tuo Reame, puoi giocare la carta Tirare per tentare di vincere la partita.\n\nRivela le prime cinque carte del tuo Mazzo Cattivo e somma tra loro i costi delle carte pescate. Se il totale è più basso della Forza totale di tutti gli Archetti nel Reame, allora sei riuscito a Tirare e vinci la partita!\n\nSe non riesci a Tirare con successo, scarta la carta, assieme alle cinque che hai rivelato. Potrai ritentare giocando un'altra carta Tirare. Ce ne sono tre nel mazzo."
+      },
+      {
+        "title": "Eroi Rimpiccioliti",
+        "text": "Le carte Ti Fa più Piccola e Furia permettono alla Regina di Cuori di rimpicciolire gli Eroi. Quando un Eroe è rimpicciolito, ruotalo di 45 gradi in modo da coprire solo uno dei due simboli azione, con l'angolo della carta, e lasciando l'altro simbolo disponibile.\n\nSe ci sono più Eroi in un Luogo con un Eroe rimpicciolito, quest'ultimo è l'unico Eroe che copre un simbolo azione. Gli altri Eroi non coprono alcun simbolo finché quello rimpicciolito non viene mosso o sconfitto."
+      },
+      {
+        "title": "Eroi Ingranditi",
+        "text": "Quando un avversario gioca la carta Ti Fa più Grande, può scegliere un Eroe nel tuo Reame da ingrandire. La carta Eroe viene ruotata di 90 gradi in modo da coprire anche il simbolo più vicino di un Luogo adiacente. Il tuo avversario sceglie quale azione coprire. Un Eroe ingrandito è considerato all'interno di entrambi i Luoghi. Quando ruoti un Eroe ingrandito e lo riporti alla normalità, devi riportarlo nel Luogo originario da cui si era ingrandito."
+      }
+    ]
+  },
+  "Jafar": {
+    "objective": "Per raggiungere l'obiettivo di Jafar, dovrai sbloccare la Caverna delle Meraviglie con l'Amuleto dello Scarabeo. Dopodiché la Lampada dovrà essere giocata nella Caverna delle Meraviglie, che porterà il Genio nello stesso Luogo. Dovrai Ipnotizzare il Genio, portandolo sotto il controllo di Jafar, e muovere la Lampada Magica nel Palazzo del Sultano.\n\nImportante: Per vincere, la Lampada Magica deve essere nel tuo lato della Plancia.",
+    "sections": [
+      {
+        "title": "Preparazione speciale",
+        "text": "Piazza un Segnalino Lucchetto sulla Caverna delle Meraviglie, perché questo Luogo è bloccato all'inizio della partita."
+      },
+      {
+        "title": "Amuleto dello Scarabeo",
+        "text": "Giocare l'Amuleto dello Scarabeo è il primo passo verso la vittoria. Quando lo giochi, sblocca la Caverna delle Meraviglie rimuovendo il Segnalino Lucchetto dal Luogo."
+      },
+      {
+        "title": "Tutto a portata di mano",
+        "text": "Alcune carte di Jafar gli permettono di recuperare carte dalla pila degli scarti. Dopo averlo fatto, potresti avere più di quattro carte in mano. Anche se non ci sono limiti al numero di carte nella tua mano durante il turno, potrai pescare carte nuove solamente se alla fine del turno ne avrai meno di quattro, o meno di cinque se hai giocato l'Amuleto dello Scarabeo."
+      },
+      {
+        "title": "Lampada Magica",
+        "text": "Dopo che la Caverna delle Meraviglie è stata sbloccata, puoi giocare la Lampada Magica in quel Luogo. Quando giochi la Lampada Magica, trova il Genio e giocalo nella Caverna delle Meraviglie.\n\nNote: Se quando la Lampada Magica viene giocata il Genio si trova sotto il controllo di Jafar, il Genio torna nella parte superiore della Plancia e smette di essere sotto il controllo di Jafar."
+      },
+      {
+        "title": "Ottieni ciò che ti serve",
+        "text": "Ti servirà giocare le carte Amuleto dello Scarabeo e Lampada Magica il prima possibile. Carte come Chiaroveggenza e Gazeem ti aiuteranno a trovarle."
+      },
+      {
+        "title": "Sotto il tuo controllo",
+        "text": "Jafar è in grado di Ipnotizzare gli Eroi, sconfiggendoli e trasformandoli in Alleati. Quando ipnotizzi un Eroe, scarta qualsiasi Desiderio a loro assegnato e muovi l'Eroe nella parte bassa della tua Plancia. Non sarà più considerato come un Eroe, ma sarà invece trattato a tutti gli effetti come un Alleato con la stessa Forza. Quando un Eroe ipnotizzato viene usato per sconfiggere un altro Eroe, entrambi vengono scartati nella pila degli scarti del Mazzo Fato."
+      },
+      {
+        "title": "Abilità Attivate",
+        "text": "Jafar ha a disposizione alcune carte che possiedono Abilità Attivate. Leggi nel regolamento come funzionano queste carte.\n\nIago può essere usato per muovere la Lampada Magica verso il Palazzo del Sultano. Il Bastone del Serpente può aiutarti a prendere una carta Ipnotizzare nel momento in cui sei pronto a portare il Genio sotto il tuo controllo. La Clessidra Gigante indebolisce gli Eroi, in modo da rendere più semplice ipnotizzarli o sconfiggerli."
+      }
+    ]
+  },
+  "Davy Jones": {
+    "objective": "Il quasi immortale Davy Jones, capitano dell'Olandese Volante, è il giudice della vita e della morte sui mari. Quando ha il controllo di tutti i suoi oggetti mistici, non solo governa i mari, ma è venerato e temuto da tutti coloro che navigano in quelle acque. Ora Jack Sparrow ha dato il via a una serie di eventi che costringono Davy Jones a trovare e recuperare i suoi tesori sparsi tra gli Eroi. Davy Jones deve trovare gli Eroi e raccogliere i suoi tesori per prendere il posto che gli spetta come sovrano assoluto di tutti i mari!",
+    "sections": [
+      {
+        "title": "Preparazione dei Tesori Perduti",
+        "text": "Posiziona i cinque segnalini Tesoro a faccia in giù al lato del tuo Reame e poi mescolali. Davy Jones piazza un segnalino Tesoro a faccia in giù sugli Eroi quando gioca le carte Temi tu la morte? e Sono qui."
+      },
+      {
+        "title": "Raccogliere il Tesoro",
+        "text": "Per raccogliere un Tesoro, Davy Jones deve prima rivelarlo e poi sconfiggere l'Eroe a cui è assegnato. Alcune carte, come Sputafuoco Bill, Hadras e La Macchia Nera, rivelano i segnalini a faccia in giù. Un Eroe può avere un solo segnalino Tesoro assegnato per volta.\n\nSe Davy Jones sconfigge un Eroe con un segnalino Tesoro a faccia in giù, quel segnalino torna nella riserva di segnalini iniziale."
+      }
+    ]
+  }
+}

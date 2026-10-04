@@ -62,6 +62,19 @@
   <div id="csFaq"></div>
 </main>
 
+<!-- Villain Guide sheet (opened from the objective); before the card sheet so a
+     card opened from the guide stacks on top of it -->
+<div class="overlay" id="guideOverlay" onclick="if(event.target===this) closeOverlay('guideOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="guideTitle" data-i18n>Villain guide</h3>
+      <button class="sheet-close" onclick="closeOverlay('guideOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="guideBody"></div>
+  </div>
+</div>
+
 <!-- Card detail sheet (opened from a deck row) -->
 <div class="overlay" id="cardOverlay" onclick="if(event.target===this) closeOverlay('cardOverlay')">
   <div class="sheet">

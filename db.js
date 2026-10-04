@@ -119,24 +119,28 @@ async function _fetchJson(url) {
   }
 }
 
-// Merge a translation over the English data: objects merge key by key (so a
-// missing villain or entry falls back to English), anything else is replaced.
-function _mergeLocalized(base, over) {
-  if (!over || typeof over !== 'object' || Array.isArray(over)
-      || !base || typeof base !== 'object' || Array.isArray(base)) return over ?? base;
+// TRANSLATED DATA: one rule for every file. The English file is the default;
+// `<file>.<LANG>.json` holds translated entries, and each translated entry
+// replaces its English entry as a whole (never a mix of the two). Entries it
+// doesn't have stay English; in English the translation file isn't read.
+// `depth` says where entries sit: 1 = top-level keys (a villain's objective or
+// guide), 2 = one level down (faq.json's villains.<name>).
+function _mergeLocalized(base, over, depth) {
   const out = { ...base };
-  for (const k of Object.keys(over)) out[k] = k in base ? _mergeLocalized(base[k], over[k]) : over[k];
+  for (const k of Object.keys(over)) {
+    const both = depth > 1 && base[k] && typeof base[k] === 'object' && !Array.isArray(base[k])
+      && over[k] && typeof over[k] === 'object' && !Array.isArray(over[k]);
+    out[k] = both ? _mergeLocalized(base[k], over[k], depth - 1) : over[k];
+  }
   return out;
 }
 
-// A data file in the current language: `faq.json` plus `faq.it.json` merged
-// over it when the site is in Italian. No translation file → English as is.
-async function _fetchJsonLocalized(url) {
+async function _fetchJsonLocalized(url, depth = 1) {
   const base = await _fetchJson(url);
   if (LANG === 'en') return base;
   try {
     const r = await fetch(url.replace(/\.json$/, `.${LANG}.json`));
-    return r.ok ? _mergeLocalized(base, await r.json()) : base;
+    return r.ok ? _mergeLocalized(base, await r.json(), depth) : base;
   } catch (_) { return base; }
 }
 
@@ -151,8 +155,17 @@ async function loadObjectives() {
 // faq.it.json (same shape) replaces what it covers; villains it lacks stay English.
 let _faq = null;
 async function loadFaq() {
-  if (!_faq) _faq = await _fetchJsonLocalized(DATA_FAQ_URL);
+  if (!_faq) _faq = await _fetchJsonLocalized(DATA_FAQ_URL, 2);
   return _faq;
+}
+
+// Villain Guides from the game boxes: { villain: { objective?, sections: [{ title,
+// text }] } }; `objective` explains the objective (objectives.json), texts split
+// paragraphs by blank lines. Translated per villain (villain-guides.it.json).
+let _guides = null;
+async function loadVillainGuides() {
+  if (!_guides) _guides = await _fetchJsonLocalized(DATA_GUIDES_URL);
+  return _guides;
 }
 
 // Villain decks from the Disney Villainous Wiki: name -> [{ name, count, type }].

@@ -1,0 +1,150 @@
+{
+  "Captain Hook": {
+    "objective": "In order to achieve this objective, you must unlock the Hangman's Tree location by playing the Never Land Map. Peter Pan must be played, either by you or an opponent, to Hangman's Tree. You will then need to move him to Mermaid Lagoon, then to Skull Rock, and finally to the Jolly Roger, where you must defeat him to win the game.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place a Lock Token on Hangman's Tree, as that location is locked at the beginning of the game."
+      },
+      {
+        "title": "Peter Pan",
+        "text": "When Peter Pan is revealed, he must immediately be played to Hangman's Tree, even if Hangman's Tree is still locked. If Peter Pan is one of the two cards drawn by an opponent while performing a Fate action targeting you, the opponent must play Peter Pan and discard the other card."
+      },
+      {
+        "title": "Never Land Map",
+        "text": "When you play the Never Land Map, unlock Hangman's Tree by removing the Lock Token from the location.\n\nImportant: Peter Pan may not be moved from Hangman's Tree until it is unlocked."
+      },
+      {
+        "title": "Controlling Your Fate",
+        "text": "Unlike other Villains, Captain Hook can play and discard cards from his own Fate deck using Worthy Opponent, Give Them a Scare, and Obsession. Using these cards will help you reveal Peter Pan and bring him into your Realm as soon as possible."
+      },
+      {
+        "title": "Extra Actions",
+        "text": "Cannon, Hook's Case, and Ingenious Device are Items that add extra action symbols to your Realm. After the Item has been played to a location, you may perform the extra action in addition to the other available actions there.\n\nExample: If Cannon has been played to Skull Rock, you may perform five actions when you are at Skull Rock: its four action symbols plus the Vanquish action from Cannon."
+      }
+    ]
+  },
+  "Maleficent": {
+    "sections": [
+      {
+        "title": "Curses",
+        "text": "Curse is a card type unique to Maleficent. Curses are played to locations, and each one has an Ability that affects Heroes at that location. However, each Curse also has an action that will cause it to be discarded, so you'll need to strategize when and where to play each Curse.\n\nMultiple Curses may be played to the same location, and a Curse may be moved using a Move an Item or Ally action.\n\nThe three Curses are Forest of Thorns, Green Fire, and Dreamless Sleep."
+      },
+      {
+        "title": "Forest of Thorns",
+        "text": "Forest of Thorns makes it difficult for opponents to play a Hero at its location because a Hero must have a Strength of 4 or more to be played there.\n\nBeware: If a qualifying Hero is played to its location, Forest of Thorns is discarded."
+      },
+      {
+        "title": "Green Fire",
+        "text": "Green Fire is a very powerful Curse because Heroes cannot be played to its location.\n\nBeware: If Maleficent ever moves to its location, Green Fire is discarded."
+      },
+      {
+        "title": "Dreamless Sleep",
+        "text": "Dreamless Sleep reduces the Strengths of all Heroes at its location by 2.\n\nBeware: If you play an Ally to its location, Dreamless Sleep is discarded.\n\nNote: You may move an Ally to a location with Dreamless Sleep without having to discard the Curse. Also, you can play Dreamless Sleep to a location that already has Allies without affecting the Allies or the Curse."
+      },
+      {
+        "title": "Other Cards",
+        "text": "Vanish allows Maleficent to remain at a location, enabling her to take the same actions two turns in a row.\n\nRaven is a powerful Ally to play as early as possible. At the start of each turn, you may move Raven and perform one action that is available at his new location.\n\nNote: Raven may not take Fate actions."
+      }
+    ]
+  },
+  "Prince John": {
+    "objective": "Prince John is all about greed, so he needs to accumulate Power. However, as tempting as it might be to save all the Power you can, you will need to spend some Power in order to win.\n\nSeveral Heroes can hinder Prince John's ability to gain Power. It is a good idea to play Allies, even before any Heroes have been played. By doing so, you will be prepared to Vanquish a Hero that is affecting your progress.",
+    "sections": [
+      {
+        "title": "The Jail",
+        "text": "Prince John's Realm has a location that can be used to his advantage. The Jail does not have any action symbols that can be covered by Heroes, making Heroes at that location less disruptive. Prince John has Imprison cards which allow him to move Heroes to The Jail in order to make actions available elsewhere.\n\nNote: When at The Jail, Heroes' Abilities are still in effect."
+      },
+      {
+        "title": "It's Good to Be the King!",
+        "text": "Although Heroes can be disruptive to his plans, Prince John has several tricks up his sleeve. Cards such as Warrant, Sheriff of Nottingham, and Beautiful, Lovely Taxes allow him to profit from having Heroes in his Realm. Sometimes it pays to keep your enemies close!"
+      },
+      {
+        "title": "Special Fate Cards",
+        "text": "When Steal from the Rich is played, 4 Power is taken from Prince John and placed on any one Hero that is in his Realm. When a Hero that has Power on them is defeated, Prince John takes all of the Power back.\n\nThe same Hero may be used to Steal from the Rich multiple times, which can lead to a big payoff when the Hero is defeated!"
+      },
+      {
+        "title": "Robin Hood",
+        "text": "While Robin Hood is in Prince John's Realm, every time Prince John gains Power due to an action or card, he gains 1 less Power than he would normally gain. It is usually a good idea to defeat Robin Hood as soon as possible!"
+      },
+      {
+        "title": "Little John",
+        "text": "When Little John is played, 4 Power is taken from Prince John and placed on Little John's card. When Little John is defeated, Prince John takes all of the Power back. Waiting for just the right time to defeat Little John can help set up an unexpected victory!"
+      }
+    ]
+  },
+  "Jafar": {
+    "objective": "To achieve Jafar's Objective, you must unlock the Cave of Wonders with the Scarab Pendant. Then the Magic Lamp must be played to the Cave of Wonders, which also brings Genie to the same location. You must Hypnotize Genie, which puts Genie under Jafar's control, and move the Magic Lamp to Sultan's Palace.\n\nImportant: To win, the Magic Lamp must be on your side of the Board.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place a Lock Token on the Cave of Wonders, as that location is locked at the beginning of the game."
+      },
+      {
+        "title": "Scarab Pendant",
+        "text": "Playing the Scarab Pendant is the first step to achieving victory. When you play the Scarab Pendant, unlock the Cave of Wonders by removing the Lock Token from the location. Additionally, while the Scarab Pendant is in your Realm, you may draw an extra card at the end of each turn."
+      },
+      {
+        "title": "Magic Lamp",
+        "text": "After the Cave of Wonders has been unlocked, you may play the Magic Lamp to that location. When you play the Magic Lamp, immediately find Genie and play him to the Cave of Wonders.\n\nNote: If Genie is under Jafar's control when the Magic Lamp is played, he is no longer under Jafar's control."
+      },
+      {
+        "title": "Get What You Need",
+        "text": "You will want to play the Scarab Pendant and the Magic Lamp as soon as possible. Scrying and Gazeem are cards that can help you find them."
+      },
+      {
+        "title": "Under Your Control",
+        "text": "Jafar is able to Hypnotize Heroes. When you Hypnotize a Hero, you defeat them and move them to the bottom of your Board. The Hypnotized Hero is now under your control and is treated as an Ally with the same Strength. When a Hypnotized Hero is used to defeat another Hero, they are both discarded to the Fate discard pile."
+      },
+      {
+        "title": "Activated Abilities",
+        "text": "Jafar has some cards with Activated Abilities. See the Instructions for details on how cards with Activated Abilities are played and their Abilities activated.\n\nIago may be used to move the Magic Lamp toward Sultan's Palace. Snake Staff can help you get a Hypnotize card when you are ready to put Genie under your control. Giant Hourglass weakens Heroes to make them easier to Hypnotize or defeat."
+      }
+    ]
+  },
+  "Queen of Hearts": {
+    "sections": [
+      {
+        "title": "Activated Abilities",
+        "text": "Queen of Hearts has some cards with Activated Abilities, such as Card Guard and Stopwatch. See the Instructions for details on how cards with Activated Abilities are played and their Abilities activated."
+      },
+      {
+        "title": "Card Guards / Wickets",
+        "text": "Card Guards are played like other Allies, and may be used to defeat Heroes. However, if you activate a Card Guard's Activated Ability, it is converted into a Wicket and is no longer considered a Card Guard. Rotate the card 90 degrees to indicate that it is a Wicket.\n\nWickets may not be used to defeat Heroes. However, you may convert a Wicket back to a Card Guard by activating its Ability again.\n\nNote: A Wicket is still considered to be an Ally. Their Strength is affected by any Abilities on cards that are in your Realm. In addition, Spears may be added to Wickets to increase their Strength, thereby increasing your chances of successfully taking a shot."
+      },
+      {
+        "title": "Take the Shot",
+        "text": "If there is at least one Wicket at each location in your Realm, you may play Take the Shot to attempt to win the game. Reveal the top five cards of your Villain deck and add up the total Cost of those cards. If the total Cost of the revealed cards is lower than the total Strength of all of the Wickets in your Realm, then you make the shot and win the game! If you do not make the shot, discard the five revealed cards and try again later."
+      },
+      {
+        "title": "Shrinking Heroes",
+        "text": "Makes You Smaller and Fury allow Queen of Hearts to Shrink Heroes. When a Hero is Shrunk, rotate the Hero 45 degrees so that only one action symbol is covered by the corner of the card, leaving the other action available.\n\nIf there are multiple Heroes at a location with a Shrunken Hero, the Shrunken Hero is the only Hero that covers up an action symbol. The other Heroes do not cover any actions until the Shrunken Hero is moved or defeated."
+      },
+      {
+        "title": "Enlarging Heroes",
+        "text": "When an opponent plays Makes You Larger, they choose a Hero in your Realm and Enlarge it. The Hero card is rotated 90 degrees so that it covers one action symbol at an adjacent location in addition to the two action symbols at the Hero's location. Your opponent chooses which action to cover."
+      }
+    ]
+  },
+  "Ursula": {
+    "objective": "Important: To win, the Trident and the Crown must be on your side of the Board.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place a Lock Token on The Palace, as that location is locked at the beginning of the game."
+      },
+      {
+        "title": "Changing Form",
+        "text": "Ursula's Realm has a locked location, but it functions differently than in other Villains' Realms. The Lock Token is never removed from Ursula's Realm.\n\nEach time you play Change Form, the Lock Token is moved between The Palace and Ursula's Lair, unlocking one location and locking the other.\n\nBoth locations have useful actions, so choosing when to play Change Form is very important."
+      },
+      {
+        "title": "The Trident",
+        "text": "When you play the Trident, immediately find King Triton and play him to the same location. Then move the Trident to the other side of the Board and attach it to King Triton.\n\nWhen King Triton is defeated, the Trident is returned to your side of the Board at the location King Triton was defeated."
+      },
+      {
+        "title": "Binding Contracts",
+        "text": "Ursula is unique in that she does not have a Vanquish action in her Realm. Instead, Ursula defeats Heroes by using Binding Contracts. When you play a Binding Contract, attach it to a Hero. (Binding Contracts are one of the rare instances where an Item from the Villain deck can be attached to a Hero.)\n\nEach Binding Contract is tied to a location in Ursula's Realm. A Hero with a Binding Contract attached to them is defeated when they are moved to the location specified on the card. Discard the Hero to your Fate discard pile and discard the Binding Contract to your Villain discard pile.\n\nExample: A Hero with the Binding Contract for The Shore attached is defeated when you move them to The Shore."
+      }
+    ]
+  }
+}
