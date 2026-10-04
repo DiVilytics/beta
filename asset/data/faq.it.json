@@ -280,7 +280,7 @@
   },
   "general": [
     {
-      "title": "Regole generali",
+      "title": "Approfondimenti sulle regole base",
       "items": [
         {
           "term": "Inizio del turno",
@@ -292,11 +292,11 @@
         },
         {
           "term": "Eroi con Forza 0",
-          "text": "Un Eroe con Forza 0 può essere sconfitto con un'azione Scontro senza necessariamente impiegare Alleati. Se lo si desidera, però, si possono comunque impiegare degli Alleati. In quel caso, gli Alleati non vengono scartati dopo l'azione Scontro."
+          "text": "Quando sconfiggi con uno Scontro un Eroe con Forza 0, puoi comunque impiegare degli Alleati, se lo desideri. In quel caso, gli Alleati non vengono scartati dopo l'azione Scontro."
         },
         {
           "term": "Luoghi bloccati",
-          "text": "Oggetti, Alleati ed Eroi non possono essere giocati né mossi in luoghi bloccati. Non si possono assegnare Oggetti ad Eroi o Alleati in luoghi bloccati. Non si possono attivare Oggetti in luoghi bloccati."
+          "text": "Non si possono assegnare Oggetti ad Eroi o Alleati in luoghi bloccati. Non si possono attivare Oggetti in luoghi bloccati."
         },
         {
           "term": "Niente sotto lo zero",
@@ -304,7 +304,7 @@
         },
         {
           "term": "Trovare una carta",
-          "text": "Quando una carta istruisce di TROVARE un'altra carta bisogna nell'ordine cercare prima nel Reame, poi nella relativa pila degli scarti, poi nel relativo mazzo."
+          "text": "L'ordine di ricerca per trovare un Eroe vale per qualsiasi carta che si debba TROVARE: prima nel Reame, poi nella relativa pila degli scarti, poi nel relativo mazzo."
         },
         {
           "term": "Mostrare le carte recuperate",

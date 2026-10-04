@@ -701,6 +701,7 @@ main {
 .cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: 12px; letter-spacing: 0.06em; }
 /* The card type written in its color (no dot); the count after it stays grey. */
 .cs-deck-type { color: var(--deck-c); }
+.cs-kw { color: var(--deck-c); font-weight: 600; }
 .cs-deck-title { display: flex; justify-content: space-between; gap: 8px; }
 /* Each row is a button opening the card sheet. */
 .cs-deck-row {
@@ -721,6 +722,7 @@ main {
 .cs-card-stat span { font-size: 11px; color: var(--muted); }
 .cs-card-stat strong { font-size: 14px; font-weight: 600; color: var(--text); }
 .cs-card-stat strong.cs-deck-type { color: var(--deck-c); }
+.cs-kw { color: var(--deck-c); font-weight: 600; }
 .cs-card-text p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
 .cs-card-empty { color: var(--muted) !important; font-style: italic; }
 .cs-card-back { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }

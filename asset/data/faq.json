@@ -124,14 +124,14 @@
   },
   "general": [
     {
-      "title": "Core rules",
+      "title": "More on the core rules",
       "items": [
         { "term": "Starting a turn", "text": "Once you move your mover to a new location, your turn has officially begun. To keep tournament play running smoothly, you can take back your move (and go to a different location) only if you have NOT yet taken any action at the new location. If you have taken even one action there, you must stay and carry on with your remaining actions." },
         { "term": "Playing a Condition", "text": "You can't play a Condition unless you can do exactly what its text says." },
-        { "term": "0-Strength Heroes", "text": "A Hero with 0 Strength can be defeated with a Vanquish action without using Allies. You can still use Allies if you want; in that case they are not discarded after the Vanquish." },
-        { "term": "Locked locations", "text": "Items, Allies and Heroes can't be played or moved to locked locations. Items can't be attached to Heroes or Allies at locked locations, and Items at locked locations can't be activated." },
+        { "term": "0-Strength Heroes", "text": "When you Vanquish a Hero with 0 Strength, you can still use Allies if you want. They aren't discarded after the Vanquish." },
+        { "term": "Locked locations", "text": "Items can't be attached to Heroes or Allies at a locked location, and Items at a locked location can't be activated." },
         { "term": "Nothing below zero", "text": "No value in the game can go below zero." },
-        { "term": "Finding a card", "text": "When a card tells you to FIND another card, look first in the Realm, then in the matching discard pile, then in the matching deck." },
+        { "term": "Finding a card", "text": "The search order for finding a Hero applies to any card a card tells you to FIND: first the Realm, then the matching discard pile, then the matching deck." },
         { "term": "Showing retrieved cards", "text": "To be fair to your opponents, when you retrieve a card of a specific category (Effect, Ally, etc.) from a discard pile or a deck, show it to them to prove it's the right kind. If you can retrieve any card, you don't need to show it." },
         { "term": "Endless searches", "text": "Cards that reveal from a deck until a card of a specific type is found can loop forever if no copies of that card are left in the deck or discard pile. In that case the card can still be played, but its only effect is to reshuffle that whole deck, discard pile included.", "source": "Lord of the Board, playtester" },
         { "term": "Discard-based Conditions", "text": "Conditions that trigger when an opponent discards cards can be used only when the opponent discards cards from their hand, either with the Discard Cards action or through other cards' effects (such as the Evil Queen's Magic Tomes). Discarding cards in any other way doesn't trigger them." }

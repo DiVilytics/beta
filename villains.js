@@ -675,8 +675,63 @@ function _cardMetaHTML(c) {
   return parts.length ? `<span class="cs-deck-meta">${parts.join(' | ')}</span>` : '';
 }
 
+// Card type keywords in card texts, singular and plural, English and Italian,
+// colored like their card type (as on the printed cards). Capitalized only, the
+// way the cards write them, so plain words stay as they are. The five base types
+// are colored for every villain; a special type (Witch, Titan, Prince…) only for
+// the villain whose deck has it. Ally/Item and Hero/Effect are covered by their
+// parts. A keyword inside a mentioned card name ("Le Streghe di Morva", "Il
+// Principe", "Omnidroide v.10") stays plain: it names a card, not a type.
+const BASE_CARD_TYPES = ['Ally', 'Hero', 'Effect', 'Item', 'Condition'];
+let _keywordRe    = null;
+let _keywordClass = {};
+let _cardNameRe   = null;   // the shown deck's card names that contain a keyword
+
+const _reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// The shown villain's keywords (each type's English and current-language forms)
+// and the card names to leave plain (English and shown, with or without article).
+function _setCardKeywords(deck) {
+  const types = new Set(BASE_CARD_TYPES);
+  const cards = [...(deck.villain || []), ...(deck.fate || []), ...(deck.extra || []).flatMap(e => e.cards)];
+  for (const c of cards) if (!c.type.includes('/')) types.add(c.type);
+  _keywordClass = {};
+  for (const type of types) {
+    const plural = DECK_PLURAL[type] || `${type}s`;
+    for (const w of [type, plural, t(type), t(plural)]) _keywordClass[w] = DECK_TYPE_COLOR[type] || 'other';
+  }
+  const words = Object.keys(_keywordClass).sort((a, b) => b.length - a.length);
+  _keywordRe = new RegExp(`(?<!\\p{L})(${words.join('|')})(?!\\p{L})`, 'gu');
+
+  const anyCase = new RegExp(_keywordRe.source, 'giu');
+  const names = new Set();
+  for (const c of cards) for (const n of [c.name, _cardName(c.name)]) {
+    if (!anyCase.test(n)) continue;
+    anyCase.lastIndex = 0;
+    names.add(_esc(n));
+    const bare = n.replace(/^(the|il|lo|la|i|gli|le)\s+|^l'/i, '');
+    if (bare !== n) names.add(_esc(bare));
+  }
+  _cardNameRe = names.size
+    ? new RegExp(`(?<!\\p{L})(${[...names].sort((a, b) => b.length - a.length).map(_reEsc).join('|')})(?!\\p{L})`, 'giu')
+    : null;
+}
+
+// Merlin's Transformations are Fate cards, so they take the Hero color, as
+// printed: "Merlin Transformation", "Trasformazione di Merlino".
+const _isMerlinForm = (w, at, str) => /^Trasformazion|^Transformation/.test(w)
+  && (str.slice(Math.max(0, at - 7), at) === 'Merlin ' || str.startsWith(' di Merlino', at + w.length));
+
+function _colorKeywords(html) {
+  if (!_keywordRe) return html;
+  const names = _cardNameRe ? [...html.matchAll(_cardNameRe)].map(m => [m.index, m.index + m[0].length]) : [];
+  const inName = at => names.some(([a, b]) => at >= a && at < b);
+  return html.replace(_keywordRe, (w, _, at, str) => inName(at) ? w
+    : `<span class="cs-kw deck-${_isMerlinForm(w, at, str) ? 'hero' : _keywordClass[w]}">${w}</span>`);
+}
+
 const _cardTextHTML = text => text
-  ? text.split('\n\n').map(p => `<p>${_esc(p).replace(/\n/g, '<br>')}</p>`).join('')
+  ? text.split('\n\n').map(p => `<p>${_colorKeywords(_esc(p)).replace(/\n/g, '<br>')}</p>`).join('')
   : `<p class="cs-card-empty">${t('No ability text.')}</p>`;
 
 function openCardSheet(i) {
@@ -777,6 +832,7 @@ async function renderDeck(charName) {
   if (!deck) { el.innerHTML = ''; return; }
   _cardNameMap = names[charName] || {};
   _cardTextMap = texts[charName] || {};
+  _setCardKeywords(deck);
   _deckCards = [];
   el.innerHTML = _deckHTML('Villain deck', deck.villain)
     + _deckHTML('Fate deck', deck.fate)
