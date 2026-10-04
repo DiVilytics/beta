@@ -652,8 +652,9 @@ const _cardTotal = cards => cards.reduce((n, c) => n + c.count, 0);
 // Cards of the rendered decks, indexed by the rows' openCardSheet(i).
 let _deckCards = [];
 
-// The shown villain's card names in the current language (loadCardNames);
-// a [TAG] rework uses its base villain's names plus any of its own.
+// The shown villain's card names in the current language (loadCardNames). A
+// [TAG] rework is a separate villain with its own entries (shared cards are
+// duplicated in the data), never borrowing from its base villain.
 let _cardNameMap = {};
 const _cardName = name => _cardNameMap[name] || name;
 // Same for card texts: the Italian text when transcribed, else the wiki's English.
@@ -772,9 +773,8 @@ async function renderDeck(charName) {
   const [decks, names, texts] = await Promise.all([loadVillainDecks(), loadCardNames(), loadCardTexts()]);
   const deck = decks[charName];
   if (!deck) { el.innerHTML = ''; return; }
-  const baseName = charName.replace(/\s*\[[^\]]+\]$/, '');
-  _cardNameMap = { ...names[baseName], ...names[charName] };
-  _cardTextMap = { ...texts[baseName], ...texts[charName] };
+  _cardNameMap = names[charName] || {};
+  _cardTextMap = texts[charName] || {};
   _deckCards = [];
   el.innerHTML = _deckHTML('Villain deck', deck.villain)
     + _deckHTML('Fate deck', deck.fate)

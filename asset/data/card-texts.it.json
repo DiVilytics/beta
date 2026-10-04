@@ -166,5 +166,32 @@
     "Aurora": "Quando Aurora viene giocata, rivela la prima carta del Mazzo Fato di Malefica. Se è un Eroe, giocalo. Altrimenti, rimetti la carta in cima al mazzo.",
     "Fauna": "Quando Fauna viene giocata, puoi scartare Sonno senza Sogni dal Luogo in cui lei si trova.",
     "King Stefan": "Quando Re Stefano viene giocato, puoi muovere Malefica in un Luogo a tua scelta."
+  },
+  "Captain Hook": {
+    "Aye, Aye, Sir!": "Muovi un Alleato in un Luogo adiacente e sbloccato. Quell'Alleato ottiene +2 Forza fino alla fine del tuo turno.",
+    "Worthy Opponent": "Ottieni 2 Segnalini Potere. Rivela carte dalla cima del tuo Mazzo Fato finché non riveli un Eroe. Gioca quell'Eroe e scarta il resto.",
+    "Cunning": "Durante il suo turno, se un altro giocatore ha un Alleato con forza 4 o superiore, puoi giocare Astuzia. Gioca un Alleato dalla tua mano gratuitamente.",
+    "Give Them a Scare": "Guarda le prime due carte del tuo Mazzo Fato. Scartale entrambe o rimettile in cima al mazzo nell'ordine che preferisci.",
+    "Never Land Map": "Quando la Mappa dell'Isola che non c'è viene giocata, sblocca l'Albero dell'Impiccato.\n\nLa prossima volta che giochi un Oggetto, puoi scartare la Mappa dell'Isola che non c'è al posto di pagare il costo di quell'Oggetto.",
+    "Obsession": "Durante il suo turno, se un altro giocatore sconfigge un Eroe con forza 4 o superiore, puoi giocare Ossessione. Rivela carte dalla cima del tuo Mazzo Fato finché non riveli un Eroe. Gioca o scarta questo Eroe. Scarta il resto delle carte.",
+    "Hook's Case": "Questo Luogo ottiene: azione Ottenere 1 Potere.",
+    "Cutlass": "Quando la Sciabola viene giocata, assegnala a un Alleato. Quell'Alleato ottiene +2 Forza.",
+    "Ingenious Device": "Questo Luogo ottiene: azione Muovere un Eroe.",
+    "Cannon": "Questo Luogo ottiene: azione Scontro.",
+    "Pirate Brute": "Nessuna abilità addizionale.",
+    "Boarding Party": "Quando svolgi un'azione Scontro, la Banda d'Arrembaggio può essere usata per sconfiggere un Eroe nel Luogo in cui si trova o in un Luogo adiacente e sbloccato.",
+    "Smee": "Spugna ottiene +2 Forza se si trova nella Jolly Roger.",
+    "Mr. Starkey": "Quando giochi Mr. Starkey, puoi muovere un Eroe dal suo Luogo a uno adiacente e sbloccato.",
+    "Swashbuckler": "Nessuna abilità addizionale.",
+    "Lost Boys": "Per sconfiggere i Bimbi Sperduti, devi utilizzare almeno due Alleati.",
+    "Wendy": "Tutti gli altri Eroi nel Reame di Capitan Uncino ottengono +1 Forza.",
+    "Tinker Bell": "Quando Trilli viene giocata, puoi scartare un Alleato dal Luogo in cui si trova.",
+    "Peter Pan": "Quando Peter Pan viene rivelato, DEVI IMMEDIATAMENTE GIOCARLO sull'Albero dell'Impiccato, anche se questo è ancora bloccato. Qualsiasi altra carta Fato rivelata durante questa azione va scartata.",
+    "Tick Tock": "Se Capitan Uncino si muove sul Luogo in cui si trova Tic Tac, deve immediatamente scartare tutte le carte della sua mano.",
+    "Michael": "Michele ottiene +1 Forza per ogni Luogo nel Reame di Capitan Uncino che ha un Eroe, incluso il Luogo in cui si trova Michele.",
+    "Taunt": "Quando Schernire viene giocato, assegnalo a un Eroe. Capitan Uncino deve sconfiggere gli Eroi con schernire prima di quelli senza.",
+    "Splitting Headache": "Scarta un Oggetto dal Reame di Capitan Uncino.",
+    "Pixie Dust": "Quando la Polvere di Fata viene giocata, assegnala a un Eroe. Questo Eroe ottiene +2 Forza.",
+    "John": "Gianni ottiene +1 Forza se ha un qualsiasi Oggetto assegnato a sé."
   }
 }

@@ -158,5 +158,51 @@
         "text": "Svanire permette a Malefica di rimanere nel Luogo in cui si trova, consentendole di svolgere le stesse azioni del turno precedente.\n\nIl Corvo è un potente Alleato, da giocare il prima possibile. All'inizio di ogni turno, prima di muovere la Pedina, puoi muovere il Corvo in un Luogo qualsiasi e svolgere una delle azioni lì disponibili.\n\nNota: Il Corvo non può svolgere le azioni Fato."
       }
     ]
+  },
+  "Captain Hook": {
+    "objective": "Per raggiungere questo obiettivo, dovrai sbloccare l'Albero dell'Impiccato, giocando la Mappa dell'Isola che non c'è. Peter Pan deve essere giocato, da te o da un avversario, sull'Albero dell'Impiccato. A quel punto dovrai spostarlo alla Laguna delle Sirene, poi alla Roccia del Teschio e infine alla Jolly Roger, dove dovrai sconfiggerlo per vincere la partita.",
+    "sections": [
+      {
+        "title": "Preparazione speciale",
+        "text": "Piazza un segnalino Lucchetto sull'Albero dell'Impiccato, perché questo luogo è bloccato all'inizio della partita."
+      },
+      {
+        "title": "Peter Pan",
+        "text": "Quando Peter Pan viene rivelato, deve essere immediatamente giocato sull'Albero dell'Impiccato, anche se questo è ancora bloccato. Se Peter Pan è una delle due carte Fato pescate da un giocatore durante un'azione Fato che ha te come bersaglio, l'avversario deve per forza giocare Peter Pan e scartare l'altra carta."
+      },
+      {
+        "title": "La Mappa dell'Isola che non c'è",
+        "text": "Quando giochi la Mappa dell'Isola che non c'è, sblocca l'Albero dell'Impiccato, rimuovendo il Segnalino Lucchetto dal Luogo.\n\nImportante: Peter Pan non può essere mosso al di fuori dell'Albero dell'Impiccato fintanto che questo è ancora bloccato."
+      },
+      {
+        "title": "Controllare il tuo Fato",
+        "text": "A differenza degli altri Cattivi, Capitan Uncino può giocare e scartare carte dal proprio Mazzo Fato usando le carte Degno Avversario, Spaventare e Ossessione. Usando queste carte, sarà più facile rivelare Peter Pan e giocarlo all'Albero dell'Impiccato il prima possibile. Se usi queste carte per giocare un qualsiasi altro Eroe nel tuo Reame, potrai giocarlo in un luogo a tua scelta."
+      },
+      {
+        "title": "Azioni Extra",
+        "text": "Le carte Cannone, Uncino da Cerimonia e Dispositivo Ingegnoso sono Oggetti che aggiungono un simbolo azione extra al tuo Reame. Dopo aver giocato l'Oggetto in un Luogo, potrai eseguire l'azione extra in aggiunta alle altre azioni disponibili in quel Luogo.\n\nEsempio: Se il Cannone viene giocato sulla Roccia del Teschio, potrai svolgere cinque azioni quando sarai in quel Luogo: i suoi quattro simboli azione più l'azione Scontro del Cannone."
+      }
+    ]
+  },
+  "Ursula": {
+    "objective": "Importante: Per vincere, il Tridente e la Corona devono essere dalla tua parte della Plancia.",
+    "sections": [
+      {
+        "title": "Preparazione speciale",
+        "text": "Piazza un Segnalino Lucchetto sul Palazzo, perché questo Luogo è bloccato all'inizio della partita."
+      },
+      {
+        "title": "Trasformazione",
+        "text": "Il Reame di Ursula ha un Luogo bloccato, ma il Segnalino Lucchetto non può mai essere rimosso. Può invece essere spostato, ogni volta che giochi la carta Trasformazione, tra il Palazzo e il Covo di Ursula, sbloccando di volta in volta uno dei due Luoghi. Se sposti il Segnalino Lucchetto nel Luogo in cui ti trovi in quel momento, puoi comunque continuare il tuo turno e svolgere qualsiasi azione rimanente. Non ci puoi però giocare, muovere o attivare nessuna carta.\n\nEntrambi i Luoghi hanno azioni utili, quindi la scelta di quando giocare Trasformazione è molto importante."
+      },
+      {
+        "title": "Il Tridente",
+        "text": "Quando giochi il Tridente, trova immediatamente il Re Tritone e giocalo nello stesso Luogo in cui hai giocato il Tridente. Dopodiché muovi il Tridente nella parte alta della Plancia e assegnalo al Re Tritone.\n\nQuando il Re Tritone viene sconfitto, il Tridente torna sul tuo lato della Plancia, nel Luogo dove il Re Tritone è stato sconfitto."
+      },
+      {
+        "title": "Contratti Vincolanti",
+        "text": "Ursula è unica nel fatto che non ha l'azione Scontro sulla sua plancia. In compenso, sconfigge gli Eroi utilizzando i Contratti Vincolanti.\n\nQuando giochi un Contratto Vincolante, assegnalo a un Eroe. (I Contratti Vincolanti sono uno dei rari casi in cui è possibile assegnare un Oggetto dal Mazzo Cattivo a un Eroe.)\n\nOgni Contratto Vincolante è legato a uno dei Luoghi del Reame di Ursula. Un Eroe con un Contratto Vincolante viene sconfitto quando è mosso sul Luogo indicato dalla carta.\n\nScarta l'Eroe nella pila degli scarti del Mazzo Fato, e il Contratto Vincolante nella pila degli scarti del Mazzo Cattivo.\n\nEsempio: Un Eroe con il Contratto Vincolante della Riva assegnato viene sconfitto quando lo muovi sulla Riva."
+      }
+    ]
   }
 }
