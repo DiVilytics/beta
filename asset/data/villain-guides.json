@@ -146,5 +146,191 @@
         "text": "Ursula is unique in that she does not have a Vanquish action in her Realm. Instead, Ursula defeats Heroes by using Binding Contracts. When you play a Binding Contract, attach it to a Hero. (Binding Contracts are one of the rare instances where an Item from the Villain deck can be attached to a Hero.)\n\nEach Binding Contract is tied to a location in Ursula's Realm. A Hero with a Binding Contract attached to them is defeated when they are moved to the location specified on the card. Discard the Hero to your Fate discard pile and discard the Binding Contract to your Villain discard pile.\n\nExample: A Hero with the Binding Contract for The Shore attached is defeated when you move them to The Shore."
       }
     ]
+  },
+  "Oogie Boogie": {
+    "objective": "Oogie Boogie wants to become the new ruler of Halloween Town. With Jack Skellington trying to take over Christmas, the path is clear for Oogie Boogie to dominate. But soon Jack will know that he truly is the Pumpkin King and will be back to take over. Oogie Boogie must prepare for the fight to come.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place the Sandy Claws card at Oogie Boogie's Lair face up. Set Oogie Boogie's dice off to the side near your Realm."
+      },
+      {
+        "title": "How to Win",
+        "text": "Oogie Boogie knows the only way to become the ruler of Halloween Town is to defeat Jack Skellington, but Jack is the Impostor Sandy Claws. Oogie Boogie must play Impostor Sandy Claws cards from his Villain deck. The more Impostor Sandy Claws cards that are successfully played, the closer Jack is to remembering who he is and coming back to face Oogie Boogie."
+      },
+      {
+        "title": "Impostor Jack",
+        "text": "When Oogie Boogie has successfully removed four Impostor Sandy Claws cards from his deck and placed them in a pile next to Sandy Claws, remove Sandy Claws from the game. Find Jack Skellington and place him in Oogie Boogie's Lair. Place the four Impostor Sandy Claws cards into Oogie Boogie's Villain discard pile."
+      },
+      {
+        "title": "Rolling Dice",
+        "text": "Some of Oogie Boogie's cards allow him to roll his dice. Play the card as normal. Then, roll the dice. The results of the dice are included on the card. Oogie Boogie may not win every roll, but he rarely loses. Even bad rolls result in something that can work in Oogie Boogie's plan for defeating Jack."
+      },
+      {
+        "title": "Dice Hijinx",
+        "text": "Oogie Boogie cheats, especially when it comes to dice rolls. He even has cards that say so! After any dice rolls, Oogie Boogie may play Loaded Dice immediately (no Play a Card action needed). Loaded Dice allows Oogie Boogie to reroll one of the dice he just rolled.\n\nTo slow down the cheating Oogie Boogie, place the Fate card Hello, Oogie! under the Oogie Boogie mover. Hello, Oogie! reduces the next dice roll result by 2, after any rerolls. You may stack Hello, Oogie! cards and subtract that total. Discard Hello, Oogie! after rolling the dice."
+      },
+      {
+        "title": "Changes to Strength",
+        "text": "Use +1/-1 Strength tokens to indicate changes to Hero and Ally Strength."
+      }
+    ]
+  },
+  "Sanderson Sisters": {
+    "objective": "The Sanderson Sisters, Winifred, Mary and Sarah, all want one thing: to live forever! To do this cursed action, they must brew the Life Potion and give it to either Max, Dani, or Allison, the heroes trying to stop them. By cursing Salem and brewing the potion, the Sanderson Sisters will be younger, more beautiful, live forever and be the evilest Villains ever!",
+    "sections": [
+      {
+        "title": "Setup",
+        "text": "Stack the Recipe cards in numerical order near your Realm. Flip the top card so the cards look like a book. Place the Witches' Cauldron tile, the Ingredient tokens, and the Life Potion token near your Realm."
+      },
+      {
+        "title": "Sanderson Sisters",
+        "text": "In addition to the mover, each of the Sanderson Sisters has a Witch card. The Witches have an ability that gives them more strength the more Witches are in play. The Witches are considered Allies."
+      },
+      {
+        "title": "Brewing the Life Potion",
+        "text": "There are 6 pages to creating the Life Potion. You must complete the requirement on each card in order to brew the horrible elixir. When revealing cards, reveal them like a book.\n\nOnce the recipe for the ingredient is completed, take the corresponding token and place it in the Witches' Cauldron, then move on to the next recipe card to add the next ingredient. Only one ingredient can be added per turn."
+      },
+      {
+        "title": "Using the Life Potion",
+        "text": "When you have brewed the Life Potion, attach the token to a Hero in play. If there is no Hero in play, you must attach it to the next Hero played. If that Hero is somehow removed from play, attach it to next Hero that is played.\n\nAll three Witch cards (the Sisters themselves), the Life Potion, and the mover must be in the same location with a Hero. Vanquish the Hero to achieve your Objective.\n\nNote: Binx cannot be defeated with the Life Potion."
+      },
+      {
+        "title": "Hallowed Ground and Salt",
+        "text": "Hallowed Ground has different Fate Item rules. It is attached to a location and not a Hero. It blocks any actions in that location as a Hero does. You cannot take a Vanquish action at a location with Hallowed Ground. Salt works just like any normal Fate Item."
+      }
+    ]
+  },
+  "Prince Hans": {
+    "objective": "As the thirteenth-born son, Prince Hans will weave any story to become the prince of a Realm, and the Realm he is targeting is Arendelle. Using charm, lies, and the unfortunate, never-ending winter caused by Elsa, he pursues his ruthless plan to become the savior of Arendelle! To see his villainous plans come to fruition, he must defeat both Elsa and Anna to take their throne and the kingdom.",
+    "sections": [
+      {
+        "title": "Setup",
+        "text": "Start the game with the Realm on the unfrozen side.\n\nPlace a Frozen Ring token over one action in each location. Place the rest near your board."
+      },
+      {
+        "title": "The Freezing of Arendelle",
+        "text": "Elsa has lost control of her powers and is freezing Arendelle in an endless winter.\n\nPlace Frozen Ring tokens over the various actions in the Realm. Hans can use any uncovered action, frozen or not. You can place Frozen Ring tokens on actions covered by Heroes. Cards like Monster! and Sorcery! help Hans place Frozen Ring tokens on his Realm.\n\nNote: Prince Hans can play a Frozen Ring token to any location if he defeats a Hero in a Vanquish action."
+      },
+      {
+        "title": "The Endless Winter",
+        "text": "Once all sixteen actions on the Realm are covered with Frozen Ring tokens, remove all tokens, note the locations of Prince Hans, Allies and Heroes, then flip over the entire Realm. Place Prince Hans, Allies and Heroes back at the same locations in the Frozen Realm. Place Frozen Ring tokens over two actions in each location. This ends Prince Hans' turn.\n\nHans must again fill actions with Frozen Ring tokens. Once a frozen location has 4 Frozen Ring tokens on it, it is considered fully frozen."
+      },
+      {
+        "title": "The Duke and His Guards",
+        "text": "When Prince Hans moves to the Duke of Weselton's location, you may trigger the Duke's ability any time during that turn.\n\nFrancis' and Erik's abilities are always active and both can be triggered whenever an Effect is played."
+      },
+      {
+        "title": "The Power of Elsa!",
+        "text": "Elsa has a very powerful ability. Prince Hans cannot perform an action at Elsa's location if it has a Frozen Ring token on it. Prince Hans can counter that restriction with I Love Crazy and So Desperate For Love to gain actions."
+      },
+      {
+        "title": "The Sisters",
+        "text": "Once any location is fully frozen, Prince Hans may Vanquish Elsa or Anna there. If either sister is Vanquished at a fully frozen location, they are not discarded. Instead, they are given to Prince Hans to set aside. That character is no longer in the game. Once Prince Hans has both sisters, he truly is the most Villainous of Kings!\n\nNote: Anna and Elsa do not need to be defeated on the same turn or at the same fully frozen location to win the game."
+      }
+    ]
+  },
+  "Ernesto de la Cruz": {
+    "objective": "Ernesto de la Cruz is a beloved musician, actor, performer and hero to many... and above all that he is a backstabbing, song-stealing FRAUD! He maintains his lavish status in the Land of the Dead, but Ernesto's past is beginning to unravel thanks to Miguel Rivera, the rest of the Rivera family, and the one person who lived and died the truth, Héctor Rivera. As long as Ernesto can keep the secret and eliminate the main proof of his crimes (the photo and the memory of Héctor, the real creative genius), he can ensure the world will always remember the Great Hero Ernesto de la Cruz!",
+    "sections": [
+      {
+        "title": "Setup",
+        "text": "Place the photo cards near Ernesto's realm as shown. The top right card should be face down to start the game."
+      },
+      {
+        "title": "The Photo",
+        "text": "The one item that can drag down the powerful Ernesto de la Cruz is the photo of Héctor, Mamá Imelda and Coco Rivera, so it must be destroyed. The photo is destroyed when all six cards are face down.\n\nErnesto has multiple cards in his deck to help him flip sections of the photo. One of the most powerful is Forgetting Me. Choose a card and flip all adjacent cards. It may be two or three cards, depending on what card is chosen.\n\nSeize Your Moment is a powerful card; it allows multiple photo cards to be flipped. Ernesto must discard at least one Ally before discarding any Heroes at that location (including Héctor Rivera)."
+      },
+      {
+        "title": "The Rivera Family",
+        "text": "Miguel is both helpful and harmful to Ernesto de la Cruz, depending on who is playing or moving the card. Flip a card when Miguel is played; he can reveal or hide photo cards. When Miguel is moved, he may reveal or hide photo cards based on his new location."
+      },
+      {
+        "title": "Héctor Rivera",
+        "text": "Ernesto cannot win the game if Héctor is in play, even if all the photo cards are face down. Héctor's Strength is always equal to 1 plus the number of face-up photo cards. His Strength can and will change multiple times during Ernesto's turns. The card's Strength must be confirmed before any Vanquish action occurs."
+      }
+    ]
+  },
+  "Lotso": {
+    "objective": "Lotso wants to keep new toys in the Caterpillar room.\n\nYou need access to all the Strength Modifier tokens.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place Buzz Lightyear at the top of Lotso's Realm in the Caterpillar Room with his Guardian side facing up."
+      },
+      {
+        "title": "Reducing Heroes' Strength",
+        "text": "Lotso has two ways to reduce Heroes' Strength: with Vanquish actions and with cards. To reduce a Hero's Strength, add Strength modifier tokens to the card. For example, to reduce a Hero's Strength to 0, put Strength tokens equal to the Hero's current total Strength on their card.\n\nImportant: Unlike the normal rules, if a Hero in Lotso's Realm is at 0 Strength, they cannot use their ability.\n\nWhen Lotso Vanquishes a Hero, he does not discard them from his Realm. Instead, he reduces their Strength to 0 using Strength tokens. The Hero stays on Lotso's Realm where they are. Lotso still discards the Ally or Allies used in the Vanquish action.\n\nLotso can also reduce Strength with specific cards like Patrolling All Night Long and New Toys Don't Stand A Chance. The Bookworm allows Lotso to lose Power to reduce a Hero's Strength by the same amount. Where's Your Kid Now? allows Lotso to reduce the Strength of any Hero in his location to 0. While Woody's Hat is in Lotso's Realm, it reduces the Strength of all Heroes in Lotso's Realm except Woody."
+      },
+      {
+        "title": "The Caterpillar Room",
+        "text": "Lotso has several ways to move Heroes to the Caterpillar Room and keep them there. Stretch and Welcome to Sunnyside move Heroes into the Caterpillar Room. These can be used at any time regardless of a Hero's Strength."
+      },
+      {
+        "title": "Controlling Lotso's Fate",
+        "text": "Some Heroes are more difficult for Lotso to subdue. For example, Rex's Strength can only be reduced by cards or by a Vanquish action if he is the only Hero in a location. Hamm can only be Vanquished by two or more Allies."
+      },
+      {
+        "title": "Buzz Lightyear",
+        "text": "Depending on his settings, Buzz Lightyear can be either Lotso's Ally or a Guardian of Heroes.\n\nBuzz Lightyear starts as a Guardian. He is not considered a Hero and cannot be targeted by Vanquish actions. Original Factory Settings flips Buzz Lightyear to Demo Mode Buzz Lightyear, Lotso's Ally. Flip over the tile and move Demo Mode Buzz Lightyear to the bottom of Lotso's Realm.\n\nDemo Mode Buzz Lightyear cannot be discarded from Lotso's Realm. Cards targeting Allies, such as Jessie and Lotso Was Special, do not affect Demo Mode Buzz Lightyear. Spanish Mode can flip Buzz Lightyear back to his Guardian side. Flip over the tile and move it back to the top of Lotso's Realm.\n\nEither Buzz Lightyear or Demo Mode Buzz Lightyear must be in the Caterpillar Room for Lotso to win."
+      }
+    ]
+  },
+  "Madam Mim": {
+    "objective": "Win the Wizard's Duel by defeating all of Merlin's Transformations with Mim's Transformations.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Separate Merlin's Transformation deck from Madam Mim's Fate deck. Take the top card from Merlin's Transformation deck and place it face up at the Dueling Ground."
+      },
+      {
+        "title": "Madam Mim's Transformations",
+        "text": "Madam Mim does not have Allies. Instead, she has Transformations, the different animal forms she takes in the Wizard's Duel against Merlin. Merlin also has Transformations, each of which can be defeated by specific Mim Transformations. There are no Heroes in Madam Mim's Fate deck.\n\nMim's Transformations are counted as Allies for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Mim Transformations on her Realm to determine how many \"Allies\" are in her Realm.\n\nThe Move an Item or Ally action allows you to move a Mim Transformation card."
+      },
+      {
+        "title": "Merlin's Transformations",
+        "text": "Merlin's Transformation deck only contains Merlin Transformations. There will always be at least one Merlin Transformation card in Madam Mim's Realm. Once a Merlin Transformation card is defeated, discard the card from your Realm into a separate discard pile just for Merlin Transformation cards. Then, immediately reveal and play a new Merlin Transformation card to the Dueling Ground. If there are no more cards in Merlin's Transformation deck and no Merlin Transformations in Madam Mim's Realm, Madam Mim wins the game.\n\nMerlin's Transformations are counted as Heroes for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Merlin Transformations on her Realm to determine how many \"Heroes\" are in her Realm. Also, if Madam Mim defeats a Merlin Transformation, this counts as defeating a Hero. The Move a Hero action allows you to move a Merlin Transformation card."
+      },
+      {
+        "title": "Madam Mim's Fate Deck",
+        "text": "Madam Mim has few Fate cards. When Madam Mim is the target of a Fate action, her opponent draws from this deck. Since there are so few cards, it may need to be reshuffled often.\n\nArchimedes can interfere with Madam Mim's plans by replacing one Merlin Transformation with another. First, a Merlin Transformation is played to the same location as a Merlin Transformation (or Transformations) already in your Realm. Then, your opponent will choose one of the Merlin Transformations at that location and shuffle it back into Merlin's deck."
+      },
+      {
+        "title": "A Wizard's Duel",
+        "text": "Madam Mim has no Vanquish actions. Instead, each of her Transformations adds a Vanquish action to its location.\n\nEach of Mim's Transformations can only defeat specific Merlin Transformations:\n\n• Crocodile Mim Vanquishes Turtle Merlin\n\n• Fox Mim Vanquishes Rabbit Merlin\n\n• Chicken Mim Vanquishes Caterpillar Merlin\n\n• Elephant Mim Vanquishes Walrus Merlin\n\n• Tiger Mim Vanquishes Mouse Merlin\n\n• Rattlesnake Mim Vanquishes Mouse Merlin\n\n• Rhinoceros Mim Vanquishes Crab Merlin\n\n• Purple Dragon Mim Vanquishes Goat Merlin\n\nI'll Make the Rules allows Madam Mim to defeat any Merlin Transformation in play."
+      }
+    ]
+  },
+  "Syndrome": {
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place Omnidroid v.X8 at Nomanisan Island at the bottom of Syndrome's Realm. Set the Omnidroid v.X9 tile on top of the Omnidroid v.10 tile and place both to the right side of your Realm."
+      },
+      {
+        "title": "Using Omnidroids",
+        "text": "Syndrome can use Omnidroids in a Vanquish action, along with any Allies. All Omnidroids can be moved using the Move an Item or Ally action while at the bottom of Syndrome's Realm. Syndrome cannot move Omnidroids at the top of his Realm."
+      },
+      {
+        "title": "Defeating an Omnidroid",
+        "text": "Omnidroid v.X8 and Omnidroid v.X9 have a unique ability that triggers only after they have been defeated in a Vanquish action. Once Vanquished, use their Ability before removing the tile. That tile will no longer be used in this game. Omnidroid v.X8 must be defeated before Omnidroid v.X9 is played, and Omnidroid v.X9 must be defeated before Omnidroid v.10 can be played."
+      },
+      {
+        "title": "Upgrading Omnidroids",
+        "text": "Upgrade to Omnidroid v.X9 or v.10 by removing the correct number of Major Modifications from your Realm and placing the new Omnidroid tile in the location indicated. This is a free action with no Power Cost and can be done anytime during Syndrome's turn. Place removed cards into the discard pile.\n\nImportant: There can never be more than one Omnidroid card in Syndrome's Realm at any time."
+      },
+      {
+        "title": "Syndrome's Remote",
+        "text": "Syndrome cannot win the game unless Syndrome's Remote is in his Realm. When Syndrome is in Omnidroid v.10's location and Syndrome's Remote is at the bottom of his Realm, he must activate the Remote to defeat Omnidroid v.10.\n\nWhen a Hero is played to Syndrome's Realm, attach Syndrome's Remote to them and immediately move Omnidroid v.10 to the bottom of Syndrome's Realm at the same location of the Hero with Syndrome's Remote.\n\nOnce a Hero with Syndrome's Remote has been defeated, Syndrome's Remote moves back to the bottom of Syndrome's Realm. Omnidroid v.10 then moves to the top of Syndrome's Realm.\n\nSyndrome's Remote can be moved using the Move an Item or Ally action while on the bottom of Syndrome's Realm."
+      },
+      {
+        "title": "Omnidroid v.10",
+        "text": "Omnidroid v.10 is initially played to Downtown Metroville. If Syndrome's Remote is not in Syndrome's Realm, play Omnidroid v.10 to the top of Syndrome's Realm. Omnidroid v.10 is not discarded when used in a Vanquish action.\n\nWhen Omnidroid v.10 has been defeated by using Syndrome's Remote, flip the tile over. Omnidroid v.10 can no longer be moved."
+      },
+      {
+        "title": "Reducing Strength",
+        "text": "To reduce a Hero's Strength, add Strength tokens to the Hero card. For example, to reduce a Hero's Strength to 0, put Strength tokens equal to their current total Strength on their card."
+      }
+    ]
   }
 }

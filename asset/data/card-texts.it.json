@@ -141,5 +141,30 @@
     "Magic Lamp": "La Lampada Magica può essere giocata solo nella Caverna delle Meraviglie.\nQuando la Lampada Magica viene giocata, trova il Genio e giocalo nella Caverna delle Meraviglie.",
     "Scarab Pendant": "Quando giochi l'Amuleto dello Scarabeo, sblocca la Caverna delle Meraviglie. Alla fine di ogni turno, pesca finché non hai cinque carte in mano, invece che quattro.",
     "Snake Staff": "Attiva: Paga 1 Gettone Potere. Aggiungi alla tua mano una carta Ipnotizzare che si trova nella tua pila degli scarti."
+  },
+  "Maleficent": {
+    "Malice": "Durante il suo turno, se un altro giocatore sconfigge un Eroe con Forza 4 o superiore, puoi giocare Malignità. Sconfiggi un Eroe con Forza 4 o inferiore.",
+    "Tyranny": "Durante il suo turno, se un altro giocatore ha tre o più Alleati nel suo Reame, puoi giocare Tirannia. Pesca tre carte, poi scarta tre carte a tua scelta dalla tua mano.",
+    "Staff": "Se Malefica si trova in questo Luogo, il costo per giocare le carte Effetto o Maledizione è ridotto di 1.",
+    "Green Fire": "Gli Eroi non possono essere giocati in questo Luogo.\nScarta questa Maledizione se Malefica si muove in questo Luogo.",
+    "Forest of Thorns": "Gli Eroi devono avere Forza 4 o superiore per poter essere giocati in questo Luogo.\nScarta questa Maledizione quando un Eroe viene giocato in questo Luogo.",
+    "Dreamless Sleep": "Gli Eroi in questo Luogo ricevono -2 Forza.\nScarta questa Maledizione quando un Alleato viene giocato in questo Luogo.",
+    "Spinning Wheel": "Se un Eroe viene sconfitto in questo Luogo, ottieni Potere in base alla Forza dell'Eroe meno 1.",
+    "Sinister Goon": "Lo Scagnozzo Sinistro ottiene +1 Forza se nel suo Luogo è presente una qualsiasi Maledizione.",
+    "Savage Goon": "Nessuna abilità addizionale.",
+    "Cackling Goon": "Lo Scagnozzo Gracchiante ottiene +1 Forza per ogni Eroe nel suo stesso Luogo.",
+    "Raven": "A inizio turno, prima di muovere Malefica, puoi muovere il Corvo in un Luogo a tua scelta e svolgere una delle azioni lì disponibili. Il Corvo non può svolgere le azioni Fato.",
+    "Dragon Form": "Sconfiggi un Eroe con Forza 3 o inferiore. Se una azione Fato ha te come bersaglio prima del tuo prossimo turno, ottieni 3 Gettoni Potere.",
+    "Vanish": "Nel tuo prossimo turno, Malefica non è obbligata a muoversi e a cambiare Luogo.",
+    "Sword of Truth": "Quando la Spada di Verità viene giocata, assegnala a un Eroe senza altri Oggetti assegnati. Quell'Eroe ottiene +2 Forza. Il Costo per giocare una Maledizione in questo Luogo aumenta di 2 Gettoni Potere.",
+    "Flora": "Quando Flora viene giocata, Malefica deve rivelare la sua mano. Finché Flora non viene sconfitta, Malefica deve continuare a giocare a carte scoperte.",
+    "Merryweather": "Le Maledizioni non possono essere giocate nel Luogo in cui si trova Serena.",
+    "King Hubert": "Quando Re Uberto viene giocato, puoi muovere un Alleato da ogni Luogo adiacente al Luogo in cui si trova.",
+    "Guards": "Quando viene svolta un'azione Scontro per sconfiggere le Guardie, devono essere utilizzati almeno due Alleati.",
+    "Once Upon a Dream": "Scarta una Maledizione da un Luogo del Reame di Malefica in cui si trova un Eroe.",
+    "Prince Phillip": "Quando il Principe Filippo viene giocato, puoi scartare tutti gli Alleati presenti nel suo stesso Luogo.",
+    "Aurora": "Quando Aurora viene giocata, rivela la prima carta del Mazzo Fato di Malefica. Se è un Eroe, giocalo. Altrimenti, rimetti la carta in cima al mazzo.",
+    "Fauna": "Quando Fauna viene giocata, puoi scartare Sonno senza Sogni dal Luogo in cui lei si trova.",
+    "King Stefan": "Quando Re Stefano viene giocato, puoi muovere Malefica in un Luogo a tua scelta."
   }
 }

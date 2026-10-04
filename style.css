@@ -302,6 +302,7 @@ a.chip {
 .guide-title:first-child { margin-top: 0; }
 #guideBody p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
 #guideBody .guide-objective { font-weight: 600; }
+#guideBody .guide-item { margin-bottom: 6px; padding-left: 12px; border-left: 2px solid var(--border); }
 #guideBody .guide-note { padding: 8px 10px; background: var(--s2); border-radius: var(--r); font-size: 13px; }
 .guide-card {
   display: inline; padding: 0; border: none; background: none;

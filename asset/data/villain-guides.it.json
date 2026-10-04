@@ -124,6 +124,38 @@
       {
         "title": "Raccogliere il Tesoro",
         "text": "Per raccogliere un Tesoro, Davy Jones deve prima rivelarlo e poi sconfiggere l'Eroe a cui è assegnato. Alcune carte, come Sputafuoco Bill, Hadras e La Macchia Nera, rivelano i segnalini a faccia in giù. Un Eroe può avere un solo segnalino Tesoro assegnato per volta.\n\nSe Davy Jones sconfigge un Eroe con un segnalino Tesoro a faccia in giù, quel segnalino torna nella riserva di segnalini iniziale."
+      },
+      {
+        "title": "Il Potere dei Tesori",
+        "text": "Ogni segnalino Tesoro ha un'abilità unica. Quando il segnalino viene rivelato, quell'abilità influenzerà l'Eroe o renderà più difficile per Davy Jones recuperare i suoi averi. I segnalini Tesoro hanno effetto immediato quando vengono rivelati.\n\n• La Chiave: Quando La Chiave viene rivelata, scarta la tua mano.\n\n• Il Cuore: Quando Il Cuore viene raccolto, perdi tutto il Potere.\n\n• Forziere del Tesoro: Non si possono giocare Alleati in questo Luogo.\n\n• Carillon: Il Kraken non può essere utilizzato per sconfiggere questo Eroe.\n\n• Bussola di Jack: Questo Eroe ottiene +2 Forza."
+      },
+      {
+        "title": "Quei Fastidiosi Eroi",
+        "text": "Gli Eroi possono rendere difficile per Davy Jones la ricerca dei suoi tesori. E dove punta? e Maledetto Jack Sparrow costringono Davy Jones a tirare ad indovinare su dove potrebbero trovarsi gli Eroi e quale Tesoro potrebbero custodire."
+      }
+    ]
+  },
+  "Maleficent": {
+    "sections": [
+      {
+        "title": "Le Maledizioni",
+        "text": "La Maledizione è un tipo di carta unico e disponibile solo a Malefica. Le Maledizioni vanno giocate sui Luoghi e hanno degli effetti che influenzano gli Eroi presenti negli stessi Luoghi. Tuttavia, ogni Maledizione presenta anche una condizione che ti obbligherà a scartarla, quindi dovrai stare attento a dove e quando giocare ogni Maledizione.\n\nPuoi giocare una Maledizione in un Luogo qualsiasi, anche se ci sono già uno o più Eroi. È possibile giocare più di una Maledizione nello stesso Luogo. Puoi spostare una Maledizione con l'azione Muovere un Oggetto o un Alleato.\n\nLe tre Maledizioni sono Foresta di Rovi, Fuoco Verde e Sonno senza Sogni."
+      },
+      {
+        "title": "Foresta di Rovi",
+        "text": "La Foresta di Rovi impedisce ai tuoi avversari di giocare facilmente degli Eroi sul Luogo corrispondente, perché un Eroe deve avere almeno Forza 4 o superiore per poter essere giocato dove c'è questa Maledizione.\n\nAttenzione: Se un Eroe con Forza sufficiente viene giocato sul Luogo, la Foresta di Rovi deve essere scartata."
+      },
+      {
+        "title": "Fuoco Verde",
+        "text": "Il Fuoco Verde è una Maledizione molto potente perché impedisce a qualsiasi Eroe di essere giocato nello stesso Luogo in cui si trova.\n\nAttenzione: Se Malefica si muove nel Luogo in cui si trova il Fuoco Verde, questo va scartato."
+      },
+      {
+        "title": "Sonno senza Sogni",
+        "text": "Sonno senza Sogni riduce di 2 la Forza di tutti gli Eroi nello stesso Luogo.\n\nAttenzione: Se giochi un Alleato in questo Luogo, Sonno senza Sogni dovrà essere scartato.\n\nNota: Puoi spostare un Alleato in un Luogo con Sonno senza Sogni senza dover scartare la Maledizione. Inoltre, puoi giocare Sonno senza Sogni in un Luogo in cui ci sono già degli Alleati, senza che questo influisca su di loro, o sulla Maledizione."
+      },
+      {
+        "title": "Altre Carte",
+        "text": "Svanire permette a Malefica di rimanere nel Luogo in cui si trova, consentendole di svolgere le stesse azioni del turno precedente.\n\nIl Corvo è un potente Alleato, da giocare il prima possibile. All'inizio di ogni turno, prima di muovere la Pedina, puoi muovere il Corvo in un Luogo qualsiasi e svolgere una delle azioni lì disponibili.\n\nNota: Il Corvo non può svolgere le azioni Fato."
       }
     ]
   }

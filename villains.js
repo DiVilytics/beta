@@ -811,13 +811,20 @@ async function openGuide() {
   const names = [...byShown.keys()].sort((a, b) => b.length - a.length)
     .map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   // Not after "del/della…": that's a place ("Palazzo del Sultano"), like the
-  // English possessive.
-  const re = names.length ? new RegExp(`(?<![\\p{L}\\p{N}])(?<!\\b(?:del|della|dello|dei|degli|delle) )(${names.join('|')})((?:e?s)?)(?![\\p{L}\\p{N}'’])`, 'giu') : null;
+  // English possessive; not before "Transformation(s)" ("Merlin Transformations"
+  // are Merlin's cards, not the Merlin card).
+  const re = names.length ? new RegExp(`(?<![\\p{L}\\p{N}])(?<!\\b(?:del|della|dello|dei|degli|delle) )(${names.join('|')})((?:e?s)?)(?![\\p{L}\\p{N}'’])(?!\\s+Transformations?\\b)`, 'giu') : null;
   const NOTE = /^(Note|Important|Beware|Example|Nota|Importante|Attenzione|Esempio):\s*/;
 
-  const paraHTML = (p, linked) => {
-    const m = NOTE.exec(p);
-    const body = m ? p.slice(m[0].length) : p;
+  // "• text" is a list item; "• Name: text" also puts the name in bold (Davy
+  // Jones's treasures).
+  const ITEM = /^• (?:([^:]+):\s*)?/;
+  const paraHTML = (p, sectionLinked) => {
+    const item = ITEM.exec(p);
+    // List items link their own cards, even ones already linked in the section.
+    const linked = item ? new Set() : sectionLinked;
+    const m = item ? null : NOTE.exec(p);
+    const body = item ? p.slice(item[0].length) : m ? p.slice(m[0].length) : p;
     let html = '', last = 0, hit;
     if (re) re.lastIndex = 0;
     while (re && (hit = re.exec(body))) {
@@ -831,6 +838,7 @@ async function openGuide() {
       last = hit.index + hit[0].length;
     }
     html += _esc(body.slice(last));
+    if (item) return `<p class="guide-item">${item[1] ? `<strong>${_esc(item[1])}:</strong> ` : ''}${html}</p>`;
     return m ? `<p class="guide-note"><strong>${_esc(m[1])}:</strong> ${html}</p>` : `<p>${html}</p>`;
   };
 
