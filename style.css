@@ -476,7 +476,11 @@ main {
   width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
-.players-count-select.draw-mode-count { margin-left: auto; height: 30px; min-height: 30px; max-height: 30px; }
+.count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }
+/* The same ▼ as the Draw pool box, instead of the select's line chevron. */
+.count-select-wrap .players-count-select { height: 30px; min-height: 30px; max-height: 30px; background-image: none; padding-right: 26px; }
+.count-select-wrap .chevron { position: absolute; right: 10px; pointer-events: none; }
+.count-select-wrap select:open + .chevron { transform: rotate(180deg); }
 
 /* ── BUTTONS ──────────────────────────────────────────────────────── */
 .btn {

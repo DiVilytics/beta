@@ -99,13 +99,16 @@
           <span class="chevron" id="exChevron">▼</span>
         </div>
       </button>
-      <select id="playerCountSel" class="players-count-select draw-mode-count" onchange="setPlayerCount(this.value)">
-        <option value="2">2p</option>
-        <option value="3">3p</option>
-        <option value="4">4p</option>
-        <option value="5">5p</option>
-        <option value="6">6p</option>
-      </select>
+      <span class="count-select-wrap draw-mode-count">
+        <select id="playerCountSel" class="players-count-select" onchange="setPlayerCount(this.value)">
+          <option value="2">2p</option>
+          <option value="3">3p</option>
+          <option value="4">4p</option>
+          <option value="5">5p</option>
+          <option value="6">6p</option>
+        </select>
+        <span class="chevron" aria-hidden="true">▼</span>
+      </span>
     </div>
     <div class="exclude-body" id="excludeBody">
       <div class="filter-actions">
