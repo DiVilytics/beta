@@ -321,6 +321,7 @@ function render() {
       headLabel:   t('Villain'),
       getKey:      r   => r.character,
       getName:     villainName,
+      getNameHTML: villainNameInline,
       getHref:     key => `villains.html?vil=${encodeURIComponent(key)}`,
       getIdentity: key => charImgHTML(key),
       getSub:      key => pfCharBoxMap[key],

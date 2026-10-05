@@ -102,7 +102,7 @@ function render() {
         <div class="claim-char">
           <span class="chip-seat">${i + 1}</span>
           ${charImgHTML(p.character)}
-          <div class="claim-who"><div class="claim-name">${_esc(villainName(p.character))}</div>${nickHTML}</div>
+          <div class="claim-who"><div class="claim-name">${villainNameHTML(p.character)}</div>${nickHTML}</div>
           ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
         </div>
         ${actionHTML}
@@ -120,7 +120,7 @@ function render() {
     </div>
     <div class="section-label">${t('Players')}</div>
     <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${_esc(villainName(myClaim.character))}</strong>` })}</p>` : ''}`;
+    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}`;
 }
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@ function claimCharacter(playerId) {
   openConfirmSheet({
     id:           'claimConfirmOverlay',
     title:        t('Confirm your villain'),
-    bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${_esc(villainName(player.character))}</strong>` })}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`,
     confirmLabel: t('Claim villain'),
     busyLabel:    t('Claiming…'),
     onConfirm:    () => _doClaim(playerId),
@@ -242,7 +242,7 @@ function releaseCharacter(playerId) {
   openConfirmSheet({
     id:           'releaseConfirmOverlay',
     title:        t('Release this villain?'),
-    bodyHTML:     `<p class="confirm-text">${t('This frees up {villain} so it can be claimed again, by you or another player.', { villain: `<strong class="text-emph">${charImgHTML(player.character)}${_esc(villainName(player.character))}</strong>` })}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t('This frees up {villain} so it can be claimed again, by you or another player.', { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`,
     confirmLabel: t('Release'),
     busyLabel:    t('Releasing…'),
     danger:       true,

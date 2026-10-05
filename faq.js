@@ -106,7 +106,7 @@ function _menuHTML() {
       ${_villainNames().map(v => `
         <a class="char-roster-item" href="${_faqHref(v)}">
           <img class="char-roster-portrait" src="${charImgSrc(v)}" alt="" onerror="this.src='asset/players/default.svg'">
-          <div class="char-roster-name">${_esc(villainName(v))}</div>
+          <div class="char-roster-name">${villainNameInline(v)}</div>
           <div class="faq-roster-sub">${tn(faqData.villains[v].length, '{n} entry', '{n} entries')}</div>
         </a>`).join('')}
     </div>
@@ -143,7 +143,7 @@ function _villainHTML(v) {
     <div class="pf-identity faq-identity">
       <img class="char-portrait identity-portrait" src="${charImgSrc(v)}" alt="" onerror="this.src='asset/players/default.svg'">
       <span class="pf-name-block">
-        <span class="pf-nick">${_esc(villainName(v))}</span>
+        <span class="pf-nick">${villainNameInline(v)}</span>
         <a class="pf-since pf-since-link" href="villains.html?vil=${encodeURIComponent(v)}">${t('View stats')}</a>
       </span>
     </div>

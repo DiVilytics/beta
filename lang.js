@@ -64,6 +64,26 @@ function villainName(name) {
   return (_dict('villains')[base] || base) + tag;
 }
 
+// The same, as markup for places that truncate long names: only the name gets
+// the "…", the [TAG] stays whole after it, so "Capitan Uncino" and "Capitan
+// Uncino [I2E]" can't be mistaken for each other. Style: .vn (style.css).
+function villainNameHTML(name) {
+  if (!name) return '';
+  const m = /^(.*?)\s*(\[[^\]]+\])$/.exec(name);
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (!m) return `<span class="vn"><span class="vn-name">${esc(villainName(name))}</span></span>`;
+  return `<span class="vn"><span class="vn-name">${esc(villainName(m[1]))}</span><span class="vn-tag">${esc(m[2])}</span></span>`;
+}
+
+// Inline version for names that never get cut: "Capitan Uncino [I2E]" with the
+// tag in the same small style (.vn-tag), already escaped.
+function villainNameInline(name) {
+  if (!name) return '';
+  const m = /^(.*?)\s*(\[[^\]]+\])$/.exec(name);
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return m ? `${esc(villainName(m[1]))} <span class="vn-tag">${esc(m[2])}</span>` : esc(villainName(name));
+}
+
 // Static HTML: elements marked data-i18n get their content translated (the
 // key is the element's own HTML, so inline markup like <em> can be kept), and
 // data-i18n-attr="title placeholder" translates those attributes. Runs on

@@ -1987,6 +1987,20 @@ select:disabled {
 }
 .order-slot-select option,
 .order-slot-select optgroup { font-size: calc(13px * var(--ts)); }
+/* A villain name that may be cut short (villainNameHTML, lang.js): the name
+   takes the "…", the [TAG] after it always stays whole.
+   On a very narrow row the name keeps at least a few letters and the tag
+   wraps under it instead of crowding it out. */
+.vn { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.3em; min-width: 0; max-width: 100%; }
+.vn-name { min-width: min(100%, 4.5em); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vn-tag { flex-shrink: 0; white-space: nowrap; font-size: 0.8em; }
+/* New Game rows keep the tag on the name's line: the name gives way first. */
+.order-slot-name .vn { flex-wrap: nowrap; }
+.order-slot-name .vn { column-gap: 0.2em; }
+.order-slot-name .vn-name { min-width: 0; }
+/* Inside a card's villain link the name box needs a block to size against. */
+.chip-char a.char-link:has(.vn) { display: block; }
+
 .order-slot-name {
   flex: 1;
   font-size: calc(14px * var(--ts));
@@ -2916,6 +2930,8 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
+  /* New Game rows: a smaller portrait leaves the villain name more room. */
+  .order-slot-portrait { width: 26px; height: 26px; }
   :root { --lineup-btn-w: calc(76px * var(--ts)); }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); white-space: normal; }
   .home-faq-list { grid-template-columns: 1fr; }

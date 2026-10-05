@@ -332,7 +332,7 @@ function drawSlot(id) {
   slotTimers[id] = setInterval(() => {
     const pick = pool[Math.floor(Math.random() * pool.length)];
     portraitEl.src = charImgSrc(pick.name);
-    if (nameEl) nameEl.textContent = villainName(pick.name);
+    if (nameEl) nameEl.innerHTML = villainNameHTML(pick.name);
     ticks++;
 
     if (ticks >= total) {
@@ -348,7 +348,7 @@ function drawSlot(id) {
         const final = finalPool[Math.floor(Math.random() * finalPool.length)];
         slot.char = final.name;
         portraitEl.src = charImgSrc(final.name);
-        if (nameEl) nameEl.textContent = villainName(final.name);
+        if (nameEl) nameEl.innerHTML = villainNameHTML(final.name);
       }
       slotEl.classList.remove('spinning');
       _saveLiveState();
@@ -451,7 +451,7 @@ function shuffleOrder() {
       const nameEl   = el.querySelector('.order-slot-name');
       const numEl    = el.querySelector('.row-num');
       if (portrait) portrait.src = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-      if (nameEl)   nameEl.textContent = s.char ? villainName(s.char) : t('Select villain');
+      if (nameEl)   nameEl.innerHTML = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
       if (numEl)    numEl.textContent = origPos.get(s.id) + '.';
     });
   }, FRAME_MS);
@@ -474,7 +474,7 @@ function renderOrderSlots() {
     const taken     = new Set(orderSlots.filter(o => o.id !== s.id && o.char).map(o => o.char));
     const available = chars.filter(c => !taken.has(c.name));
     const src       = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-    const nameTxt   = s.char ? _esc(villainName(s.char)) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
+    const nameTxt   = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
     const meTitle   = isAuthed ? t('My villain') : t('Sign in to mark your villain');
     return `
       <div class="order-slot" data-id="${s.id}">
@@ -524,9 +524,11 @@ function _updateActionBtns() {
     if (drawAllBtn) drawAllBtn.disabled = true;
     document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
   } else if (drawAllBtn) {
-    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all villains') }[_drawMode()];
+    // "Redraw all" breaks after its first word, so it sits on two lines like "Random order".
+    const html  = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw<br>all') }[_drawMode()];
+    const label = html.replace('<br>', ' ');
     const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
-    if (drawAllBtn.textContent !== label) drawAllBtn.textContent = label;
+    if (drawAllBtn.innerHTML !== html) drawAllBtn.innerHTML = html;
     drawAllBtn.disabled = animating || !can;
     drawAllBtn.title    = can ? label : t('Not enough villains in the draw pool');
   }

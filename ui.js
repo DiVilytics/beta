@@ -109,7 +109,7 @@ function buildCharPillGrid(container, chars, set, { activeClass = 'on', onToggle
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'char-pill' + (set.has(c.name) ? ` ${activeClass}` : '');
-      btn.innerHTML = charImgHTML(c.name) + _esc(villainName(c.name));
+      btn.innerHTML = charImgHTML(c.name) + villainNameInline(c.name);
       btn.dataset.name = c.name;
       btn.dataset.box  = box;   // which box THIS pill represents, for per-box ownership checks (pace-filter.js)
       btn.onclick = () => applyPill(btn, !isActive(btn));

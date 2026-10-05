@@ -99,6 +99,7 @@ function boxAnchorId(box) {
 //   headLabel     : column header for the identity column ("Character" | "Player")
 //   getKey(r)     : returns the row's key (villain name or nickname)
 //   getName(key)  : optional, the name shown for a key (villainName for villains)
+//   getNameHTML(key): optional markup instead (villainNameInline: small [TAG])
 //   getHref(key)  : returns the link target
 //   getIdentity(key): returns the inline HTML for the row's avatar/portrait
 //   getSub(key)   : optional, returns small gray sub-text under the name
@@ -108,7 +109,7 @@ function boxAnchorId(box) {
 //                   `limit`, pin it at the bottom under a "Your position" divider
 //                   so the viewer always sees their standing for the current sort.
 function renderStatTableHTML(rows, opts) {
-  const { mode, headLabel, getKey, getName = k => k, getHref, getIdentity, getSub, getSubHref,
+  const { mode, headLabel, getKey, getName = k => k, getNameHTML, getHref, getIdentity, getSub, getSubHref,
           wrapClass = '', limit = Infinity, selfKey = null } = opts;
   const sorted = sortStatRows(rows, mode);
 
@@ -133,7 +134,7 @@ function renderStatTableHTML(rows, opts) {
         <div class="row-identity">
           ${getIdentity(key, r)}
           <div class="row-id-text">
-            <a class="row-name row-name-link" href="${getHref(key, r)}">${_esc(getName(key))}</a>
+            <a class="row-name row-name-link" href="${getHref(key, r)}">${getNameHTML ? getNameHTML(key) : _esc(getName(key))}</a>
             ${sub ? (subHref
               ? `<a class="row-sub row-sub-link" href="${_esc(subHref)}" title="${_esc(t('View {box} villains', { box: sub }))}">${_esc(sub)}</a>`
               : `<div class="row-sub">${_esc(sub)}</div>`) : ''}

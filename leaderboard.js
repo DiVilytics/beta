@@ -151,6 +151,7 @@ function render({ rows, summary }) {
       mode:        lbMode,
       headLabel:   isChar ? t('Villain') : t('Player'),
       getName:     key => isChar ? villainName(key) : key,
+      getNameHTML: isChar ? villainNameInline : undefined,
       limit:       lbDisplayLimit,
       selfKey,
       getKey:      r   => isChar ? r.character : r.nickname,

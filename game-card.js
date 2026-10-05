@@ -44,7 +44,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
       ${rows ? `<span class="chip-seat">${i + 1}</span>` : star}
       <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
-        <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${_esc(villainName(p.character))}</a></div>
+        <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${villainNameHTML(p.character)}</a></div>
         ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>` : ''}
       </div>
       ${rows ? star : ''}

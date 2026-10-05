@@ -123,7 +123,7 @@ function renderBoxDetailHTML(boxRow, boxChars, charAch) {
     return `
       <div class="box-detail-char">
         <img class="char-portrait" src="${charImgSrc(c.name)}" onerror="this.src='asset/players/default.svg'" alt="">
-        <span class="box-detail-char-name">${_esc(villainName(c.name))}</span>
+        <span class="box-detail-char-name">${villainNameInline(c.name)}</span>
         <span class="box-detail-marks">
           <span class="${s.plays > 0 ? 'on ach-star ach-star-gold' : ''}">${s.plays > 0 ? '⭐' : '·'}</span>
           <span class="${s.wins  > 0 ? 'on ach-cup ach-cup-gold' : ''}">${s.wins  > 0 ? '🏆' : '·'}</span>
@@ -445,7 +445,7 @@ function renderAchievementDetailHTML(charName, stats) {
   return `
     <div class="ach-detail-head${bothGold ? ' crowned' : ''}">
       <img class="char-portrait identity-portrait" src="${charImgSrc(charName)}" onerror="this.src='asset/players/default.svg'" alt="">
-      <div class="ach-detail-name">${_esc(villainName(charName))}</div>
+      <div class="ach-detail-name">${villainNameInline(charName)}</div>
     </div>
     ${track(stats.plays, t('Plays'), 'Play', 'medal')}
     ${track(stats.wins,  t('Wins'),  'Win',  'cup')}`;
