@@ -520,13 +520,15 @@ function _updateActionBtns() {
 
   // Mid-draw the lineup is half filled: keep the label and every 🎲 as they
   // were, all disabled, and recompute once the draw has settled.
+  document.getElementById('orderSlots')?.classList.toggle('busy', animating);   // ⠿ grays out
   if (animating) {
     if (drawAllBtn) drawAllBtn.disabled = true;
     document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
   } else if (drawAllBtn) {
-    // "Redraw all" breaks after its first word, so it sits on two lines like "Random order".
-    const html  = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw<br>all') }[_drawMode()];
-    const label = html.replace('<br>', ' ');
+    // "Redraw all" breaks after its first word on phones only (two lines like
+    // "Random order" there); the break is hidden on wider screens (.br-sm).
+    const html  = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw<br>all') }[_drawMode()].replace('<br>', ' <br class="br-sm">');
+    const label = html.replace(/\s*<br[^>]*>/, ' ');
     const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
     if (drawAllBtn.innerHTML !== html) drawAllBtn.innerHTML = html;
     drawAllBtn.disabled = animating || !can;
@@ -559,43 +561,75 @@ function _updateActionBtns() {
 
 let _dragSrc = null;
 
+// Reorder rows by their ⠿ handle: the grabbed row follows the finger, the rows
+// it passes slide out of its way, and on release it settles into its slot
+// before the new order is saved (same feel as dragging a sheet to close).
 function _initDrag() {
   const container = document.getElementById('orderSlots');
+  let rows = [], rects = [], si = 0, target = 0, startY = 0, gap = 4, dragH = 0;
 
-  function _endDrag() {
-    if (!_dragSrc) return;
-    _dragSrc.classList.remove('dragging');
-    _dragSrc = null;
-    document.body.style.touchAction = '';
-    // Sync orderSlots state to the new DOM order
-    const newOrder = [...container.querySelectorAll('.order-slot')]
-      .map(el => Number(el.dataset.id));
-    orderSlots.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
-    renderOrderSlots();
-    _saveLiveState();
-  }
+  const offsetTo = idx => {
+    let off = 0;
+    if (idx > si) for (let i = si + 1; i <= idx; i++) off += rects[i].height + gap;
+    if (idx < si) for (let i = idx; i < si; i++) off -= rects[i].height + gap;
+    return off;
+  };
 
   container.addEventListener('pointerdown', e => {
     const handle = e.target.closest('.drag-handle');
-    if (!handle) return;
+    if (!handle || _dragSrc) return;
+    // Not mid-draw or mid-shuffle: those animations write into the rows and set
+    // the order themselves when they settle, which would undo the drag.
+    if (_shuffleTimer || Object.keys(slotTimers).length) { e.preventDefault(); return; }
     e.preventDefault();
     _dragSrc = handle.closest('.order-slot');
+    rows   = [...container.querySelectorAll('.order-slot')];
+    rects  = rows.map(r => r.getBoundingClientRect());
+    si     = target = rows.indexOf(_dragSrc);
+    gap    = rows.length > 1 ? rects[1].top - rects[0].bottom : 4;
+    dragH  = rects[si].height + gap;
+    startY = e.clientY;
+    rows.forEach(r => { r.style.transition = r === _dragSrc ? 'none' : 'transform 0.18s ease'; });
     _dragSrc.classList.add('dragging');
     document.body.style.touchAction = 'none';
-    container.setPointerCapture(e.pointerId);
+    try { container.setPointerCapture(e.pointerId); } catch (_) {}
   });
 
   container.addEventListener('pointermove', e => {
     if (!_dragSrc) return;
-    _dragSrc.style.visibility = 'hidden';
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    _dragSrc.style.visibility = '';
-    if (!el) return;
-    const row = el.closest('.order-slot');
-    if (!row || row === _dragSrc) return;
-    const rect = row.getBoundingClientRect();
-    container.insertBefore(_dragSrc, e.clientY < rect.top + rect.height / 2 ? row : row.nextSibling);
+    const minDy = rects[0].top - rects[si].top;
+    const maxDy = rects[rects.length - 1].bottom - rects[si].bottom;
+    const dy = Math.max(minDy, Math.min(maxDy, e.clientY - startY));
+    _dragSrc.style.transform = `translateY(${dy}px)`;
+    const center = rects[si].top + rects[si].height / 2 + dy;
+    target = si;
+    for (let i = si + 1; i < rows.length; i++) if (center >= rects[i].top + rects[i].height / 2) target = i;
+    for (let i = si - 1; i >= 0; i--)          if (center <= rects[i].top + rects[i].height / 2) target = i;
+    rows.forEach((r, i) => {
+      if (r === _dragSrc) return;
+      const shift = (i > si && i <= target) ? -dragH : (i < si && i >= target) ? dragH : 0;
+      r.style.transform = shift ? `translateY(${shift}px)` : '';
+    });
   });
+
+  function _endDrag() {
+    if (!_dragSrc) return;
+    const src = _dragSrc;
+    _dragSrc = null;
+    document.body.style.touchAction = '';
+    src.style.transition = 'transform 0.15s ease';
+    src.style.transform  = `translateY(${offsetTo(target)}px)`;
+    setTimeout(() => {
+      rows.forEach(r => { r.style.transition = ''; r.style.transform = ''; });
+      src.classList.remove('dragging');
+      if (target !== si) {
+        const moved = orderSlots.splice(si, 1)[0];
+        orderSlots.splice(target, 0, moved);
+      }
+      renderOrderSlots();
+      _saveLiveState();
+    }, 160);
+  }
 
   container.addEventListener('pointerup',     _endDrag);
   container.addEventListener('pointercancel', _endDrag);

@@ -1168,6 +1168,9 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 }
 .drag-handle:active { cursor: grabbing; }
 .drag-dots { font-size: calc(16px * var(--ts)); color: var(--muted); line-height: 1; }
+/* Mid-draw / mid-shuffle the rows can't be dragged (new-game.js): ⠿ grays out. */
+#orderSlots.busy .drag-dots { color: var(--dim); opacity: 0.5; }
+#orderSlots.busy .drag-handle { cursor: not-allowed; }
 
 .pf-btn.me.on {
   background: var(--accent-d);
@@ -1941,7 +1944,7 @@ select:disabled {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-d);
 }
-.order-slot.dragging { opacity: 0.35; }
+.order-slot.dragging { position: relative; z-index: 2; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); border-color: var(--dim); cursor: grabbing; }
 .order-slot.spinning .order-slot-portrait {
   animation: slotPulse 0.55s ease-in-out infinite;
 }
@@ -1993,6 +1996,8 @@ select:disabled {
    wraps under it instead of crowding it out. */
 .vn { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.3em; min-width: 0; max-width: 100%; }
 .vn-name { min-width: min(100%, 4.5em); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A line break only on phones (≤480px), e.g. "Redraw / all". */
+.br-sm { display: none; }
 .vn-tag { flex-shrink: 0; white-space: nowrap; font-size: 0.8em; }
 /* New Game rows keep the tag on the name's line: the name gives way first. */
 .order-slot-name .vn { flex-wrap: nowrap; }
@@ -2930,6 +2935,7 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
+  .br-sm { display: inline; }
   /* New Game rows: a smaller portrait leaves the villain name more room. */
   .order-slot-portrait { width: 26px; height: 26px; }
   :root { --lineup-btn-w: calc(76px * var(--ts)); }
