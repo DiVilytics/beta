@@ -54,9 +54,12 @@
   <div class="home-hero">
     <div class="home-title-row">
       <h1 class="home-title" data-i18n>DiVilytics | Disney Villainous Analytics</h1>
-      <button class="btn btn-ghost btn-sm home-share-btn" onclick="shareApp()" title="Share DiVilytics" data-i18n data-i18n-attr="title">Share</button>
     </div>
     <p class="home-tagline" data-i18n>Archive, track, and analyze your Disney Villainous sessions. Every game you record joins a shared community database, turning one evening around the table into win rates, leaderboards, and per-villain stats for you and everyone you play with.</p>
+    <div class="home-actions">
+      <button class="btn btn-ghost btn-sm home-share-btn hidden" id="installBtn" type="button" onclick="installApp()" title="Add DiVilytics to your home screen" data-i18n-attr="title">📲 <span data-i18n>Install</span></button>
+      <button class="btn btn-ghost btn-sm home-share-btn" onclick="shareApp()" title="Share DiVilytics" data-i18n data-i18n-attr="title">Share</button>
+    </div>
   </div>
 
   <a class="home-section-link home-tutorial-link" href="tutorial.html">
@@ -107,6 +110,24 @@
     </div>
     <div class="sheet-footer">
       <button class="btn btn-primary" onclick="closeOverlay('shareAppOverlay')" data-i18n>Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Install steps, for browsers that can't install it themselves (iPhone, Mac Safari) -->
+<div class="overlay" id="installOverlay" onclick="if(event.target===this) closeOverlay('installOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="installTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('installOverlay')">×</button>
+    </div>
+    <div class="sheet-body">
+      <p class="modal-hint" id="installHint"></p>
+      <ol class="install-steps" id="installSteps"></ol>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-primary" onclick="closeOverlay('installOverlay')" data-i18n>Done</button>
     </div>
   </div>
 </div>

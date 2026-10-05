@@ -1,7 +1,22 @@
 {
+  "id": "/",
   "name": "DiVilytics",
   "short_name": "DiVilytics",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
+    {
+      "src": "/asset/favicon/web-app-manifest-192x192.png?v=20260603b",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/asset/favicon/web-app-manifest-512x512.png?v=20260603b",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/asset/favicon/web-app-manifest-192x192.png?v=20260603b",
       "sizes": "192x192",
