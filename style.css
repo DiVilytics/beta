@@ -2464,7 +2464,8 @@ select:disabled {
 .cs-search {
   position: relative;
   width: 190px;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;   /* gives way to a long page title on narrow phones */
 }
 .cs-search input { font-size: calc(13px * var(--ts)); padding: 7px 10px; }
 /* Disabled only until its data loads: same look as the live box, no flash. */

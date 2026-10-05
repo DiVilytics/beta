@@ -334,6 +334,8 @@ window.I18N.it = {
     "DiVilytics | Disney Villainous Analytics": "DiVilytics | Disney Villainous Analytics",
     "Archive, track, and analyze your Disney Villainous sessions. Every game you record joins a shared community database, turning one evening around the table into win rates, leaderboards, and per-villain stats for you and everyone you play with.": "Archivia, segui e analizza le tue partite a Disney Villainous. Ogni partita che registri entra in un archivio condiviso dalla community, e una serata attorno al tavolo diventa percentuali di vittoria, classifiche e statistiche per cattivo, per te e per chi gioca con te.",
     "Tutorial": "Tutorial",
+    "DiVilytics tutorial": "Tutorial di DiVilytics",
+    "Disney Villainous F.A.Q.": "F.A.Q. di Disney Villainous",
     "New here? Step by step: recording a game, claiming your villain, and finding your stats.": "Prima volta qui? Passo per passo: registrare una partita, rivendicare il tuo cattivo e trovare le tue statistiche.",
     "Acknowledgments": "Ringraziamenti",
     "<em>Disney Villainous</em> is a board game by <a href=\"https://www.ravensburger.us/en-US\" target=\"_blank\" rel=\"noopener\">Ravensburger</a>.": "<em>Disney Villainous</em> è un gioco da tavolo di <a href=\"https://www.ravensburger.us/en-US\" target=\"_blank\" rel=\"noopener\">Ravensburger</a>.",
