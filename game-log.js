@@ -139,6 +139,7 @@ function updateFilterUI() {
   const badge = document.getElementById('charBadge');
   badge.textContent = glChars.length - pace.excluded.size;   // characters still included
   badge.classList.add('visible');
+  badge.classList.toggle('full', !pace.excluded.size);
 }
 
 // ── PACE / MY-BOXES SELECTION ──────────────────────────────────────────────────

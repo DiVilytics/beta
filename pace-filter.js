@@ -91,22 +91,36 @@ function createPaceFilter({
   // actually leaves the pool once every one of its pills fails, mirroring how
   // a manual click in the grid behaves (buildCharPillGrid's applyPill).
   function applyPaceSelection() {
-    const band       = selectedPace ? paceBand(selectedPace) : null;
-    const useMine    = mineOn && !!getCurrentUser() && ownedBoxes.size > 0;
+    const band    = selectedPace ? paceBand(selectedPace) : null;
+    const useMine = mineOn && !!getCurrentUser() && ownedBoxes.size > 0;
+    const off     = _excludedFor(band, useMine, true);
+    excluded.clear();
+    off.forEach(n => excluded.add(n));
+    updatePaceUI();
+    onChange();
+  }
+
+  // The characters a pace band and/or My boxes leave out (see above), optionally
+  // painting the pills to match.
+  function _excludedFor(band, useMine, paint = false) {
     const paceByName = new Map(getChars().map(c => [c.name, c.pace]));
     const onNames    = new Set();   // characters left included by at least one pill
     document.querySelectorAll(`#${gridId} .char-pill`).forEach(btn => {
       const name = btn.dataset.name;
       const off  = (band && !band.has(paceByName.get(name))) || (useMine && !ownedBoxes.has(btn.dataset.box));
-      btn.classList.toggle('excluded', off);
+      if (paint) btn.classList.toggle('excluded', off);
       if (!off) onNames.add(name);
     });
-    excluded.clear();
-    for (const c of getChars()) {
-      if (!onNames.has(c.name)) excluded.add(c.name);
-    }
-    updatePaceUI();
-    onChange();
+    return new Set(getChars().filter(c => !onNames.has(c.name)).map(c => c.name));
+  }
+
+  // True when the pool is what a fresh page starts with: every villain, or only
+  // the user's boxes when they've marked some on the Account page.
+  function isDefault() {
+    const mineDefault = !!getCurrentUser() && ownedBoxes.size > 0;
+    if (selectedPace || pacePlus || mineOn !== mineDefault) return false;
+    const want = _excludedFor(null, mineDefault);
+    return want.size === excluded.size && [...want].every(n => excluded.has(n));
   }
 
   // Clicking a color resets the pool to that color's band (not additive).
@@ -126,6 +140,15 @@ function createPaceFilter({
     if (!getCurrentUser()) { onError(t('Sign in to filter by owned boxes.')); return; }
     if (!ownedBoxes.size)  { onError(t('Mark which boxes you own on the account page first.')); return; }
     mineOn = !mineOn;
+    applyPaceSelection();
+  }
+
+  // A fresh pool starts limited to the user's boxes when they've marked any on
+  // the Account page. Only on an untouched pool: a restored draft keeps its own.
+  function defaultToMine() {
+    if (mineOn || selectedPace || excluded.size) return;
+    if (!getCurrentUser() || !ownedBoxes.size) return;
+    mineOn = true;
     applyPaceSelection();
   }
 
@@ -183,6 +206,8 @@ function createPaceFilter({
     selectPace,
     setPaceMode,
     toggleMine,
+    defaultToMine,
+    isDefault,
     excludeAll,
     clearExcluded,
     reset,

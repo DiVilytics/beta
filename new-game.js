@@ -56,7 +56,7 @@ async function init() {
   renderOrderSlots();
   _initLegend();   // before the network awaits too: until it runs, the legend wraps 3 + 1
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
-    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, _updateDiscardBtn);
+    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
   }
 
   // Re-render slots whenever auth state changes so the Me-locked indicator
@@ -83,14 +83,13 @@ async function init() {
     updateExcludeUI,
     boxInfo
   );
-  onBeforeSignIn(_savePendingState);
-  const restored = _restorePendingState();
-  if (!restored) {
-    // The starter rows are already on screen; re-render now that chars are
-    // loaded (fills the selects) and auth is resolved, then persist the draft.
-    renderOrderSlots();
-    _saveLiveState();
-  }
+  onBeforeSignIn(_saveDraft);
+  const poolRestored = _restoreDraft();
+  // Re-render now that chars are loaded (fills the selects), auth is resolved and
+  // any draft is back, then start saving it.
+  renderOrderSlots();
+  _draftReady = true;   // from now on every change is saved (not this load: the 24h count from the last change)
+  if (!poolRestored) pace.defaultToMine();   // boxes marked on the Account page: draw from those
   pace.updatePaceUI();
   updateExcludeUI();   // show the pool size from the start
   _initDrag();
@@ -98,62 +97,65 @@ async function init() {
   attachLocationAutocomplete('fLocation', 'fLocationDropdown');
 }
 
-// Pending-state survives the OAuth round-trip (sessionStorage = same tab only)
-// so users don't lose their draft if they sign in mid-edit.
-const PENDING_KEY = 'newGamePending';
+// ── DRAFT ─────────────────────────────────────────────────────────────────────
+// The form (players, villains, 👤 / 👑, date and details) and the draw pool are
+// kept in localStorage as you edit, so leaving the page, switching apps or a
+// sign-in round-trip don't lose them. The draft expires 24 hours after the last
+// change; Discard and saving the game clear it, pool included. A fresh pool is
+// every villain, or only your boxes when you've marked some on the Account page
+// (the one lasting way to shape it). An untouched date isn't kept: it comes back
+// as "now". A game in progress has its own snapshot (liveGame) and wins over it.
+const DRAFT_KEY    = 'divilytics_new_game_draft';
+const DRAFT_MAX_MS = 24 * 60 * 60 * 1000;
+let _draftReady = false;   // nothing is saved until init has restored (or not) the draft
 
-function _savePendingState() {
-  const hasContent = orderSlots.some(s => s.char || s.isMe || s.isWinner) ||
-                     document.getElementById('fLocation')?.value ||
-                     document.getElementById('fDur')?.value ||
-                     document.getElementById('fTurns')?.value;
-  if (!hasContent) return;
+// Saves the draft, or drops it when the page is back to a fresh one (nothing to keep).
+function _saveDraft() {
+  if (!_draftReady) return;
+  if (!_isFormChanged()) { _dropDraft(); return; }
+  const val = id => document.getElementById(id)?.value || '';
   try {
-    sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-      slots:          orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
-      fDate:          document.getElementById('fDate')?.value     || '',
-      fLocation:      document.getElementById('fLocation')?.value || '',
-      fDur:           document.getElementById('fDur')?.value      || '',
-      fTurns:         document.getElementById('fTurns')?.value    || '',
-      excluded:       [...pace.excluded],
-      selectedPace:   pace.selectedPace,
-      pacePlus:       pace.pacePlus,
-      mineOn:         pace.mineOn,
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      saved:     Date.now(),
+      slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
+      fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
+      fLocation: val('fLocation'),
+      fDur:      val('fDur'),
+      fTurns:    val('fTurns'),
+      pool:      { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn },
     }));
   } catch (_) {}
 }
 
-function _restorePendingState() {
-  const raw = sessionStorage.getItem(PENDING_KEY);
-  if (!raw) return false;
-  sessionStorage.removeItem(PENDING_KEY);
+function _dropDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+}
 
-  // A saved live game is newer and more authoritative; let _checkResume handle it.
-  if (liveGame.loadSaved()) return false;
+function _loadDraft() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch (_) {}
+  if (d && !(Date.now() - d.saved <= DRAFT_MAX_MS)) {
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    return null;
+  }
+  return d;
+}
 
-  let state;
-  try { state = JSON.parse(raw); } catch (_) { return false; }
-  if (!state || !state.slots || !state.slots.length) return false;
-
-  if (state.fDate)     document.getElementById('fDate').value     = state.fDate;
-  if (state.fLocation) document.getElementById('fLocation').value = state.fLocation;
-  if (state.fDur)      document.getElementById('fDur').value      = state.fDur;
-  if (state.fTurns)    document.getElementById('fTurns').value    = state.fTurns;
-
-  orderSlots = state.slots.map(s => ({
-    id:       orderNextId++,
-    char:     s.char || '',
-    isMe:     !!s.isMe,
-    isWinner: !!s.isWinner,
-  }));
-
-  pace.restoreState({
-    excluded:     state.excluded,
-    selectedPace: state.selectedPace,
-    pacePlus:     state.pacePlus,
-    mineOn:       state.mineOn,
-  });
-  renderOrderSlots();
+// Puts a saved draft back on the page. Returns true when it restored a pool, so
+// the My boxes default isn't applied over the user's own choice.
+function _restoreDraft() {
+  if (liveGame.loadSaved()) return false;   // the resume banner handles a game in progress
+  const d = _loadDraft();
+  if (!d) return false;
+  if (d.slots && d.slots.length >= 2) {
+    orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
+    if (d.fDate) document.getElementById('fDate').value = d.fDate;
+    document.getElementById('fLocation').value = d.fLocation || '';
+    document.getElementById('fDur').value      = d.fDur      || '';
+    document.getElementById('fTurns').value    = d.fTurns    || '';
+  }
+  if (!d.pool) return false;
+  pace.restoreState(d.pool);
   return true;
 }
 
@@ -178,6 +180,9 @@ function updateExcludeUI() {
   if (!badge) return;
   badge.textContent = chars.length - pace.excluded.size;   // pool size: starts full, shrinks as you exclude
   badge.classList.add('visible');
+  badge.classList.toggle('full', !pace.excluded.size);
+  _updateDiscardBtn();
+  _saveDraft();
 }
 
 // Bulk pool controls (wired to the filter toolbar) delegate to the shared
@@ -328,7 +333,7 @@ function drawSlot(id) {
   slotTimers[id] = setInterval(() => {
     const pick = pool[Math.floor(Math.random() * pool.length)];
     portraitEl.src = charImgSrc(pick.name);
-    if (nameEl) nameEl.textContent = pick.name;
+    if (nameEl) nameEl.textContent = villainName(pick.name);
     ticks++;
 
     if (ticks >= total) {
@@ -344,7 +349,7 @@ function drawSlot(id) {
         const final = finalPool[Math.floor(Math.random() * finalPool.length)];
         slot.char = final.name;
         portraitEl.src = charImgSrc(final.name);
-        if (nameEl) nameEl.textContent = final.name;
+        if (nameEl) nameEl.textContent = villainName(final.name);
       }
       slotEl.classList.remove('spinning');
       _saveLiveState();
@@ -465,7 +470,7 @@ function renderOrderSlots() {
         <div class="order-slot-actions">
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
-          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" title="${meTitle}">👤</button>
+          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
       </div>`;
@@ -662,6 +667,7 @@ function _saveLiveState() {
     fDur:      document.getElementById('fDur')?.value      || '',
     fTurns:    document.getElementById('fTurns')?.value    || '',
   });
+  _saveDraft();
   updateLiveGameNavBadge();
 }
 
@@ -677,15 +683,16 @@ function _clearLiveState() {
 let _freshDate = '';
 function _markFresh() { _freshDate = document.getElementById('fDate')?.value || ''; }
 
-// True when the game itself differs from a fresh page load: player count,
-// villains, 👤 / 👑 marks, date, location, duration or rounds. The draw pool is
-// a setting, not part of the game, so it doesn't count (and Discard keeps it).
+// True when the page differs from a fresh load: player count, villains, 👤 / 👑
+// marks, date, location, duration, rounds, or a draw pool other than the
+// default (every villain, or your boxes).
 function _isFormChanged() {
   const val = id => document.getElementById(id)?.value || '';
   return orderSlots.length !== 2
       || orderSlots.some(s => s.char || s.isMe || s.isWinner)
       || val('fDate') !== _freshDate
-      || !!(val('fLocation') || val('fDur') || val('fTurns'));
+      || !!(val('fLocation') || val('fDur') || val('fTurns'))
+      || !pace.isDefault();
 }
 
 // Discard shows as soon as anything changed, or while a game session exists.
@@ -701,7 +708,7 @@ function _confirmDiscard(onConfirm) {
   openConfirmSheet({
     id:           'discardGameOverlay',
     title:        t('Discard this game?'),
-    bodyHTML:     `<p class="confirm-text">${t('This resets the form (villains, players and details) and clears any saved progress. Your draw pool stays as it is.')}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t('This resets the form (villains, players, details and draw pool) and clears any saved progress.')}</p>`,
     confirmLabel: t('Discard'),
     danger:       true,
     onConfirm,
@@ -730,9 +737,13 @@ function _doDiscard() {
   addOrderSlot();
   addOrderSlot();
 
+  pace.reset();           // the pool goes back to the default too:
+  pace.defaultToMine();   // every villain, or your boxes
+
   setLiveUI(false);
   _markFresh();
   _updateDiscardBtn();
+  _saveDraft();           // nothing left to keep: drops the draft
 }
 
 // ── RESUME BANNER ─────────────────────────────────────────────────────────────
@@ -754,8 +765,8 @@ function _checkResume() {
       <span>${tn(state.slots.length, '{n} player', '{n} players')} | ${t('Round {n}', { n: state.liveTurns })}<span id="resumeElapsed"></span></span>
     </div>
     <div class="resume-banner-btns">
-      <button class="btn btn-primary btn-sm" onclick="_doResume()">${t('Resume')}</button>
-      <button class="btn btn-ghost btn-sm" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">${t('Discard')}</button>
+      <button class="btn btn-primary btn-ng" onclick="_doResume()">${t('Resume')}</button>
+      <button class="btn btn-danger btn-ng" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">${t('Discard')}</button>
     </div>`;
   document.querySelector('main').prepend(banner);
 
@@ -874,6 +885,8 @@ async function submitForm() {
 
   // Clear live state (we just saved the game) and notify hooks
   _clearLiveState();
+  _dropDraft();          // saved for good: the next visit starts fresh
+  _draftReady = false;   // and nothing on this page re-creates it
   liveGame.emit('close');
 
   showQR(g.id);

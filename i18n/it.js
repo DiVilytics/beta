@@ -195,7 +195,7 @@ window.I18N.it = {
     "Mark your villain with 👤.": "Segna il tuo cattivo con 👤.",
     "Resume Game": "Riprendi partita",
     "Discard this game?": "Scartare questa partita?",
-    "This resets the form (villains, players and details) and clears any saved progress. Your draw pool stays as it is.": "Svuota il modulo (cattivi, giocatori e dettagli) e cancella i progressi salvati. La riserva cattivi resta com'è.",
+    "This resets the form (villains, players, details and draw pool) and clears any saved progress.": "Svuota il modulo (cattivi, giocatori, dettagli e riserva cattivi) e cancella i progressi salvati.",
     "Discard": "Scarta",
     "Start Game": "Inizia partita",
     "Game in progress": "Partita in corso",

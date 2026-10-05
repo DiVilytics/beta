@@ -475,6 +475,10 @@ main {
 .btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
+/* New Game's Resume / Discard (page header and the game-in-progress banner):
+   the same size as the lineup buttons, keeping their own colors. */
+.btn.btn-ng { min-height: 30px; width: var(--lineup-btn-w); border-radius: 6px; padding: 3px 8px;
+  font-size: calc(12px * var(--ts)); line-height: 1.15; white-space: nowrap; justify-content: center; }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
 .players-count-select.draw-mode-count { margin-left: auto; height: 30px; min-height: 30px; max-height: 30px; }
 
@@ -556,6 +560,9 @@ main {
   display: none;
 }
 .badge.visible { display: inline-block; }
+/* A villain filter that leaves everyone in: the count stays neutral, purple
+   only once something is filtered out. */
+.badge.full { background: var(--s4); color: var(--muted); }
 
 .chevron { font-size: calc(11px * var(--ts)); color: var(--dim); transition: transform 0.2s; }
 .chevron.open { transform: rotate(180deg); }
@@ -2898,6 +2905,9 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
+  /* Game-in-progress banner: the text on its own line, Resume / Discard under it. */
+  .resume-banner { flex-wrap: wrap; row-gap: 10px; }
+  .resume-banner-text { flex-basis: 100%; }
   :root { --lineup-btn-w: calc(76px * var(--ts)); }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); white-space: normal; }
   .home-faq-list { grid-template-columns: 1fr; }
