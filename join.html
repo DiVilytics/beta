@@ -2,126 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title data-i18n>DiVilytics | Claim Villain</title>
+  <title>DiVilytics</title>
   <meta name="robots" content="noindex">
-  <script src="lang.js"></script>
-  <script src="i18n/it.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/asset/favicon/favicon-96x96.png?v=20260603b" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/asset/favicon/favicon.svg?v=20260603b" />
-  <link rel="shortcut icon" href="/asset/favicon/favicon.ico?v=20260603b" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/asset/favicon/apple-touch-icon.png?v=20260603b" />
-  <meta name="apple-mobile-web-app-title" content="DiVilytics" />
-  <meta name="theme-color" content="#000000" />
-  <link rel="manifest" href="/asset/favicon/site.webmanifest?v=20260603b" />
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MTR91YL11"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-6MTR91YL11');
-  </script>
+  <!-- join.html was renamed to claim.html. This stub forwards the QR codes and
+       links already shared (join.html?game=<id>), keeping the query and any
+       hash. Keep it: printed or saved QR codes may point here for a long time. -->
+  <script>location.replace('claim.html' + location.search + location.hash);</script>
+  <meta http-equiv="refresh" content="0; url=claim.html">
 </head>
-<body>
-
-<nav>
-  <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
-  <div class="nav-right">
-    <div class="nav-links">
-      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
-      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
-      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
-      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
-      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
-      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
-    </div>
-    <div class="nav-auth" id="navAuth"></div>
-  </div>
-</nav>
-
-<main>
-  <div class="page-header">
-    <h2 data-i18n>Claim your villain</h2>
-  </div>
-  <a class="back-link" href="players.html" onclick="claimGoBack(); return false;" data-i18n>← Back</a>
-  <div id="claimRoot" class="spinner" data-i18n>Loading…</div>
-</main>
-
-<!-- QR share sheet -->
-<div class="overlay" id="qrOverlay">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3 id="qrTitle" data-i18n>Share with players</h3>
-      <button class="sheet-close" onclick="closeOverlay('qrOverlay')">×</button>
-    </div>
-    <div class="sheet-body">
-      <p id="qrBlurb" class="modal-hint" data-i18n>Other players can scan this to claim their villain in this game.</p>
-      <div class="qr-wrap">
-        <div id="qrCode"></div>
-      </div>
-      <div class="qr-url-row">
-        <div class="qr-url" id="qrUrlText"></div>
-        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
-      </div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn btn-primary" onclick="closeOverlay('qrOverlay')" data-i18n>Done</button>
-    </div>
-  </div>
-</div>
-
-<!-- Edit game details sheet -->
-<div class="overlay" id="editDetailsOverlay" onclick="if(event.target===this) closeEditDetails()">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3 data-i18n>Edit Game</h3>
-      <button class="sheet-close" onclick="closeEditDetails()">×</button>
-    </div>
-    <div class="sheet-body">
-      <div class="err" id="editDetailsErr"></div>
-      <div class="field">
-        <label data-i18n>Location <span class="optional"></span></label>
-        <div class="ac-wrap">
-          <input type="text" id="editLocation" maxlength="60" placeholder="optional" autocomplete="off" data-i18n-attr="placeholder">
-          <div class="cs-dropdown" id="editLocationDropdown"></div>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label data-i18n>Duration <span class="optional">(min)</span></label>
-          <input type="number" id="editDur" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
-        </div>
-        <div class="field">
-          <label data-i18n>Rounds <span class="optional"></span></label>
-          <input type="number" id="editTurns" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
-        </div>
-      </div>
-    </div>
-    <div class="sheet-footer sheet-footer-row">
-      <button class="btn btn-ghost"   onclick="closeEditDetails()" data-i18n>Cancel</button>
-      <button class="btn btn-primary" id="editDetailsSaveBtn" onclick="saveGameDetails()" data-i18n>Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="config.js"></script>
-<script src="db.js"></script>
-  <script src="theme.js"></script>
-  <script src="ui.js"></script>
-  <script src="avatar.js"></script>
-  <script src="achievements.js"></script>
-  <script src="stats-table.js"></script>
-  <script src="search.js"></script>
-  <script src="game-card.js"></script>
-  <script src="shared.js"></script>
-<script src="join.js"></script>
-</body>
+<body></body>
 </html>

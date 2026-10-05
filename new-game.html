@@ -32,7 +32,7 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
       <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -45,11 +45,7 @@
 
 <main>
   <div class="page-header">
-    <h2 data-i18n>New Game</h2>
-    <div class="header-actions">
-      <button class="btn btn-primary btn-ng hidden" id="resumeBtn" onclick="startLive()" data-i18n>Resume</button>
-      <button class="btn btn-danger btn-ng hidden" id="discardBtn" onclick="discardLiveGame()" data-i18n>Discard</button>
-    </div>
+    <h2><span class="page-ico" aria-hidden="true">⚔️</span><span data-i18n>New Game</span></h2>
   </div>
   <p class="page-intro" data-i18n>Pick or draw villains, time the game, save and share it.</p>
 
@@ -65,7 +61,7 @@
       <div class="live-turn-count"><span id="liveTurnCount">0</span><span class="live-turn-lbl" data-i18n>rounds</span></div>
       <button class="live-btn" type="button" onclick="bumpTurn(1)">+</button>
     </div>
-    <p class="live-hint" data-i18n>Tap + once every player has taken their turn (one full round). When you're done, tap Pause Game: the duration and the number of rounds are filled in automatically.</p>
+    <p class="live-hint" data-i18n>Tap + once every player has taken their turn (one full round). When you're done, tap Pause game: the duration and the number of rounds are filled in automatically.</p>
   </div>
 
   <!-- FORM CONTENT, hidden while a live game is running -->
@@ -149,11 +145,12 @@
 
   <!-- FOOTER actions -->
   <div id="footerDefault" class="new-game-footer">
-    <button class="btn btn-primary" id="startBtn"  onclick="startLive()" data-i18n>Start Game</button>
-    <button class="btn btn-save" id="submitBtn" onclick="submitForm()" data-i18n>Save Game</button>
+    <button class="btn btn-danger" id="discardBtn" onclick="discardLiveGame()" disabled data-i18n>Discard game</button>
+    <button class="btn btn-primary" id="startBtn"  onclick="startLive()" data-i18n>Start game</button>
+    <button class="btn btn-save" id="submitBtn" onclick="submitForm()" data-i18n>Save game</button>
   </div>
   <div id="footerLive" class="new-game-footer hidden">
-    <button class="btn btn-danger" onclick="stopLive()" data-i18n>Pause Game</button>
+    <button class="btn btn-primary" onclick="stopLive()" data-i18n>Pause game</button>
   </div>
 </main>
 
@@ -182,6 +179,16 @@
 </div>
 
 <audio id="bgAudio" src="asset/audio/empty.mp3" preload="metadata" loop></audio>
+
+<!-- A running game shown on page load: the browser won't start the lock-screen
+     controls without a tap, so this asks for one (new-game-audio.js). -->
+<div class="tap-resume hidden" id="tapResume" role="button" tabindex="0" onclick="resumeLockScreen()" onkeydown="if(event.key==='Enter'||event.key===' ')resumeLockScreen()">
+  <div class="tap-resume-card">
+    <div class="tap-resume-ico">🔒</div>
+    <div class="tap-resume-title" data-i18n>Tap to continue</div>
+    <p class="tap-resume-text" data-i18n>The game is still running. Tap anywhere to turn the lock-screen controls (timer and rounds) back on.</p>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>

@@ -403,7 +403,7 @@ function buildProfileCard(g, gp) {
   const role    = gameUserRole(g, gp, getCurrentUser());
   const actions = role.isParticipant ? `
     <div class="card-actions">
-      <a class="btn btn-ghost btn-sm" href="join.html?game=${g.id}" onclick="pfRememberReturn('${g.id}')">${t('Open')}</a>
+      <a class="btn btn-ghost btn-sm" href="claim.html?game=${g.id}" onclick="pfRememberReturn('${g.id}')">${t('Open')}</a>
       ${role.isCreator ? `<button class="btn btn-danger btn-sm" onclick="pfDeleteGame('${g.id}')">${t('Delete')}</button>` : ''}
     </div>` : '';
   const me = getCurrentUser();

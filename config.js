@@ -14,7 +14,7 @@ const PAGE_SIZE = 20;
 // Key under which an in-progress recorded game is parked in localStorage,
 // and how long a snapshot stays valid before we discard it as stale.
 const LIVE_GAME_KEY        = 'divilytics_live_game';
-const LIVE_GAME_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+const LIVE_GAME_MAX_AGE_MS = 48 * 60 * 60 * 1000;   // 48h: a paused game since its last save, a running one since it started
 
 // ── STATIC DATA ──────────────────────────────────────────────────────────────
 const DATA_OBJECTIVES_URL    = 'asset/data/objectives.json';

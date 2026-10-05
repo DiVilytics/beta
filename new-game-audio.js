@@ -22,7 +22,17 @@ function _audioPlay() {
       if (!_mediaReady) _setupMediaSession();
       navigator.mediaSession && (navigator.mediaSession.playbackState = 'playing');
     })
-    .catch(console.error);
+    .catch(() => {
+      // Blocked without a tap (a running game shown on page load): ask for one,
+      // full screen, so nobody locks the phone without the controls.
+      if (liveGame.isRunning) document.getElementById('tapResume')?.classList.remove('hidden');
+    });
+}
+
+// The tap the browser needs: hide the prompt and start the lock-screen controls.
+function resumeLockScreen() {
+  document.getElementById('tapResume')?.classList.add('hidden');
+  if (liveGame.isRunning) _audioPlay();
 }
 
 function _audioPause() {
@@ -116,6 +126,7 @@ liveGame.on('turnBump', () => {
 });
 
 liveGame.on('close', () => {
+  document.getElementById('tapResume')?.classList.add('hidden');
   _audioStop();
 });
 

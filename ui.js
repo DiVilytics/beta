@@ -246,6 +246,74 @@ function layoutSeparatedRows(host, items, maxW = host.getBoundingClientRect().wi
   return true;
 }
 
+// "← Back" links: return to the previous page when it was one of ours (the
+// leaderboard row, game card or FAQ link you came from), else open `fallback`
+// (a link opened cold, e.g. from a QR code or another site).
+function goBack(fallback) {
+  let ours = false;
+  try { ours = !!document.referrer && new URL(document.referrer).origin === location.origin && document.referrer !== location.href; } catch (_) {}
+  if (ours && history.length > 1) history.back();
+  else location.href = fallback;
+}
+
+// ── DRAG TO CLOSE ─────────────────────────────────────────────────────────────
+// Every bottom sheet can be dragged down by its handle or header: let go far
+// enough down (or flick it) and it closes the same way its × does, running that
+// sheet's own close logic (some also navigate, e.g. New Game's QR). A sheet with
+// no × (the required "Choose your nickname") snaps back, unless its overlay
+// provides `_dragClose()` returning true once it has closed.
+const SHEET_DRAG_CLOSE_PX = 90;    // or a third of the sheet, whichever is smaller
+const SHEET_FLICK_PX_MS   = 0.6;   // a fast downward flick closes too
+
+function _closeSheetByDrag(overlay) {
+  const x = overlay.querySelector('.sheet-close');
+  if (x) { x.click(); return true; }
+  return typeof overlay._dragClose === 'function' && overlay._dragClose() === true;
+}
+
+document.addEventListener('pointerdown', e => {
+  if (e.button > 0) return;
+  const grip = e.target.closest('.sheet-handle, .sheet-header');
+  if (!grip || e.target.closest('button, a, input, select, textarea')) return;
+  const sheet   = grip.closest('.sheet');
+  const overlay = sheet?.closest('.overlay');
+  if (!overlay || !overlay.classList.contains('open') || overlay.classList.contains('no-drag')) return;
+
+  const startY = e.clientY, startT = performance.now();
+  let dy = 0, lastY = startY, lastT = startT, v = 0;
+  sheet.style.transition = 'none';
+  try { grip.setPointerCapture(e.pointerId); } catch (_) {}
+
+  const move = ev => {
+    dy = Math.max(0, ev.clientY - startY);
+    const now = performance.now();
+    if (now > lastT) v = (ev.clientY - lastY) / (now - lastT);
+    lastY = ev.clientY; lastT = now;
+    sheet.style.transform = `translateY(${dy}px)`;
+  };
+  const end = () => {
+    grip.removeEventListener('pointermove', move);
+    grip.removeEventListener('pointerup', end);
+    grip.removeEventListener('pointercancel', end);
+    const far = dy > Math.min(SHEET_DRAG_CLOSE_PX, sheet.offsetHeight / 3);
+    sheet.style.transition = 'transform 0.2s ease';
+    if (dy > 0 && (far || v > SHEET_FLICK_PX_MS)) {
+      sheet.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        const closed = _closeSheetByDrag(overlay);
+        sheet.style.transition = '';
+        sheet.style.transform = closed ? '' : 'translateY(0)';
+      }, 180);
+    } else {
+      sheet.style.transform = 'translateY(0)';
+      setTimeout(() => { sheet.style.transition = ''; sheet.style.transform = ''; }, 200);
+    }
+  };
+  grip.addEventListener('pointermove', move);
+  grip.addEventListener('pointerup', end);
+  grip.addEventListener('pointercancel', end);
+});
+
 function closeOverlay(id) {
   document.getElementById(id).classList.remove('open');
   // Another sheet may still be open underneath (a card opened from the guide).

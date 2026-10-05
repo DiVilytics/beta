@@ -314,11 +314,11 @@ function renderGlobalStripHTML(global, onlyEarned = false, onClickFn = '_showGlo
   const wonAll    = sizes.every(s => global.tableSizes[s].won > 0);
   const tiles = [
     tile('volume',    '👤', global.volume.games,     VOLUME_TIERS, global.volume.wins,   VOLUME_TIERS),
-    tile('tables',    '🪑', playedAll ? 1 : 0,       DONE_TIER,    wonAll ? 1 : 0,       DONE_TIER),
+    tile('tables',    '👥', playedAll ? 1 : 0,       DONE_TIER,    wonAll ? 1 : 0,       DONE_TIER),
     tile('locations', '📍', global.locations.played, ACH_TIERS,    global.locations.won, ACH_TIERS),
     tile('players',   '🤝', global.players.played,   ACH_TIERS,    global.players.won,   ACH_TIERS),
     tile('pace',      '🌈', PACE_KEYS.every(k => global.pace[k].played > 0) ? 1 : 0, DONE_TIER, PACE_KEYS.every(k => global.pace[k].won > 0) ? 1 : 0, DONE_TIER),
-    tile('positions', '🎲', SEAT_KEYS.every(i => global.positions[i].played > 0) ? 1 : 0, DONE_TIER, SEAT_KEYS.every(i => global.positions[i].won > 0) ? 1 : 0, DONE_TIER),
+    tile('positions', '🪑', SEAT_KEYS.every(i => global.positions[i].played > 0) ? 1 : 0, DONE_TIER, SEAT_KEYS.every(i => global.positions[i].won > 0) ? 1 : 0, DONE_TIER),
   ];
   return `<div class="ach-grid">${tiles.join('')}</div>`;
 }
@@ -362,7 +362,7 @@ function renderGlobalDetailHTML(key, global) {
       <p class="modal-hint">${t("Only players who've claimed their villain in a game count.")}</p>`;
   }
   if (key === 'tables') {
-    return _setCompletionDetailHTML(`🪑 ${t('Table sizes')}`,
+    return _setCompletionDetailHTML(`👥 ${t('Table sizes')}`,
       [2, 3, 4, 5, 6].map(s => ({ label: t('{n} players', { n: s }), played: global.tableSizes[s].played, won: global.tableSizes[s].won })),
       t('Played every size (2–6p)'), t('Won every size (2–6p)'));
   }
@@ -374,7 +374,7 @@ function renderGlobalDetailHTML(key, global) {
   }
   if (key === 'positions') {
     const ord = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
-    return _setCompletionDetailHTML(`🎲 ${t('Starting position')}`,
+    return _setCompletionDetailHTML(`🪑 ${t('Starting position')}`,
       SEAT_KEYS.map(i => ({ label: t(`${ord[i]} seat`), played: global.positions[i].played, won: global.positions[i].won })),
       t('Played from every seat (1st–6th)'), t('Won from every seat (1st–6th)'));
   }

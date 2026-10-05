@@ -40,7 +40,7 @@ function _dict(name) {
   return (LANG !== 'en' && window.I18N && window.I18N[LANG] && window.I18N[LANG][name]) || {};
 }
 
-// Interface text: t('Save Game') → "Salva partita" in Italian, the English text
+// Interface text: t('Save game') → "Salva partita" in Italian, the English text
 // itself when there's no translation. `{name}` placeholders are filled from
 // `vars`: t('{n} games', { n: 3 }).
 function t(text, vars) {

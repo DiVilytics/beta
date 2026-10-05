@@ -37,7 +37,7 @@
   <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="new-game.html" title="New Game" data-i18n-attr="title">🎲</a>
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
       <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -51,7 +51,7 @@
 <main>
   <div class="page-header align-top">
     <div>
-      <h2 data-i18n>Villains</h2>
+      <h2><span class="page-ico" aria-hidden="true">🎭</span><span data-i18n>Villains</span></h2>
     </div>
     <div class="cs-search" id="csSearchWrap">
       <input type="text" id="csSearchInput" placeholder="Jump to villain…" autocomplete="off" disabled data-i18n-attr="placeholder">
@@ -59,7 +59,7 @@
     </div>
   </div>
   <p class="page-intro" data-i18n>Stats, rivalries, guides and cards for every villain.</p>
-  <a class="back-link hidden" id="csBack" href="villains.html" data-i18n>← All villains</a>
+  <a class="back-link hidden" id="csBack" href="villains.html" onclick="goBack('villains.html'); return false;" data-i18n>← Back</a>
 
   <div id="csIdentity"></div>
 

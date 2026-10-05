@@ -101,8 +101,9 @@
 
 /* Reserve the standard control height (38px input) so a search box that only
    appears after data loads (the game log location filter) doesn't grow the
-   header and shift the title down on first render. */
-.page-header.has-search-control { min-height: 38px; }
+   header and shift the title down on first render. The title sits at the top,
+   like Players and Villains, not centered against the 38px box. */
+.page-header.has-search-control { min-height: 38px; align-items: flex-start; }
 
 /* Char detail-page identity portrait (40px). Compound selector wins against
    the later `.char-portrait` rule (18px) when both classes are applied. */
@@ -266,9 +267,6 @@ a.chip {
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-/* Your own chip (signed-in player, on every page): a purple ring inside
-   the chip's border, strong enough to stay visible on a gold winner chip too. */
-.chip.self { outline: 1.5px solid rgba(124, 106, 247, 0.85); outline-offset: -3px; }
 
 /* Inline links within chips */
 .chip-char a.char-link {
@@ -462,8 +460,10 @@ main {
   letter-spacing: -0.02em;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
+/* The page's nav emoji before its title (⚔️ New Game, 🕒 Game Log…). */
+.page-ico { font-size: 0.9em; line-height: 1; letter-spacing: 0; }
 
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
 /* New Game lineup buttons (Draw all, Random order): neutral like the row
@@ -475,10 +475,6 @@ main {
 .btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
-/* New Game's Resume / Discard (page header and the game-in-progress banner):
-   the same size as the lineup buttons, keeping their own colors. */
-.btn.btn-ng { min-height: 30px; width: var(--lineup-btn-w); border-radius: 6px; padding: 3px 8px;
-  font-size: calc(12px * var(--ts)); line-height: 1.15; white-space: nowrap; justify-content: center; }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
 .players-count-select.draw-mode-count { margin-left: auto; height: 30px; min-height: 30px; max-height: 30px; }
 
@@ -615,22 +611,6 @@ main {
   margin-bottom: 10px;
 }
 
-/* ── RESUME BANNER ────────────────────────────────────────────────── */
-.resume-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  background: var(--accent-d);
-  border: 1px solid var(--accent);
-  border-radius: var(--r);
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-}
-.resume-banner-text { display: flex; flex-direction: column; gap: 0.15rem; }
-.resume-banner-text strong { color: var(--accent); font-size: calc(0.9rem * var(--ts)); }
-.resume-banner-text span   { color: var(--muted);  font-size: calc(0.8rem * var(--ts)); }
-.resume-banner-btns { display: flex; gap: 0.5rem; flex-shrink: 0; }
 
 /* ── LOAD MORE BUTTON ─────────────────────────────────────────────── */
 .btn-load-more {
@@ -975,7 +955,14 @@ main {
   border-radius: 2px;
   margin: 10px auto 0;
   flex-shrink: 0;
+  position: relative;
+  cursor: grab;
 }
+/* Drag to close (ui.js): the handle's grab area is wider and taller than the
+   bar, and handle + header take the gesture instead of scrolling the page. */
+.sheet-handle::before { content: ''; position: absolute; inset: -12px -60px -8px; }
+.sheet-handle, .sheet-header { touch-action: none; }
+.overlay.no-drag .sheet-handle { visibility: hidden; }
 
 .sheet-header {
   display: flex;
@@ -1444,11 +1431,11 @@ select:disabled {
   cursor: zoom-out;
 }
 .avatar-lightbox.open { display: flex; }
+/* A fixed size, whatever the image: with width/height auto, Safari can lay a
+   photo avatar out tiny (aspect-ratio + auto sizes), unlike a built one. */
 .avatar-lightbox-img {
-  max-width: min(420px, 80vw);
-  max-height: min(420px, 80vh);
-  width: auto;
-  height: auto;
+  width: min(420px, 80vw, 80vh);
+  height: min(420px, 80vw, 80vh);
   border-radius: 50%;
   object-fit: cover;
   aspect-ratio: 1 / 1;
@@ -1517,13 +1504,7 @@ select:disabled {
 }
 /* Composite shown in the zoom lightbox needs an explicit square size since the
    stacked layers are absolutely positioned (no intrinsic dimensions). */
-.avatar-stack.avatar-lightbox-img {
-  width: min(420px, 80vw);
-  height: min(420px, 80vw);
-  max-width: none;
-  max-height: none;
-  aspect-ratio: 1 / 1;
-}
+
 
 /* ── AVATAR BUILDER ───────────────────────────────────────────────── */
 /* Toolbar row: the Presets / Build .seg tabs on the left, "Use default icon" on
@@ -2032,6 +2013,25 @@ select:disabled {
   padding-bottom: env(safe-area-inset-bottom);
 }
 .new-game-footer .btn { flex: 1; justify-content: center; font-size: calc(14px * var(--ts)); padding: 9px; }
+/* Discard, Start, Save share the row in thirds; on narrow phones a long label wraps. */
+.new-game-footer .btn { min-width: 0; white-space: normal; text-align: center; line-height: 1.2; }
+
+/* "Tap to continue": a running game shown on page load can't start the
+   lock-screen controls without a tap, so the whole screen asks for one. No
+   card: the text sits on a heavy blur tinted with the page background, which
+   keeps it readable in both themes. */
+.tap-resume {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center; padding: 32px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+  cursor: pointer;
+}
+.tap-resume.hidden { display: none; }
+.tap-resume-card  { max-width: 320px; text-align: center; }
+.tap-resume-ico   { font-size: calc(40px * var(--ts)); line-height: 1; }
+.tap-resume-title { margin-top: 14px; font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.tap-resume-text  { margin: 10px 0 0; font-size: calc(15px * var(--ts)); line-height: 1.5; color: var(--text); opacity: 0.8; }
 
 /* Shared char grid (exclude panel + filter panel) */
 .exclude-toggle,
@@ -2172,7 +2172,11 @@ select:disabled {
   box-sizing: border-box;
 }
 /* .claim-row.winner shares .chip.winner (winner highlight, above). */
-.claim-row.mine { border-color: rgba(124, 106, 247, 0.4); }
+/* Your own villain, on game cards and the claim page alike: a single purple
+   border, kept over the gold winner background (after .chip.winner, so the
+   border stays purple on a winner). */
+.chip.self,
+.claim-row.mine { border-color: rgba(124, 106, 247, 0.55); }
 
 /* Seat number, portrait, villain + nickname, then the crown at the end (like the game cards). */
 .claim-char { font-weight: 600; font-size: calc(14px * var(--ts)); display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
@@ -2462,17 +2466,20 @@ select:disabled {
 }
 
 /* ── HOME PAGE ────────────────────────────────────────────────────── */
+/* Home, Tutorial and 404 heads match every other page: the title like
+   .page-header h2, the tagline like .page-intro, the same gaps. */
 .home-hero {
-  margin-bottom: 2rem;
-  padding-top: 0.5rem;
+  margin-bottom: 20px;
 }
 
 .home-title {
-  font-size: calc(26px * var(--ts));
+  font-size: calc(20px * var(--ts));
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .home-title-row {
@@ -2484,10 +2491,10 @@ select:disabled {
 .home-title-row .home-title { flex: 1; }
 
 .home-tagline {
-  margin-top: 8px;
-  font-size: calc(13px * var(--ts));
+  margin-top: 1rem;
+  font-size: calc(14px * var(--ts));
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .home-share-btn { flex-shrink: 0; }
@@ -2905,9 +2912,6 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
-  /* Game-in-progress banner: the text on its own line, Resume / Discard under it. */
-  .resume-banner { flex-wrap: wrap; row-gap: 10px; }
-  .resume-banner-text { flex-basis: 100%; }
   :root { --lineup-btn-w: calc(76px * var(--ts)); }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); white-space: normal; }
   .home-faq-list { grid-template-columns: 1fr; }

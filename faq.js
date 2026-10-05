@@ -113,7 +113,9 @@ function _menuHTML() {
     <p class="faq-credit">${t('Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.', { link: '<a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>' })}</p>`;
 }
 
-const _BACK_HTML = `<a class="back-link" href="faq.html">${t('← All topics')}</a>`;
+// Back to the page you came from (a villain's "Rules F.A.Q." link, the topic
+// menu…), or the topic menu when the page was opened cold.
+const _BACK_HTML = `<a class="back-link" href="faq.html" onclick="goBack('faq.html'); return false;">${t('← Back')}</a>`;
 
 function _groupsHTML(groups) {
   return groups.map(g => `

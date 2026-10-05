@@ -68,6 +68,8 @@ const liveGame = (() => {
       try { s = JSON.parse(localStorage.getItem(KEY)); } catch (_) { return null; }
       if (!s || !s.slots || !s.slots.length) return null;
       if (Date.now() - s.saved > MAX_AGE_MS)  return null;
+      // Running for 48h: someone forgot to pause and stopped playing long ago.
+      if (s.liveStart && Date.now() - s.liveStart > MAX_AGE_MS) return null;
       if (!s.liveStart && !s.fDurExactMs)     return null;
       return s;
     },
@@ -392,6 +394,7 @@ function _openNicknameModal(onSuccess) {
   _nickMode = 'create';
   _nickOnSuccess = onSuccess || null;
   if (!document.getElementById('nicknameOverlay')) return;
+  document.getElementById('nicknameOverlay').classList.add('no-drag');   // required: no dragging it away
   document.getElementById('nickModalTitle').textContent = t('Choose your nickname');
   document.getElementById('nickModalHint').textContent  = t("This nickname identifies you on game records and the leaderboard. You can change it later from your Account page.");
   document.getElementById('nickInput').value = '';
@@ -403,7 +406,10 @@ function _openNicknameModal(onSuccess) {
 function openChangeNicknameModal(onSuccess) {
   _nickMode = 'update';
   _nickOnSuccess = onSuccess || null;
-  if (!document.getElementById('nicknameOverlay')) return;
+  const overlay = document.getElementById('nicknameOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('no-drag');   // optional: drag down to cancel
+  overlay._dragClose = () => { _closeNicknameModal(); return true; };
   document.getElementById('nickModalTitle').textContent = t('Change your nickname');
   document.getElementById('nickModalHint').textContent  = t('Your nickname will be updated on all past and future game records.');
   document.getElementById('nickInput').value = _currentProfile?.nickname || '';

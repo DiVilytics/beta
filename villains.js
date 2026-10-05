@@ -940,8 +940,8 @@ async function renderFaqLink(charName) {
     <a class="home-section-link mt-1-5" href="faq.html?topic=${encodeURIComponent(base)}">
       <span class="home-section-icon">📜</span>
       <div class="home-section-text">
-        <span class="home-section-name">${t('Rules FAQ')}</span>
-        <span class="home-section-desc">${_esc(tn(rules.length, '{n} clarification for {villain}', '{n} clarifications for {villain}', { villain: villainName(base) }))}</span>
+        <span class="home-section-name">${t('Rules F.A.Q.')}</span>
+        <span class="home-section-desc">${_esc(tn(rules.length, '{n} clarification for {villain}.', '{n} clarifications for {villain}.', { villain: villainName(base) }))}</span>
       </div>
     </a>`;
 }

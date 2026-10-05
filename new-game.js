@@ -13,7 +13,6 @@ let _lastAuthId;                    // last auth user id the slots were rendered
 // persistence) lives in the shared `liveGame` module.
 let liveTimerId     = null;        // 1s clock ticker
 let _saveIntervalId = null;        // 30s background-persist
-let _resumeTickId   = null;        // resume-banner ticker (set in _checkResume)
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
@@ -58,6 +57,7 @@ async function init() {
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
     for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
   }
+  _checkResume();   // a game in progress shows right away, not after an empty form
 
   // Re-render slots whenever auth state changes so the Me-locked indicator
   // updates in-place after sign-in / sign-out.
@@ -88,25 +88,24 @@ async function init() {
   // Re-render now that chars are loaded (fills the selects), auth is resolved and
   // any draft is back, then start saving it.
   renderOrderSlots();
-  _draftReady = true;   // from now on every change is saved (not this load: the 24h count from the last change)
+  _draftReady = true;   // from now on every change is saved (not this load: the hour counts from the last change)
   if (!poolRestored) pace.defaultToMine();   // boxes marked on the Account page: draw from those
   pace.updatePaceUI();
   updateExcludeUI();   // show the pool size from the start
   _initDrag();
-  _checkResume();
   attachLocationAutocomplete('fLocation', 'fLocationDropdown');
 }
 
 // ── DRAFT ─────────────────────────────────────────────────────────────────────
 // The form (players, villains, 👤 / 👑, date and details) and the draw pool are
 // kept in localStorage as you edit, so leaving the page, switching apps or a
-// sign-in round-trip don't lose them. The draft expires 24 hours after the last
+// sign-in round-trip don't lose them. The draft expires an hour after the last
 // change; Discard and saving the game clear it, pool included. A fresh pool is
 // every villain, or only your boxes when you've marked some on the Account page
 // (the one lasting way to shape it). An untouched date isn't kept: it comes back
 // as "now". A game in progress has its own snapshot (liveGame) and wins over it.
 const DRAFT_KEY    = 'divilytics_new_game_draft';
-const DRAFT_MAX_MS = 24 * 60 * 60 * 1000;
+const DRAFT_MAX_MS = 60 * 60 * 1000;
 let _draftReady = false;   // nothing is saved until init has restored (or not) the draft
 
 // Saves the draft, or drops it when the page is back to a fresh one (nothing to keep).
@@ -622,9 +621,10 @@ function startLive() {
 
   const fDurEl    = document.getElementById('fDur');
   const durOffset = liveGame.exactDurMs ?? (parseInt(fDurEl.value) || 0) * 60000;
+  const resuming  = liveGame.hasSession;   // a paused game: keep the date it started on
   liveGame.markStarted(Date.now() - durOffset);
 
-  _setDateToNow();
+  if (!resuming) _setDateToNow();
 
   liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 0);
   document.getElementById('liveTurnCount').textContent = liveGame.turns;
@@ -651,7 +651,7 @@ function stopLive() {
 
   setLiveUI(false);
   const sb = document.getElementById('startBtn');
-  sb.textContent = t('Resume Game');   // stays purple (btn-primary)
+  sb.textContent = t('Resume game');   // stays purple (btn-primary)
   _updateDiscardBtn();
   liveGame.emit('stop');
   _saveLiveState();
@@ -695,13 +695,14 @@ function _isFormChanged() {
       || !pace.isDefault();
 }
 
-// Discard shows as soon as anything changed, or while a game session exists.
+// Discard is always there; it's enabled as soon as anything changed, or while a
+// game session exists.
 function _updateDiscardBtn() {
-  setVisible('discardBtn', liveGame.hasSession || _isFormChanged());
-  setVisible('resumeBtn',  liveGame.isPaused);
+  const btn = document.getElementById('discardBtn');
+  if (btn) btn.disabled = !(liveGame.hasSession || _isFormChanged());
 }
 
-// Both Discard buttons (page header and resume banner) ask with the same app
+// The Discard button asks with the app
 // confirm sheet: the browser's native confirm() is suppressed (auto-cancelled)
 // in some in-app browsers and installed web apps.
 function _confirmDiscard(onConfirm) {
@@ -724,7 +725,7 @@ function _doDiscard() {
   liveGame.emit('close');
 
   const sbD = document.getElementById('startBtn');
-  sbD.textContent = t('Start Game');   // stays purple (btn-primary)
+  sbD.textContent = t('Start game');   // stays purple (btn-primary)
   clearError('err');
   document.getElementById('fLocation').value = '';
   document.getElementById('fDur').value = '';
@@ -746,65 +747,26 @@ function _doDiscard() {
   _saveDraft();           // nothing left to keep: drops the draft
 }
 
-// ── RESUME BANNER ─────────────────────────────────────────────────────────────
+// ── GAME IN PROGRESS ─────────────────────────────────────────────────────────
+// There's at most one game. When one is saved (running or paused), landing on
+// the page shows it straight away, the running timer included, and Start game
+// reads Resume game. Starting another one takes Discard (or saving this one).
 
 function _checkResume() {
   const state = liveGame.loadSaved();
   if (!state) {
-    // Drop any stale (>24h) or incomplete snapshot still sitting in storage.
+    // Drop any stale (48h) or incomplete snapshot still sitting in storage.
     if (localStorage.getItem(liveGame.KEY)) liveGame.clear();
     return;
   }
-
-  const banner = document.createElement('div');
-  banner.id = 'resumeBanner';
-  banner.className = 'resume-banner';
-  banner.innerHTML = `
-    <div class="resume-banner-text">
-      <strong>${t('Game in progress')}</strong>
-      <span>${tn(state.slots.length, '{n} player', '{n} players')} | ${t('Round {n}', { n: state.liveTurns })}<span id="resumeElapsed"></span></span>
-    </div>
-    <div class="resume-banner-btns">
-      <button class="btn btn-primary btn-ng" onclick="_doResume()">${t('Resume')}</button>
-      <button class="btn btn-danger btn-ng" onclick="_confirmDiscard(() => { _dismissResume(); _doDiscard(); })">${t('Discard')}</button>
-    </div>`;
-  document.querySelector('main').prepend(banner);
-
-  const elapsedEl = document.getElementById('resumeElapsed');
-  if (state.liveStart) {
-    const tick = () => { elapsedEl.textContent = ` | ${fmtElapsed(Date.now() - state.liveStart)}`; };
-    tick();
-    _resumeTickId = setInterval(tick, 1000);
-  } else if (state.fDurExactMs) {
-    elapsedEl.textContent = ` | ${fmtElapsed(state.fDurExactMs)}`;
-  }
-}
-
-function _dismissResume() {
-  if (_resumeTickId) { clearInterval(_resumeTickId); _resumeTickId = null; }
-  _clearLiveState();
-  document.getElementById('resumeBanner')?.remove();
-}
-
-function _doResume() {
-  const state = liveGame.loadSaved();
-  if (!state) return;
-
-  if (_resumeTickId) { clearInterval(_resumeTickId); _resumeTickId = null; }
-  document.getElementById('resumeBanner')?.remove();
-  if (!getCurrentUser()) { goToSignIn(); return; }
-  if (!getCurrentProfile()) { _openNicknameModal(); return; }
-
-  const sbR = document.getElementById('startBtn');
-  sbR.textContent = t('Resume Game');   // stays purple (btn-primary)
+  liveGame.restoreFrom(state);
+  document.getElementById('startBtn').textContent = t('Resume game');   // stays purple (btn-primary)
   clearError('err');
 
   document.getElementById('fDate').value     = state.fDate     || '';
   document.getElementById('fLocation').value = state.fLocation || '';
   document.getElementById('fDur').value      = state.fDur      || '';
   document.getElementById('fTurns').value    = state.fTurns    || '';
-
-  liveGame.restoreFrom(state);
 
   orderSlots = (state.slots || []).map(s => ({
     id:       orderNextId++,
@@ -813,7 +775,6 @@ function _doResume() {
     isWinner: !!s.isWinner,
   }));
   renderOrderSlots();
-  _updateDiscardBtn();
 
   if (state.liveStart) {
     document.getElementById('liveTurnCount').textContent = liveGame.turns;
@@ -821,14 +782,17 @@ function _doResume() {
     setLiveUI(true);
     tickLive();
     liveTimerId = setInterval(tickLive, 1000);
-    _updateDiscardBtn();
-    liveGame.emit('start');
+    // Once every script is in: new-game-audio.js (lock-screen controls) loads after this one.
+    const start = () => liveGame.emit('start');
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+    else start();
     _saveLiveState();
     if (!_saveIntervalId) _saveIntervalId = setInterval(_saveLiveState, 30000);
   }
+  _updateDiscardBtn();
 }
 
-// ── SUBMIT (Save Game) ────────────────────────────────────────────────────────
+// ── SUBMIT (Save game) ────────────────────────────────────────────────────────
 
 async function submitForm() {
   clearError('err');
@@ -874,14 +838,14 @@ async function submitForm() {
   const { data: g, error } = await db.from('games').insert(gameData).select().single();
   if (error) {
     btn.disabled    = false;
-    btn.textContent = t('Save Game');
+    btn.textContent = t('Save game');
     return showErr(error.message);
   }
 
   await db.from('game_players').insert(ps.map(p => ({ game_id: g.id, ...p })));
 
   btn.disabled    = false;
-  btn.textContent = t('Save Game');
+  btn.textContent = t('Save game');
 
   // Clear live state (we just saved the game) and notify hooks
   _clearLiveState();
@@ -895,7 +859,7 @@ async function submitForm() {
 // ── QR CODE ───────────────────────────────────────────────────────────────────
 
 function showQR(gameId) {
-  showQRModal(new URL(`join.html?game=${gameId}`, location.href).href, 'qrCode', 'qrOverlay');
+  showQRModal(new URL(`claim.html?game=${gameId}`, location.href).href, 'qrCode', 'qrOverlay');
 }
 
 function closeQR() {

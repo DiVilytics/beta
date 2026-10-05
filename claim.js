@@ -126,15 +126,14 @@ function render() {
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
 function claimGoBack() {
-  // Return to wherever we came from (e.g. the player profile); fall back to the
-  // profile page when the claim page was opened cold (e.g. via a shared QR).
-  if (history.length > 1) { history.back(); return; }
-  location.href = 'players.html';
+  // Back to wherever we came from (e.g. the player profile); the profile page
+  // when the claim page was opened cold (e.g. via a shared QR).
+  goBack('players.html');
 }
 
 function shareGame() {
   if (!claimGame) return;
-  const url = new URL(`join.html?game=${claimGame.id}`, location.href).href;
+  const url = new URL(`claim.html?game=${claimGame.id}`, location.href).href;
   showQRModal(url, 'qrCode', 'qrOverlay');
 }
 
