@@ -253,7 +253,7 @@ function render() {
   if (!pfGames.length) {
     setVisible('pfControls', false);
     root.innerHTML =
-      `<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
+      `<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
     return;
   }
 

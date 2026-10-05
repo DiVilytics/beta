@@ -295,11 +295,11 @@ function _settingsPanel() {
     </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Text size')}</span>
-      <div class="seg">${btn('data-text-opt', 'small', t('Small'))}${btn('data-text-opt', 'large', t('Large'))}</div>
+      <div class="seg">${btn('data-text-opt', 'small', `<span class="settings-ico ts-a">A</span>${t('Small')}`)}${btn('data-text-opt', 'large', `<span class="settings-ico ts-a">A</span>${t('Large')}`)}</div>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Language')}</span>
-      <div class="seg">${btn('data-lang', 'en', 'EN', 'English')}${btn('data-lang', 'it', 'IT', 'Italiano')}</div>
+      <div class="seg">${btn('data-lang', 'en', '<span class="settings-ico">🌐</span>EN', 'English')}${btn('data-lang', 'it', '<span class="settings-ico">🌐</span>IT', 'Italiano')}</div>
     </div>`;
   panel.addEventListener('click', e => {
     const b = e.target.closest('.seg-btn');

@@ -8,6 +8,15 @@ let glBoxInfo      = {};   // loadBoxInfo(), used to order box groups by release
 let glFilterCount    = 'all';   // 'all' | 2 | 3 | 4 | 5 | 6
 let glFilterLocation = null;
 
+// Villain filter mode. 'only': games played entirely within the included set
+// (the pool built by excluding, pace and My boxes). 'with': games that have
+// every selected villain at the table; the grid starts all struck through and
+// a tap picks a villain (picked = not in pace.excluded). The 'only' selection
+// is set aside meanwhile and comes back on switching back. In the UI the modes
+// read "Among these" and "With these".
+let glCharMode     = 'only';
+let _onlySnapshot  = null;
+
 // The "included characters" filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
 const pace = createPaceFilter({
@@ -49,7 +58,7 @@ async function init() {
     () => updateFilterUI(),
     glBoxInfo
   );
-  await loadLocationOptions();
+  await Promise.all([loadLocationOptions(), _probeWithMode()]);
   await load();
   updateFilterUI();      // show the included-character count from the start
   pace.updatePaceUI();   // initialize the pace swatches + My-boxes button
@@ -63,25 +72,22 @@ async function load(reset = true) {
     // Don't wipe the DOM yet. keep current cards visible while fetching
   }
 
-  // char_filter is the INCLUDED set (everything not excluded). Nothing excluded →
-  // null (no restriction); excluding everything → empty array → no games.
-  const charArr  = pace.excluded.size === 0 ? null : glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
+  // 'only': char_filter is the INCLUDED set (everything not excluded). Nothing
+  // excluded → null (no restriction); excluding everything → empty array → no
+  // games. 'with': with_filter is the picked villains; none picked → no filter.
+  const included = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
+  const withArr  = glCharMode === 'with' && included.length ? included : null;
+  const charArr  = glCharMode === 'only' && pace.excluded.size ? included : null;
   const countVal = glFilterCount !== 'all' ? glFilterCount : null;
   const locVal   = glFilterLocation || null;
 
+  const filters = withArr
+    ? { with_filter: withArr, count_filter: countVal, location_filter: locVal }
+    : { char_filter: charArr, count_filter: countVal, location_filter: locVal };
+  const suffix  = withArr ? '_with' : '';
   const [{ data: newGames, error }, { data: total }] = await Promise.all([
-    db.rpc('get_game_page', {
-      char_filter:     charArr,
-      count_filter:    countVal,
-      location_filter: locVal,
-      page_offset:     _gameOffset,
-      page_size:       PAGE_SIZE,
-    }),
-    db.rpc('get_game_count', {
-      char_filter:     charArr,
-      count_filter:    countVal,
-      location_filter: locVal,
-    }),
+    db.rpc('get_game_page' + suffix, { ...filters, page_offset: _gameOffset, page_size: PAGE_SIZE }),
+    db.rpc('get_game_count' + suffix, filters),
   ]);
 
   if (error) {
@@ -136,10 +142,53 @@ function toggleCharFilter() {
 // when the panel closes (Done or the toggle), so toggling characters never
 // reloads mid-edit.
 function updateFilterUI() {
-  const badge = document.getElementById('charBadge');
-  badge.textContent = glChars.length - pace.excluded.size;   // characters still included
-  badge.classList.add('visible');
-  badge.classList.toggle('full', !pace.excluded.size);
+  // The toggle sums the filter up: "Villains | among 12" or "Villains | with
+  // Ursula, Jafar" (names up to two, then a count); nothing after it when off.
+  const picked = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
+  let summary = '';
+  if (_charFilterActive()) {
+    summary = glCharMode === 'with'
+      ? (picked.length <= 2
+          ? t('with {names}', { names: picked.map(villainNameInline).join(', ') })
+          : t('with {n}', { n: picked.length }))
+      : t('among {n}', { n: picked.length });
+  }
+  document.getElementById('charFilterSummary').innerHTML = summary ? `<span class="sep"> | </span>${summary}` : '';
+}
+
+// True when the villain filter actually narrows the list.
+function _charFilterActive() {
+  return glCharMode === 'with' ? pace.excluded.size < glChars.length : pace.excluded.size > 0;
+}
+
+// The 'with' mode needs the get_game_page_with / get_game_count_with functions;
+// without them the switch stays hidden and the filter works as before.
+async function _probeWithMode() {
+  const { error } = await db.rpc('get_game_count_with', { with_filter: [], count_filter: null, location_filter: null });
+  setVisible('glCharMode', !error);
+}
+
+function glSetCharMode(mode) {
+  if (mode === glCharMode) return;
+  if (mode === 'with') {
+    _onlySnapshot = { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn };
+    glCharMode = mode;
+    pace.excludeAll();
+  } else {
+    glCharMode = mode;
+    pace.restoreState(_onlySnapshot || {});
+  }
+  _syncCharModeUI();
+}
+
+function _syncCharModeUI() {
+  const withMode = glCharMode === 'with';
+  document.getElementById('charFilterPanel').classList.toggle('with-mode', withMode);
+  document.querySelectorAll('#glCharMode .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === glCharMode));
+  document.getElementById('glFilterHint').textContent = withMode
+    ? t('Tap the villains that must all be in the game.')
+    : t('Tap to exclude villains; games using any excluded villain are hidden.');
+  updateFilterUI();
 }
 
 // ── PACE / MY-BOXES SELECTION ──────────────────────────────────────────────────
@@ -155,7 +204,8 @@ function glSelectPace(color) { pace.selectPace(color); }
 function glSetPaceMode(plus) { pace.setPaceMode(plus); }
 function glToggleMine()      { pace.toggleMine(); }
 function glExcludeAll()      { pace.excludeAll(); }
-function glClearExcluded()   { pace.clearExcluded(); }
+// "Clear" empties the filter: everyone back in ('only'), nobody picked ('with').
+function glClearExcluded()   { if (glCharMode === 'with') pace.excludeAll(); else pace.clearExcluded(); }
 
 function showErr(msg) {
   showError('err', msg, { scroll: true });
@@ -217,7 +267,7 @@ function render() {
   if (!_loaded) return;
 
   const hint         = document.getElementById('resultsHint');
-  const filterActive = glFilterCount !== 'all' || pace.excluded.size > 0 || glFilterLocation !== null;
+  const filterActive = glFilterCount !== 'all' || _charFilterActive() || glFilterLocation !== null;
   const root         = document.getElementById('root');
 
   const pillArea = document.getElementById('locationPillArea');
@@ -275,4 +325,8 @@ function buildCard(g, gp) {
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
+// The filters always start fresh: a page the browser brings back from its
+// back/forward cache (Safari keeps it as you left it) is loaded again.
+window.addEventListener('pageshow', e => { if (e.persisted) location.reload(); });
+
 init();

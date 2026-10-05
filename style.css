@@ -248,8 +248,17 @@ nav {
 .settings-row { display: flex; flex-direction: column; gap: 6px; }
 .settings-lbl { font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .settings-panel .seg { width: 100%; }
-.settings-panel .seg-btn { flex: 1; padding: 5px 8px; }
+.settings-panel .seg-btn {
+  flex: 1; padding: 0 8px; height: calc(28px * var(--ts));
+  display: inline-flex; align-items: center; justify-content: center;
+}
 .settings-ico { margin-right: 5px; }
+/* Text size: each option is shown at its own size (12px, or 12px × 1.125). */
+.settings-panel [data-text-opt="small"] { font-size: 12px; }
+.settings-panel [data-text-opt="large"] { font-size: 13.5px; }
+.ts-a { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; }
+[data-text-opt="small"] .ts-a { font-size: 11px; }
+[data-text-opt="large"] .ts-a { font-size: 16px; }
 
 .nav-icon-btn {
   background: none;
@@ -552,6 +561,10 @@ main {
   align-self: flex-start;
 }
 .filter-char-toggle .toggle-right { display: flex; align-items: center; gap: 8px; }
+/* Game Log: "Villains | among 12", the summary in purple while a filter is on. */
+.gl-char-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gl-char-summary { color: var(--accent); }
+.gl-char-summary .sep { color: var(--dim); }
 
 .badge {
   font-size: calc(11px * var(--ts));
@@ -588,6 +601,11 @@ main {
 }
 .filter-apply-btn { margin-left: auto; }
 .gl-filter-hint { font-size: calc(11px * var(--ts)); color: var(--dim); margin: 0 0 8px; }
+/* Only these / With these: the second mode picks villains that must all be at
+   the table, so the pace and My-boxes tools (which shape a pool) step aside. */
+#charFilterPanel .filter-actions { flex-wrap: wrap; row-gap: 8px; }
+.gl-actions-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.filter-char-panel.with-mode .gl-only { display: none; }
 .txt-btn {
   font-family: inherit;
   font-size: calc(12px * var(--ts));
@@ -610,6 +628,8 @@ main {
   margin-bottom: 10px;
 }
 .list-header .results-hint { margin-bottom: 0; }
+/* As tall as the filter's Done button (a link would inherit the body's line height). */
+.list-header .btn-sm { line-height: normal; }
 
 /* ── RESULTS HINT ─────────────────────────────────────────────────── */
 .results-hint {
@@ -1508,9 +1528,6 @@ select:disabled {
   object-fit: cover;
   pointer-events: none;
   user-select: none;
-  /* The source art sits slightly left of center; nudge every layer right.
-     Percentage keeps it proportional at every avatar size (nav → lightbox). */
-  transform: translateX(2%);
 }
 /* Composite shown in the zoom lightbox needs an explicit square size since the
    stacked layers are absolutely positioned (no intrinsic dimensions). */
@@ -1928,7 +1945,11 @@ select:disabled {
   gap: 10px;
   margin-bottom: 10px;
 }
-.filter-bulk-row .seg-btn { padding: 4px 10px; }
+/* Filter switches (Pace / Pace+, Among / With these) and the pace dots are as
+   tall as the Done button next to them (.btn-sm). */
+.filter-bulk-row .seg, .gl-char-mode { padding: 2px; gap: 2px; height: 25px; box-sizing: border-box; align-items: stretch; }
+.filter-bulk-row .seg-btn, .gl-char-mode .seg-btn { padding: 0 9px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
+.filter-bulk-row .pace-color { width: 25px; height: 25px; }
 .owned-toggle.on { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
@@ -1994,16 +2015,14 @@ select:disabled {
 .order-slot-select option,
 .order-slot-select optgroup { font-size: calc(13px * var(--ts)); }
 /* A villain name that may be cut short (villainNameHTML, lang.js): the name
-   takes the "…", the [TAG] after it always stays whole.
-   On a very narrow row the name keeps at least a few letters and the tag
-   wraps under it instead of crowding it out. */
+   takes the "…", the [TAG] after it always stays whole and sits right after
+   the name, or wraps under it when the whole name doesn't fit beside it. */
 .vn { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.3em; min-width: 0; max-width: 100%; }
-.vn-name { min-width: min(100%, 4.5em); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vn-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vn-tag { flex-shrink: 0; white-space: nowrap; font-size: 0.8em; }
 /* New Game rows keep the tag on the name's line: the name gives way first. */
 .order-slot-name .vn { flex-wrap: nowrap; }
 .order-slot-name .vn { column-gap: 0.2em; }
-.order-slot-name .vn-name { min-width: 0; }
 /* Inside a card's villain link the name box needs a block to size against. */
 .chip-char a.char-link:has(.vn) { display: block; }
 
@@ -2935,7 +2954,7 @@ select:disabled {
 @media (max-width: 768px) {
   .draw-mode-row                  { gap: 6px; }
   .filter-bulk-row .pace-colors   { gap: 3px; }
-  .filter-bulk-row .pace-color    { width: 24px; height: 24px; border-width: 1px; }
+  .filter-bulk-row .pace-color    { border-width: 1px; }
 }
 
 @media (max-width: 480px) {
@@ -2947,7 +2966,6 @@ select:disabled {
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }
   .form-row input { font-size: calc(13px * var(--ts)); }
-  .filter-bulk-row .pace-color    { width: 22px; height: 22px; }
   /* Tighter box picker: lets 3 columns fit instead of 2, keeping cover art
      a comfortable size on phones. */
   .box-picker { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
@@ -2963,7 +2981,6 @@ select:disabled {
   .nav-links a { padding: 4px 6px; font-size: 12px; }
   .draw-mode-row                  { gap: 4px; }
   .filter-bulk-row .pace-colors   { gap: 2px; }
-  .filter-bulk-row .pace-color    { width: 20px; height: 20px; }
   .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 5px 6px; font-size: calc(11px * var(--ts)); }
   .box-picker { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
 }
