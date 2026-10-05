@@ -473,7 +473,7 @@ main {
    phones they narrow and the label wraps to two lines. */
 :root { --lineup-btn-w: calc(112px * var(--ts)); }
 .btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
-  width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
+  width: var(--lineup-btn-w); white-space: normal; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
 .count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }

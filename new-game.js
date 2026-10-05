@@ -524,7 +524,7 @@ function _updateActionBtns() {
     if (drawAllBtn) drawAllBtn.disabled = true;
     document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
   } else if (drawAllBtn) {
-    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all') }[_drawMode()];
+    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all villains') }[_drawMode()];
     const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
     if (drawAllBtn.textContent !== label) drawAllBtn.textContent = label;
     drawAllBtn.disabled = animating || !can;
