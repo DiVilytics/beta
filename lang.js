@@ -23,6 +23,11 @@ const LOCALE = LANG === 'it' ? 'it-IT' : 'en-US';
 
 document.documentElement.lang = LANG;
 
+// Text size (Settings: Small / Large), applied here because this is the one
+// script every page loads in <head>, so the page never paints at the wrong size.
+// setTextSize() lives in shared.js.
+try { if (localStorage.getItem('textSize') === 'large') document.documentElement.dataset.text = 'large'; } catch (_) {}
+
 // Pick a language (home page switch): remember it and redraw every page in it.
 function setLang(lang) {
   if (!LANGS.includes(lang) || lang === LANG) return;

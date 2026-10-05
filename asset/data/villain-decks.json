@@ -552,7 +552,7 @@
       {"name": "The Witches of Morva", "count": 1, "type": "Hero", "strength": "3", "text": "When The Witches of Morva are played, the Horned King must immediately either lose 2 Power or discard two cards from his hand."}
     ],
     "extra": [
-      {"title": "Tile", "note": "Two-sided tile, set aside at the start: The Black Cauldron on one side, The Power of the Black Cauldron on the other. Claim it to put it next to the Villain portrait.", "cards": [
+      {"title": "Tile", "note": "Two-sided tile, set aside at the start: The Black Cauldron on one side, The Power of the Black Cauldron on the other. Once claimed, it goes on the Villain portrait.", "cards": [
         {"name": "The Black Cauldron", "count": 1, "type": "Relic", "text": "At the start of your turn, discard one Cauldron Born from any location.\nActivate: Flip this tile to The Power of the Black Cauldron.", "back": {"name": "The Power of the Black Cauldron", "text": "On your turn, before you move, you may pay 2 Power to replace an Ancient Soldier in play with a Cauldron Born from your hand. You may only do this once per turn."}}
       ]}
     ]

@@ -48,7 +48,7 @@ async function init() {
     } else {
       document.getElementById('pfRoot').className = '';
       document.getElementById('pfRoot').innerHTML =
-        `<div class="empty"><div class="empty-icon">👤</div><h3>${t('No player selected')}</h3><p>${t('Open a profile by clicking a nickname on the leaderboard or a game card.')}</p></div>`;
+        `<div class="empty"><div class="empty-icon">👤</div><h3>${t('No player selected')}</h3><p>${t('Open a profile by tapping a nickname on the leaderboard or a game card.')}</p></div>`;
       return;
     }
   }

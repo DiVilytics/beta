@@ -292,6 +292,10 @@ function _settingsPanel() {
       <div class="seg">${btn('data-theme-opt', 'auto', `<span class="settings-ico">🌗</span>${t('Auto')}`)}${btn('data-theme-opt', 'light', `<span class="settings-ico">☀️</span>${t('Light')}`)}${btn('data-theme-opt', 'dark', `<span class="settings-ico">🌙</span>${t('Dark')}`)}</div>
     </div>
     <div class="settings-row">
+      <span class="settings-lbl">${t('Text size')}</span>
+      <div class="seg">${btn('data-text-opt', 'small', t('Small'))}${btn('data-text-opt', 'large', t('Large'))}</div>
+    </div>
+    <div class="settings-row">
       <span class="settings-lbl">${t('Language')}</span>
       <div class="seg">${btn('data-lang', 'en', 'EN', 'English')}${btn('data-lang', 'it', 'IT', 'Italiano')}</div>
     </div>`;
@@ -299,13 +303,32 @@ function _settingsPanel() {
     const b = e.target.closest('.seg-btn');
     if (!b) return;
     if (b.dataset.themeOpt) setTheme(b.dataset.themeOpt);
+    if (b.dataset.textOpt)  setTextSize(b.dataset.textOpt);
     if (b.dataset.lang)     setLang(b.dataset.lang);   // reloads, unless it's already the language
     _closeSettings();
   });
   panel.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  _updateTextSizeBtns(panel);
   nav.appendChild(panel);
   _updateThemeBtn();
   return panel;
+}
+
+// Text size: Small (default) or Large, kept in localStorage like the theme. The
+// scale is CSS (--ts); a 'resize' event re-runs the layouts that measure text
+// (the New Game legend, the game cards' details line).
+function setTextSize(size) {
+  const large = size === 'large';
+  if (large) document.documentElement.dataset.text = 'large';
+  else       delete document.documentElement.dataset.text;
+  try { localStorage.setItem('textSize', large ? 'large' : 'small'); } catch (_) {}
+  _updateTextSizeBtns();
+  window.dispatchEvent(new Event('resize'));
+}
+
+function _updateTextSizeBtns(panel = document.getElementById('settingsPanel')) {
+  const cur = document.documentElement.dataset.text === 'large' ? 'large' : 'small';
+  panel?.querySelectorAll('[data-text-opt]').forEach(b => b.classList.toggle('on', b.dataset.textOpt === cur));
 }
 
 function toggleSettings(e) {
@@ -349,7 +372,7 @@ function _injectNicknameModal() {
         </div>
         <div class="sheet-body">
           <p id="nickModalHint" class="modal-hint">
-            ${t("This nickname identifies you on game records and the leaderboard. You can't change it later.")}
+            ${t("This nickname identifies you on game records and the leaderboard. You can change it later from your Account page.")}
           </p>
           <div class="err" id="nickErr"></div>
           <div class="field">
@@ -370,7 +393,7 @@ function _openNicknameModal(onSuccess) {
   _nickOnSuccess = onSuccess || null;
   if (!document.getElementById('nicknameOverlay')) return;
   document.getElementById('nickModalTitle').textContent = t('Choose your nickname');
-  document.getElementById('nickModalHint').textContent  = t("This nickname identifies you on game records and the leaderboard. You can't change it later.");
+  document.getElementById('nickModalHint').textContent  = t("This nickname identifies you on game records and the leaderboard. You can change it later from your Account page.");
   document.getElementById('nickInput').value = '';
   clearError('nickErr');
   openOverlay('nicknameOverlay');

@@ -228,9 +228,9 @@ function _initLegend() {
       const w = Math.round(e.contentRect.width);
       if (w && w !== lastW) { lastW = w; _layoutLegend(); }
     }).observe(legend);
-  } else {
-    window.addEventListener('resize', _onLegendResize);
   }
+  // Window resizes, and the Text size setting (same width, bigger text).
+  window.addEventListener('resize', _onLegendResize);
 }
 
 function _onLegendResize() {
@@ -424,7 +424,7 @@ function shuffleOrder() {
       const nameEl   = el.querySelector('.order-slot-name');
       const numEl    = el.querySelector('.row-num');
       if (portrait) portrait.src = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-      if (nameEl)   nameEl.textContent = s.char ? villainName(s.char) : t('Villain');
+      if (nameEl)   nameEl.textContent = s.char ? villainName(s.char) : t('Select villain');
       if (numEl)    numEl.textContent = origPos.get(s.id) + '.';
     });
   }, FRAME_MS);
@@ -447,7 +447,7 @@ function renderOrderSlots() {
     const taken     = new Set(orderSlots.filter(o => o.id !== s.id && o.char).map(o => o.char));
     const available = chars.filter(c => !taken.has(c.name));
     const src       = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-    const nameTxt   = s.char ? _esc(villainName(s.char)) : `<span class="order-slot-empty">${t('Villain')}</span>`;
+    const nameTxt   = s.char ? _esc(villainName(s.char)) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
     const meTitle   = isAuthed ? t('My villain') : t('Sign in to mark your villain');
     return `
       <div class="order-slot" data-id="${s.id}">
@@ -606,7 +606,7 @@ function _validateLineup() {
   if (orderSlots.some(s => !s.char)) return t('Choose a villain for each player.');
   const names = orderSlots.map(s => s.char);
   if (new Set(names).size !== names.length) return t('Each player must use a different villain.');
-  if (!orderSlots.some(s => s.isMe)) return t('Mark which villain you played with 👤.');
+  if (!orderSlots.some(s => s.isMe)) return t('Mark your villain with 👤.');
   return null;
 }
 

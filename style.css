@@ -28,6 +28,12 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 /* ── 1. TOKENS ────────────────────────────────────────────────────── */
+/* Text size (Settings): every font-size is calc(N * var(--ts)), so Large
+   grows the text by an eighth and leaves the layout alone. Chart labels drawn
+   inside SVGs keep their size (they're laid out in the chart's own units). */
+:root { --ts: 1; }
+:root[data-text="large"] { --ts: 1.125; }
+
 :root {
   --bg: #000000;
   --nav-bg: rgba(0, 0, 0, 0.94);
@@ -83,7 +89,7 @@
 
 /* Modal/sheet body intro paragraph (replaces inline font/color/margin styles). */
 .modal-hint {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--muted);
   margin-bottom: 16px;
   line-height: 1.5;
@@ -127,7 +133,7 @@ body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   line-height: 1.5;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
@@ -151,7 +157,7 @@ nav {
 }
 
 .nav-brand {
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
@@ -168,7 +174,7 @@ nav {
 
 .nav-links a {
   position: relative;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 500;
   color: var(--muted);
   text-decoration: none;
@@ -237,7 +243,7 @@ nav {
 }
 .settings-panel.open { display: flex; }
 .settings-row { display: flex; flex-direction: column; gap: 6px; }
-.settings-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.settings-lbl { font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .settings-panel .seg { width: 100%; }
 .settings-panel .seg-btn { flex: 1; padding: 5px 8px; }
 .settings-ico { margin-right: 5px; }
@@ -245,7 +251,7 @@ nav {
 .nav-icon-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts));
   line-height: 1;
   padding: 5px 6px;
   border-radius: var(--rs);
@@ -300,12 +306,12 @@ a.chip {
 .pf-share-btn { flex: none; }
 
 .pf-name-block { display: flex; flex-direction: column; gap: 1px; }
-.pf-nick { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-.pf-since { font-size: 12px; font-weight: 400; color: var(--dim); letter-spacing: 0; }
+.pf-nick { font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.pf-since { font-size: calc(12px * var(--ts)); font-weight: 400; color: var(--dim); letter-spacing: 0; }
 .pf-since-link { color: inherit; text-decoration: none; cursor: pointer; }
 
 /* Under the villain's name: "Pace: ● | Villain guide ›". */
-.char-meta { margin: 10px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.char-meta { margin: 10px 0 0; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .char-meta .pace-dot { margin: 0 0 0 2px; }
 .char-meta-sep { margin: 0 3px; color: var(--dim); }
 .char-guide-link {
@@ -314,17 +320,17 @@ a.chip {
 }
 
 /* Villain Guide sheet: a heading per section, card names in their type color. */
-.guide-title { margin: 18px 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.guide-title { margin: 18px 0 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .guide-title:first-child { margin-top: 0; }
-#guideBody p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
+#guideBody p { margin: 0 0 10px; font-size: calc(14px * var(--ts)); line-height: 1.55; color: var(--text); }
 /* The villain's objective, the line that matters most: a gold box, like the
    winner's crown, a size up from the guide text. */
 #guideBody .guide-objective {
   padding: 10px 12px; border-left: 3px solid var(--gold); border-radius: var(--rs);
-  background: var(--gold-d); color: var(--text); font-size: 15px; font-weight: 600; line-height: 1.45;
+  background: var(--gold-d); color: var(--text); font-size: calc(15px * var(--ts)); font-weight: 600; line-height: 1.45;
 }
 #guideBody .guide-item { margin-bottom: 6px; padding-left: 12px; border-left: 2px solid var(--border); }
-#guideBody .guide-note { padding: 8px 10px; background: var(--s2); border-radius: var(--r); font-size: 13px; }
+#guideBody .guide-note { padding: 8px 10px; background: var(--s2); border-radius: var(--r); font-size: calc(13px * var(--ts)); }
 .guide-card {
   display: inline; padding: 0; border: none; background: none;
   font: inherit; font-weight: 600; color: var(--deck-c); cursor: pointer;
@@ -351,7 +357,7 @@ a.pace-dot:hover { transform: scale(1.3); }
 /* ── LIVE GAME PANEL ──────────────────────────────────────────────── */
 .live-status {
   text-align: center;
-  font-size: 10px;
+  font-size: calc(10px * var(--ts));
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
@@ -360,7 +366,7 @@ a.pace-dot:hover { transform: scale(1.3); }
 }
 .live-info {
   text-align: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--muted);
   margin-top: 4px;
 }
@@ -381,7 +387,7 @@ a.pace-dot:hover { transform: scale(1.3); }
 }
 .live-time {
   text-align: center;
-  font-size: 52px;
+  font-size: calc(52px * var(--ts));
   font-weight: 700;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
@@ -402,7 +408,7 @@ a.pace-dot:hover { transform: scale(1.3); }
   background: var(--s2);
   color: var(--text);
   font-family: inherit;
-  font-size: 22px;
+  font-size: calc(22px * var(--ts));
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -416,12 +422,12 @@ a.pace-dot:hover { transform: scale(1.3); }
   line-height: 1.1;
 }
 .live-turn-count > span:first-child {
-  font-size: 42px;
+  font-size: calc(42px * var(--ts));
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .live-turn-lbl {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -429,7 +435,7 @@ a.pace-dot:hover { transform: scale(1.3); }
 }
 .live-hint {
   text-align: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--dim);
   max-width: 320px;
   margin: 4px auto 4px;
@@ -451,7 +457,7 @@ main {
 }
 
 .page-header h2 {
-  font-size: 20px;
+  font-size: calc(20px * var(--ts));
   font-weight: 700;
   letter-spacing: -0.02em;
   display: flex;
@@ -465,8 +471,8 @@ main {
 /* Lineup buttons have a fixed width, the same in every language, and the Draw
    pool toggle spans two of them (see below). One line on wide screens; on
    phones they narrow and the label wraps to two lines. */
-:root { --lineup-btn-w: 112px; }
-.btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: 12px; line-height: 1.15;
+:root { --lineup-btn-w: calc(112px * var(--ts)); }
+.btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   width: var(--lineup-btn-w); white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
@@ -478,7 +484,7 @@ main {
   align-items: center;
   gap: 6px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: 600;
   padding: 8px 14px;
   border-radius: var(--rs);
@@ -497,7 +503,7 @@ main {
 
 .btn-save { background: #f59e0b; color: #271a02; border: 1px solid #f59e0b; }
 
-.btn-sm { font-size: 12px; padding: 5px 10px; border-radius: 5px; }
+.btn-sm { font-size: calc(12px * var(--ts)); padding: 5px 10px; border-radius: 5px; }
 
 /* ── FILTER BAR ───────────────────────────────────────────────────── */
 .filter-bar { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 8px; }
@@ -506,7 +512,7 @@ main {
 
 .pill {
   font-family: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 20px;
@@ -533,7 +539,7 @@ main {
   transition: background 0.15s;
   font-family: inherit;
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   width: auto;
   align-self: flex-start;
@@ -541,7 +547,7 @@ main {
 .filter-char-toggle .toggle-right { display: flex; align-items: center; gap: 8px; }
 
 .badge {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 700;
   background: var(--accent);
   color: #fff;
@@ -551,7 +557,7 @@ main {
 }
 .badge.visible { display: inline-block; }
 
-.chevron { font-size: 11px; color: var(--dim); transition: transform 0.2s; }
+.chevron { font-size: calc(11px * var(--ts)); color: var(--dim); transition: transform 0.2s; }
 .chevron.open { transform: rotate(180deg); }
 
 .filter-char-panel {
@@ -571,10 +577,10 @@ main {
   align-items: center;
 }
 .filter-apply-btn { margin-left: auto; }
-.gl-filter-hint { font-size: 11px; color: var(--dim); margin: 0 0 8px; }
+.gl-filter-hint { font-size: calc(11px * var(--ts)); color: var(--dim); margin: 0 0 8px; }
 .txt-btn {
   font-family: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   background: none;
@@ -583,7 +589,7 @@ main {
   padding: 0;
   transition: color 0.12s;
 }
-.sep { color: var(--dim); font-size: 12px; }
+.sep { color: var(--dim); font-size: calc(12px * var(--ts)); }
 
 
 /* ── LIST HEADER (results hint + new game button) ─────────────────── */
@@ -597,7 +603,7 @@ main {
 
 /* ── RESULTS HINT ─────────────────────────────────────────────────── */
 .results-hint {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--dim);
   margin-bottom: 10px;
 }
@@ -615,8 +621,8 @@ main {
   margin-bottom: 1rem;
 }
 .resume-banner-text { display: flex; flex-direction: column; gap: 0.15rem; }
-.resume-banner-text strong { color: var(--accent); font-size: 0.9rem; }
-.resume-banner-text span   { color: var(--muted);  font-size: 0.8rem; }
+.resume-banner-text strong { color: var(--accent); font-size: calc(0.9rem * var(--ts)); }
+.resume-banner-text span   { color: var(--muted);  font-size: calc(0.8rem * var(--ts)); }
 .resume-banner-btns { display: flex; gap: 0.5rem; flex-shrink: 0; }
 
 /* ── LOAD MORE BUTTON ─────────────────────────────────────────────── */
@@ -626,7 +632,7 @@ main {
   margin-top: 12px;
   padding: 10px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   background: var(--s1);
@@ -650,7 +656,7 @@ main {
   margin-bottom: 12px;
 }
 .pf-games-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -675,9 +681,9 @@ main {
 }
 .pf-friend:first-child { border-top: none; }
 .pf-friend .player-avatar { margin-right: 0; }
-.pf-friend-rank  { width: 16px; flex-shrink: 0; text-align: right; font-size: 13px; font-weight: 700; color: var(--muted); }
-.pf-friend-nick  { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pf-friend-count { flex-shrink: 0; font-size: 13px; color: var(--dim); }
+.pf-friend-rank  { width: 16px; flex-shrink: 0; text-align: right; font-size: calc(13px * var(--ts)); font-weight: 700; color: var(--muted); }
+.pf-friend-nick  { flex: 1; min-width: 0; font-size: calc(14px * var(--ts)); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-friend-count { flex-shrink: 0; font-size: calc(13px * var(--ts)); color: var(--dim); }
 
 /* Character detail: "Rivalries", three side-by-side columns (beaten most, lost
    to most, faced most) of opponent portrait + value, like the monthly report. */
@@ -685,7 +691,7 @@ main {
 .cs-adv-col { min-width: 0; background: var(--s1); border-radius: var(--r); overflow: hidden; }
 .cs-adv-title {
   padding: 9px 10px 7px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  font-size: calc(10px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   color: var(--muted);
 }
 .cs-adv-row {
@@ -694,8 +700,8 @@ main {
   border-top: 1px solid var(--border);
 }
 .cs-adv-row .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
-.cs-adv-count { margin-left: auto; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
-.cs-adv-empty { padding: 4px 10px 12px; color: var(--dim); font-size: 13px; }
+.cs-adv-count { margin-left: auto; flex-shrink: 0; font-size: calc(13px * var(--ts)); font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.cs-adv-empty { padding: 4px 10px 12px; color: var(--dim); font-size: calc(13px * var(--ts)); }
 .cs-adv-seg .seg-btn { padding: 4px 11px; }
 
 /* Character detail: Villain deck, Fate deck and extras, one column per card
@@ -714,7 +720,7 @@ main {
 .cs-deck { display: flex; gap: 12px; align-items: flex-start; }
 .cs-deck-stack { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }   /* gap = DECK_STACK_GAP in villains.js */
 .cs-deck-col { border-top: 3px solid var(--deck-c); }
-.cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: 12px; letter-spacing: 0.06em; }
+.cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: calc(12px * var(--ts)); letter-spacing: 0.06em; }
 /* The card type written in its color (no dot); the count after it stays grey. */
 .cs-deck-type { color: var(--deck-c); }
 .cs-kw { color: var(--deck-c); font-weight: 600; }
@@ -726,33 +732,33 @@ main {
   background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .cs-deck-card  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.cs-deck-name  { font-size: 13px; font-weight: 600; color: var(--text); }
-.cs-deck-meta  { font-size: 11px; color: var(--muted); }
-.cs-deck-count { flex-shrink: 0; font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
-.cs-deck-total { font-size: 12px; color: var(--muted); }
-.cs-deck-note { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.cs-deck-name  { font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); }
+.cs-deck-meta  { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.cs-deck-count { flex-shrink: 0; font-size: calc(12px * var(--ts)); color: var(--dim); font-variant-numeric: tabular-nums; }
+.cs-deck-total { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.cs-deck-note { margin: 0 0 10px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
 
 /* Card detail sheet. */
 .cs-card-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
 .cs-card-stat { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--s2); border-radius: var(--r); }
-.cs-card-stat span { font-size: 11px; color: var(--muted); }
-.cs-card-stat strong { font-size: 14px; font-weight: 600; color: var(--text); }
+.cs-card-stat span { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.cs-card-stat strong { font-size: calc(14px * var(--ts)); font-weight: 600; color: var(--text); }
 .cs-card-stat strong.cs-deck-type { color: var(--deck-c); }
 .cs-kw { color: var(--deck-c); font-weight: 600; }
-.cs-card-text p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: var(--text); }
+.cs-card-text p { margin: 0 0 10px; font-size: calc(14px * var(--ts)); line-height: 1.55; color: var(--text); }
 .cs-card-empty { color: var(--muted) !important; font-style: italic; }
 .cs-card-back { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.cs-card-sub { margin-bottom: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-.cs-card-versions { margin: 12px 0 0; padding: 10px 12px; background: var(--s2); border-radius: var(--r); font-size: 13px; color: var(--muted); line-height: 1.5; }
+.cs-card-sub { margin-bottom: 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cs-card-versions { margin: 12px 0 0; padding: 10px 12px; background: var(--s2); border-radius: var(--r); font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
 
 /* ── CHARTS PAGE + CHART PRIMITIVES ───────────────────────────────────────── */
 /* One-line description of what a page is for, right under its header. */
-.page-intro { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 0 0 16px; }
+.page-intro { color: var(--muted); font-size: calc(14px * var(--ts)); line-height: 1.45; margin: 0 0 16px; }
 .chart-picker { margin-bottom: 16px; min-height: 38px; }   /* the select is injected by JS; hold its height so the card doesn't jump down */
 .chart-select-wrap { position: relative; width: 100%; }
 .chart-chevron {
   position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  pointer-events: none; color: var(--muted); font-size: 18px;
+  pointer-events: none; color: var(--muted); font-size: calc(18px * var(--ts));
   transition: transform 0.2s;
 }
 .chart-select:open ~ .chart-chevron { transform: translateY(-50%) rotate(180deg); }
@@ -761,7 +767,7 @@ main {
    right padding for the chevron, and hide the global arrow. */
 .chart-select {
   width: 100%;
-  font-size: 14px; font-weight: 600;
+  font-size: calc(14px * var(--ts)); font-weight: 600;
   background: var(--s1);
   background-image: none;
   padding: 0 32px 0 12px;
@@ -772,15 +778,15 @@ main {
   background: var(--s1); border: 1px solid var(--border);
   border-radius: var(--r); padding: 16px;
 }
-.chart-card-desc { font-size: 13px; color: var(--muted); margin: 0 0 14px; line-height: 1.45; min-height: 4.4em; }
+.chart-card-desc { font-size: calc(13px * var(--ts)); color: var(--muted); margin: 0 0 14px; line-height: 1.45; min-height: 4.4em; }
 /* Every chart is drawn on a 440x280 viewBox and scales to the card width, so
    reserve exactly that ratio up front: the card is already its final size
    while "Loading…" shows, and nothing jumps when the chart arrives. */
 .chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
 .chart-stage > .chart-svg { flex-shrink: 0; }
-.chart-note { color: var(--muted); font-size: 13px; text-align: center; padding: 0 16px; }
-.chart-note code { background: var(--s3); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
-.chart-caption { margin-top: 10px; min-height: 18px; font-size: 13px; font-weight: 600; color: var(--text); text-align: center; }
+.chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
+.chart-note code { background: var(--s3); padding: 1px 5px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
+.chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }
 .chart-caption-link { color: var(--accent); text-decoration: none; }
 
 /* SVG chart primitives (charts.js) */
@@ -834,10 +840,10 @@ main {
   gap: 8px;
 }
 
-.card-date { font-size: 13px; font-weight: 600; }
+.card-date { font-size: calc(13px * var(--ts)); font-weight: 600; }
 
 .card-meta {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   color: var(--muted);
   flex-shrink: 0;
   text-align: right;
@@ -865,7 +871,7 @@ main {
 .card-players.rows .chip-body { flex: 1; }
 .card-players.rows .chip-char,
 .card-players.rows .chip-nick { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chip-seat { width: 12px; flex-shrink: 0; text-align: right; font-size: 11px; font-weight: 700; color: var(--dim); }
+.chip-seat { width: 12px; flex-shrink: 0; text-align: right; font-size: calc(11px * var(--ts)); font-weight: 700; color: var(--dim); }
 /* Rows layout: the date stays on one line and the meta wraps on the right. */
 .card-top-wrap .card-date { white-space: nowrap; }
 .card-top-wrap .card-meta { flex-shrink: 1; min-width: 0; }
@@ -876,7 +882,7 @@ main {
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   padding: 6px 10px;
   border-radius: var(--rs);
   background: var(--s2);
@@ -893,10 +899,10 @@ main {
   display: block;
 }
 
-.chip-char .win-star { font-size: 11px; }
-.win-star { font-size: 13px; line-height: 1; align-self: center; }
+.chip-char .win-star { font-size: calc(11px * var(--ts)); }
+.win-star { font-size: calc(13px * var(--ts)); line-height: 1; align-self: center; }
 
-.chip-nick { font-size: 11px; color: var(--muted); }
+.chip-nick { font-size: calc(11px * var(--ts)); color: var(--muted); }
 
 /* Winner highlight, game-card chips and claim-page rows. */
 .chip.winner,
@@ -921,10 +927,10 @@ main {
   padding: 4rem 1rem;
   color: var(--muted);
 }
-.empty-icon { font-size: 32px; margin-bottom: 0.5rem; opacity: 0.4; }
-.empty h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
-.empty p { font-size: 13px; margin-bottom: 1rem; }
-.spinner { text-align: center; padding: 3rem; color: var(--dim); font-size: 13px; }
+.empty-icon { font-size: calc(32px * var(--ts)); margin-bottom: 0.5rem; opacity: 0.4; }
+.empty h3 { font-size: calc(15px * var(--ts)); font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.empty p { font-size: calc(13px * var(--ts)); margin-bottom: 1rem; }
+.spinner { text-align: center; padding: 3rem; color: var(--dim); font-size: calc(13px * var(--ts)); }
 
 /* ── BOTTOM SHEET ─────────────────────────────────────────────────── */
 .overlay {
@@ -972,7 +978,7 @@ main {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.sheet-header h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.sheet-header h3 { font-size: calc(16px * var(--ts)); font-weight: 700; letter-spacing: -0.01em; }
 
 .sheet-close {
   background: var(--s2);
@@ -982,7 +988,7 @@ main {
   height: 28px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: calc(18px * var(--ts));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1002,7 +1008,7 @@ main {
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
-.sheet-footer .btn { width: 100%; justify-content: center; font-size: 14px; padding: 11px; }
+.sheet-footer .btn { width: 100%; justify-content: center; font-size: calc(14px * var(--ts)); padding: 11px; }
 
 .sheet-footer-row {
   display: flex;
@@ -1014,7 +1020,7 @@ main {
 .pf-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
 .confirm-text {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--muted);
   line-height: 1.6;
 }
@@ -1023,11 +1029,11 @@ main {
 .field { margin-bottom: 12px; min-width: 0; }
 .form-row .field { margin-bottom: 6px; }
 .form-row .field label { margin-bottom: 2px; }
-.form-row input { height: 30px; min-height: 30px; max-height: 30px; font-size: 13px; }
+.form-row input { height: 30px; min-height: 30px; max-height: 30px; font-size: calc(13px * var(--ts)); }
 
 .field label {
   display: block;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -1040,7 +1046,7 @@ main {
   text-transform: none;
   letter-spacing: 0;
   color: var(--dim);
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
 }
 
 input[type="datetime-local"],
@@ -1057,7 +1063,7 @@ select {
   border-radius: var(--rs);
   color: var(--text);
   font-family: inherit;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   line-height: 1.3;
   padding: 0 11px;
   outline: none;
@@ -1088,12 +1094,12 @@ select {
   cursor: pointer;
 }
 select option { background: #1a1a1a; }
-select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; font-size: 11px; }
+select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; font-size: calc(11px * var(--ts)); }
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .section-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -1121,7 +1127,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   min-height: 26px;
   max-height: 26px;
   padding: 0 22px 0 9px;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1135,7 +1141,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   letter-spacing: 0;
   /* font-style: italic; */
   color: var(--dim);
-  font-size: 10px;
+  font-size: calc(10px * var(--ts));
   margin-left: 10px;
   text-align: right;
   /* Take the row's free width so _layoutLegend() can measure how much fits and
@@ -1150,7 +1156,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 .sep-item { white-space: nowrap; }
 .sep-sep  { white-space: pre; }
 
-.row-num { font-size: 12px; color: var(--dim); width: 16px; text-align: right; flex-shrink: 0; margin-right: 8px; }
+.row-num { font-size: calc(12px * var(--ts)); color: var(--dim); width: 16px; text-align: right; flex-shrink: 0; margin-right: 8px; }
 .drag-handle {
   display: flex;
   align-items: center;
@@ -1163,7 +1169,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   touch-action: none;
 }
 .drag-handle:active { cursor: grabbing; }
-.drag-dots { font-size: 16px; color: var(--muted); line-height: 1; }
+.drag-dots { font-size: calc(16px * var(--ts)); color: var(--muted); line-height: 1; }
 
 .pf-btn.me.on {
   background: var(--accent-d);
@@ -1183,7 +1189,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   justify-content: center;
   transition: all 0.15s;
   border: 1px solid var(--border);
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   background: var(--s3);
   color: var(--dim);
 }
@@ -1210,7 +1216,7 @@ select:disabled {
   border-radius: var(--rs);
   color: var(--muted);
   font-family: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 500;
   padding: 10px;
   cursor: pointer;
@@ -1223,7 +1229,7 @@ select:disabled {
   background: var(--red-d);
   border: 1px solid rgba(224, 84, 84, 0.3);
   color: var(--red);
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   padding: 9px 12px;
   border-radius: var(--rs);
   margin-bottom: 12px;
@@ -1252,7 +1258,7 @@ select:disabled {
 }
 .seg-btn {
   font-family: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   padding: 5px 14px;
   border-radius: 5px;
@@ -1278,8 +1284,8 @@ select:disabled {
   border-radius: var(--r);
   padding: 12px 14px;
 }
-.stat-val { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
-.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.stat-val { font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.stat-lbl { font-size: calc(11px * var(--ts)); color: var(--muted); margin-top: 2px; }
 /* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
 .stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
 .stat-box.hot .stat-val { color: var(--gold); }
@@ -1302,7 +1308,7 @@ select:disabled {
   background: var(--bg);
 }
 .lb-head span {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   color: var(--dim);
   text-transform: uppercase;
@@ -1341,7 +1347,7 @@ select:disabled {
 /* "Your position" divider shown above a pinned self-row that ranks below the cut. */
 .lb-row-sep {
   padding: 6px 14px;
-  font-size: 10px;
+  font-size: calc(10px * var(--ts));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1351,29 +1357,29 @@ select:disabled {
   border-bottom: 1px solid var(--border);
 }
 
-.rank-num { font-size: 12px; font-weight: 700; color: var(--dim); }
+.rank-num { font-size: calc(12px * var(--ts)); font-weight: 700; color: var(--dim); }
 .rank-num.gold   { color: var(--gold); }
 .rank-num.silver { color: #aaa; }
 .rank-num.bronze { color: #a0856a; }
 
-.row-name { display: block; font-size: 14px; font-weight: 600; color: inherit; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-name { display: block; font-size: calc(14px * var(--ts)); font-weight: 600; color: inherit; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row-name .char-portrait { margin-right: 5px; }
-.row-sub  { display: block; font-size: 11px; color: var(--dim); text-decoration: none; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-sub  { display: block; font-size: calc(11px * var(--ts)); color: var(--dim); text-decoration: none; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .row-identity { display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; }
 .row-identity > div { overflow: hidden; min-width: 0; }
 .row-identity .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .row-identity .player-avatar { width: 28px; height: 28px; flex-shrink: 0; }
 
-.row-val   { font-size: 14px; font-weight: 700; text-align: right; white-space: nowrap; }
+.row-val   { font-size: calc(14px * var(--ts)); font-weight: 700; text-align: right; white-space: nowrap; }
 /* Leaderboard / player tables: the value sits on top of its bar, which spans the column. */
 .row-val-stack { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-.row-games { font-size: 12px; color: var(--muted); text-align: right; }
+.row-games { font-size: calc(12px * var(--ts)); color: var(--muted); text-align: right; }
 /* Value cell: the value and "(games)" as two right-aligned sub-columns. The games
    part has the table's fixed width (--sv-games, from its largest count) and the
    digits are tabular, so values and games each line up from row to row. */
 .sv { display: flex; justify-content: flex-end; align-items: baseline; gap: 3px; font-variant-numeric: tabular-nums; }
-.sv-games { min-width: var(--sv-games, 3.5em); text-align: right; font-size: 12px; font-weight: 400; color: var(--muted); }
+.sv-games { min-width: var(--sv-games, 3.5em); text-align: right; font-size: calc(12px * var(--ts)); font-weight: 400; color: var(--muted); }
 /* The value header ("% Wins (Games)", longer in Italian) is wider than its
    column: it spans from the second column to the end, right-aligned, so it uses
    the empty header space over the names/bars instead of being cut off. */
@@ -1388,7 +1394,7 @@ select:disabled {
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
 
-.empty-state { text-align: center; padding: 2.5rem; color: var(--muted); font-size: 13px; }
+.empty-state { text-align: center; padding: 2.5rem; color: var(--muted); font-size: calc(13px * var(--ts)); }
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */
 .char-portrait {
@@ -1453,7 +1459,7 @@ select:disabled {
   border: none;
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  font-size: 22px;
+  font-size: calc(22px * var(--ts));
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -1572,10 +1578,10 @@ select:disabled {
 .builder-row .cs-month-nav {
   width: 22px;
   height: 22px;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
 }
 .builder-row-label {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--ts));
   color: var(--text);
 }
 .builder-stepper {
@@ -1586,7 +1592,7 @@ select:disabled {
 .builder-count {
   min-width: 38px;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--ts));
   color: var(--muted);
 }
 .builder-num { color: var(--text); font-weight: 600; }
@@ -1658,7 +1664,7 @@ select:disabled {
 }
 /* Box-completion achievements: a compact strip of covers (grayscale until the
    box is fully played, like the box picker) with play/win gold markers. */
-.ach-group-label { font-size: 11px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; margin: 6px 0 5px; }
+.ach-group-label { font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; margin: 6px 0 5px; }
 .box-ach-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
@@ -1678,10 +1684,10 @@ select:disabled {
 .box-ach.played .box-ach-img { filter: none; opacity: 1; }
 /* Won-all: a crown badge on the top-right corner of the (full-color) cover. */
 .box-ach.won { position: relative; }
-.box-ach.won::after { content: '👑'; position: absolute; top: -4px; left: -4px; font-size: 15px; line-height: 1; }
+.box-ach.won::after { content: '👑'; position: absolute; top: -4px; left: -4px; font-size: calc(15px * var(--ts)); line-height: 1; }
 /* Medal strip under achievement / box-completion tiles. */
 .box-ach-medals,
-.ach-tile-medals { display: flex; gap: 6px; font-size: 13px; line-height: 1; }
+.ach-tile-medals { display: flex; gap: 6px; font-size: calc(13px * var(--ts)); line-height: 1; }
 .box-ach-medal:not(.on) { color: var(--dim); }
 
 /* Box achievement detail sheet */
@@ -1689,16 +1695,16 @@ select:disabled {
 .box-detail-list { display: flex; flex-direction: column; margin-top: 14px; }
 .box-detail-char { display: flex; align-items: center; gap: 10px; padding: 7px 2px; border-top: 1px solid var(--border); }
 .box-detail-char .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
-.box-detail-char-name { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.box-detail-marks { display: flex; gap: 10px; font-size: 13px; flex-shrink: 0; }
+.box-detail-char-name { flex: 1; font-size: calc(13px * var(--ts)); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.box-detail-marks { display: flex; gap: 10px; font-size: calc(13px * var(--ts)); flex-shrink: 0; }
 .box-detail-marks span:not(.on) { color: var(--dim); }
 
-.box-option-name { font-size: 12px; font-weight: 600; text-align: center; line-height: 1.2; }
-.box-option-year { font-size: 11px; }
+.box-option-name { font-size: calc(12px * var(--ts)); font-weight: 600; text-align: center; line-height: 1.2; }
+.box-option-year { font-size: calc(11px * var(--ts)); }
 .box-option.selected { color: var(--text); }
 .box-option.selected img { filter: none; opacity: 1; }
 .ach-hint {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--muted);
   margin: 0 0 8px;
 }
@@ -1738,7 +1744,7 @@ select:disabled {
 /* Grayscale + dim characters with no plays and no wins (mirrors a locked box). */
 .ach-tile.dim .ach-tile-img { filter: grayscale(1); opacity: 0.4; }
 /* Crown (gold on both plays and wins) on the portrait corner, like the box badge. */
-.ach-tile.crowned .ach-tile-imgwrap::after { content: '👑'; position: absolute; top: -6px; left: -6px; font-size: 15px; line-height: 1; }
+.ach-tile.crowned .ach-tile-imgwrap::after { content: '👑'; position: absolute; top: -6px; left: -6px; font-size: calc(15px * var(--ts)); line-height: 1; }
 /* .ach-tile-medals shares .box-ach-medals (above). */
 /* Badge used as the "image" for global tiles (table-size number, location pin). */
 .gl-badge {
@@ -1750,16 +1756,16 @@ select:disabled {
   justify-content: center;
   background: var(--s2);
   border: 1px solid var(--border);
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: 700;
   color: var(--muted);
 }
-.gl-badge-emoji { font-size: 21px; font-weight: 400; }
+.gl-badge-emoji { font-size: calc(21px * var(--ts)); font-weight: 400; }
 .gl-badge { transition: filter 0.2s, opacity 0.2s; }
 .ach-tile.dim .gl-badge { filter: grayscale(1); opacity: 0.45; }
-.ach-row-icon { font-size: 12px; opacity: 0.7; }
+.ach-row-icon { font-size: calc(12px * var(--ts)); opacity: 0.7; }
 .ach-medal {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   line-height: 1;
   transition: opacity 0.15s;
 }
@@ -1795,8 +1801,8 @@ select:disabled {
   margin-bottom: 14px;
 }
 .ach-detail-head.crowned { position: relative; }
-.ach-detail-head.crowned::after { content: '👑'; position: absolute; top: -6px; left: -6px; font-size: 17px; line-height: 1; }
-.ach-detail-name { font-size: 18px; font-weight: 700; }
+.ach-detail-head.crowned::after { content: '👑'; position: absolute; top: -6px; left: -6px; font-size: calc(17px * var(--ts)); line-height: 1; }
+.ach-detail-name { font-size: calc(18px * var(--ts)); font-weight: 700; }
 .ach-track {
   background: var(--s1);
   border: 1px solid var(--border);
@@ -1805,7 +1811,7 @@ select:disabled {
   margin-bottom: 10px;
 }
 .ach-track-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -1821,10 +1827,10 @@ select:disabled {
   opacity: 0.5;
 }
 .ach-track-tier.earned { opacity: 1; }
-.ach-track-icon { font-size: 18px; text-align: center; line-height: 1; }
+.ach-track-icon { font-size: calc(18px * var(--ts)); text-align: center; line-height: 1; }
 .ach-track-tier:not(.earned) .ach-track-icon { filter: grayscale(1); }
-.ach-track-name { font-size: 13px; font-weight: 600; }
-.ach-track-status { font-size: 12px; color: var(--muted); }
+.ach-track-name { font-size: calc(13px * var(--ts)); font-weight: 600; }
+.ach-track-status { font-size: calc(12px * var(--ts)); color: var(--muted); }
 
 .box-option.selected::after {
   content: '✓';
@@ -1836,7 +1842,7 @@ select:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 700;
   background: var(--accent);
   color: #fff;
@@ -1862,7 +1868,7 @@ select:disabled {
   min-height: 30px;
   max-height: 30px;
   padding: 0 26px 0 10px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   flex-shrink: 0;
   background-position: right 8px center;
@@ -1896,7 +1902,7 @@ select:disabled {
   width: calc(2 * var(--lineup-btn-w) + 6px);
   justify-content: space-between;
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   height: 30px;
   flex-shrink: 0;
@@ -1958,7 +1964,7 @@ select:disabled {
   object-fit: cover;
   flex-shrink: 0;
 }
-.order-slot .pf-btn { width: 30px; height: 30px; font-size: 12px; }
+.order-slot .pf-btn { width: 30px; height: 30px; font-size: calc(12px * var(--ts)); }
 .order-slot-actions {
   display: flex;
   gap: 2px;
@@ -1988,10 +1994,10 @@ select:disabled {
   padding: 0;
 }
 .order-slot-select option,
-.order-slot-select optgroup { font-size: 13px; }
+.order-slot-select optgroup { font-size: calc(13px * var(--ts)); }
 .order-slot-name {
   flex: 1;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -2001,7 +2007,7 @@ select:disabled {
 .order-slot-empty { color: var(--dim); font-weight: 400; font-style: italic; }
 .order-slot-chevron {
   flex-shrink: 0;
-  font-size: 22px;
+  font-size: calc(22px * var(--ts));
   color: var(--muted);
   line-height: 1;
   transition: transform 0.2s;
@@ -2018,7 +2024,7 @@ select:disabled {
   margin-top: 0.5rem;
   padding-bottom: env(safe-area-inset-bottom);
 }
-.new-game-footer .btn { flex: 1; justify-content: center; font-size: 14px; padding: 9px; }
+.new-game-footer .btn { flex: 1; justify-content: center; font-size: calc(14px * var(--ts)); padding: 9px; }
 
 /* Shared char grid (exclude panel + filter panel) */
 .exclude-toggle,
@@ -2036,7 +2042,7 @@ select:disabled {
   width: 100%;
   font-family: inherit;
   color: var(--muted);
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 500;
 }
 .exclude-toggle-label { color: inherit; }
@@ -2064,7 +2070,7 @@ select:disabled {
   border: none;
   background: none;
   font: inherit;
-  font-size: 10px;
+  font-size: calc(10px * var(--ts));
   font-weight: 600;
   color: var(--dim);
   text-transform: uppercase;
@@ -2081,7 +2087,7 @@ select:disabled {
 
 .char-pill {
   font-family: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 20px;
@@ -2128,7 +2134,7 @@ select:disabled {
 }
 .qr-url {
   flex: 1;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   color: var(--muted);
   word-break: break-all;
 }
@@ -2141,8 +2147,8 @@ select:disabled {
   padding: 12px 14px;
   margin-bottom: 20px;
 }
-.claim-date { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-.claim-meta { font-size: 12px; color: var(--muted); }
+.claim-date { font-size: calc(14px * var(--ts)); font-weight: 600; margin-bottom: 2px; }
+.claim-meta { font-size: calc(12px * var(--ts)); color: var(--muted); }
 
 .claim-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
@@ -2162,19 +2168,19 @@ select:disabled {
 .claim-row.mine { border-color: rgba(124, 106, 247, 0.4); }
 
 /* Seat number, portrait, villain + nickname, then the crown at the end (like the game cards). */
-.claim-char { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.claim-char { font-weight: 600; font-size: calc(14px * var(--ts)); display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
 .claim-char .win-star { margin-left: auto; }
 .claim-char .char-portrait { width: 32px; height: 32px; }
 .claim-row.winner .claim-char { color: var(--gold); }
 .claim-who  { min-width: 0; line-height: 1.25; }
-.claim-nick { font-size: 11px; font-weight: 400; color: var(--muted); }
+.claim-nick { font-size: calc(11px * var(--ts)); font-weight: 400; color: var(--muted); }
 .claim-row.winner .claim-nick { color: rgba(240, 165, 0, 0.55); }
 [data-theme="light"] .claim-row.winner .claim-nick { color: var(--gold); }
 .claim-nick.unclaimed { font-style: italic; }
 .claim-share-row { display: flex; justify-content: flex-end; gap: 8px; margin: 4px 0 14px; }
 .claim-success {
   text-align: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--accent);
   padding: 12px 0 0;
 }
@@ -2186,7 +2192,7 @@ select:disabled {
 }
 
 .row-label {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -2197,7 +2203,7 @@ select:disabled {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 700;
   color: var(--text);
   margin-bottom: 8px;
@@ -2237,7 +2243,7 @@ select:disabled {
   justify-content: space-between;
   margin-bottom: 8px;
 }
-.cs-mp-year-text { font-weight: 700; font-size: 14px; }
+.cs-mp-year-text { font-weight: 700; font-size: calc(14px * var(--ts)); }
 .cs-mp-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2250,7 +2256,7 @@ select:disabled {
   border-radius: var(--rs);
   padding: 6px 0;
   font: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, opacity 0.15s;
@@ -2268,7 +2274,7 @@ select:disabled {
   height: 26px;
   border-radius: var(--rs);
   font-family: inherit;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts));
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
@@ -2293,7 +2299,7 @@ select:disabled {
 @keyframes csSkelPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 /* While a new month loads, the existing cards stay put but dim for feedback. */
 .cs-report-loading .cs-summary { opacity: 0.45; transition: opacity 0.1s; }
-.cs-summary-empty { color: var(--muted); font-size: 13px; padding: 14px 2px; margin-bottom: 1.25rem; }
+.cs-summary-empty { color: var(--muted); font-size: calc(13px * var(--ts)); padding: 14px 2px; margin-bottom: 1.25rem; }
 .cs-summary-card {
   background: var(--s1);
   border: 1px solid var(--border);
@@ -2305,7 +2311,7 @@ select:disabled {
   min-width: 0;
 }
 .cs-summary-title {
-  font-size: 10px;
+  font-size: calc(10px * var(--ts));
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
@@ -2317,7 +2323,7 @@ select:disabled {
   gap: 4px;
 }
 .cs-mini-section-lbl {
-  font-size: 9px;
+  font-size: calc(9px * var(--ts));
   font-weight: 700;
   color: var(--dim);
   text-transform: uppercase;
@@ -2337,7 +2343,7 @@ select:disabled {
 .cs-mini-row .char-portrait { width: 28px; height: 28px; }
 .cs-mini-val {
   margin-left: auto;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 700;
   color: var(--text);
   flex-shrink: 0;
@@ -2348,12 +2354,12 @@ select:disabled {
 }
 
 .cs-roster-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
-.cs-roster-controls-lbl { font-size: 12px; font-weight: 600; color: var(--muted); }
+.cs-roster-controls-lbl { font-size: calc(12px * var(--ts)); font-weight: 600; color: var(--muted); }
 
 .char-roster-group { margin-bottom: 1.5rem; scroll-margin-top: 70px; }
 
 .char-roster-group-name {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -2391,7 +2397,7 @@ select:disabled {
 }
 
 .char-roster-name {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 600;
   color: var(--text);
   line-height: 1.3;
@@ -2402,7 +2408,7 @@ select:disabled {
   width: 190px;
   flex-shrink: 0;
 }
-.cs-search input { font-size: 13px; padding: 7px 10px; }
+.cs-search input { font-size: calc(13px * var(--ts)); padding: 7px 10px; }
 /* Disabled only until its data loads: same look as the live box, no flash. */
 .cs-search input:disabled { opacity: 1; cursor: default; }
 
@@ -2430,7 +2436,7 @@ select:disabled {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   cursor: pointer;
   transition: background 0.12s;
@@ -2438,7 +2444,7 @@ select:disabled {
 .cs-option.active { background: var(--s3); }
 .cs-option .char-portrait { width: 20px; height: 20px; flex-shrink: 0; }
 .cs-option-box {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 400;
   color: var(--muted);
   margin-left: auto;
@@ -2455,7 +2461,7 @@ select:disabled {
 }
 
 .home-title {
-  font-size: 26px;
+  font-size: calc(26px * var(--ts));
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -2472,7 +2478,7 @@ select:disabled {
 
 .home-tagline {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--muted);
   line-height: 1.5;
 }
@@ -2480,7 +2486,7 @@ select:disabled {
 .home-share-btn { flex-shrink: 0; }
 
 .home-steps-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -2505,7 +2511,7 @@ select:disabled {
 }
 
 .home-step-num {
-  font-size: 18px;
+  font-size: calc(18px * var(--ts));
   font-weight: 700;
   color: var(--dim);
   line-height: 1;
@@ -2517,13 +2523,13 @@ select:disabled {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--muted);
   line-height: 1.45;
 }
 
 .home-step-body strong {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   color: var(--text);
 }
@@ -2539,14 +2545,14 @@ select:disabled {
   background: var(--s1);
   color: var(--text);
   text-decoration: none;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   font-weight: 500;
   transition: background 0.12s;
   box-sizing: border-box;
 }
 
 .home-section-icon {
-  font-size: 22px;
+  font-size: calc(22px * var(--ts));
   line-height: 1;
   width: 28px;
   text-align: center;
@@ -2564,7 +2570,7 @@ select:disabled {
 }
 
 .home-section-desc {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   font-weight: 400;
   color: var(--muted);
 }
@@ -2578,7 +2584,7 @@ select:disabled {
 }
 
 .home-faq-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -2605,13 +2611,13 @@ select:disabled {
   background: var(--s1);
   border-radius: var(--r);
   padding: 12px 14px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--muted);
   line-height: 1.45;
 }
 
 .home-faq-item strong {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 600;
   color: var(--text);
 }
@@ -2621,7 +2627,7 @@ select:disabled {
   background: var(--s1);
   border-radius: var(--r);
   padding: 14px 16px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: var(--muted);
   line-height: 1.6;
 }
@@ -2636,27 +2642,27 @@ select:disabled {
 
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */
-.back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--accent); text-decoration: none; }
 .faq-general-link { margin-bottom: 2rem; }
 .faq-rulebook-link { margin-bottom: 10px; }
-.faq-rulebook-title { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-.faq-rulebook-intro { margin: 0 0 1.5rem; font-size: 14px; color: var(--muted); line-height: 1.5; }
+.faq-rulebook-title { margin: 0 0 6px; font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.faq-rulebook-intro { margin: 0 0 1.5rem; font-size: calc(14px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .faq-group { margin-bottom: 2rem; }
-.faq-group-intro { margin: 0 0 10px 2px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.faq-group-intro { margin: 0 0 10px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .faq-identity { margin-bottom: 1rem; }
 .faq-vil { font-weight: 500; color: var(--muted); }
-.faq-src { margin-top: 2px; font-size: 11px; color: var(--dim); }
+.faq-src { margin-top: 2px; font-size: calc(11px * var(--ts)); color: var(--dim); }
 .faq-item mark { background: var(--accent-d); color: var(--text); border-radius: 3px; padding: 0 1px; }
-.faq-roster-sub { font-size: 11px; color: var(--muted); }
-.faq-count { margin: 0 0 12px 2px; font-size: 13px; color: var(--muted); }
+.faq-roster-sub { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.faq-count { margin: 0 0 12px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); }
 .faq-title-link { color: inherit; text-decoration: none; }
-.faq-credit { margin-top: 2rem; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.faq-credit { margin-top: 2rem; font-size: calc(12px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .faq-credit a { color: var(--accent); text-decoration: none; }
 
 /* ── TUTORIAL PAGE ───────────────────────────────────────────────── */
 /* Reuses the home page's steps / FAQ cards; only the inline links are its own. */
 .tut-link { color: var(--accent); text-decoration: none; }
-.tut-open { margin-top: 4px; font-size: 12px; font-weight: 600; align-self: flex-start; }
+.tut-open { margin-top: 4px; font-size: calc(12px * var(--ts)); font-weight: 600; align-self: flex-start; }
 /* Button / label names (<em>) read as semibold upright text, not italics: the
    site font only ships upright, and its synthesized slant eats the following space. */
 .tutorial em { font-style: normal; font-weight: 600; color: var(--text); }
@@ -2685,7 +2691,7 @@ select:disabled {
   flex-shrink: 0;
 }
 .acct-identity-info { display: flex; flex-direction: column; gap: 4px; }
-.acct-nick { font-size: 20px; font-weight: 700; color: var(--text); }
+.acct-nick { font-size: calc(20px * var(--ts)); font-weight: 700; color: var(--text); }
 .acct-nick-link { color: inherit; text-decoration: none; }
 .acct-change-nick { align-self: flex-start; margin-top: 6px; }
 
@@ -2695,7 +2701,7 @@ select:disabled {
 }
 
 .acct-section .section-label {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -2719,7 +2725,7 @@ select:disabled {
 }
 .signin-intro {
   color: var(--text);
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   line-height: 1.5;
   margin: 0;
 }
@@ -2728,7 +2734,7 @@ select:disabled {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 12px 14px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   line-height: 1.45;
   color: var(--muted);
   margin: 0;
@@ -2752,7 +2758,7 @@ select:disabled {
   background: var(--s1);
   color: var(--text);
   font-family: inherit;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.08s;
@@ -2790,12 +2796,12 @@ select:disabled {
   min-width: 0;
 }
 .identity-name {
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: 600;
   color: var(--text);
 }
 .identity-meta {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2808,7 +2814,7 @@ select:disabled {
   flex-shrink: 0;
 }
 .identity-linked-badge {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts));
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -2885,12 +2891,12 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
-  :root { --lineup-btn-w: 76px; }
-  .btn.btn-lineup { font-size: 11px; white-space: normal; }
+  :root { --lineup-btn-w: calc(76px * var(--ts)); }
+  .btn.btn-lineup { font-size: calc(11px * var(--ts)); white-space: normal; }
   .home-faq-list { grid-template-columns: 1fr; }
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }
-  .form-row input { font-size: 13px; }
+  .form-row input { font-size: calc(13px * var(--ts)); }
   .filter-bulk-row .pace-color    { width: 22px; height: 22px; }
   /* Tighter box picker: lets 3 columns fit instead of 2, keeping cover art
      a comfortable size on phones. */
@@ -2904,11 +2910,11 @@ select:disabled {
 }
 
 @media (max-width: 360px) {
-  .nav-links a { padding: 4px 6px; font-size: 12px; }
+  .nav-links a { padding: 4px 6px; font-size: calc(12px * var(--ts)); }
   .draw-mode-row                  { gap: 4px; }
   .filter-bulk-row .pace-colors   { gap: 2px; }
   .filter-bulk-row .pace-color    { width: 20px; height: 20px; }
-  .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 5px 6px; font-size: 11px; }
+  .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 5px 6px; font-size: calc(11px * var(--ts)); }
   .box-picker { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
 }
 
