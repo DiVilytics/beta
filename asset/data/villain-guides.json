@@ -147,6 +147,312 @@
       }
     ]
   },
+  "Evil Queen": {
+    "objective": "In order to achieve Evil Queen's Objective, you must unlock the Dwarfs' Cottage by playing four different Ingredients. You will also need to Brew Poison, which is used to defeat Heroes in your Realm, including Snow White. Snow White must be played, either by you or an opponent. Finally, you will need to play Take a Bite when you are at Snow White's location in order to defeat her and win the game.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place a Lock Token on the Dwarfs' Cottage, as that location is locked at the beginning of the game."
+      },
+      {
+        "title": "Ingredients",
+        "text": "Ingredient is a card type unique to Evil Queen. Ingredients function the same as Effects, with one exception. The first time you play each Ingredient, after doing what it says, put it below your Board. If you play an Ingredient that youve played before, do what it says, then discard it.\n\nAs soon as you have played each of the four Ingredients (Scream of Fright, Old Hag's Cackle, Mummy Dust, and Black of Night), unlock the Dwarfs' Cottage by removing the Lock Token from the location. The four Ingredients remain below your Board for the rest of the game."
+      },
+      {
+        "title": "Activated Abilities",
+        "text": "Evil Queen has some cards with Activated Abilities. See the Instructions for details on how cards with Activated Abilities are played and their Abilities activated."
+      },
+      {
+        "title": "Magic Mirror",
+        "text": "Evil Queen can use her Magic Mirror to find Snow White. To activate this Ability, perform an Activate action and pay 3 Power. Then find Snow White and play her to the Dwarfs' Cottage, even if it is locked.\n\nIn addition, while the Magic Mirror is in your Realm, each time you are the target of a Fate action, you may draw a card."
+      },
+      {
+        "title": "Poison Apples",
+        "text": "Evil Queen does not have a Vanquish action in her Realm. Instead, she uses poison apples to defeat Heroes. To do this, she must Brew Poison and then get a Hero to Take A Bite."
+      },
+      {
+        "title": "Brew Poison Action",
+        "text": "The Brew Poison action is unique to Evil Queen and is found at the Laboratory location. Each time you perform this action, you may convert as many of your Power as you wish into Poison. Move the Power onto your Board to indicate that it is now Poison.\n\nNote: Poison is no longer considered Power. Poison may not be used to pay a card or Ability's Cost. Having Poison or adding Power from the Supply to your Poison do not trigger Conditions that require having Power or gaining Power."
+      },
+      {
+        "title": "Take A Bite",
+        "text": "When you play Take A Bite, Evil Queen must be at the same location as the Hero being defeated. You must also pay Poison equal to the Hero's Strength, which may be modified by other cards in the Realm. Remove that many Poison from your Board and return it to the Supply. Discard the defeated Hero to your Fate discard pile, and discard Take A Bite to your Villain discard pile.\n\nNote: If you do not have enough Poison to defeat a Hero, you may not play Take a Bite."
+      }
+    ]
+  },
+  "Dr. Facilier": {
+    "objective": "Dr. Facilier is unique because during the game, you and your opponents will put cards into a Fortune pile. When you play The Cards Will Tell, cards will be revealed from the Fortune pile, and you will receive the rewards or consequences of those cards.\n\nTo achieve Dr. Facilier's Objective, you must reveal the card Rule New Orleans from the Fortune pile. However, you also must control the Talisman.\n\nImportant: To win, the Talisman must be on your side of the Board.",
+    "sections": [
+      {
+        "title": "Fortune Pile",
+        "text": "Dr. Facilier has a Fortune pile that is separate from his decks and discard piles. You need to play Rule New Orleans in order to put it into the Fortune pile before you can win. You can also play Friends on the Other Side to add it to the pile and gain Power. However, you want to keep your Fortune pile small, to give yourself a better chance of ruling New Orleans. Your opponents will be adding other, less helpful cards to the Fortune pile. Use Desperation and Illusion Powder to remove cards from the Fortune pile.\n\nKeep the Fortune pile face up below your Board. The cards in the Fortune pile are public information.\n\nNote: Cards are only put into or removed from the Fortune pile if a card Ability specifically instructs you to do so."
+      },
+      {
+        "title": "Fortune Abilities",
+        "text": "Some cards in Dr. Faciliers deck have Fortune Abilities. These Abilities are ignored when the cards are played, and are only resolved when revealed from the Fortune pile by playing The Cards Will Tell.\n\nNote: Cards without Fortune Abilities may still be put into the Fortune pile. When revealed, they are discarded without any effect."
+      },
+      {
+        "title": "The Cards Will Tell",
+        "text": "When you play The Cards Will Tell, shuffle the cards in the Fortune pile face down, fan them out, and have an opponent reveal three at random. Resolve all Fortune Abilities on the revealed cards, in the order of your choice.\n\nNote: You may still play The Cards Will Tell if there are fewer than three cards in the Fortune pile. Reveal and resolve them all."
+      },
+      {
+        "title": "Pay Back Your Debt",
+        "text": "All the spirits are Allies, and may be moved and used to defeat Heroes as normal. However, when an opponent adds cards to the Fortune pile, they may convince the spirits to turn against you and collect on your debt.\n\nWhen Shadow Spirits are revealed from the Fortune pile, they force you to lose two Power.\n\nWhen Masked Spirits are revealed from the Fortune pile, they stop you from resolving the Fortune Abilities of other cards, including Shadow Spirits and Rule New Orleans. All Masked Spirits that were revealed are discarded, even if there's more than one, and all other revealed cards are returned to the Fortune pile without being resolved. In addition, Masked Spirits are unique because they are considered both an Ally and an Item."
+      },
+      {
+        "title": "Control the Talisman",
+        "text": "To win the game, you must have the Talisman under your control when Rule New Orleans' Fortune Ability is resolved. It can be difficult to keep control of the Talisman, so you'll need to strategize the best time to play it.\n\nIf you have the Talisman when a Hero with a Strength of 3 or less is played, that Hero steals it from you. Move the Talisman to the top of the Board and attach it to the Hero. When that Hero is defeated, the Talisman is returned to your side of the Board at the location the Hero was defeated.\n\nNote: If a Hero already has the Talisman when a new Hero is played, the Talisman does not move. It remains with the Hero it is attached to."
+      }
+    ]
+  },
+  "Hades": {
+    "objective": "To achieve Hades' Objective, you must play Titans to The Underworld and move them across your Realm to Mount Olympus.\n\nImportant: Trapped Titans do not count toward your Objective. However, you can win even if there are additional Titans trapped in your Realm.",
+    "sections": [
+      {
+        "title": "Titans",
+        "text": "Titan is a card type unique to Hades. You must lead at least three Titans to Mount Olympus in order to achieve victory. There are five Titans in your deck and each one has a powerful Ability.\n\nTitans function much like your Allies, but they must be played to The Underworld. You may move a Titan using the Move an Item or Ally action. Don't forget to use the Titan's Ability each time he is moved.\n\nJust like Allies, Titans may be used to defeat Heroes by performing the Vanquish action. However, because they are still discarded when used to defeat a Hero, this could set you back in getting Titans to Mount Olympus."
+      },
+      {
+        "title": "Trapped",
+        "text": "During the game, Titans may be trapped by cards in your Fate deck. Rotate the card 90 degrees to indicate that the Titan is trapped.\n\nWhile a Titan is trapped, their Ability is ignored. They may not be moved or used to defeat a Hero. In addition, trapped Titans do not count toward your Objective.\n\nYou can untrap Titans by playing Planets Align, or by using Pyros' Ability. When you untrap a Titan, rotate the card back to its normal position to indicate that it is no longer trapped."
+      },
+      {
+        "title": "Make Them Mortal",
+        "text": "Mortality Potion will help you defeat Heroes without sacrificing your Titans. If you play Mortality Potion on a Hero, you'll be able to use Titans to defeat that Hero without discarding the Titans. Any Allies used are discarded as normal."
+      },
+      {
+        "title": "Ride Your Chariot",
+        "text": "Chariot will give you extra actions during the game. After performing your normal actions, if Chariot is at your location, you may 'ride' the Chariot to any other location and perform one available action there. Chariot may only be used once per turn and may not be used to perform a Fate action. You may use Chariot in the same turn you play it."
+      },
+      {
+        "title": "Let's Get Ready to Rumble",
+        "text": "In addition to the Move an Item or Ally action, you can use Get Ready to Rumble! to move Titans toward Mount Olympus. You may either pay 2 Power to move a Titan one location or pay 5 Power to move a Titan two locations. You may only move one Titan when you play this card, and you may not move trapped Titans.\n\nNote: If you move a Titan two locations, it is considered a single move and the Titan effectively jumps over the first location. Only Abilities at the Titan's final location are triggered by the move. Any Abilities at the jumped location are not triggered."
+      }
+    ]
+  },
+  "Ratigan": {
+    "objective": "Important: Ratigan's Objective can change. If The Robot Queen is discarded from your Realm, your new Objective is to defeat Basil.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place Ratigan's Objective Tile on the left side of the Board so The Superior Mind is showing."
+      },
+      {
+        "title": "The Robot Queen",
+        "text": "To achieve Ratigans Objective, you must find The Robot Queen, play it to The Secret Lair, and move it to Buckingham Palace. Plan ahead so you can pay The Robot Queen's Cost, which is normally 15 Power.\n\nSome cards help you find The Robot Queen. If you play Fidget's List, you can later activate it to draw the next Item from your deck. Playing Greatest Criminal Mind lets you either gain Power or draw extra cards.\n\nOther cards help you reduce the Cost to play The Robot Queen. The card Tools is good to play as early as possible, as it reduces the Cost of all Items. The card Gears also reduces the Cost of an Item, but it is discarded when it is used."
+      },
+      {
+        "title": "Marvelous Trap",
+        "text": "Marvelous Trap is a powerful card that can defeat all Heroes at its location, but it must first be set up and takes time to deploy.\n\nFirst play the trap to any location. Then, when you perform the Activate action, you can pay 1 Power to activate it. Leave the Power on the card to indicate that its been activated and will go off at the start of your next turn.\n\nIf there are no Heroes at the trap's location when it goes off, it is still discarded. If the trap is discarded before it goes off, no Heroes are defeated. When Marvelous Trap is discarded, return the Power on it to the supply.\n\nNote: If you have The Robot Queen at Buckingham Palace and The Mouse Queen is defeated with a trap, you do not immediately win. You must wait until the start of your next turn to see if you still achieve your Objective."
+      },
+      {
+        "title": "The Great Mouse Detective",
+        "text": "Basil is Ratigans most formidable adversary. When Basil is played or moved, he discards an Item from his new location. Some Fate cards can move Basil, making him a constant threat to your Items, including The Robot Queen.\n\nIf Basil discards The Robot Queen, flip the Objective Tile so The Rat is showing. Your new Objective is to defeat Basil.\n\nNote: Once Ratigan's Objective changes, it cannot change back. You must defeat Basil to win."
+      },
+      {
+        "title": "The Secret Lair",
+        "text": "Ratigan has a location that can be used to his advantage. The Secret Lair does not have any action symbols at the top, making Heroes at that location less disruptive. Ratigan has Capture cards which allow him to move Heroes to The Secret Lair.\n\nIf you capture the Hero Flaversham, you'll reduce the Cost to play The Robot Queen. Your Ally Fidget will help you find and play Flaversham so you can later capture him.\n\nNote: When at The Secret Lair, Heroes' Abilities are still in effect."
+      }
+    ]
+  },
+  "Scar": {
+    "objective": "Scar is unique because during the game, you will put Heroes you defeat into a Succession pile instead of the Fate discard pile. If the Heroes in your Succession pile have a total Strength of 15 or more at the start of your turn, you achieve your Objective. However, you cannot start putting Heroes in your Succession pile until you defeat Mufasa.\n\nNote: You may defeat other Heroes before defeating Mufasa. However, they are discarded to your Fate discard pile instead of being put into the Succession pile.",
+    "sections": [
+      {
+        "title": "Controlling Your Fate",
+        "text": "Your first step toward your Objective is to find and defeat Mufasa, who is in your Fate deck.\n\nLong Live The King lets you reveal four cards from your Fate deck, which will help you quickly find and play Mufasa.\n\nWhisper allows you to play any card from your Fate discard pile, in case Mufasa is discarded by an opponent. You can also use Whisper to play Hakuna Matata in order to move a Hero in your Realm to any location.\n\nAfter you defeat Mufasa, both Long Live The King and Whisper will help you play Heroes so you can quickly defeat them and add them to the Succession pile."
+      },
+      {
+        "title": "Succession Pile",
+        "text": "Scar has a Succession pile that is separate from his decks and discard piles. When you defeat Mufasa, put him into the Succession pile instead of in the Fate discard pile. For the rest of the game, all Heroes you defeat are put into the Succession pile. Keep the Succession pile face up below your Board. The cards in the Succession pile are public information.\n\nItems are not put into the Succession pile. If a Hero has a Prophecy attached to them when they are defeated, the Prophecy is discarded to the Fate discard pile.\n\nImportant: The Succession pile is not considered to be in your Realm. The Abilities of Heroes in the Succession pile are ignored, and no cards can be played directly to the Succession pile."
+      },
+      {
+        "title": "Hyenas",
+        "text": "Hyenas are the Allies that you'll most often use to defeat Heroes, and the more Hyenas there are, the stronger they become. Hungry Hyenas get additional Strength for each other Hyena at their location.\n\nSimba is a Hero that limits the Strength of all Hyenas in your Realm. If a Hyena would have a Strength of more than 2, their Strength is reduced to 2 until Simba is defeated.\n\nExample: There are three Hyenas at Pride Rock, including Ed. Normally each Hungry Hyena's Strength would be 3 and Ed's would be 2. However, Simba limits each Hyenas Strength to 2. If you perform a Vanquish action to defeat Simba, whose Strength is 5, you must discard all three Allies."
+      },
+      {
+        "title": "Leaders of the Pack",
+        "text": "The Hyenas Shenzi, Banzai, and Ed are Allies that help you gain or save Power. By playing them as early as possible, you can use their Abilities to play more Hyenas, which you'll use to defeat Heroes.\n\nShenzi lets you play another Hyena for free.\n\nBanzai gains you Power when other Hyenas at his location are discarded, even if Banzai is discarded in the same action. For example, if you perform a Vanquish action using Banzai and two Hungry Hyenas, you gain 2 Power.\n\nEd reduces the Cost to play Hyenas to his location.\n\nNote: Shenzi, Banzai, and Ed are Hyenas. Any card that refers to Hyenas includes them."
+      }
+    ]
+  },
+  "Yzma": {
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Instead of having a single Fate deck, Yzma has four. Shuffle your Fate cards and deal them evenly to form four Fate decks-one at each location. Place them above your Board, leaving space for Heroes."
+      },
+      {
+        "title": "Finding Kuzco",
+        "text": "To achieve Yzma's Objective, you'll need to find Kuzco, who is in one of your Fate decks.\n\nEavesdrop lets you look at all the cards in one Fate deck, which is the safest way to search for Kuzco.\n\nAfter Them! reveals the cards in a Fate deck and plays all the Heroes to that location. This is most useful if you know which Fate deck Kuzco is in. But be careful-if you ever reveal Wrong Lever, you lose Power.\n\nSmash It With A Hammer reveals and discards two cards from a Fate deck, allowing you to get rid of troublesome Fate cards like On The Run and Beware The Groove. But if you discard Kuzco, he gets reshuffled into your Fate decks."
+      },
+      {
+        "title": "Controlling Kronk",
+        "text": "Kronk is a powerful Ally and essential to your Objective, but he can turn against you. Each time Kronk is moved, whether by an action or card Ability, put 1 Power from the Supply on him. When he has 3 or more Power on him, he becomes a Hero. Put him at the top of your Board at the same location. He has the same Strength, but ignore his Ability-moving him when hes a Hero does not add Power.\n\nThe Path That Rocks lets you gain the Power on Kronk, whether hes an Ally or a Hero. Right-Hand Man can be used to put Kronk into your hand, whether he is close to turning, already a Hero, or still in your deck.\n\nNote: Removing Power from Kronk when hes a Hero does not turn him back into an Ally."
+      },
+      {
+        "title": "Yzma's Fate",
+        "text": "When an opponent targets you with a Fate action, they must choose one of your Fate decks, secretly look at all the cards in it, and choose one card to play. If they choose to play a Hero, that Hero must be played to the location of the Fate deck it came from. All other cards are shuffled and returned to that Fate deck. If none of the cards can be played, all of them are returned.\n\nNote: Since your opponents do not reveal the cards, they can choose not to play Wrong Lever, unless there are no other cards they can play.\n\nIf a Fate deck is empty, do not shuffle the discard pile yet-your opponents will choose from only the remaining Fate decks. However, if all of the Fate decks are empty, shuffle the discard pile and deal the cards as evenly as possible to form four new Fate decks.\n\nExample: An opponent targets you with a Fate action. They choose the Fate deck at The Palace and look at all the cards in that deck. They choose to play Bucky, who must be played to the same location.\n\nNote: There is no limit to the number of Heroes at a location. Move the Fate deck to make room, and offset the Heroes so all cards can be seen."
+      }
+    ]
+  },
+  "Pete": {
+    "objective": "To achieve Petes Objective, you must complete each of the four Goals in your Realm. You may complete them in any order. When you complete a Goal, reveal that Goal Token and then remove it from your Board.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Turn the five Goal Tokens face down, mix them up, and place one at each location. Set the remaining Goal Token aside. You may look at the Goal Tokens at any time, but keep them secret from the other players.\n\nNote: Once a Goal Token has been revealed, it can never be turned face down again."
+      },
+      {
+        "title": "Goal: Power Play",
+        "text": "Spend at least 6 Power in one turn while Pete is at this location.\n\nBeing able to play more than one card at the same location will make this Goal easier. If this Goal is at a location with multiple Play a Card actions, you have more options to play cards. However, if only one Play a Card action is available, you can use Bandit's ability to play at least three Bandits with one action."
+      },
+      {
+        "title": "Goal: Rule the Realm",
+        "text": "Start your turn with more Allies than Heroes at each location.\n\nThis Goal is completed by playing multiple Allies. Cricket can help secure this Goal by moving to any location when a Hero is played to it."
+      },
+      {
+        "title": "Goal: Win Big",
+        "text": "Gain at least 4 Power from playing Play a Game at this location.\n\nComplete this Goal when you play Play A Game and reveal cards with a total Cost of at least 4 Power.\n\nYou can improve your chance by using Mischief or Sneaky Pete to put cards with a high Cost on top of your deck."
+      },
+      {
+        "title": "Strike It Rich",
+        "text": "Start your turn with at least three Items at this location.\n\nPete's deck contains four Items that can only be played to their specified location. Pete does not need to be at that location to play them.\n\nYou may complete this Goal on the start of your next turn after moving at least three Items to the Goal's location. Horse and Steamboat Willie can help you achieve this goal by quickly moving Items to the Goal's location."
+      },
+      {
+        "title": "Goal: Round Up",
+        "text": "Start your turn with Allies totaling at least 10 Strength at this location.\n\nPlaying many Allies with high Strength to this Goal's location is the easiest way to complete it. Bandit and Horse help you play and move Allies to the Goal's location."
+      },
+      {
+        "title": "Extra Actions",
+        "text": "Each of Pete's Items adds an extra action symbol to your Realm. After the Item has been played to a location, you may perform the extra action in addition to the other available actions there."
+      }
+    ]
+  },
+  "Cruella de Vil": {
+    "objective": "To achieve Cruella De Vil's Objective, you must add Puppy Tokens from the Supply to locations in your Realm, then capture them.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Turn the 12 Puppy Tokens face down (red side showing), mix them up, and keep them in a pile next to your Board to form a Supply."
+      },
+      {
+        "title": "Puppy Tokens",
+        "text": "Puppy Tokens represent the puppies that Cruella De Vil must capture, with each Puppy Token representing either 11 or 22 puppies.\n\nIn order to capture Puppy Tokens, they must first be taken from the Supply and added to your Realm. Each Puppy Token features one of the four locations in your Realm. When adding a Puppy Token to your Realm, reveal the Puppy Token and place it face up at the location specified.\n\nNote: Each time you add a Puppy Token to your Realm, you may choose one from the Supply that is face up or face down. Once a Puppy Token has been revealed, it can never be turned face down again, even if it is returned to the Supply.\n\nNote: Place captured Puppy Tokens below your Board, keeping them face up so all players can see how many puppies have been captured."
+      },
+      {
+        "title": "Activated Abilities",
+        "text": "Cruella De Vil has some cards with Activated Abilities. See the Instructions for details on how cards with Activated Abilities are played and their Abilities activated.\n\nFlashlight and Horace bring Puppy Tokens into your Realm. Horace and Jasper capture Puppy Tokens from your Realm. Telephone can help put Horace and Jasper back into play from your discard pile."
+      },
+      {
+        "title": "Roadster",
+        "text": "Roadster can help you move Puppy Tokens to locations so they can be more easily captured. When moved, Roadster can move to any location."
+      },
+      {
+        "title": "Horace and Jasper",
+        "text": "Cruella DeVil has only two Allies, and they must be used to capture puppies and defeat Heroes. Getting them into your Realm quickly and keeping them there will be important to obtaining your Objective.\n\nYou Idiots! allows you to choose an Ally from your deck and put them into your hand. This will help get Horace or Jasper into play quickly.\n\nWhen an Ally with Fireplace Poker attached to them is used to defeat a Hero, you may discard Fireplace Poker instead of that Ally, allowing them to stay in your Realm longer.\n\nIf Telephone is in your Realm, it can be activated to choose an Ally from your discard pile and play it to any location."
+      }
+    ]
+  },
+  "Mother Gothel": {
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place the Rapunzel Tile at Rapunzel's Tower."
+      },
+      {
+        "title": "Trust",
+        "text": "Mother Gothel wants to keep Rapunzel close, so she needs Rapunzel to trust her. If a card instructs you to gain Trust, take Power from the Supply equal to that amount and place it onto your Board to indicate that it is now Trust.\n\nNote: Trust is no longer considered Power. Trust may not be used to pay a card or Ability's Cost. Having Trust or adding Power from the Supply to your Trust do not trigger Conditions that require having Power or gaining Power."
+      },
+      {
+        "title": "Rapunzel",
+        "text": "Rapunzel is a unique Hero because she is already in your Realm at the start of the game, and she is never discarded. Like other Heroes, she blocks actions at her location and may be defeated by using a Vanquish action.\n\nHowever, when Rapunzel is defeated, instead of discarding her, move her to Rapunzel's Tower.\n\nImportant: At the end of Mother Gothel's turn, move Rapunzel one location toward Corona. If you cannot move Rapunzel because she is already at Corona, Mother Gothel loses 1 Trust."
+      },
+      {
+        "title": "Controlling Rapunzel",
+        "text": "Mother Gothel is able to gain Trust easily when Rapunzel is at Rapunzel's Tower, and keeping her away from Corona is important. Mother Gothel has several ways she controls Rapunzel's location.\n\nMother Knows Best prevents Rapunzel from moving toward Corona at the end of that turn.\n\nPatchy Stabbington and Sideburns Stabbington move Rapunzel to Rapunzel's Tower and are powerful Allies that can be used to defeat Heroes.\n\nNow I'm The Bad Guy moves Rapunzel to Rapunzels Tower. Mother Gothel loses 1 Trust, but it might be helpful in combination with other actions."
+      },
+      {
+        "title": "Gaining Trust",
+        "text": "There are several cards that can gain Trust.\n\nWhen Hair Brush is played or moved to Rapunzel's location, gain 1 Trust. This Item is good to play early as it can keep gaining Trust when it is in your Realm.\n\nI Love You Most gains 1 Trust if Mother Gothel is at Rapunzel's location. It is most effective when played at Rapunzel's Tower to gain an additional Trust.\n\nLet Down Your Hair can gain you Trust or move Rapunzel to help keep her away from Corona.\n\nMisdirection gains 1 Trust but moves Rapunzel toward Corona, so it should be used strategically to avoid losing Trust later.\n\nCrown can be used as a way to gain Power each time a Hero is defeated at that location. You can instead choose to discard Crown to gain 1 Trust.\n\nRevenge allows you to perform a Vanquish action and gain 1 Trust if a Hero other than Rapunzel is defeated."
+      },
+      {
+        "title": "Strategy Tips",
+        "text": "Some cards are most effective if played when Rapunzel is at Rapunzel's Tower. Since Rapunzel will move toward Corona at the end of your turn, moving her to Rapunzel's Tower or keeping her there will allow you to gain more Trust from those cards.\n\nPlaying Effect or Condition cards and using Allies to defeat Rapunzel can move her to Rapunzel's Tower."
+      }
+    ]
+  },
+  "Horned King": {
+    "objective": "As the Horned King, your goal is to control the world using your Cauldron Born warriors. To do so, you must first claim The Black Cauldron. Once it is in your possession, you must power The Black Cauldron. Finally, you must use The Black Cauldron’s Ability to swap your Ancient Soldiers for Cauldron Born. Once you have Cauldron Born in all four locations, you control the world and win the game!",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "The Black Cauldron tile is a Relic, a card type unique to the Horned King. Set The Black Cauldron tile to the side of your Realm. Once you claim it, set it above your portrait on your player board with The Black Cauldron side showing."
+      },
+      {
+        "title": "Claiming The Black Cauldron",
+        "text": "You must have The Black Cauldron to win. You cannot lose The Black Cauldron once you claim it. Show Me The Black Cauldron allows you to claim The Black Cauldron immediately.\n\nWe Have Made a Bargain allows you to remove Dyrnwyn from your Realm and exchange it for The Black Cauldron.\n\nWe Got You Now, Pig Keeper allows you to find and place Hen Wen. Vanquishing Hen Wen allows you to claim The Black Cauldron.\n\nThese three cards have additional powers besides gaining The Black Cauldron. So, plan ahead and use them as you think best."
+      },
+      {
+        "title": "Powering The Black Cauldron",
+        "text": "You may power The Black Cauldron either by playing Our Hour Has Arrived or by using an Activate action to flip the tile and reveal The Power of The Black Cauldron.\n\nThere are no Activate actions in the Horned King's Realm. Ancient Soldiers add an Activate action to their location."
+      },
+      {
+        "title": "Making Cauldron Born",
+        "text": "You need Ancient Soldiers to make the Cauldron Born.\n\nWith The Power of The Black Cauldron revealed, you can now replace Ancient Soldiers with Cauldron Born. On your turn, before you move to a new location, you may pay 2 Power and discard an Ancient Soldier from your Realm to place a Cauldron Born from your hand into any location."
+      },
+      {
+        "title": "Gurgi's Sacrifice and The Black Cauldron",
+        "text": "Gurgi's Sacrifice flips The Power of The Black Cauldron back to The Black Cauldron. While The Black Cauldron side is showing, the Horned King discards one Cauldron Born in play at the start of every turn BEFORE moving to a new location. You will need to use an Activate action to flip The Black Cauldron back to The Power of The Black Cauldron to make more Cauldron Born."
+      }
+    ]
+  },
+  "Gaston": {
+    "objective": "Gaston has many Obstacles to overcome in order to convince Belle he's the perfect man. By using his Allies and Effect cards, he can remove Obstacles and limit the impact of the Heroes who replace Obstacles in his Realm.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Place one Obstacle Token on each of the eight indicated spots in Gaston’s Realm."
+      },
+      {
+        "title": "Remove Obstacles with Effects",
+        "text": "Effect cards such as Temper, Come Into the Light, and Get Out allow Gaston to directly remove Obstacles. These cards cost plenty of Power, so replacing an Obstacle Token to gain Power when you play Swoon might help you out in the long run."
+      },
+      {
+        "title": "Remove Obstacles with Allies",
+        "text": "Monsieur D’Arque will help remove Obstacle Tokens by using an Activate action and paying 2 Power."
+      },
+      {
+        "title": "Remove Obstacles by Vanquishing Heroes",
+        "text": "Vanquishing Maurice and Beast allows Gaston to remove Obstacles from specific locations in his Realm. If there are no Obstacle Tokens in those locations, no Obstacles are removed."
+      },
+      {
+        "title": "Replace Obstacles",
+        "text": "Fate Effect cards such as I’ve Never Seen So Many Books, Saving My Life, It Is You, and Massaging My Feet replace Obstacle Tokens in Gaston’s Realm. The player who plays the Fate Effect card decides where to replace Obstacle Tokens. Only one Obstacle Token may be played to each spot.\n\nWhile in play, Belle prevents Gaston from removing Obstacles."
+      }
+    ]
+  },
+  "Lady Tremaine": {
+    "objective": "To achieve Lady Tremaine's Objective, the Prince must be played from her Fate deck to The Ballroom, which must be unlocked by playing Invitation From the King, and you must move Ball Gown Drizella or Ball Gown Anastasia to The Ballroom. While there, you must activate the Wedding Bells card.",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "The Ballroom starts the game locked: put a Lock Token on it. Lady Tremaine can't move there until it's unlocked."
+      },
+      {
+        "title": "Going to the Ball",
+        "text": "Once The Ballroom is unlocked by playing Invitation From the King, The Ballroom cannot be re-locked.\n\nOnly four characters can be played or moved to The Ballroom: The Prince (who is played there immediately when revealed), Ball Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia.\n\nWhile in play, Ball Gown Cinderella prevents Ball Gown Drizella or Ball Gown Anastasia from entering The Ballroom. This card has no effect if they are already there.\n\nSweet Nightingale is a powerful Fate card that may slow your progress to The Ballroom by moving any Ally to a new location.\n\nBall Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia can only be played by first playing Cinderella, Drizella, or Anastasia in their everyday dresses then discarding them to play their Ball Gown versions to the same location. This swap requires a Play a Card action. There can never be two versions of a character in play at the same time.\n\nExample: Swap Drizella for Ball Gown Drizella, who is played to the same location.\n\nImportant: Fairy Godmother can play Ball Gown Cinderella even if Cinderella is not in play. If this occurs, you may play Ball Gown Cinderella to any unlocked location."
+      },
+      {
+        "title": "Trapped!",
+        "text": "Cards like Lucifer, The Key, and Trapped allow you to place a Trapped Token on a Hero in your Realm. When a Hero has a Trapped Token, their Ability is ignored, as if the card has no Ability at all. The card still remains in play and blocks your actions. If a Trapped Hero is removed and placed in the Fate discard pile, remove the Trapped Token as well.\n\nBall Gown Cinderella cannot be Trapped by any card, although she can still be moved using the Activate action of The Key.\n\nLady Tremaine has no Vanquish actions. However, players can use Activate actions to discard or defeat Fate cards from play. Cards such as Lady Tremaine’s Cane, Midnight, and You Little Thief all remove specific Hero and Item cards from your Realm."
+      },
+      {
+        "title": "Glass Slippers",
+        "text": "Unlike other Items in the Fate card deck, Glass Slippers do not attach to a Hero. You cannot win the game while a Glass Slipper is in your Realm. You can remove a Glass Slipper by Activating Lady Tremaine's Cane.\n\nNote: The Prince card is a Prince, not a Hero. The Prince is not affected by cards targeting Heroes."
+      }
+    ]
+  },
   "Oogie Boogie": {
     "objective": "Oogie Boogie wants to become the new ruler of Halloween Town. With Jack Skellington trying to take over Christmas, the path is clear for Oogie Boogie to dominate. But soon Jack will know that he truly is the Pumpkin King and will be back to take over. Oogie Boogie must prepare for the fight to come.",
     "sections": [
