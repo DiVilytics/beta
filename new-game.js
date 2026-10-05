@@ -364,13 +364,36 @@ function drawSlot(id) {
 }
 
 // Draw villains: clear every slot, then draw each one in turn.
+// The draw button adapts to the lineup: every row empty → "Draw villains";
+// some empty → "Draw the rest" (keeps the villains already chosen); every row
+// filled → "Redraw all". Disabled when the draw pool can't cover it.
+function _drawMode() {
+  const empty = orderSlots.filter(s => !s.char).length;
+  return empty === orderSlots.length ? 'all' : empty ? 'rest' : 'redraw';
+}
+
+// Pool villains not yet in the lineup (manual picks outside the pool don't use it up).
+function _freePool() {
+  const taken = new Set(orderSlots.map(s => s.char).filter(Boolean));
+  return chars.filter(c => !pace.excluded.has(c.name) && !taken.has(c.name));
+}
+
+function _canDrawAll() {
+  const mode = _drawMode();
+  if (mode === 'rest') return _freePool().length >= orderSlots.filter(s => !s.char).length;
+  return chars.filter(c => !pace.excluded.has(c.name)).length >= orderSlots.length;
+}
+
 function drawAll() {
+  if (!_canDrawAll()) return;
   _cancelShuffle();
   for (const id of Object.keys(slotTimers)) { clearInterval(slotTimers[id]); }
   slotTimers = {};
-  for (const s of orderSlots) s.char = '';
+  const mode = _drawMode();
+  if (mode !== 'rest') for (const s of orderSlots) s.char = '';
+  const targets = mode === 'rest' ? orderSlots.filter(s => !s.char) : orderSlots;
   renderOrderSlots();
-  orderSlots.forEach((s, i) => setTimeout(() => drawSlot(s.id), i * 60));
+  targets.forEach((s, i) => setTimeout(() => drawSlot(s.id), i * 60));
 }
 
 function shuffleOrder() {
@@ -495,9 +518,25 @@ function _updateActionBtns() {
   const startBtn        = document.getElementById('startBtn');
   const submitBtn       = document.getElementById('submitBtn');
 
-  if (drawAllBtn) {
-    drawAllBtn.disabled = animating;
-    drawAllBtn.title    = t('Draw villains');
+  // Mid-draw the lineup is half filled: keep the label and every 🎲 as they
+  // were, all disabled, and recompute once the draw has settled.
+  if (animating) {
+    if (drawAllBtn) drawAllBtn.disabled = true;
+    document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
+  } else if (drawAllBtn) {
+    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all') }[_drawMode()];
+    const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
+    if (drawAllBtn.textContent !== label) drawAllBtn.textContent = label;
+    drawAllBtn.disabled = animating || !can;
+    drawAllBtn.title    = can ? label : t('Not enough villains in the draw pool');
+  }
+  // A row's 🎲: off when the pool has nothing it could draw (other than its own villain).
+  if (chars.length && !animating) for (const s of orderSlots) {
+    const btn = document.querySelector(`.order-slot[data-id="${s.id}"] .pf-btn.rand`);
+    if (!btn) continue;
+    const can = _slotPool(s.id).some(c => c.name !== s.char);
+    btn.disabled = !can;
+    btn.title    = can ? t('Draw') : t('No villains left in the draw pool');
   }
   if (shuffleBtn) {
     shuffleBtn.disabled = animating || filled < 2;
