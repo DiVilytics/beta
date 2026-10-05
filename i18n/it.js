@@ -369,7 +369,7 @@ window.I18N.it = {
     "Draw pool": "Riserva cattivi",
     "Draw villains": "Pesca i cattivi",
     "Draw the rest": "Pesca i mancanti",
-    "Redraw<br>all": "Ripesca tutti",
+    "Redraw all": "Ripesca tutti",
     "Not enough villains in the draw pool": "Non ci sono abbastanza cattivi nella riserva",
     "No villains left in the draw pool": "Nessun cattivo rimasto nella riserva",
     "Random order": "Ordine casuale",

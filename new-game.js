@@ -44,20 +44,24 @@ async function init() {
   // Build the default layout synchronously, the date and the two starter rows,
   // BEFORE the network awaits, so the form doesn't render empty (0 rows, no date,
   // "Add player" at the top) and then visibly fill in / shift once JS finishes.
-  // The character <select> options fill in once chars load (no visible change);
-  // a saved draft, if any, replaces these rows further down.
+  // The character <select> options fill in once chars load (no visible change).
+  // A saved draft's rows and details go in here too, before the first render, so
+  // they don't flash from empty to filled; its draw pool waits for the pool grid.
   _setDateToNow();
   _markFresh();
   orderSlots = [
     { id: orderNextId++, char: '', isMe: false, isWinner: false },
     { id: orderNextId++, char: '', isMe: false, isWinner: false },
   ];
+  const draft = _restoreDraftForm();
   renderOrderSlots();
   _initLegend();   // before the network awaits too: until it runs, the legend wraps 3 + 1
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
     for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
   }
   _checkResume();   // a game in progress shows right away, not after an empty form
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _initButtonLines, { once: true });
+  else _initButtonLines();
 
   // Re-render slots whenever auth state changes so the Me-locked indicator
   // updates in-place after sign-in / sign-out.
@@ -84,7 +88,7 @@ async function init() {
     boxInfo
   );
   onBeforeSignIn(_saveDraft);
-  const poolRestored = _restoreDraft();
+  const poolRestored = !!draft?.pool && (pace.restoreState(draft.pool), true);
   // Re-render now that chars are loaded (fills the selects), auth is resolved and
   // any draft is back, then start saving it.
   renderOrderSlots();
@@ -140,12 +144,13 @@ function _loadDraft() {
   return d;
 }
 
-// Puts a saved draft back on the page. Returns true when it restored a pool, so
-// the My boxes default isn't applied over the user's own choice.
-function _restoreDraft() {
-  if (liveGame.loadSaved()) return false;   // the resume banner handles a game in progress
+// Puts a saved draft's rows and details back on the page (synchronously, before
+// the first render) and returns the draft, whose pool init() restores once the
+// pool grid exists; a restored pool keeps the My boxes default from overriding it.
+function _restoreDraftForm() {
+  if (liveGame.loadSaved()) return null;   // a game in progress shows instead
   const d = _loadDraft();
-  if (!d) return false;
+  if (!d) return null;
   if (d.slots && d.slots.length >= 2) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     if (d.fDate) document.getElementById('fDate').value = d.fDate;
@@ -153,9 +158,7 @@ function _restoreDraft() {
     document.getElementById('fDur').value      = d.fDur      || '';
     document.getElementById('fTurns').value    = d.fTurns    || '';
   }
-  if (!d.pool) return false;
-  pace.restoreState(d.pool);
-  return true;
+  return d;
 }
 
 function _setDateToNow() {
@@ -505,6 +508,66 @@ function renderOrderSlots() {
   _updateDiscardBtn();
 }
 
+// ── BUTTON LINES ──────────────────────────────────────────────────────────────
+// Each button row (Random order + Draw, and Discard + Start + Save) is either all
+// on one line or all on two: when any label doesn't fit on one line, every
+// button in the row breaks its label in two, at the space nearest the middle.
+// Re-run on resize (screen or Text size) and whenever a label changes.
+const _LINE_ROWS = ['#lineupBtns', '#footerDefault'];
+
+function _splitLabel(label) {
+  const words = label.split(' ');
+  if (words.length < 2) return _esc(label);
+  let best = 1, bestLen = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const len = Math.max(words.slice(0, i).join(' ').length, words.slice(i).join(' ').length);
+    if (len < bestLen) { best = i; bestLen = len; }
+  }
+  return `${_esc(words.slice(0, best).join(' '))}<br>${_esc(words.slice(best).join(' '))}`;
+}
+
+// The label a button shows: the one we last wrote, unless other code has since
+// set its text directly (e.g. Start game → Resume game).
+function _btnLabel(b) {
+  return b.innerHTML === b.dataset.html ? b.dataset.label : b.textContent.trim();
+}
+
+function _setBtnLabel(b, label) {
+  if (_btnLabel(b) === label) return;
+  b.textContent = label;
+  _balanceButtonLines();
+}
+
+function _balanceButtonLines() {
+  // Not before DOMContentLoaded: the static labels are only translated then
+  // (applyI18n), and splitting them first would hide them from the dictionary.
+  if (document.readyState === 'loading') return;
+  for (const sel of _LINE_ROWS) {
+    const row = document.querySelector(sel);
+    if (!row || !row.offsetParent) continue;   // hidden (live game): next time
+    const btns = [...row.querySelectorAll('.btn')].filter(b => b.offsetParent);
+    const labels = btns.map(_btnLabel);
+    btns.forEach((b, i) => { b.textContent = labels[i]; });
+    const two = btns.some(b => b.scrollWidth > b.clientWidth + 1);
+    btns.forEach((b, i) => {
+      if (two) b.innerHTML = _splitLabel(labels[i]);
+      b.dataset.label = labels[i];
+      b.dataset.html  = b.innerHTML;
+    });
+  }
+}
+
+function _initButtonLines() {
+  const run = () => _balanceButtonLines();
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(run);
+    _LINE_ROWS.forEach(sel => { const el = document.querySelector(sel); if (el) ro.observe(el); });
+  }
+  window.addEventListener('resize', run);   // the Text size setting fires one too
+  document.fonts?.ready.then(run);
+  run();
+}
+
 function _updateActionBtns() {
   // While a draw or shuffle is animating, hold the draw/shuffle/start/save
   // buttons disabled, so they don't flicker as slots fill in one by one, and
@@ -525,12 +588,9 @@ function _updateActionBtns() {
     if (drawAllBtn) drawAllBtn.disabled = true;
     document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
   } else if (drawAllBtn) {
-    // "Redraw all" breaks after its first word on phones only (two lines like
-    // "Random order" there); the break is hidden on wider screens (.br-sm).
-    const html  = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw<br>all') }[_drawMode()].replace('<br>', ' <br class="br-sm">');
-    const label = html.replace(/\s*<br[^>]*>/, ' ');
+    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all') }[_drawMode()];
     const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
-    if (drawAllBtn.innerHTML !== html) drawAllBtn.innerHTML = html;
+    _setBtnLabel(drawAllBtn, label);
     drawAllBtn.disabled = animating || !can;
     drawAllBtn.title    = can ? label : t('Not enough villains in the draw pool');
   }
@@ -773,6 +833,7 @@ function _isFormChanged() {
 // Discard is always there; it's enabled as soon as anything changed, or while a
 // game session exists.
 function _updateDiscardBtn() {
+  _balanceButtonLines();   // a footer label may just have changed (Start ↔ Resume)
   const btn = document.getElementById('discardBtn');
   if (btn) btn.disabled = !(liveGame.hasSession || _isFormChanged());
 }

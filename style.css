@@ -158,7 +158,7 @@ nav {
 }
 
 .nav-brand {
-  font-size: calc(15px * var(--ts));
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
@@ -173,9 +173,11 @@ nav {
 
 .nav-links { display: flex; gap: 2px; }
 
+/* The nav is icons, not text: it keeps its size with Large text, so the bar
+   still fits next to the logo on small phones (e.g. iPhone SE). */
 .nav-links a {
   position: relative;
-  font-size: calc(13px * var(--ts));
+  font-size: 13px;
   font-weight: 500;
   color: var(--muted);
   text-decoration: none;
@@ -252,7 +254,7 @@ nav {
 .nav-icon-btn {
   background: none;
   border: none;
-  font-size: calc(16px * var(--ts));
+  font-size: 16px;
   line-height: 1;
   padding: 5px 6px;
   border-radius: var(--rs);
@@ -468,12 +470,13 @@ main {
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
 /* New Game lineup buttons (Draw all, Random order): neutral like the row
    buttons (🎲 ❌ 👤 👑), so Start/Save stay the only colored buttons. */
-/* Lineup buttons have a fixed width, the same in every language, and the Draw
-   pool toggle spans two of them (see below). One line on wide screens; on
-   phones they narrow and the label wraps to two lines. */
-:root { --lineup-btn-w: calc(112px * var(--ts)); }
+/* The Draw pool box and the two lineup buttons under it are as wide as the
+   form's left column (the Duration box): half the row minus the 10px gap. The
+   buttons split that width; their labels go on two lines together when one
+   doesn't fit (_balanceButtonLines, new-game.js). */
+#lineupBtns { width: calc((100% - 10px) / 2); }
 .btn.btn-lineup { min-height: 30px; border-radius: 6px; padding: 3px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
-  width: var(--lineup-btn-w); white-space: normal; justify-content: center; text-align: center;
+  flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
 .count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }
@@ -1891,10 +1894,10 @@ select:disabled {
 .pace-color.sel-out     { opacity: 0.2; }
 
 /* Inline variant, sits in the same row as the mode select */
-/* Spans exactly the two lineup buttons below it (Random order + Draw
-   villains, plus the 6px gap between them), in every language. */
+/* As wide as the Duration box (the form's left column), like the lineup
+   buttons under it. */
 .exclude-toggle.exclude-toggle-inline {
-  width: calc(2 * var(--lineup-btn-w) + 6px);
+  width: calc((100% - 10px) / 2);
   justify-content: space-between;
   padding: 5px 10px;
   font-size: calc(12px * var(--ts));
@@ -1996,8 +1999,6 @@ select:disabled {
    wraps under it instead of crowding it out. */
 .vn { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.3em; min-width: 0; max-width: 100%; }
 .vn-name { min-width: min(100%, 4.5em); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* A line break only on phones (≤480px), e.g. "Redraw / all". */
-.br-sm { display: none; }
 .vn-tag { flex-shrink: 0; white-space: nowrap; font-size: 0.8em; }
 /* New Game rows keep the tag on the name's line: the name gives way first. */
 .order-slot-name .vn { flex-wrap: nowrap; }
@@ -2036,8 +2037,9 @@ select:disabled {
   padding-bottom: env(safe-area-inset-bottom);
 }
 .new-game-footer .btn { flex: 1; justify-content: center; font-size: calc(14px * var(--ts)); padding: 9px; }
-/* Discard, Start, Save share the row in thirds; on narrow phones a long label wraps. */
-.new-game-footer .btn { min-width: 0; white-space: normal; text-align: center; line-height: 1.2; }
+/* Discard, Start, Save share the row in thirds; labels go on two lines together
+   when one doesn't fit (_balanceButtonLines, new-game.js). */
+.new-game-footer .btn { min-width: 0; white-space: nowrap; text-align: center; line-height: 1.2; }
 
 /* "Tap to continue": a running game shown on page load can't start the
    lock-screen controls without a tap, so the whole screen asks for one. No
@@ -2076,6 +2078,9 @@ select:disabled {
   font-weight: 500;
 }
 .exclude-toggle-label { color: inherit; }
+/* The Draw pool box is half the row: on the narrowest phones with Large text
+   its label is cut short rather than wrapping onto a second line. */
+.exclude-toggle-inline .exclude-toggle-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toggle-right { display: flex; align-items: center; gap: 8px; }
 
 .exclude-body {
@@ -2935,11 +2940,9 @@ select:disabled {
 
 @media (max-width: 480px) {
   .home-steps    { grid-template-columns: 1fr; }
-  .br-sm { display: inline; }
   /* New Game rows: a smaller portrait leaves the villain name more room. */
   .order-slot-portrait { width: 26px; height: 26px; }
-  :root { --lineup-btn-w: calc(76px * var(--ts)); }
-  .btn.btn-lineup { font-size: calc(11px * var(--ts)); white-space: normal; }
+  .btn.btn-lineup { font-size: calc(11px * var(--ts)); }
   .home-faq-list { grid-template-columns: 1fr; }
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }
@@ -2957,7 +2960,7 @@ select:disabled {
 }
 
 @media (max-width: 360px) {
-  .nav-links a { padding: 4px 6px; font-size: calc(12px * var(--ts)); }
+  .nav-links a { padding: 4px 6px; font-size: 12px; }
   .draw-mode-row                  { gap: 4px; }
   .filter-bulk-row .pace-colors   { gap: 2px; }
   .filter-bulk-row .pace-color    { width: 20px; height: 20px; }
