@@ -98,10 +98,19 @@ function _registerMediaHandlers() {
   navigator.mediaSession.setActionHandler('pause', () => {
     stopLive(); // pauses game timer + pauses audio via wrapped stopLive
   });
-  navigator.mediaSession.setActionHandler('previoustrack', () => bumpTurn(-1));
   navigator.mediaSession.setActionHandler('nexttrack',     () => bumpTurn(1));
-  navigator.mediaSession.setActionHandler('seekbackward',  () => bumpTurn(-1));
   navigator.mediaSession.setActionHandler('seekforward',   () => bumpTurn(1));
+  _syncBackHandlers();
+}
+
+// "Back" on the lock screen (−) only when there's a round to go back to: at
+// round 1 the handlers are removed, which disables or hides the button.
+function _syncBackHandlers() {
+  if (!_mediaReady || !('mediaSession' in navigator)) return;
+  const back = liveGame.turns > 1 ? () => bumpTurn(-1) : null;
+  for (const action of ['previoustrack', 'seekbackward']) {
+    try { navigator.mediaSession.setActionHandler(action, back); } catch (_) {}
+  }
 }
 
 // ── GAME EVENT HOOKS ──────────────────────────────────────────────────────────
@@ -109,6 +118,7 @@ function _registerMediaHandlers() {
 let _metaInterval = null;
 
 liveGame.on('start', () => {
+  _syncBackHandlers();
   if (liveGame.isRunning) {
     _audioPlay();
     if (!_metaInterval) _metaInterval = setInterval(_updatePositionState, 1000);
@@ -123,6 +133,7 @@ liveGame.on('stop', () => {
 
 liveGame.on('turnBump', () => {
   _updateMediaMetadata();
+  _syncBackHandlers();
 });
 
 liveGame.on('close', () => {

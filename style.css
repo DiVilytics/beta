@@ -444,7 +444,8 @@ a.pace-dot:hover { transform: scale(1.3); }
   cursor: pointer;
   transition: all 0.15s;
 }
-.live-btn:active { transform: scale(0.95); }
+.live-btn:active:not(:disabled) { transform: scale(0.95); }
+.live-btn:disabled { opacity: 0.35; cursor: default; }
 .live-turn-count {
   min-width: 100px;
   display: flex;
@@ -2915,7 +2916,7 @@ select:disabled {
   .acct-nick-link:hover                     { text-decoration: underline; text-underline-offset: 2px; }
   .lb-row:hover                             { background: var(--s2); }
   .pf-identity:hover                        { opacity: 1; }
-  .live-btn:hover                           { background: var(--s3); border-color: var(--s4); }
+  .live-btn:hover:not(:disabled)            { background: var(--s3); border-color: var(--s4); }
   .btn-primary:hover                        { opacity: 0.88; }
   .btn-ghost:hover                          { color: var(--text); background: var(--s3); }
   .btn-danger:hover                         { background: var(--red-d); border-color: rgba(224, 84, 84, 0.45); }

@@ -33,7 +33,7 @@ const liveGame = (() => {
     markStopped(durMs)   { _exactDurMs = durMs; _start = null; },
     setTurns(n)          { _turns = n; },
     bumpTurns(delta) {
-      _turns = Math.max(0, _turns + delta);
+      _turns = Math.max(1, _turns + delta);   // the current round: never below 1
       this.emit('turnBump');
     },
 

@@ -13,6 +13,7 @@ let _lastAuthId;                    // last auth user id the slots were rendered
 // persistence) lives in the shared `liveGame` module.
 let liveTimerId     = null;        // 1s clock ticker
 let _saveIntervalId = null;        // 30s background-persist
+let _turnBumped     = false;       // + or − used since the last start (see stopLive)
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
@@ -726,9 +727,17 @@ function tickLive() {
   document.getElementById('liveTime').textContent = fmtElapsed(liveGame.elapsedMs);
 }
 
-function bumpTurn(delta) {
-  liveGame.bumpTurns(delta);
+// The live round and its − button, disabled at round 1 (the lowest round).
+function _renderTurnCount() {
   document.getElementById('liveTurnCount').textContent = liveGame.turns;
+  document.getElementById('liveMinusBtn').disabled = liveGame.turns <= 1;
+}
+
+function bumpTurn(delta) {
+  if (delta < 0 && liveGame.turns <= 1) return;   // round 1 is the lowest (also from the lock screen)
+  _turnBumped = true;
+  liveGame.bumpTurns(delta);
+  _renderTurnCount();
   if (!liveTimerId) {
     const fTurns = document.getElementById('fTurns');
     if (fTurns) fTurns.value = liveGame.turns || '';
@@ -761,8 +770,11 @@ function startLive() {
 
   if (!resuming) _setDateToNow();
 
-  liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 0);
-  document.getElementById('liveTurnCount').textContent = liveGame.turns;
+  // The counter shows the current round: a new game starts at 1, a resumed one
+  // carries on from its rounds.
+  liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 1);
+  _turnBumped = false;
+  _renderTurnCount();
 
   _renderLiveInfo();
   setLiveUI(true);
@@ -780,8 +792,13 @@ function stopLive() {
   liveTimerId = null;
 
   const ms = liveGame.elapsedMs;
-  document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
-  if (liveGame.turns > 0) document.getElementById('fTurns').value = liveGame.turns;
+  // Paused within the first minute without + or −: most likely an accidental
+  // start, so duration and rounds stay as they were (empty) instead of "1 min"
+  // and "1 round". The exact time is kept, so Resume carries on from it.
+  if (ms >= 60000 || _turnBumped) {
+    document.getElementById('fDur').value   = Math.max(1, Math.round(ms / 60000));
+    document.getElementById('fTurns').value = liveGame.turns;
+  }
   liveGame.markStopped(ms);
 
   setLiveUI(false);
@@ -913,7 +930,8 @@ function _checkResume() {
   renderOrderSlots();
 
   if (state.liveStart) {
-    document.getElementById('liveTurnCount').textContent = liveGame.turns;
+    if (liveGame.turns < 1) liveGame.setTurns(1);   // games saved before the counter started at 1
+    _renderTurnCount();
     _renderLiveInfo();
     setLiveUI(true);
     tickLive();
