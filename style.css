@@ -44,7 +44,11 @@
    around 24px buttons.
    Font sizes (before the --ts multiplier): 10 (uppercase micro labels), 11,
    12, 13, 14 (buttons, fields), 15 (body), 16, 18, 20, 22; display 32, 40,
-   52. Chart SVG text keeps its own sizes (chart units, not screen px). */
+   52. Chart SVG text keeps its own sizes (chart units, not screen px).
+   Corner radius: 2 (handles, bars, highlights), 4 (buttons inside a switch,
+   inline code, skeleton bars: a switch's --rs minus its 2px frame), --rs 6
+   (controls), --r 10 (cards, panels), 16 (top of bottom sheets), 999px
+   (pills, badges), 50% (circles). */
 
 :root {
   --bg: #000000;
@@ -111,11 +115,13 @@
 /* Page header that aligns its right-side controls to the top instead of center. */
 .page-header.align-top { align-items: flex-start; }
 
-/* Reserve the standard control height (38px input) so a search box that only
-   appears after data loads (the game log location filter) doesn't grow the
-   header and shift the title down on first render. The title sits at the top,
-   like Players and Villains, not centered against the 38px box. */
-.page-header.has-search-control { min-height: 38px; align-items: flex-start; }
+/* Header controls are compact (30px, under the 34px title), so a header row is
+   always as tall as its title and the title-to-intro gap is the same on every
+   page, with or without a search box or switch. A search box that appears only
+   after data loads (the game log location filter) can't shift anything. The
+   title sits at the top, like Players and Villains, so a title that wraps on a
+   narrow phone keeps the search box beside its first line. */
+.page-header.has-search-control { align-items: flex-start; }
 
 /* Char detail-page identity portrait (40px). Compound selector wins against
    the later `.char-portrait` rule (18px) when both classes are applied. */
@@ -503,7 +509,7 @@ main {
    buttons split that width; their labels go on two lines together when one
    doesn't fit (_balanceButtonLines, new-game.js). */
 #lineupBtns { width: calc((100% - 10px) / 2); }
-.btn.btn-lineup { height: auto; min-height: 30px; border-radius: 6px; padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
+.btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
 /* New Game: the player count sits on the Draw pool row, at its right end. */
@@ -539,7 +545,7 @@ main {
 
 .btn-save { background: #f59e0b; color: #271a02; border: 1px solid #f59e0b; }
 
-.btn-sm { font-size: calc(12px * var(--ts)); height: 25px; padding: 0 10px; border-radius: 5px; }
+.btn-sm { font-size: calc(12px * var(--ts)); height: 25px; padding: 0 10px; border-radius: var(--rs); }
 
 /* ── FILTER BAR ───────────────────────────────────────────────────── */
 .filter-bar { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
@@ -552,7 +558,7 @@ main {
   font-weight: 600;
   height: 25px;
   padding: 0 12px;
-  border-radius: 20px;
+  border-radius: 999px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
@@ -593,7 +599,7 @@ main {
   background: var(--accent);
   color: #fff;
   padding: 1px 6px;
-  border-radius: 10px;
+  border-radius: 999px;
   display: none;
 }
 .badge.visible { display: inline-block; }
@@ -1072,7 +1078,6 @@ main {
 .field { margin-bottom: 12px; min-width: 0; }
 .form-row .field { margin-bottom: 6px; }
 .form-row .field label { margin-bottom: 2px; }
-.form-row input { height: 30px; min-height: 30px; max-height: 30px; font-size: calc(13px * var(--ts)); }
 
 .field label {
   display: block;
@@ -1309,7 +1314,7 @@ select:disabled {
   font-weight: 600;
   height: 24px;
   padding: 0 14px;
-  border-radius: 5px;
+  border-radius: 4px;
   border: none;
   background: transparent;
   color: var(--muted);
@@ -2169,7 +2174,7 @@ select:disabled {
   font-size: calc(12px * var(--ts));
   font-weight: 500;
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: 999px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
@@ -2492,7 +2497,10 @@ select:disabled {
   flex-shrink: 1;
   min-width: 0;   /* gives way to a long page title on narrow phones */
 }
-.cs-search input { font-size: calc(13px * var(--ts)); padding: 0 10px; }
+.cs-search input { font-size: calc(13px * var(--ts)); padding: 0 10px; height: 30px; min-height: 30px; max-height: 30px; }
+/* Top-aligned headers: center the 30px box on the title's first line, which
+   is 30px at Small text and grows with --ts (34px at Large). */
+.page-header .cs-search { margin-top: calc((30px * var(--ts) - 30px) / 2); }
 /* Disabled only until its data loads: same look as the live box, no flash. */
 .cs-search input:disabled { opacity: 1; cursor: default; }
 
@@ -2746,7 +2754,7 @@ select:disabled {
 .faq-identity { margin-bottom: 16px; }
 .faq-vil { font-weight: 500; color: var(--muted); }
 .faq-src { margin-top: 2px; font-size: calc(11px * var(--ts)); color: var(--dim); }
-.faq-item mark { background: var(--accent-d); color: var(--text); border-radius: 3px; padding: 0 1px; }
+.faq-item mark { background: var(--accent-d); color: var(--text); border-radius: 2px; padding: 0 1px; }
 .faq-roster-sub { font-size: calc(11px * var(--ts)); color: var(--muted); }
 .faq-count { margin: 0 0 12px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); }
 .faq-title-link { color: inherit; text-decoration: none; }
