@@ -1377,7 +1377,9 @@ select:disabled {
    player rows are 1 line, so they differ in height. Even both tabs out to a
    middle height, a min-height plus slightly tighter padding so the taller
    (character) rows shrink and the shorter (player) rows grow to meet it. */
-#lb .lb-row, #pfRoot .lb-row { min-height: 47px; padding-top: 6px; padding-bottom: 6px; }
+/* The minimum grows with the text size (--ts), so a two-line row (villain name +
+   box) and a one-line row (player) stay the same height at Large text too. */
+#lb .lb-row, #pfRoot .lb-row { min-height: calc(47px * var(--ts)); padding-top: 6px; padding-bottom: 6px; }
 /* The character identity is two lines (name + box) and inherits body line-height
    1.5, making it taller than the min-height can absorb. Tighten it so the block
    fits and min-height governs both tabs to the same height. Applied on the
