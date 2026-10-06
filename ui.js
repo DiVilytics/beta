@@ -333,17 +333,8 @@ document.addEventListener('pointerdown', e => {
   grip.addEventListener('pointercancel', end);
 });
 
-// Escape closes the topmost pop-up (the avatar zoom, else the last open sheet)
-// the same way dragging it down does.
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape' || e.defaultPrevented) return;
-  if (document.querySelector('.avatar-lightbox.open')) { closeAvatarLightbox(); return; }
-  const open = [...document.querySelectorAll('.overlay.open')];
-  const overlay = open[open.length - 1];
-  if (!overlay || overlay.classList.contains('no-drag')) return;
-  e.preventDefault();
-  _closeSheetByDrag(overlay);
-});
+// Escape closes the topmost sheet the same way dragging it down does: see the
+// keyboard section in shared.js, which handles every key.
 
 function closeOverlay(id) {
   document.getElementById(id).classList.remove('open');

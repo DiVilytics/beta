@@ -251,7 +251,7 @@ function _updateAuthUI() {
 
   const themeBtn = `<button class="nav-icon-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${t('Settings')}" aria-haspopup="true" aria-expanded="false">⚙️</button>`;
   const avatarLink = src =>
-    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${t('Account')}">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
+    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${_withShortcut(t('Account'), 'a')}" aria-keyshortcuts="A">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
 
   // Before the session check resolves, fall back to the cached avatar (if any) so
   // a returning user sees their icon immediately rather than a guest flash.
@@ -265,7 +265,7 @@ function _updateAuthUI() {
     el.innerHTML = avatarLink(cached);
   } else {
     if (_authResolved) _setCachedNavAvatar(null);   // confirmed signed out, drop the cache
-    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="${t('Sign in')}"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
+    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="${_withShortcut(t('Sign in'), 'a')}" aria-keyshortcuts="A"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
   }
   _updateThemeBtn();
   _updateThemeIcons();
@@ -275,7 +275,7 @@ function _updateAuthUI() {
 // The ⚙️ in the nav opens a small panel with the theme (Auto / Light / Dark,
 // theme.js) and the language (EN / IT, lang.js; switching reloads the page).
 // It lives in the nav itself (not in #navAuth, which is repainted on sign-in),
-// and closes after a choice, on a tap outside it, or on Escape.
+// and closes after a choice, on a tap outside it, or on Escape (KEYBOARD).
 function _settingsPanel() {
   let panel = document.getElementById('settingsPanel');
   if (panel) return panel;
@@ -342,20 +342,178 @@ function toggleSettings(e) {
   document.getElementById('settingsBtn')?.setAttribute('aria-expanded', String(open));
 }
 
+// Returns whether the panel was open.
 function _closeSettings() {
   const panel = document.getElementById('settingsPanel');
-  if (!panel || !panel.classList.contains('open')) return;
+  if (!panel || !panel.classList.contains('open')) return false;
   panel.classList.remove('open');
   document.getElementById('settingsBtn')?.setAttribute('aria-expanded', 'false');
+  return true;
 }
 document.addEventListener('click', e => {
   if (!e.target.closest('#settingsPanel, #settingsBtn')) _closeSettings();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') _closeSettings(); });
 
 // Paint the nav immediately, the cached avatar for a returning user, else the
 // sign-in button, before the async session check, so nothing flickers in.
 _updateAuthUI();
+
+// ── KEYBOARD ─────────────────────────────────────────────────────────────────
+// Single-key shortcuts, the same in both languages: a letter per page, 1 2 for
+// the language, [ ] \ for the theme, ; ' for the text size, / for the page's
+// search box, ? for the list of them all, and Escape to close what's on top.
+// Keys typed in a field are left alone, so phones (whose only keyboard is the
+// on-screen one, in a field) never trigger them; Cmd / Ctrl combinations stay
+// the browser's; media keys (headphones, clickers: the live game's controls,
+// new-game-audio.js) aren't characters, so they never match. The match is on
+// the character typed, so it follows the keyboard layout.
+
+const _KBD_PAGES = [
+  ['n', 'new-game.html',    'New Game'],
+  ['g', 'game-log.html',    'Game Log'],
+  ['l', 'leaderboard.html', 'Leaderboard'],
+  ['v', 'villains.html',    'Villains'],
+  ['p', 'players.html',     'Players'],
+  ['c', 'charts.html',      'Charts'],
+  ['a', 'account.html',     'Account'],
+  ['h', 'index.html',       'Home'],
+  ['t', 'tutorial.html',    'Tutorial'],
+  ['f', 'faq.html',         'F.A.Q.'],
+];
+// In the order of the settings panel: theme, text size, language.
+const _KBD_SETTINGS = [
+  ['[',  'Light theme', () => setTheme('light')],
+  [']',  'Dark theme',  () => setTheme('dark')],
+  ['\\', 'Auto theme',  () => setTheme('auto')],
+  [';',  'Small text',  () => setTextSize('small')],
+  ["'",  'Large text',  () => setTextSize('large')],
+  ['1',  'English',     () => setLang('en')],
+  ['2',  'Italiano',    () => setLang('it')],
+];
+
+function _withShortcut(title, key) { return `${title} (${key.toUpperCase()})`; }
+
+function _isTextField(el) {
+  return el instanceof Element && (el.isContentEditable || el.matches('input, textarea, select'));
+}
+
+// The bare page you're on does nothing; a page with a query (a villain, a
+// player, an F.A.Q. topic) goes back to its main view.
+function _goToPage(file) {
+  const here = location.pathname.split('/').pop() || 'index.html';
+  if (here === file && !location.search) return;
+  if (file === 'account.html' && _authResolved && !_currentUser) {
+    if (here !== 'sign-in.html') goToSignIn();
+    return;
+  }
+  // Closed first, so going Back to this page doesn't show them still open.
+  _toggleKbdHelp(false);
+  _closeSettings();
+  location.href = file;
+}
+
+// The search box in the page header (Game Log, Villains, Players, F.A.Q.),
+// when it's there and ready.
+function _pageSearchBox() {
+  const input = document.querySelector('.page-header .cs-search input');
+  return input && !input.disabled && input.offsetParent ? input : null;
+}
+
+function _kbdHelpOpen() {
+  return !!document.getElementById('kbdHelp')?.classList.contains('open');
+}
+
+// The list of shortcuts: the "Tap to continue" look (New Game), on top of the
+// page; a click anywhere closes it. Settings keys work under it, to try them.
+function _toggleKbdHelp(open = !_kbdHelpOpen()) {
+  let el = document.getElementById('kbdHelp');
+  if (!open) { el?.classList.remove('open'); return; }
+  if (!el) {
+    const row = (key, label) => `<div class="kbd-help-row"><kbd>${_esc(key)}</kbd><span>${_esc(label)}</span></div>`;
+    const group = (title, rows, note = '') =>
+      `<section class="kbd-help-group"><div class="kbd-help-lbl">${_esc(title)}</div>${rows.map(r => row(...r)).join('')}${note ? `<p class="kbd-help-note">${_esc(note)}</p>` : ''}</section>`;
+    el = document.createElement('div');
+    el.id = 'kbdHelp';
+    el.className = 'kbd-help';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', t('Keyboard shortcuts'));
+    el.innerHTML = `
+      <div class="kbd-help-card">
+        <div class="kbd-help-ico">⌨️</div>
+        <div class="kbd-help-title">${_esc(t('Keyboard shortcuts'))}</div>
+        <div class="kbd-help-groups">
+          ${group(t('Pages'), _KBD_PAGES.map(([k, , label]) => [k.toUpperCase(), t(label)]))}
+          ${group(t('Settings'), _KBD_SETTINGS.map(([k, label]) => [k, t(label)]))}
+          ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
+          ${group(t('During a game'), [['⏯︎', t('Pause or resume the timer')], ['⏮︎', t('Previous round')], ['⏭︎', t('Next round')]],
+                  t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
+        </div>
+        <p class="kbd-help-text">${_esc(t('Click anywhere or press Esc to close.'))}</p>
+      </div>`;
+    el.addEventListener('click', () => _toggleKbdHelp(false));
+    document.body.appendChild(el);
+  }
+  el.classList.add('open');
+}
+
+// Escape closes one thing, the topmost: this list, the avatar zoom, a sheet
+// (as dragging it down does, ui.js), the settings panel. With nothing open it
+// leaves the text field, so the shortcuts work again.
+function _escape() {
+  if (_kbdHelpOpen()) { _toggleKbdHelp(false); return true; }
+  if (document.querySelector('.avatar-lightbox.open')) { closeAvatarLightbox(); return true; }
+  const sheets = document.querySelectorAll('.overlay.open');
+  const sheet = sheets[sheets.length - 1];
+  if (sheet) return !sheet.classList.contains('no-drag') && _closeSheetByDrag(sheet);
+  if (_closeSettings()) return true;
+  const el = document.activeElement;
+  if (_isTextField(el)) { el.blur(); return true; }
+  return false;
+}
+
+function _kbdAction(key) {
+  const page = _KBD_PAGES.find(([k]) => k === key);
+  if (page) return () => _goToPage(page[1]);
+  const setting = _KBD_SETTINGS.find(([k]) => k === key);
+  if (setting) return setting[2];
+  if (key === '?') return () => _toggleKbdHelp();
+  if (key === '/') {
+    // Only where there's a search box, so elsewhere / stays the browser's
+    // (Firefox's quick find).
+    const input = _pageSearchBox();
+    return input && (() => { _toggleKbdHelp(false); input.focus(); input.select(); });
+  }
+  return null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.defaultPrevented || e.isComposing) return;
+  if (e.key === 'Escape') { if (_escape()) e.preventDefault(); return; }
+  if (e.repeat || e.metaKey || (e.ctrlKey && !e.getModifierState('AltGraph'))) return;
+  if (e.key.length !== 1 || _isTextField(e.target)) return;
+  // An open pop-up keeps the keyboard: Escape closes it first.
+  if (document.querySelector('.overlay.open, .avatar-lightbox.open')) return;
+  // Alt + a letter or digit is the browser's menus (Windows) or a special
+  // character (Mac); Alt / AltGr with a symbol is how some layouts type [ ] \.
+  const alnum = /^[a-z0-9]$/i.test(e.key);
+  if (alnum && e.altKey) return;
+  const action = _kbdAction(alnum ? e.key.toLowerCase() : e.key);
+  if (!action) return;
+  e.preventDefault();
+  action();
+});
+
+// The nav icons' tooltips name their key ("New Game (N)"), once applyI18n
+// (lang.js, on DOMContentLoaded too but registered earlier) has translated them.
+document.addEventListener('DOMContentLoaded', () => {
+  for (const [key, file] of _KBD_PAGES) {
+    document.querySelectorAll(`.nav-links a[href="${file}"]`).forEach(a => {
+      a.title = _withShortcut(a.title, key);
+      a.setAttribute('aria-keyshortcuts', key.toUpperCase());
+    });
+  }
+});
 
 // ── NICKNAME MODAL ────────────────────────────────────────────────────────────
 

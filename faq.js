@@ -212,7 +212,8 @@ async function init() {
   input.disabled = false;
   input.addEventListener('input', render);
   input.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && input.value) { input.value = ''; render(); }
+    // A first Escape clears the search, a second one leaves the box (shared.js).
+    if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; render(); }
   });
   render();
 }
