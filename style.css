@@ -34,6 +34,11 @@
 :root { --ts: 1; }
 :root[data-text="large"] { --ts: 1.125; }
 
+/* Spacing scale: every margin, padding and gap is one of these px values
+   (negatives too), never rem: 1 (hairline), 2, 4, 6, 8, 10, 12, 14, 16, 20,
+   24, 28, 32, 40, 48, 64, 80. em is kept only where spacing should follow the
+   text size. */
+
 :root {
   --bg: #000000;
   --nav-bg: rgba(0, 0, 0, 0.94);
@@ -83,9 +88,9 @@
 /* ── UTILITIES ────────────────────────────────────────────────────── */
 .hidden          { display: none !important; }
 .text-right      { text-align: right; }
-.mb-1            { margin-bottom: 1rem; }
-.mb-1-25         { margin-bottom: 1.25rem; }
-.mt-1-5          { margin-top: 1.5rem; }
+.mb-1            { margin-bottom: 16px; }
+.mb-1-25         { margin-bottom: 20px; }
+.mt-1-5          { margin-top: 24px; }
 
 /* Modal/sheet body intro paragraph (replaces inline font/color/margin styles). */
 .modal-hint {
@@ -111,7 +116,7 @@
 .char-portrait.identity-portrait { width: 40px; height: 40px; flex-shrink: 0; }
 
 /* Tight spinner for inline reloads. */
-.spinner-inline { padding: 1rem 0; }
+.spinner-inline { padding: 16px 0; }
 
 /* QR-copy "✓" success flash on the copy button. */
 .copy-success { color: #4ade80; }
@@ -120,7 +125,7 @@
 .text-emph { color: var(--text); }
 
 /* 404 page back-to-home spacer */
-.home-back-link { margin-top: 18px; }
+.home-back-link { margin-top: 16px; }
 
 button, a, [role="button"] {
   -webkit-tap-highlight-color: transparent;
@@ -149,7 +154,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding: 0 16px;
   height: 54px;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
@@ -252,7 +257,7 @@ nav {
   flex: 1; padding: 0 8px; height: calc(28px * var(--ts));
   display: inline-flex; align-items: center; justify-content: center;
 }
-.settings-ico { margin-right: 5px; }
+.settings-ico { margin-right: 6px; }
 /* Text size: each option is shown at its own size (12px, or 12px × 1.125). */
 .settings-panel [data-text-opt="small"] { font-size: 12px; }
 .settings-panel [data-text-opt="large"] { font-size: 13.5px; }
@@ -322,14 +327,14 @@ a.chip {
 /* Under the villain's name: "Pace: ● | Villain guide ›". */
 .char-meta { margin: 10px 0 0; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .char-meta .pace-dot { margin: 0 0 0 2px; }
-.char-meta-sep { margin: 0 3px; color: var(--dim); }
+.char-meta-sep { margin: 0 4px; color: var(--dim); }
 .char-guide-link {
   padding: 0; border: none; background: none;
   font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; white-space: nowrap;
 }
 
 /* Villain Guide sheet: a heading per section, card names in their type color. */
-.guide-title { margin: 18px 0 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.guide-title { margin: 16px 0 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .guide-title:first-child { margin-top: 0; }
 #guideBody p { margin: 0 0 10px; font-size: calc(14px * var(--ts)); line-height: 1.55; color: var(--text); }
 /* The villain's objective, the line that matters most: a gold box, like the
@@ -351,7 +356,7 @@ a.chip {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-right: 7px;
+  margin-right: 6px;
   vertical-align: 1px;
   flex-shrink: 0;
 }
@@ -455,14 +460,14 @@ a.pace-dot:hover { transform: scale(1.3); }
 main {
   max-width: 640px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 5rem;
+  padding: 20px 16px 80px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .page-header h2 {
@@ -490,7 +495,7 @@ main {
 /* New Game: the player count sits on the Draw pool row, at its right end. */
 .count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }
 /* The same ▼ as the Draw pool box, instead of the select's line chevron. */
-.count-select-wrap .players-count-select { height: 30px; min-height: 30px; max-height: 30px; background-image: none; padding-right: 26px; }
+.count-select-wrap .players-count-select { height: 30px; min-height: 30px; max-height: 30px; background-image: none; padding-right: 24px; }
 .count-select-wrap .chevron { position: absolute; right: 10px; pointer-events: none; }
 .count-select-wrap select:open + .chevron { transform: rotate(180deg); }
 
@@ -522,7 +527,7 @@ main {
 .btn-sm { font-size: calc(12px * var(--ts)); padding: 5px 10px; border-radius: 5px; }
 
 /* ── FILTER BAR ───────────────────────────────────────────────────── */
-.filter-bar { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 8px; }
+.filter-bar { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
 
 .pill-group { display: flex; gap: 4px; flex-wrap: wrap; }
 
@@ -571,7 +576,7 @@ main {
   font-weight: 700;
   background: var(--accent);
   color: #fff;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 10px;
   display: none;
 }
@@ -704,7 +709,7 @@ main {
 .cs-adv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
 .cs-adv-col { min-width: 0; background: var(--s1); border-radius: var(--r); overflow: hidden; }
 .cs-adv-title {
-  padding: 9px 10px 7px;
+  padding: 8px 10px;
   font-size: calc(10px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   color: var(--muted);
 }
@@ -716,7 +721,7 @@ main {
 .cs-adv-row .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .cs-adv-count { margin-left: auto; flex-shrink: 0; font-size: calc(13px * var(--ts)); font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .cs-adv-empty { padding: 4px 10px 12px; color: var(--dim); font-size: calc(13px * var(--ts)); }
-.cs-adv-seg .seg-btn { padding: 4px 11px; }
+.cs-adv-seg .seg-btn { padding: 4px 12px; }
 
 /* Character detail: Villain deck, Fate deck and extras, one column per card
    type, colored like the physical cards' type banner. */
@@ -742,7 +747,7 @@ main {
 /* Each row is a button opening the card sheet. */
 .cs-deck-row {
   display: flex; align-items: center; gap: 8px; width: 100%;
-  padding: 7px 14px; border: none; border-top: 1px solid var(--border);
+  padding: 8px 14px; border: none; border-top: 1px solid var(--border);
   background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .cs-deck-card  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
@@ -799,7 +804,7 @@ main {
 .chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
 .chart-stage > .chart-svg { flex-shrink: 0; }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
-.chart-note code { background: var(--s3); padding: 1px 5px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
+.chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }
 .chart-caption-link { color: var(--accent); text-decoration: none; }
 
@@ -938,13 +943,13 @@ main {
 /* ── EMPTY / LOADING ──────────────────────────────────────────────── */
 .empty {
   text-align: center;
-  padding: 4rem 1rem;
+  padding: 64px 16px;
   color: var(--muted);
 }
-.empty-icon { font-size: calc(32px * var(--ts)); margin-bottom: 0.5rem; opacity: 0.4; }
+.empty-icon { font-size: calc(32px * var(--ts)); margin-bottom: 8px; opacity: 0.4; }
 .empty h3 { font-size: calc(15px * var(--ts)); font-weight: 600; margin-bottom: 4px; color: var(--text); }
-.empty p { font-size: calc(13px * var(--ts)); margin-bottom: 1rem; }
-.spinner { text-align: center; padding: 3rem; color: var(--dim); font-size: calc(13px * var(--ts)); }
+.empty p { font-size: calc(13px * var(--ts)); margin-bottom: 16px; }
+.spinner { text-align: center; padding: 48px; color: var(--dim); font-size: calc(13px * var(--ts)); }
 
 /* ── BOTTOM SHEET ─────────────────────────────────────────────────── */
 .overlay {
@@ -1059,7 +1064,7 @@ main {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .optional {
@@ -1086,7 +1091,7 @@ select {
   font-family: inherit;
   font-size: calc(14px * var(--ts));
   line-height: 1.3;
-  padding: 0 11px;
+  padding: 0 12px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
@@ -1147,7 +1152,7 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
   height: 26px;
   min-height: 26px;
   max-height: 26px;
-  padding: 0 22px 0 9px;
+  padding: 0 24px 0 10px;
   font-size: calc(11px * var(--ts));
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1254,7 +1259,7 @@ select:disabled {
   border: 1px solid rgba(224, 84, 84, 0.3);
   color: var(--red);
   font-size: calc(13px * var(--ts));
-  padding: 9px 12px;
+  padding: 10px 12px;
   border-radius: var(--rs);
   margin-bottom: 12px;
   display: none;
@@ -1269,7 +1274,7 @@ select:disabled {
 }
 
 /* ── LEADERBOARD ──────────────────────────────────────────────────── */
-.controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+.controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 
 .seg {
   display: flex;
@@ -1299,7 +1304,7 @@ select:disabled {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
 }
 
 .stat-box {
@@ -1323,7 +1328,7 @@ select:disabled {
 .lb-row {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
-  padding: 9px 14px;
+  padding: 8px 14px;
   align-items: center;
 }
 
@@ -1350,7 +1355,7 @@ select:disabled {
    player rows are 1 line, so they differ in height. Even both tabs out to a
    middle height, a min-height plus slightly tighter padding so the taller
    (character) rows shrink and the shorter (player) rows grow to meet it. */
-#lb .lb-row, #pfRoot .lb-row { min-height: 47px; padding-top: 7px; padding-bottom: 7px; }
+#lb .lb-row, #pfRoot .lb-row { min-height: 47px; padding-top: 6px; padding-bottom: 6px; }
 /* The character identity is two lines (name + box) and inherits body line-height
    1.5, making it taller than the min-height can absorb. Tighten it so the block
    fits and min-height governs both tabs to the same height. Applied on the
@@ -1360,7 +1365,7 @@ select:disabled {
    past the line-box and cancel the padding with an equal negative margin,
    this keeps the two-line block's total footprint (and thus min-height)
    unchanged while giving descenders physical room inside the clip box. */
-#lb .row-name, #pfRoot .row-name { line-height: 1.3; padding-bottom: 3px; margin-bottom: -3px; }
+#lb .row-name, #pfRoot .row-name { line-height: 1.3; padding-bottom: 4px; margin-bottom: -4px; }
 #lb .row-sub,  #pfRoot .row-sub  { line-height: 1.2; margin-top: 0; padding-bottom: 2px; margin-bottom: -2px; }
 
 /* The viewer's own row, highlighted wherever it appears (top list or pinned). */
@@ -1387,7 +1392,7 @@ select:disabled {
 .rank-num.bronze { color: #a0856a; }
 
 .row-name { display: block; font-size: calc(14px * var(--ts)); font-weight: 600; color: inherit; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.row-name .char-portrait { margin-right: 5px; }
+.row-name .char-portrait { margin-right: 6px; }
 .row-sub  { display: block; font-size: calc(11px * var(--ts)); color: var(--dim); text-decoration: none; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .row-identity { display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; }
@@ -1402,7 +1407,7 @@ select:disabled {
 /* Value cell: the value and "(games)" as two right-aligned sub-columns. The games
    part has the table's fixed width (--sv-games, from its largest count) and the
    digits are tabular, so values and games each line up from row to row. */
-.sv { display: flex; justify-content: flex-end; align-items: baseline; gap: 3px; font-variant-numeric: tabular-nums; }
+.sv { display: flex; justify-content: flex-end; align-items: baseline; gap: 4px; font-variant-numeric: tabular-nums; }
 .sv-games { min-width: var(--sv-games, 3.5em); text-align: right; font-size: calc(12px * var(--ts)); font-weight: 400; color: var(--muted); }
 /* The value header ("% Wins (Games)", longer in Italian) is wider than its
    column: it spans from the second column to the end, right-aligned, so it uses
@@ -1418,7 +1423,7 @@ select:disabled {
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
 
-.empty-state { text-align: center; padding: 2.5rem; color: var(--muted); font-size: calc(13px * var(--ts)); }
+.empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: calc(13px * var(--ts)); }
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */
 .char-portrait {
@@ -1437,7 +1442,7 @@ select:disabled {
   object-fit: cover;
   flex-shrink: 0;
   vertical-align: middle;
-  margin-right: 5px;
+  margin-right: 6px;
 }
 .player-avatar-lg {
   width: 40px;
@@ -1548,10 +1553,10 @@ select:disabled {
 /* Phone widths (iPhone SE etc.): tighten gaps + horizontal padding so the tabs
    and the Default/Random/Apply buttons stay on one row. */
 @media (max-width: 430px) {
-  .avatar-tab-row { gap: 5px; }
+  .avatar-tab-row { gap: 6px; }
   .avatar-actions { gap: 4px; }
   .avatar-tab-row .seg-btn { padding-left: 8px; padding-right: 8px; }
-  .avatar-tab-row .btn-sm  { padding-left: 7px; padding-right: 7px; }
+  .avatar-tab-row .btn-sm  { padding-left: 6px; padding-right: 6px; }
 }
 .builder-wrap {
   display: flex;
@@ -1602,7 +1607,7 @@ select:disabled {
 .builder-stepper {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 .builder-count {
   min-width: 38px;
@@ -1679,14 +1684,14 @@ select:disabled {
 }
 /* Box-completion achievements: a compact strip of covers (grayscale until the
    box is fully played, like the box picker) with play/win gold markers. */
-.ach-group-label { font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; margin: 6px 0 5px; }
+.ach-group-label { font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; margin: 6px 0; }
 .box-ach-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 8px;
   padding: 2px 0 10px;
 }
-.box-ach { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+.box-ach { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; }
 .box-ach-img {
   width: 100%;
   aspect-ratio: 4 / 5;
@@ -1708,7 +1713,7 @@ select:disabled {
 /* Box achievement detail sheet */
 .box-detail-cover { width: 46px; aspect-ratio: 4 / 5; object-fit: contain; border-radius: var(--rs); flex-shrink: 0; }
 .box-detail-list { display: flex; flex-direction: column; margin-top: 14px; }
-.box-detail-char { display: flex; align-items: center; gap: 10px; padding: 7px 2px; border-top: 1px solid var(--border); }
+.box-detail-char { display: flex; align-items: center; gap: 10px; padding: 6px 2px; border-top: 1px solid var(--border); }
 .box-detail-char .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .box-detail-char-name { flex: 1; font-size: calc(13px * var(--ts)); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .box-detail-marks { display: flex; gap: 10px; font-size: calc(13px * var(--ts)); flex-shrink: 0; }
@@ -1738,7 +1743,7 @@ select:disabled {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   box-sizing: border-box;
   background: none;
   border: 0;
@@ -1874,7 +1879,7 @@ select:disabled {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 .draw-mode-row .seg-btn { padding: 5px 9px; }
 .draw-mode-select {
@@ -1882,7 +1887,7 @@ select:disabled {
   height: 30px;
   min-height: 30px;
   max-height: 30px;
-  padding: 0 26px 0 10px;
+  padding: 0 24px 0 10px;
   font-size: calc(12px * var(--ts));
   font-weight: 600;
   flex-shrink: 0;
@@ -1948,7 +1953,7 @@ select:disabled {
 /* Filter switches (Pace / Pace+, Among / With these) and the pace dots are as
    tall as the Done button next to them (.btn-sm). */
 .filter-bulk-row .seg, .gl-char-mode { padding: 2px; gap: 2px; height: 25px; box-sizing: border-box; align-items: stretch; }
-.filter-bulk-row .seg-btn, .gl-char-mode .seg-btn { padding: 0 9px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
+.filter-bulk-row .seg-btn, .gl-char-mode .seg-btn { padding: 0 8px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
 .filter-bulk-row .pace-color { width: 25px; height: 25px; }
 .owned-toggle.on { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
@@ -1961,7 +1966,7 @@ select:disabled {
   background: var(--s1);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 3px 10px;
+  padding: 4px 10px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .order-slot.spinning {
@@ -2052,7 +2057,7 @@ select:disabled {
 .new-game-footer {
   display: flex;
   gap: 8px;
-  margin-top: 0.5rem;
+  margin-top: 8px;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .new-game-footer .btn { flex: 1; justify-content: center; font-size: calc(14px * var(--ts)); padding: 9px; }
@@ -2129,7 +2134,7 @@ select:disabled {
   color: var(--dim);
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   cursor: pointer;
   transition: color 0.12s;
 }
@@ -2137,7 +2142,7 @@ select:disabled {
 @media (hover: hover) {
   .box-name:hover { color: var(--text); }
 }
-.box-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.box-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .char-pill {
   font-family: inherit;
@@ -2152,7 +2157,7 @@ select:disabled {
   transition: all 0.15s;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   user-select: none;
 }
 
@@ -2346,7 +2351,7 @@ select:disabled {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
 }
 /* First-load skeleton: a placeholder row that mirrors a real .cs-mini-row so the
    card is the right height before data arrives (no layout jump). */
@@ -2357,7 +2362,7 @@ select:disabled {
 @keyframes csSkelPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 /* While a new month loads, the existing cards stay put but dim for feedback. */
 .cs-report-loading .cs-summary { opacity: 0.45; transition: opacity 0.1s; }
-.cs-summary-empty { color: var(--muted); font-size: calc(13px * var(--ts)); padding: 14px 2px; margin-bottom: 1.25rem; }
+.cs-summary-empty { color: var(--muted); font-size: calc(13px * var(--ts)); padding: 14px 2px; margin-bottom: 20px; }
 .cs-summary-card {
   background: var(--s1);
   border: 1px solid var(--border);
@@ -2386,7 +2391,7 @@ select:disabled {
   color: var(--dim);
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  margin: 3px 0 1px;
+  margin: 4px 0 1px;
 }
 .cs-mini-row {
   display: flex;
@@ -2411,10 +2416,10 @@ select:disabled {
   .cs-mini-row:hover { background: var(--s2); }
 }
 
-.cs-roster-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.cs-roster-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .cs-roster-controls-lbl { font-size: calc(12px * var(--ts)); font-weight: 600; color: var(--muted); }
 
-.char-roster-group { margin-bottom: 1.5rem; scroll-margin-top: 70px; }
+.char-roster-group { margin-bottom: 24px; scroll-margin-top: 70px; }
 
 .char-roster-group-name {
   font-size: calc(11px * var(--ts));
@@ -2539,7 +2544,7 @@ select:disabled {
 .home-title-row .home-title { flex: 1; }
 
 .home-tagline {
-  margin-top: 1rem;
+  margin-top: 16px;
   font-size: calc(14px * var(--ts));
   color: var(--muted);
   line-height: 1.45;
@@ -2567,7 +2572,7 @@ select:disabled {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .home-step {
@@ -2649,7 +2654,7 @@ select:disabled {
 .home-tutorial-link .home-section-name { color: var(--accent); font-weight: 600; }
 
 .home-faq {
-  margin-top: 2rem;
+  margin-top: 32px;
 }
 
 .home-faq-title {
@@ -2691,7 +2696,7 @@ select:disabled {
   color: var(--text);
 }
 
-.home-ack { margin-top: 2rem; }
+.home-ack { margin-top: 32px; }
 .home-ack-card {
   background: var(--s1);
   border-radius: var(--r);
@@ -2712,20 +2717,20 @@ select:disabled {
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */
 .back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--accent); text-decoration: none; }
-.faq-general-link { margin-bottom: 2rem; }
+.faq-general-link { margin-bottom: 32px; }
 .faq-rulebook-link { margin-bottom: 10px; }
 .faq-rulebook-title { margin: 0 0 6px; font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-.faq-rulebook-intro { margin: 0 0 1.5rem; font-size: calc(14px * var(--ts)); color: var(--muted); line-height: 1.5; }
-.faq-group { margin-bottom: 2rem; }
+.faq-rulebook-intro { margin: 0 0 24px; font-size: calc(14px * var(--ts)); color: var(--muted); line-height: 1.5; }
+.faq-group { margin-bottom: 32px; }
 .faq-group-intro { margin: 0 0 10px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.5; }
-.faq-identity { margin-bottom: 1rem; }
+.faq-identity { margin-bottom: 16px; }
 .faq-vil { font-weight: 500; color: var(--muted); }
 .faq-src { margin-top: 2px; font-size: calc(11px * var(--ts)); color: var(--dim); }
 .faq-item mark { background: var(--accent-d); color: var(--text); border-radius: 3px; padding: 0 1px; }
 .faq-roster-sub { font-size: calc(11px * var(--ts)); color: var(--muted); }
 .faq-count { margin: 0 0 12px 2px; font-size: calc(13px * var(--ts)); color: var(--muted); }
 .faq-title-link { color: inherit; text-decoration: none; }
-.faq-credit { margin-top: 2rem; font-size: calc(12px * var(--ts)); color: var(--muted); line-height: 1.5; }
+.faq-credit { margin-top: 32px; font-size: calc(12px * var(--ts)); color: var(--muted); line-height: 1.5; }
 .faq-credit a { color: var(--accent); text-decoration: none; }
 
 /* ── TUTORIAL PAGE ───────────────────────────────────────────────── */
@@ -2746,7 +2751,7 @@ select:disabled {
 .acct-identity {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   flex-wrap: wrap;
   padding: 4px 0 16px;
 }
@@ -2765,7 +2770,7 @@ select:disabled {
 .acct-change-nick { align-self: flex-start; margin-top: 6px; }
 
 .acct-section {
-  padding: 18px 0;
+  padding: 16px 0;
   border-top: 1px solid var(--border);
 }
 
@@ -2954,7 +2959,7 @@ select:disabled {
    ────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .draw-mode-row                  { gap: 6px; }
-  .filter-bulk-row .pace-colors   { gap: 3px; }
+  .filter-bulk-row .pace-colors   { gap: 4px; }
   .filter-bulk-row .pace-color    { border-width: 1px; }
 }
 
