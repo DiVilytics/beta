@@ -111,7 +111,7 @@ function render() {
 
   root.innerHTML = `
     <div class="claim-game-info">
-      <div class="claim-date">${fmtDateTime(claimGame.played_at)}</div>
+      <div class="claim-date">${fmtGameDate(claimGame)}</div>
       ${meta ? `<div class="claim-meta">${meta}</div>` : ''}
     </div>
     <div class="claim-share-row">

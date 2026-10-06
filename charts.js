@@ -26,10 +26,10 @@ async function _characterStats() {
   return _data.charStats;
 }
 
-// All games' played_at / duration / rounds (small rows, paged past the cap).
+// All games' played_at / duration / rounds / source (small rows, paged past the cap).
 async function _gamesLite() {
   if (_data.games) return _data.games;
-  const { rows } = await _fetchAllRows(() => db.from('games').select('played_at, duration_minutes, num_turns'));
+  const { rows } = await _fetchAllRows(() => db.from('games').select('played_at, duration_minutes, num_turns, source'));
   _data.games = rows;
   return _data.games;
 }
@@ -276,7 +276,8 @@ const CHARTS = [
       const counts = new Array(7).fill(0);   // 0 = Sunday
       for (const g of await _gamesLite()) {
         if (!g.played_at) continue;
-        counts[new Date(g.played_at).getDay()]++;
+        const d = new Date(g.played_at);
+        counts[isDateOnly(g) ? d.getUTCDay() : d.getDay()]++;   // date-only: the recorded day
       }
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
       // Weekday names in the current language (5 Jan 2025 was a Sunday).

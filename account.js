@@ -249,7 +249,7 @@ async function exportMyData() {
     const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner'];
     const rows = [header];
     for (const g of games) {
-      const dateStr = _csvDateTime(g.played_at);
+      const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
       for (const p of sortGamePlayers(playersByGame[g.id] || [])) {
         rows.push([
           g.id,

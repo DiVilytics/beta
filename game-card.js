@@ -57,7 +57,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
   return `
     <div class="card-body">
       <div class="card-top${rows ? ' card-top-wrap' : ''}">
-        <div class="card-date">${fmtDateTime(g.played_at)}</div>
+        <div class="card-date">${fmtGameDate(g)}</div>
         <div class="card-meta">${metaHTML}</div>
       </div>
       <div class="card-players${rows ? ' rows' : ''}">${chipsHTML}</div>
