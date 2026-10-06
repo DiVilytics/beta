@@ -1,26 +1,26 @@
 {
   "Captain Hook": {
-    "objective": "In order to achieve this objective, you must unlock the Hangman's Tree location by playing the Never Land Map. Peter Pan must be played, either by you or an opponent, to Hangman's Tree. You will then need to move him to Mermaid Lagoon, then to Skull Rock, and finally to the Jolly Roger, where you must defeat him to win the game.",
+    "objective": "In order to achieve this Objective, you must unlock the Hangman's Tree Location by playing the Never Land Map. Peter Pan must be played, either by you or an opponent, to Hangman's Tree. You will then need to move him to Mermaid Lagoon, then to Skull Rock, and finally to the Jolly Roger, where you must defeat him to win the game.",
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Place a Lock Token on Hangman's Tree, as that location is locked at the beginning of the game."
+        "text": "Place a Lock Token on Hangman's Tree, as that Location is locked at the beginning of the game."
       },
       {
         "title": "Peter Pan",
-        "text": "When Peter Pan is revealed, he must immediately be played to Hangman's Tree, even if Hangman's Tree is still locked. If Peter Pan is one of the two cards drawn by an opponent while performing a Fate action targeting you, the opponent must play Peter Pan and discard the other card."
+        "text": "When Peter Pan is revealed, he must immediately be played to Hangman's Tree, even if Hangman's Tree is still locked. If Peter Pan is one of the two cards drawn by an opponent while performing a Fate Action targeting you, the opponent must play Peter Pan and discard the other card."
       },
       {
         "title": "Never Land Map",
-        "text": "When you play the Never Land Map, unlock Hangman's Tree by removing the Lock Token from the location.\n\nImportant: Peter Pan may not be moved from Hangman's Tree until it is unlocked."
+        "text": "When you play the Never Land Map, unlock Hangman's Tree by removing the Lock Token from the Location.\n\nImportant: Peter Pan may not be moved from Hangman's Tree until it is unlocked."
       },
       {
         "title": "Controlling Your Fate",
-        "text": "Unlike other Villains, Captain Hook can play and discard cards from his own Fate deck using Worthy Opponent, Give Them a Scare, and Obsession. Using these cards will help you reveal Peter Pan and bring him into your Realm as soon as possible."
+        "text": "Unlike other Villains, Captain Hook can play and discard cards from his own Fate Deck using Worthy Opponent, Give Them a Scare, and Obsession. Using these cards will help you reveal Peter Pan and bring him into your Realm as soon as possible."
       },
       {
         "title": "Extra Actions",
-        "text": "Cannon, Hook's Case, and Ingenious Device are Items that add extra action symbols to your Realm. After the Item has been played to a location, you may perform the extra action in addition to the other available actions there.\n\nExample: If Cannon has been played to Skull Rock, you may perform five actions when you are at Skull Rock: its four action symbols plus the Vanquish action from Cannon."
+        "text": "Cannon, Hook's Case, and Ingenious Device are Items that add extra action symbols to your Realm. After the Item has been played to a Location, you may perform the extra action in addition to the other available actions there.\n\nExample: If Cannon has been played to Skull Rock, you may perform five actions when you are at Skull Rock: its four action symbols plus the Vanquish Action from Cannon."
       }
     ]
   },
@@ -28,32 +28,32 @@
     "sections": [
       {
         "title": "Curses",
-        "text": "Curse is a card type unique to Maleficent. Curses are played to locations, and each one has an Ability that affects Heroes at that location. However, each Curse also has an action that will cause it to be discarded, so you'll need to strategize when and where to play each Curse.\n\nMultiple Curses may be played to the same location, and a Curse may be moved using a Move an Item or Ally action.\n\nThe three Curses are Forest of Thorns, Green Fire, and Dreamless Sleep."
+        "text": "Curse is a card type unique to Maleficent. Curses are played to Locations, and each one has an Ability that affects Heroes at that Location. However, each Curse also has an action that will cause it to be discarded, so you'll need to strategize when and where to play each Curse.\n\nMultiple Curses may be played to the same Location, and a Curse may be moved using a Move an Item or Ally Action.\n\nThe three Curses are Forest of Thorns, Green Fire, and Dreamless Sleep."
       },
       {
         "title": "Forest of Thorns",
-        "text": "Forest of Thorns makes it difficult for opponents to play a Hero at its location because a Hero must have a Strength of 4 or more to be played there.\n\nBeware: If a qualifying Hero is played to its location, Forest of Thorns is discarded."
+        "text": "Forest of Thorns makes it difficult for opponents to play a Hero at its Location because a Hero must have a Strength of 4 or more to be played there.\n\nBeware: If a qualifying Hero is played to its Location, Forest of Thorns is discarded."
       },
       {
         "title": "Green Fire",
-        "text": "Green Fire is a very powerful Curse because Heroes cannot be played to its location.\n\nBeware: If Maleficent ever moves to its location, Green Fire is discarded."
+        "text": "Green Fire is a very powerful Curse because Heroes cannot be played to its Location.\n\nBeware: If Maleficent ever moves to its Location, Green Fire is discarded."
       },
       {
         "title": "Dreamless Sleep",
-        "text": "Dreamless Sleep reduces the Strengths of all Heroes at its location by 2.\n\nBeware: If you play an Ally to its location, Dreamless Sleep is discarded.\n\nNote: You may move an Ally to a location with Dreamless Sleep without having to discard the Curse. Also, you can play Dreamless Sleep to a location that already has Allies without affecting the Allies or the Curse."
+        "text": "Dreamless Sleep reduces the Strengths of all Heroes at its Location by 2.\n\nBeware: If you play an Ally to its Location, Dreamless Sleep is discarded.\n\nNote: You may move an Ally to a Location with Dreamless Sleep without having to discard the Curse. Also, you can play Dreamless Sleep to a Location that already has Allies without affecting the Allies or the Curse."
       },
       {
         "title": "Other Cards",
-        "text": "Vanish allows Maleficent to remain at a location, enabling her to take the same actions two turns in a row.\n\nRaven is a powerful Ally to play as early as possible. At the start of each turn, you may move Raven and perform one action that is available at his new location.\n\nNote: Raven may not take Fate actions."
+        "text": "Vanish allows Maleficent to remain at a Location, enabling her to take the same actions two turns in a row.\n\nRaven is a powerful Ally to play as early as possible. At the start of each turn, you may move Raven and perform one action that is available at his new Location.\n\nNote: Raven may not take Fate Actions."
       }
     ]
   },
   "Prince John": {
-    "objective": "Prince John is all about greed, so he needs to accumulate Power. However, as tempting as it might be to save all the Power you can, you will need to spend some Power in order to win.\n\nSeveral Heroes can hinder Prince John's ability to gain Power. It is a good idea to play Allies, even before any Heroes have been played. By doing so, you will be prepared to Vanquish a Hero that is affecting your progress.",
+    "objective": "Prince John is all about greed, so he needs to accumulate Power. However, as tempting as it might be to save all the Power you can, you will need to spend some Power in order to win.\n\nSeveral Heroes can hinder Prince John's Ability to gain Power. It is a good idea to play Allies, even before any Heroes have been played. By doing so, you will be prepared to Vanquish a Hero that is affecting your progress.",
     "sections": [
       {
         "title": "The Jail",
-        "text": "Prince John's Realm has a location that can be used to his advantage. The Jail does not have any action symbols that can be covered by Heroes, making Heroes at that location less disruptive. Prince John has Imprison cards which allow him to move Heroes to The Jail in order to make actions available elsewhere.\n\nNote: When at The Jail, Heroes' Abilities are still in effect."
+        "text": "Prince John's Realm has a Location that can be used to his advantage. The Jail does not have any action symbols that can be covered by Heroes, making Heroes at that Location less disruptive. Prince John has Imprison cards which allow him to move Heroes to The Jail in order to make actions available elsewhere.\n\nNote: When at The Jail, Heroes' Abilities are still in effect."
       },
       {
         "title": "It's Good to Be the King!",
@@ -74,19 +74,19 @@
     ]
   },
   "Jafar": {
-    "objective": "To achieve Jafar's Objective, you must unlock the Cave of Wonders with the Scarab Pendant. Then the Magic Lamp must be played to the Cave of Wonders, which also brings Genie to the same location. You must Hypnotize Genie, which puts Genie under Jafar's control, and move the Magic Lamp to Sultan's Palace.\n\nImportant: To win, the Magic Lamp must be on your side of the Board.",
+    "objective": "To achieve Jafar's Objective, you must unlock the Cave of Wonders with the Scarab Pendant. Then the Magic Lamp must be played to the Cave of Wonders, which also brings Genie to the same Location. You must Hypnotize Genie, which puts Genie under Jafar's control, and move the Magic Lamp to Sultan's Palace.\n\nImportant: To win, the Magic Lamp must be on your side of the Board.",
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Place a Lock Token on the Cave of Wonders, as that location is locked at the beginning of the game."
+        "text": "Place a Lock Token on the Cave of Wonders, as that Location is locked at the beginning of the game."
       },
       {
         "title": "Scarab Pendant",
-        "text": "Playing the Scarab Pendant is the first step to achieving victory. When you play the Scarab Pendant, unlock the Cave of Wonders by removing the Lock Token from the location. Additionally, while the Scarab Pendant is in your Realm, you may draw an extra card at the end of each turn."
+        "text": "Playing the Scarab Pendant is the first step to achieving victory. When you play the Scarab Pendant, unlock the Cave of Wonders by removing the Lock Token from the Location. Additionally, while the Scarab Pendant is in your Realm, you may draw an extra card at the end of each turn."
       },
       {
         "title": "Magic Lamp",
-        "text": "After the Cave of Wonders has been unlocked, you may play the Magic Lamp to that location. When you play the Magic Lamp, immediately find Genie and play him to the Cave of Wonders.\n\nNote: If Genie is under Jafar's control when the Magic Lamp is played, he is no longer under Jafar's control."
+        "text": "After the Cave of Wonders has been unlocked, you may play the Magic Lamp to that Location. When you play the Magic Lamp, immediately find Genie and play him to the Cave of Wonders.\n\nNote: If Genie is under Jafar's control when the Magic Lamp is played, he is no longer under Jafar's control."
       },
       {
         "title": "Get What You Need",
@@ -114,15 +114,15 @@
       },
       {
         "title": "Take the Shot",
-        "text": "If there is at least one Wicket at each location in your Realm, you may play Take the Shot to attempt to win the game. Reveal the top five cards of your Villain deck and add up the total Cost of those cards. If the total Cost of the revealed cards is lower than the total Strength of all of the Wickets in your Realm, then you make the shot and win the game! If you do not make the shot, discard the five revealed cards and try again later."
+        "text": "If there is at least one Wicket at each Location in your Realm, you may play Take the Shot to attempt to win the game. Reveal the top five cards of your Villain Deck and add up the total Cost of those cards. If the total Cost of the revealed cards is lower than the total Strength of all of the Wickets in your Realm, then you make the shot and win the game! If you do not make the shot, discard the five revealed cards and try again later."
       },
       {
         "title": "Shrinking Heroes",
-        "text": "Makes You Smaller and Fury allow Queen of Hearts to Shrink Heroes. When a Hero is Shrunk, rotate the Hero 45 degrees so that only one action symbol is covered by the corner of the card, leaving the other action available.\n\nIf there are multiple Heroes at a location with a Shrunken Hero, the Shrunken Hero is the only Hero that covers up an action symbol. The other Heroes do not cover any actions until the Shrunken Hero is moved or defeated."
+        "text": "Makes You Smaller and Fury allow Queen of Hearts to Shrink Heroes. When a Hero is Shrunk, rotate the Hero 45 degrees so that only one action symbol is covered by the corner of the card, leaving the other action available.\n\nIf there are multiple Heroes at a Location with a Shrunken Hero, the Shrunken Hero is the only Hero that covers up an action symbol. The other Heroes do not cover any actions until the Shrunken Hero is moved or defeated."
       },
       {
         "title": "Enlarging Heroes",
-        "text": "When an opponent plays Makes You Larger, they choose a Hero in your Realm and Enlarge it. The Hero card is rotated 90 degrees so that it covers one action symbol at an adjacent location in addition to the two action symbols at the Hero's location. Your opponent chooses which action to cover."
+        "text": "When an opponent plays Makes You Larger, they choose a Hero in your Realm and Enlarge it. The Hero card is rotated 90 degrees so that it covers one action symbol at an adjacent Location in addition to the two action symbols at the Hero's Location. Your opponent chooses which action to cover."
       }
     ]
   },
@@ -131,62 +131,62 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Place a Lock Token on The Palace, as that location is locked at the beginning of the game."
+        "text": "Place a Lock Token on The Palace, as that Location is locked at the beginning of the game."
       },
       {
         "title": "Changing Form",
-        "text": "Ursula's Realm has a locked location, but it functions differently than in other Villains' Realms. The Lock Token is never removed from Ursula's Realm.\n\nEach time you play Change Form, the Lock Token is moved between The Palace and Ursula's Lair, unlocking one location and locking the other.\n\nBoth locations have useful actions, so choosing when to play Change Form is very important."
+        "text": "Ursula's Realm has a locked Location, but it functions differently than in other Villains' Realms. The Lock Token is never removed from Ursula's Realm.\n\nEach time you play Change Form, the Lock Token is moved between The Palace and Ursula's Lair, unlocking one Location and locking the other.\n\nBoth Locations have useful actions, so choosing when to play Change Form is very important."
       },
       {
         "title": "The Trident",
-        "text": "When you play the Trident, immediately find King Triton and play him to the same location. Then move the Trident to the other side of the Board and attach it to King Triton.\n\nWhen King Triton is defeated, the Trident is returned to your side of the Board at the location King Triton was defeated."
+        "text": "When you play the Trident, immediately find King Triton and play him to the same Location. Then move the Trident to the other side of the Board and attach it to King Triton.\n\nWhen King Triton is defeated, the Trident is returned to your side of the Board at the Location King Triton was defeated."
       },
       {
         "title": "Binding Contracts",
-        "text": "Ursula is unique in that she does not have a Vanquish action in her Realm. Instead, Ursula defeats Heroes by using Binding Contracts. When you play a Binding Contract, attach it to a Hero. (Binding Contracts are one of the rare instances where an Item from the Villain deck can be attached to a Hero.)\n\nEach Binding Contract is tied to a location in Ursula's Realm. A Hero with a Binding Contract attached to them is defeated when they are moved to the location specified on the card. Discard the Hero to your Fate discard pile and discard the Binding Contract to your Villain discard pile.\n\nExample: A Hero with the Binding Contract for The Shore attached is defeated when you move them to The Shore."
+        "text": "Ursula is unique in that she does not have a Vanquish Action in her Realm. Instead, Ursula defeats Heroes by using Binding Contracts. When you play a Binding Contract, attach it to a Hero. (Binding Contracts are one of the rare instances where an Item from the Villain Deck can be attached to a Hero.)\n\nEach Binding Contract is tied to a Location in Ursula's Realm. A Hero with a Binding Contract attached to them is defeated when they are moved to the Location specified on the card. Discard the Hero to your Fate discard pile and discard the Binding Contract to your Villain discard pile.\n\nExample: A Hero with the Binding Contract for The Shore attached is defeated when you move them to The Shore."
       }
     ]
   },
   "Captain Hook [I2E]": {
-    "objective": "The Villainous Captain Hook's only goal in life is to defeat pesky Peter Pan, but it's not a simple task! Peter Pan is a tricky foe and has the Lost Boys and Tinker Bell to protect him. He's even recruited Heroes like Wendy and her brothers from London.\n\nAs Captain Hook, you must lure Peter Pan into the Lost Boys Hideout. Then, you need to get him to your ship, the Jolly Roger, where you will surely have the edge. With the help of your Allies, especially Smee and Mr. Starkey, try to defeat Peter Pan before any of the other villains complete their objective and prove that you are the greatest Pirate Captain of them all!",
+    "objective": "The Villainous Captain Hook's only goal in life is to defeat pesky Peter Pan, but it's not a simple task! Peter Pan is a tricky foe and has the Lost Boys and Tinker Bell to protect him. He's even recruited Heroes like Wendy and her brothers from London.\n\nAs Captain Hook, you must lure Peter Pan into the Lost Boys Hideout. Then, you need to get him to your ship, the Jolly Roger, where you will surely have the edge. With the help of your Allies, especially Smee and Mr. Starkey, try to defeat Peter Pan before any of the other Villains complete their Objective and prove that you are the greatest Pirate Captain of them all!",
     "sections": [
       {
         "title": "First, Find Peter Pan",
-        "text": "Peter Pan is hiding in your Fate deck. He might appear when your opponents Fate you, but you can also reveal cards from your Fate deck by playing Worthy Opponent, Obsession, or Neverland Map."
+        "text": "Peter Pan is hiding in your Fate Deck. He might appear when your opponents Fate you, but you can also reveal cards from your Fate Deck by playing Worthy Opponent, Obsession, or Neverland Map."
       },
       {
         "title": "Then, Move Peter Pan to Jolly Roger",
-        "text": "When Peter Pan is played, he's played to the Lost Boys Hideout. You'll have to move him one location at a time to the Jolly Roger with the Move Hero action on your board.\n\nPlaying Ingenious Device allows you to add the Move Hero action to any location."
+        "text": "When Peter Pan is played, he's played to the Lost Boys Hideout. You'll have to move him one Location at a time to the Jolly Roger with the Move Hero Action on your Board.\n\nPlaying Ingenious Device allows you to add the Move Hero Action to any Location."
       },
       {
         "title": "Finally, Defeat Peter Pan",
-        "text": "Use your Allies to defeat Peter Pan (and other Heroes) with the Vanquish action.\n\nPlay Cannon to add a Vanquish action to any location."
+        "text": "Use your Allies to defeat Peter Pan (and other Heroes) with the Vanquish Action.\n\nPlay Cannon to add a Vanquish Action to any Location."
       }
     ]
   },
   "Maleficent [I2E]": {
-    "objective": "Maleficent wasn't invited to the christenin of Princess Aurora, and now she wants to take her revenge by cursing the entire kingdom.\n\nSpread your Allies - like the goons and the Raven - throughout the Realm so that you can play Curses to locations with an Ally. But you must be wary of the Heroes! The good fairies - Flora, Fauna, and Merryweather - as well as Prince Philip and Aurora will do their best to foil your plans.\n\nIf you can play a Curse at every location in the Realm before any other villain achieves their goal, then you'll prove that you're the Mistress of All Evil!",
+    "objective": "Maleficent wasn't invited to the christenin of Princess Aurora, and now she wants to take her revenge by cursing the entire kingdom.\n\nSpread your Allies - like the goons and the Raven - throughout the Realm so that you can play Curses to Locations with an Ally. But you must be wary of the Heroes! The good fairies - Flora, Fauna, and Merryweather - as well as Prince Philip and Aurora will do their best to foil your plans.\n\nIf you can play a Curse at every Location in the Realm before any other Villain achieves their Goal, then you'll prove that you're the Mistress of All Evil!",
     "sections": [
       {
         "title": "Curses!",
-        "text": "Curses are unique to Maleficent's deck and each type has a unique benefit when it's in your Realm. However, cards in your Fate deck and other actions will cause the Curses to be discarded. You may play a Curse to any location, as long as there's an Ally at the location. You cannot play Curses to Ravens current location. Multiple Curses may be played to the same location, and, once played, you may move Curses using the Move an Item or Ally action.\n\nTo find the Curses or Allies in your deck, you can move to a location with the Discard action and discard multiple cards from your hand to help you cycle through your cards. Playing cards like Tyranny will also help!"
+        "text": "Curses are unique to Maleficent's deck and each type has a unique benefit when it's in your Realm. However, cards in your Fate Deck and other actions will cause the Curses to be discarded. You may play a Curse to any Location, as long as there's an Ally at the Location. You cannot play Curses to Ravens current Location. Multiple Curses may be played to the same Location, and, once played, you may move Curses using the Move an Item or Ally Action.\n\nTo find the Curses or Allies in your deck, you can move to a Location with the Discard Action and discard multiple cards from your hand to help you cycle through your cards. Playing cards like Tyranny will also help!"
       },
       {
         "title": "Be Ready for the Heroes",
-        "text": "The Heroes in your Fate deck will slow you down. Play Allies to the bottom of your Realm to play Curses and to defeat Heroes with the Vanquish action. Malice and Dragon Form also help you defeat Heroes."
+        "text": "The Heroes in your Fate Deck will slow you down. Play Allies to the bottom of your Realm to play Curses and to defeat Heroes with the Vanquish Action. Malice and Dragon Form also help you defeat Heroes."
       }
     ]
   },
   "Prince John [I2E]": {
-    "objective": "While King Richard is away, the Villainous Prince John wants to grab all the money and Power. Unfortunately, P.J. is constantly plagued by the do-gooder Robin Hood and his band of Heroes. Prince John's plan is to put Robin Hood in jail, take all the power, and show that he is the greatest villain ever.\n\nAs Prince John, you must balance hoarding Power to reach your goal and spending it on Ally and Effect cards to draw Robin Hood into Sherwood Forest and defeat him. Do it all before the other villains complete their objectives to be the winner!",
+    "objective": "While King Richard is away, the Villainous Prince John wants to grab all the money and Power. Unfortunately, P.J. is constantly plagued by the do-gooder Robin Hood and his band of Heroes. Prince John's plan is to put Robin Hood in jail, take all the power, and show that he is the greatest villain ever.\n\nAs Prince John, you must balance hoarding Power to reach your Goal and spending it on Ally and Effect cards to draw Robin Hood into Sherwood Forest and defeat him. Do it all before the other Villains complete their Objectives to be the winner!",
     "sections": [
       {
         "title": "Gain Power",
-        "text": "There are several ways for Prince John to gain Power. First, you can move to a location on your board with a Gain Power action to gain 1, 2, or 3 Power. You can also gain Power from Heroes in your Realm with Warrant, Sheriff of Nottingham, and Beautiful, Lovely Taxes and from other players with Greed."
+        "text": "There are several ways for Prince John to gain Power. First, you can move to a Location on your Board with a Gain Power Action to gain 1, 2, or 3 Power. You can also gain Power from Heroes in your Realm with Warrant, Sheriff of Nottingham, and Beautiful, Lovely Taxes and from other players with Greed."
       },
       {
         "title": "Be Ready to Vanquish Heroes",
-        "text": "In your Fate deck, Steal from the Rich will take Power from you and give it to the Heroes. But you can gain it back when you defeat those Heroes, so you'll want to have Allies played and ready to Vanquish when you need to! Little John actually reduces the Power Prince John can gain each turn so you'll want to Vanquish him as well."
+        "text": "In your Fate Deck, Steal from the Rich will take Power from you and give it to the Heroes. But you can gain it back when you defeat those Heroes, so you'll want to have Allies played and ready to Vanquish when you need to! Little John actually reduces the Power Prince John can gain each turn so you'll want to Vanquish him as well."
       },
       {
         "title": "Find Robin Hood and Defeat Him!",
@@ -195,32 +195,32 @@
     ]
   },
   "Ursula [I2E]": {
-    "objective": "Ursula, the Villainous Sea Witch, wants to rule the ocean. But first, she'll need to use her magic powers to claim the Crown and Trident - two of Triton's most prized possessions.\n\nThe Heroes, led by Ariel, Triton, and Eric, will do their best to stop her. Ursula will need to play Binding Contracts to Vanquish the Heroes with 'her babies', Flotsam and Jetsam, who never leave her side once played. If she can get Triton's Items to her Lair before the other villains complete their objectives, she'll prove that she's the true Queen of the Ocean and greatest villain of them all!",
+    "objective": "Ursula, the Villainous Sea Witch, wants to rule the ocean. But first, she'll need to use her magic powers to claim the Crown and Trident - two of Triton's most prized possessions.\n\nThe Heroes, led by Ariel, Triton, and Eric, will do their best to stop her. Ursula will need to play Binding Contracts to Vanquish the Heroes with 'her babies', Flotsam and Jetsam, who never leave her side once played. If she can get Triton's Items to her Lair before the other Villains complete their Objectives, she'll prove that she's the true Queen of the Ocean and greatest villain of them all!",
     "sections": [
       {
         "title": "First, Find the Trident and Crown",
-        "text": "There are several cards in your deck that will help you find other cards, including Whirlpool, Divination, and Opportunist. Moving to the location with the Discard action and discarding multiple cards from your hand will also help you cycle through your cards!"
+        "text": "There are several cards in your deck that will help you find other cards, including Whirlpool, Divination, and Opportunist. Moving to the Location with the Discard Action and discarding multiple cards from your hand will also help you cycle through your cards!"
       },
       {
         "title": "Then, Move the Items to Ursula's Lair",
-        "text": "Once you've found and played the Trident and the Crown, use the Move Item action to move them to Ursula's Lair."
+        "text": "Once you've found and played the Trident and the Crown, use the Move Item Action to move them to Ursula's Lair."
       },
       {
         "title": "Keep Heroes Out of Your Way!",
-        "text": "Several of the Heroes in your Fate deck will try to mess with your plan by moving Items and blocking actions. Normally, Heroes are defeated with Allies using the Vanquish action. Ursula doesn't have any Vanquish actions on her board. She will need to play Binding Contracts to locations to gain one-time-use Vanquish actions."
+        "text": "Several of the Heroes in your Fate Deck will try to mess with your plan by moving Items and blocking actions. Normally, Heroes are defeated with Allies using the Vanquish Action. Ursula doesn't have any Vanquish Actions on her Board. She will need to play Binding Contracts to Locations to gain one-time-use Vanquish Actions."
       }
     ]
   },
   "Evil Queen": {
-    "objective": "In order to achieve Evil Queen's Objective, you must unlock the Dwarfs' Cottage by playing four different Ingredients. You will also need to Brew Poison, which is used to defeat Heroes in your Realm, including Snow White. Snow White must be played, either by you or an opponent. Finally, you will need to play Take a Bite when you are at Snow White's location in order to defeat her and win the game.",
+    "objective": "In order to achieve Evil Queen's Objective, you must unlock the Dwarfs' Cottage by playing four different Ingredients. You will also need to Brew Poison, which is used to defeat Heroes in your Realm, including Snow White. Snow White must be played, either by you or an opponent. Finally, you will need to play Take a Bite when you are at Snow White's Location in order to defeat her and win the game.",
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Place a Lock Token on the Dwarfs' Cottage, as that location is locked at the beginning of the game."
+        "text": "Place a Lock Token on the Dwarfs' Cottage, as that Location is locked at the beginning of the game."
       },
       {
         "title": "Ingredients",
-        "text": "Ingredient is a card type unique to Evil Queen. Ingredients function the same as Effects, with one exception. The first time you play each Ingredient, after doing what it says, put it below your Board. If you play an Ingredient that youve played before, do what it says, then discard it.\n\nAs soon as you have played each of the four Ingredients (Scream of Fright, Old Hag's Cackle, Mummy Dust, and Black of Night), unlock the Dwarfs' Cottage by removing the Lock Token from the location. The four Ingredients remain below your Board for the rest of the game."
+        "text": "Ingredient is a card type unique to Evil Queen. Ingredients function the same as Effects, with one exception. The first time you play each Ingredient, after doing what it says, put it below your Board. If you play an Ingredient that youve played before, do what it says, then discard it.\n\nAs soon as you have played each of the four Ingredients (Scream of Fright, Old Hag's Cackle, Mummy Dust, and Black of Night), unlock the Dwarfs' Cottage by removing the Lock Token from the Location. The four Ingredients remain below your Board for the rest of the game."
       },
       {
         "title": "Activated Abilities",
@@ -228,19 +228,19 @@
       },
       {
         "title": "Magic Mirror",
-        "text": "Evil Queen can use her Magic Mirror to find Snow White. To activate this Ability, perform an Activate action and pay 3 Power. Then find Snow White and play her to the Dwarfs' Cottage, even if it is locked.\n\nIn addition, while the Magic Mirror is in your Realm, each time you are the target of a Fate action, you may draw a card."
+        "text": "Evil Queen can use her Magic Mirror to find Snow White. To activate this Ability, perform an Activate Action and pay 3 Power. Then find Snow White and play her to the Dwarfs' Cottage, even if it is locked.\n\nIn addition, while the Magic Mirror is in your Realm, each time you are the target of a Fate Action, you may draw a card."
       },
       {
         "title": "Poison Apples",
-        "text": "Evil Queen does not have a Vanquish action in her Realm. Instead, she uses poison apples to defeat Heroes. To do this, she must Brew Poison and then get a Hero to Take A Bite."
+        "text": "Evil Queen does not have a Vanquish Action in her Realm. Instead, she uses poison apples to defeat Heroes. To do this, she must Brew Poison and then get a Hero to Take A Bite."
       },
       {
         "title": "Brew Poison Action",
-        "text": "The Brew Poison action is unique to Evil Queen and is found at the Laboratory location. Each time you perform this action, you may convert as many of your Power as you wish into Poison. Move the Power onto your Board to indicate that it is now Poison.\n\nNote: Poison is no longer considered Power. Poison may not be used to pay a card or Ability's Cost. Having Poison or adding Power from the Supply to your Poison do not trigger Conditions that require having Power or gaining Power."
+        "text": "The Brew Poison Action is unique to Evil Queen and is found at the Laboratory Location. Each time you perform this action, you may convert as many of your Power as you wish into Poison. Move the Power onto your Board to indicate that it is now Poison.\n\nNote: Poison is no longer considered Power. Poison may not be used to pay a card or Ability's Cost. Having Poison or adding Power from the Supply to your Poison do not trigger Conditions that require having Power or gaining Power."
       },
       {
         "title": "Take A Bite",
-        "text": "When you play Take A Bite, Evil Queen must be at the same location as the Hero being defeated. You must also pay Poison equal to the Hero's Strength, which may be modified by other cards in the Realm. Remove that many Poison from your Board and return it to the Supply. Discard the defeated Hero to your Fate discard pile, and discard Take A Bite to your Villain discard pile.\n\nNote: If you do not have enough Poison to defeat a Hero, you may not play Take a Bite."
+        "text": "When you play Take A Bite, Evil Queen must be at the same Location as the Hero being defeated. You must also pay Poison equal to the Hero's Strength, which may be modified by other cards in the Realm. Remove that many Poison from your Board and return it to the Supply. Discard the defeated Hero to your Fate discard pile, and discard Take A Bite to your Villain discard pile.\n\nNote: If you do not have enough Poison to defeat a Hero, you may not play Take a Bite."
       }
     ]
   },
@@ -265,7 +265,7 @@
       },
       {
         "title": "Control the Talisman",
-        "text": "To win the game, you must have the Talisman under your control when Rule New Orleans' Fortune Ability is resolved. It can be difficult to keep control of the Talisman, so you'll need to strategize the best time to play it.\n\nIf you have the Talisman when a Hero with a Strength of 3 or less is played, that Hero steals it from you. Move the Talisman to the top of the Board and attach it to the Hero. When that Hero is defeated, the Talisman is returned to your side of the Board at the location the Hero was defeated.\n\nNote: If a Hero already has the Talisman when a new Hero is played, the Talisman does not move. It remains with the Hero it is attached to."
+        "text": "To win the game, you must have the Talisman under your control when Rule New Orleans' Fortune Ability is resolved. It can be difficult to keep control of the Talisman, so you'll need to strategize the best time to play it.\n\nIf you have the Talisman when a Hero with a Strength of 3 or less is played, that Hero steals it from you. Move the Talisman to the top of the Board and attach it to the Hero. When that Hero is defeated, the Talisman is returned to your side of the Board at the Location the Hero was defeated.\n\nNote: If a Hero already has the Talisman when a new Hero is played, the Talisman does not move. It remains with the Hero it is attached to."
       }
     ]
   },
@@ -274,11 +274,11 @@
     "sections": [
       {
         "title": "Titans",
-        "text": "Titan is a card type unique to Hades. You must lead at least three Titans to Mount Olympus in order to achieve victory. There are five Titans in your deck and each one has a powerful Ability.\n\nTitans function much like your Allies, but they must be played to The Underworld. You may move a Titan using the Move an Item or Ally action. Don't forget to use the Titan's Ability each time he is moved.\n\nJust like Allies, Titans may be used to defeat Heroes by performing the Vanquish action. However, because they are still discarded when used to defeat a Hero, this could set you back in getting Titans to Mount Olympus."
+        "text": "Titan is a card type unique to Hades. You must lead at least three Titans to Mount Olympus in order to achieve victory. There are five Titans in your deck and each one has a powerful Ability.\n\nTitans function much like your Allies, but they must be played to The Underworld. You may move a Titan using the Move an Item or Ally Action. Don't forget to use the Titan's Ability each time he is moved.\n\nJust like Allies, Titans may be used to defeat Heroes by performing the Vanquish Action. However, because they are still discarded when used to defeat a Hero, this could set you back in getting Titans to Mount Olympus."
       },
       {
         "title": "Trapped",
-        "text": "During the game, Titans may be trapped by cards in your Fate deck. Rotate the card 90 degrees to indicate that the Titan is trapped.\n\nWhile a Titan is trapped, their Ability is ignored. They may not be moved or used to defeat a Hero. In addition, trapped Titans do not count toward your Objective.\n\nYou can untrap Titans by playing Planets Align, or by using Pyros' Ability. When you untrap a Titan, rotate the card back to its normal position to indicate that it is no longer trapped."
+        "text": "During the game, Titans may be trapped by cards in your Fate Deck. Rotate the card 90 degrees to indicate that the Titan is trapped.\n\nWhile a Titan is trapped, their Ability is ignored. They may not be moved or used to defeat a Hero. In addition, trapped Titans do not count toward your Objective.\n\nYou can untrap Titans by playing Planets Align, or by using Pyros' Ability. When you untrap a Titan, rotate the card back to its normal position to indicate that it is no longer trapped."
       },
       {
         "title": "Make Them Mortal",
@@ -286,11 +286,11 @@
       },
       {
         "title": "Ride Your Chariot",
-        "text": "Chariot will give you extra actions during the game. After performing your normal actions, if Chariot is at your location, you may 'ride' the Chariot to any other location and perform one available action there. Chariot may only be used once per turn and may not be used to perform a Fate action. You may use Chariot in the same turn you play it."
+        "text": "Chariot will give you extra actions during the game. After performing your normal actions, if Chariot is at your Location, you may 'ride' the Chariot to any other Location and perform one available action there. Chariot may only be used once per turn and may not be used to perform a Fate Action. You may use Chariot in the same turn you play it."
       },
       {
         "title": "Let's Get Ready to Rumble",
-        "text": "In addition to the Move an Item or Ally action, you can use Get Ready to Rumble! to move Titans toward Mount Olympus. You may either pay 2 Power to move a Titan one location or pay 5 Power to move a Titan two locations. You may only move one Titan when you play this card, and you may not move trapped Titans.\n\nNote: If you move a Titan two locations, it is considered a single move and the Titan effectively jumps over the first location. Only Abilities at the Titan's final location are triggered by the move. Any Abilities at the jumped location are not triggered."
+        "text": "In addition to the Move an Item or Ally Action, you can use Get Ready to Rumble! to move Titans toward Mount Olympus. You may either pay 2 Power to move a Titan one Location or pay 5 Power to move a Titan two Locations. You may only move one Titan when you play this card, and you may not move trapped Titans.\n\nNote: If you move a Titan two Locations, it is considered a single move and the Titan effectively jumps over the first Location. Only Abilities at the Titan's final Location are triggered by the move. Any Abilities at the jumped Location are not triggered."
       }
     ]
   },
@@ -307,15 +307,15 @@
       },
       {
         "title": "Marvelous Trap",
-        "text": "Marvelous Trap is a powerful card that can defeat all Heroes at its location, but it must first be set up and takes time to deploy.\n\nFirst play the trap to any location. Then, when you perform the Activate action, you can pay 1 Power to activate it. Leave the Power on the card to indicate that its been activated and will go off at the start of your next turn.\n\nIf there are no Heroes at the trap's location when it goes off, it is still discarded. If the trap is discarded before it goes off, no Heroes are defeated. When Marvelous Trap is discarded, return the Power on it to the supply.\n\nNote: If you have The Robot Queen at Buckingham Palace and The Mouse Queen is defeated with a trap, you do not immediately win. You must wait until the start of your next turn to see if you still achieve your Objective."
+        "text": "Marvelous Trap is a powerful card that can defeat all Heroes at its Location, but it must first be set up and takes time to deploy.\n\nFirst play the trap to any Location. Then, when you perform the Activate Action, you can pay 1 Power to activate it. Leave the Power on the card to indicate that its been activated and will go off at the start of your next turn.\n\nIf there are no Heroes at the trap's Location when it goes off, it is still discarded. If the trap is discarded before it goes off, no Heroes are defeated. When Marvelous Trap is discarded, return the Power on it to the supply.\n\nNote: If you have The Robot Queen at Buckingham Palace and The Mouse Queen is defeated with a trap, you do not immediately win. You must wait until the start of your next turn to see if you still achieve your Objective."
       },
       {
         "title": "The Great Mouse Detective",
-        "text": "Basil is Ratigans most formidable adversary. When Basil is played or moved, he discards an Item from his new location. Some Fate cards can move Basil, making him a constant threat to your Items, including The Robot Queen.\n\nIf Basil discards The Robot Queen, flip the Objective Tile so The Rat is showing. Your new Objective is to defeat Basil.\n\nNote: Once Ratigan's Objective changes, it cannot change back. You must defeat Basil to win."
+        "text": "Basil is Ratigans most formidable adversary. When Basil is played or moved, he discards an Item from his new Location. Some Fate cards can move Basil, making him a constant threat to your Items, including The Robot Queen.\n\nIf Basil discards The Robot Queen, flip the Objective Tile so The Rat is showing. Your new Objective is to defeat Basil.\n\nNote: Once Ratigan's Objective changes, it cannot change back. You must defeat Basil to win."
       },
       {
         "title": "The Secret Lair",
-        "text": "Ratigan has a location that can be used to his advantage. The Secret Lair does not have any action symbols at the top, making Heroes at that location less disruptive. Ratigan has Capture cards which allow him to move Heroes to The Secret Lair.\n\nIf you capture the Hero Flaversham, you'll reduce the Cost to play The Robot Queen. Your Ally Fidget will help you find and play Flaversham so you can later capture him.\n\nNote: When at The Secret Lair, Heroes' Abilities are still in effect."
+        "text": "Ratigan has a Location that can be used to his advantage. The Secret Lair does not have any action symbols at the top, making Heroes at that Location less disruptive. Ratigan has Capture cards which allow him to move Heroes to The Secret Lair.\n\nIf you capture the Hero Flaversham, you'll reduce the Cost to play The Robot Queen. Your Ally Fidget will help you find and play Flaversham so you can later capture him.\n\nNote: When at The Secret Lair, Heroes' Abilities are still in effect."
       }
     ]
   },
@@ -324,7 +324,7 @@
     "sections": [
       {
         "title": "Controlling Your Fate",
-        "text": "Your first step toward your Objective is to find and defeat Mufasa, who is in your Fate deck.\n\nLong Live The King lets you reveal four cards from your Fate deck, which will help you quickly find and play Mufasa.\n\nWhisper allows you to play any card from your Fate discard pile, in case Mufasa is discarded by an opponent. You can also use Whisper to play Hakuna Matata in order to move a Hero in your Realm to any location.\n\nAfter you defeat Mufasa, both Long Live The King and Whisper will help you play Heroes so you can quickly defeat them and add them to the Succession pile."
+        "text": "Your first step toward your Objective is to find and defeat Mufasa, who is in your Fate Deck.\n\nLong Live The King lets you reveal four cards from your Fate Deck, which will help you quickly find and play Mufasa.\n\nWhisper allows you to play any card from your Fate discard pile, in case Mufasa is discarded by an opponent. You can also use Whisper to play Hakuna Matata in order to move a Hero in your Realm to any Location.\n\nAfter you defeat Mufasa, both Long Live The King and Whisper will help you play Heroes so you can quickly defeat them and add them to the Succession pile."
       },
       {
         "title": "Succession Pile",
@@ -332,11 +332,11 @@
       },
       {
         "title": "Hyenas",
-        "text": "Hyenas are the Allies that you'll most often use to defeat Heroes, and the more Hyenas there are, the stronger they become. Hungry Hyenas get additional Strength for each other Hyena at their location.\n\nSimba is a Hero that limits the Strength of all Hyenas in your Realm. If a Hyena would have a Strength of more than 2, their Strength is reduced to 2 until Simba is defeated.\n\nExample: There are three Hyenas at Pride Rock, including Ed. Normally each Hungry Hyena's Strength would be 3 and Ed's would be 2. However, Simba limits each Hyenas Strength to 2. If you perform a Vanquish action to defeat Simba, whose Strength is 5, you must discard all three Allies."
+        "text": "Hyenas are the Allies that you'll most often use to defeat Heroes, and the more Hyenas there are, the stronger they become. Hungry Hyenas get additional Strength for each other Hyena at their Location.\n\nSimba is a Hero that limits the Strength of all Hyenas in your Realm. If a Hyena would have a Strength of more than 2, their Strength is reduced to 2 until Simba is defeated.\n\nExample: There are three Hyenas at Pride Rock, including Ed. Normally each Hungry Hyena's Strength would be 3 and Ed's would be 2. However, Simba limits each Hyenas Strength to 2. If you perform a Vanquish Action to defeat Simba, whose Strength is 5, you must discard all three Allies."
       },
       {
         "title": "Leaders of the Pack",
-        "text": "The Hyenas Shenzi, Banzai, and Ed are Allies that help you gain or save Power. By playing them as early as possible, you can use their Abilities to play more Hyenas, which you'll use to defeat Heroes.\n\nShenzi lets you play another Hyena for free.\n\nBanzai gains you Power when other Hyenas at his location are discarded, even if Banzai is discarded in the same action. For example, if you perform a Vanquish action using Banzai and two Hungry Hyenas, you gain 2 Power.\n\nEd reduces the Cost to play Hyenas to his location.\n\nNote: Shenzi, Banzai, and Ed are Hyenas. Any card that refers to Hyenas includes them."
+        "text": "The Hyenas Shenzi, Banzai, and Ed are Allies that help you gain or save Power. By playing them as early as possible, you can use their Abilities to play more Hyenas, which you'll use to defeat Heroes.\n\nShenzi lets you play another Hyena for free.\n\nBanzai gains you Power when other Hyenas at his Location are discarded, even if Banzai is discarded in the same action. For example, if you perform a Vanquish Action using Banzai and two Hungry Hyenas, you gain 2 Power.\n\nEd reduces the Cost to play Hyenas to his Location.\n\nNote: Shenzi, Banzai, and Ed are Hyenas. Any card that refers to Hyenas includes them."
       }
     ]
   },
@@ -344,19 +344,19 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Instead of having a single Fate deck, Yzma has four. Shuffle your Fate cards and deal them evenly to form four Fate decks-one at each location. Place them above your Board, leaving space for Heroes."
+        "text": "Instead of having a single Fate Deck, Yzma has four. Shuffle your Fate cards and deal them evenly to form four Fate Decks-one at each Location. Place them above your Board, leaving space for Heroes."
       },
       {
         "title": "Finding Kuzco",
-        "text": "To achieve Yzma's Objective, you'll need to find Kuzco, who is in one of your Fate decks.\n\nEavesdrop lets you look at all the cards in one Fate deck, which is the safest way to search for Kuzco.\n\nAfter Them! reveals the cards in a Fate deck and plays all the Heroes to that location. This is most useful if you know which Fate deck Kuzco is in. But be careful-if you ever reveal Wrong Lever, you lose Power.\n\nSmash It With A Hammer reveals and discards two cards from a Fate deck, allowing you to get rid of troublesome Fate cards like On The Run and Beware The Groove. But if you discard Kuzco, he gets reshuffled into your Fate decks."
+        "text": "To achieve Yzma's Objective, you'll need to find Kuzco, who is in one of your Fate Decks.\n\nEavesdrop lets you look at all the cards in one Fate Deck, which is the safest way to search for Kuzco.\n\nAfter Them! reveals the cards in a Fate Deck and plays all the Heroes to that Location. This is most useful if you know which Fate Deck Kuzco is in. But be careful-if you ever reveal Wrong Lever, you lose Power.\n\nSmash It With A Hammer reveals and discards two cards from a Fate Deck, allowing you to get rid of troublesome Fate cards like On The Run and Beware The Groove. But if you discard Kuzco, he gets reshuffled into your Fate Decks."
       },
       {
         "title": "Controlling Kronk",
-        "text": "Kronk is a powerful Ally and essential to your Objective, but he can turn against you. Each time Kronk is moved, whether by an action or card Ability, put 1 Power from the Supply on him. When he has 3 or more Power on him, he becomes a Hero. Put him at the top of your Board at the same location. He has the same Strength, but ignore his Ability-moving him when hes a Hero does not add Power.\n\nThe Path That Rocks lets you gain the Power on Kronk, whether hes an Ally or a Hero. Right-Hand Man can be used to put Kronk into your hand, whether he is close to turning, already a Hero, or still in your deck.\n\nNote: Removing Power from Kronk when hes a Hero does not turn him back into an Ally."
+        "text": "Kronk is a powerful Ally and essential to your Objective, but he can turn against you. Each time Kronk is moved, whether by an action or card Ability, put 1 Power from the Supply on him. When he has 3 or more Power on him, he becomes a Hero. Put him at the top of your Board at the same Location. He has the same Strength, but ignore his Ability-moving him when hes a Hero does not add Power.\n\nThe Path That Rocks lets you gain the Power on Kronk, whether hes an Ally or a Hero. Right-Hand Man can be used to put Kronk into your hand, whether he is close to turning, already a Hero, or still in your deck.\n\nNote: Removing Power from Kronk when hes a Hero does not turn him back into an Ally."
       },
       {
         "title": "Yzma's Fate",
-        "text": "When an opponent targets you with a Fate action, they must choose one of your Fate decks, secretly look at all the cards in it, and choose one card to play. If they choose to play a Hero, that Hero must be played to the location of the Fate deck it came from. All other cards are shuffled and returned to that Fate deck. If none of the cards can be played, all of them are returned.\n\nNote: Since your opponents do not reveal the cards, they can choose not to play Wrong Lever, unless there are no other cards they can play.\n\nIf a Fate deck is empty, do not shuffle the discard pile yet-your opponents will choose from only the remaining Fate decks. However, if all of the Fate decks are empty, shuffle the discard pile and deal the cards as evenly as possible to form four new Fate decks.\n\nExample: An opponent targets you with a Fate action. They choose the Fate deck at The Palace and look at all the cards in that deck. They choose to play Bucky, who must be played to the same location.\n\nNote: There is no limit to the number of Heroes at a location. Move the Fate deck to make room, and offset the Heroes so all cards can be seen."
+        "text": "When an opponent targets you with a Fate Action, they must choose one of your Fate Decks, secretly look at all the cards in it, and choose one card to play. If they choose to play a Hero, that Hero must be played to the Location of the Fate Deck it came from. All other cards are shuffled and returned to that Fate Deck. If none of the cards can be played, all of them are returned.\n\nNote: Since your opponents do not reveal the cards, they can choose not to play Wrong Lever, unless there are no other cards they can play.\n\nIf a Fate Deck is empty, do not shuffle the discard pile yet-your opponents will choose from only the remaining Fate Decks. However, if all of the Fate Decks are empty, shuffle the discard pile and deal the cards as evenly as possible to form four new Fate Decks.\n\nExample: An opponent targets you with a Fate Action. They choose the Fate Deck at The Palace and look at all the cards in that deck. They choose to play Bucky, who must be played to the same Location.\n\nNote: There is no limit to the number of Heroes at a Location. Move the Fate Deck to make room, and offset the Heroes so all cards can be seen."
       }
     ]
   },
@@ -365,36 +365,36 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Turn the five Goal Tokens face down, mix them up, and place one at each location. Set the remaining Goal Token aside. You may look at the Goal Tokens at any time, but keep them secret from the other players.\n\nNote: Once a Goal Token has been revealed, it can never be turned face down again."
+        "text": "Turn the five Goal Tokens face down, mix them up, and place one at each Location. Set the remaining Goal Token aside. You may look at the Goal Tokens at any time, but keep them secret from the other players.\n\nNote: Once a Goal Token has been revealed, it can never be turned face down again."
       },
       {
         "title": "Goal: Power Play",
-        "text": "Spend at least 6 Power in one turn while Pete is at this location.\n\nBeing able to play more than one card at the same location will make this Goal easier. If this Goal is at a location with multiple Play a Card actions, you have more options to play cards. However, if only one Play a Card action is available, you can use Bandit's ability to play at least three Bandits with one action."
+        "text": "Spend at least 6 Power in one turn while Pete is at this Location.\n\nBeing able to play more than one card at the same Location will make this Goal easier. If this Goal is at a Location with multiple Play a Card Actions, you have more options to play cards. However, if only one Play a Card Action is available, you can use Bandit's Ability to play at least three Bandits with one action."
       },
       {
         "title": "Goal: Rule the Realm",
-        "text": "Start your turn with more Allies than Heroes at each location.\n\nThis Goal is completed by playing multiple Allies. Cricket can help secure this Goal by moving to any location when a Hero is played to it."
+        "text": "Start your turn with more Allies than Heroes at each Location.\n\nThis Goal is completed by playing multiple Allies. Cricket can help secure this Goal by moving to any Location when a Hero is played to it."
       },
       {
         "title": "Goal: Win Big",
-        "text": "Gain at least 4 Power from playing Play a Game at this location.\n\nComplete this Goal when you play Play A Game and reveal cards with a total Cost of at least 4 Power.\n\nYou can improve your chance by using Mischief or Sneaky Pete to put cards with a high Cost on top of your deck."
+        "text": "Gain at least 4 Power from playing Play a Game at this Location.\n\nComplete this Goal when you play Play A Game and reveal cards with a total Cost of at least 4 Power.\n\nYou can improve your chance by using Mischief or Sneaky Pete to put cards with a high Cost on top of your deck."
       },
       {
         "title": "Strike It Rich",
-        "text": "Start your turn with at least three Items at this location.\n\nPete's deck contains four Items that can only be played to their specified location. Pete does not need to be at that location to play them.\n\nYou may complete this Goal on the start of your next turn after moving at least three Items to the Goal's location. Horse and Steamboat Willie can help you achieve this goal by quickly moving Items to the Goal's location."
+        "text": "Start your turn with at least three Items at this Location.\n\nPete's deck contains four Items that can only be played to their specified Location. Pete does not need to be at that Location to play them.\n\nYou may complete this Goal on the start of your next turn after moving at least three Items to the Goal's Location. Horse and Steamboat Willie can help you achieve this Goal by quickly moving Items to the Goal's Location."
       },
       {
         "title": "Goal: Round Up",
-        "text": "Start your turn with Allies totaling at least 10 Strength at this location.\n\nPlaying many Allies with high Strength to this Goal's location is the easiest way to complete it. Bandit and Horse help you play and move Allies to the Goal's location."
+        "text": "Start your turn with Allies totaling at least 10 Strength at this Location.\n\nPlaying many Allies with high Strength to this Goal's Location is the easiest way to complete it. Bandit and Horse help you play and move Allies to the Goal's Location."
       },
       {
         "title": "Extra Actions",
-        "text": "Each of Pete's Items adds an extra action symbol to your Realm. After the Item has been played to a location, you may perform the extra action in addition to the other available actions there."
+        "text": "Each of Pete's Items adds an extra action symbol to your Realm. After the Item has been played to a Location, you may perform the extra action in addition to the other available actions there."
       }
     ]
   },
   "Cruella de Vil": {
-    "objective": "To achieve Cruella De Vil's Objective, you must add Puppy Tokens from the Supply to locations in your Realm, then capture them.",
+    "objective": "To achieve Cruella De Vil's Objective, you must add Puppy Tokens from the Supply to Locations in your Realm, then capture them.",
     "sections": [
       {
         "title": "Special Setup",
@@ -402,7 +402,7 @@
       },
       {
         "title": "Puppy Tokens",
-        "text": "Puppy Tokens represent the puppies that Cruella De Vil must capture, with each Puppy Token representing either 11 or 22 puppies.\n\nIn order to capture Puppy Tokens, they must first be taken from the Supply and added to your Realm. Each Puppy Token features one of the four locations in your Realm. When adding a Puppy Token to your Realm, reveal the Puppy Token and place it face up at the location specified.\n\nNote: Each time you add a Puppy Token to your Realm, you may choose one from the Supply that is face up or face down. Once a Puppy Token has been revealed, it can never be turned face down again, even if it is returned to the Supply.\n\nNote: Place captured Puppy Tokens below your Board, keeping them face up so all players can see how many puppies have been captured."
+        "text": "Puppy Tokens represent the puppies that Cruella De Vil must capture, with each Puppy Token representing either 11 or 22 puppies.\n\nIn order to capture Puppy Tokens, they must first be taken from the Supply and added to your Realm. Each Puppy Token features one of the four Locations in your Realm. When adding a Puppy Token to your Realm, reveal the Puppy Token and place it face up at the Location specified.\n\nNote: Each time you add a Puppy Token to your Realm, you may choose one from the Supply that is face up or face down. Once a Puppy Token has been revealed, it can never be turned face down again, even if it is returned to the Supply.\n\nNote: Place captured Puppy Tokens below your Board, keeping them face up so all players can see how many puppies have been captured."
       },
       {
         "title": "Activated Abilities",
@@ -410,11 +410,11 @@
       },
       {
         "title": "Roadster",
-        "text": "Roadster can help you move Puppy Tokens to locations so they can be more easily captured. When moved, Roadster can move to any location."
+        "text": "Roadster can help you move Puppy Tokens to Locations so they can be more easily captured. When moved, Roadster can move to any Location."
       },
       {
         "title": "Horace and Jasper",
-        "text": "Cruella DeVil has only two Allies, and they must be used to capture puppies and defeat Heroes. Getting them into your Realm quickly and keeping them there will be important to obtaining your Objective.\n\nYou Idiots! allows you to choose an Ally from your deck and put them into your hand. This will help get Horace or Jasper into play quickly.\n\nWhen an Ally with Fireplace Poker attached to them is used to defeat a Hero, you may discard Fireplace Poker instead of that Ally, allowing them to stay in your Realm longer.\n\nIf Telephone is in your Realm, it can be activated to choose an Ally from your discard pile and play it to any location."
+        "text": "Cruella DeVil has only two Allies, and they must be used to capture puppies and defeat Heroes. Getting them into your Realm quickly and keeping them there will be important to obtaining your Objective.\n\nYou Idiots! allows you to choose an Ally from your deck and put them into your hand. This will help get Horace or Jasper into play quickly.\n\nWhen an Ally with Fireplace Poker attached to them is used to defeat a Hero, you may discard Fireplace Poker instead of that Ally, allowing them to stay in your Realm longer.\n\nIf Telephone is in your Realm, it can be activated to choose an Ally from your discard pile and play it to any Location."
       }
     ]
   },
@@ -430,15 +430,15 @@
       },
       {
         "title": "Rapunzel",
-        "text": "Rapunzel is a unique Hero because she is already in your Realm at the start of the game, and she is never discarded. Like other Heroes, she blocks actions at her location and may be defeated by using a Vanquish action.\n\nHowever, when Rapunzel is defeated, instead of discarding her, move her to Rapunzel's Tower.\n\nImportant: At the end of Mother Gothel's turn, move Rapunzel one location toward Corona. If you cannot move Rapunzel because she is already at Corona, Mother Gothel loses 1 Trust."
+        "text": "Rapunzel is a unique Hero because she is already in your Realm at the start of the game, and she is never discarded. Like other Heroes, she blocks actions at her Location and may be defeated by using a Vanquish Action.\n\nHowever, when Rapunzel is defeated, instead of discarding her, move her to Rapunzel's Tower.\n\nImportant: At the end of Mother Gothel's turn, move Rapunzel one Location toward Corona. If you cannot move Rapunzel because she is already at Corona, Mother Gothel loses 1 Trust."
       },
       {
         "title": "Controlling Rapunzel",
-        "text": "Mother Gothel is able to gain Trust easily when Rapunzel is at Rapunzel's Tower, and keeping her away from Corona is important. Mother Gothel has several ways she controls Rapunzel's location.\n\nMother Knows Best prevents Rapunzel from moving toward Corona at the end of that turn.\n\nPatchy Stabbington and Sideburns Stabbington move Rapunzel to Rapunzel's Tower and are powerful Allies that can be used to defeat Heroes.\n\nNow I'm The Bad Guy moves Rapunzel to Rapunzel's Tower. Mother Gothel loses 1 Trust, but it might be helpful in combination with other actions."
+        "text": "Mother Gothel is able to gain Trust easily when Rapunzel is at Rapunzel's Tower, and keeping her away from Corona is important. Mother Gothel has several ways she controls Rapunzel's Location.\n\nMother Knows Best prevents Rapunzel from moving toward Corona at the end of that turn.\n\nPatchy Stabbington and Sideburns Stabbington move Rapunzel to Rapunzel's Tower and are powerful Allies that can be used to defeat Heroes.\n\nNow I'm The Bad Guy moves Rapunzel to Rapunzel's Tower. Mother Gothel loses 1 Trust, but it might be helpful in combination with other actions."
       },
       {
         "title": "Gaining Trust",
-        "text": "There are several cards that can gain Trust.\n\nWhen Hair Brush is played or moved to Rapunzel's location, gain 1 Trust. This Item is good to play early as it can keep gaining Trust when it is in your Realm.\n\nI Love You Most gains 1 Trust if Mother Gothel is at Rapunzel's location. It is most effective when played at Rapunzel's Tower to gain an additional Trust.\n\nLet Down Your Hair can gain you Trust or move Rapunzel to help keep her away from Corona.\n\nMisdirection gains 1 Trust but moves Rapunzel toward Corona, so it should be used strategically to avoid losing Trust later.\n\nCrown can be used as a way to gain Power each time a Hero is defeated at that location. You can instead choose to discard Crown to gain 1 Trust.\n\nRevenge allows you to perform a Vanquish action and gain 1 Trust if a Hero other than Rapunzel is defeated."
+        "text": "There are several cards that can gain Trust.\n\nWhen Hair Brush is played or moved to Rapunzel's Location, gain 1 Trust. This Item is good to play early as it can keep gaining Trust when it is in your Realm.\n\nI Love You Most gains 1 Trust if Mother Gothel is at Rapunzel's Location. It is most effective when played at Rapunzel's Tower to gain an additional Trust.\n\nLet Down Your Hair can gain you Trust or move Rapunzel to help keep her away from Corona.\n\nMisdirection gains 1 Trust but moves Rapunzel toward Corona, so it should be used strategically to avoid losing Trust later.\n\nCrown can be used as a way to gain Power each time a Hero is defeated at that Location. You can instead choose to discard Crown to gain 1 Trust.\n\nRevenge allows you to perform a Vanquish Action and gain 1 Trust if a Hero other than Rapunzel is defeated."
       },
       {
         "title": "Strategy Tips",
@@ -447,11 +447,11 @@
     ]
   },
   "Horned King": {
-    "objective": "As the Horned King, your goal is to control the world using your Cauldron Born warriors. To do so, you must first claim The Black Cauldron. Once it is in your possession, you must power The Black Cauldron. Finally, you must use The Black Cauldron’s Ability to swap your Ancient Soldiers for Cauldron Born. Once you have Cauldron Born in all four locations, you control the world and win the game!",
+    "objective": "As the Horned King, your Goal is to control the world using your Cauldron Born warriors. To do so, you must first claim The Black Cauldron. Once it is in your possession, you must power The Black Cauldron. Finally, you must use The Black Cauldron’s Ability to swap your Ancient Soldiers for Cauldron Born. Once you have Cauldron Born in all four Locations, you control the world and win the game!",
     "sections": [
       {
         "title": "Special Setup",
-        "text": "The Black Cauldron tile is a Relic, a card type unique to the Horned King. Set The Black Cauldron tile to the side of your Realm. Once you claim it, set it above your portrait on your player board with The Black Cauldron side showing."
+        "text": "The Black Cauldron Tile is a Relic, a card type unique to the Horned King. Set The Black Cauldron Tile to the side of your Realm. Once you claim it, set it above your portrait on your player Board with The Black Cauldron side showing."
       },
       {
         "title": "Claiming The Black Cauldron",
@@ -459,15 +459,15 @@
       },
       {
         "title": "Powering The Black Cauldron",
-        "text": "You may power The Black Cauldron either by playing Our Hour Has Arrived or by using an Activate action to flip the tile and reveal The Power of The Black Cauldron.\n\nThere are no Activate actions in the Horned King's Realm. Ancient Soldiers add an Activate action to their location."
+        "text": "You may power The Black Cauldron either by playing Our Hour Has Arrived or by using an Activate Action to flip the Tile and reveal The Power of The Black Cauldron.\n\nThere are no Activate Actions in the Horned King's Realm. Ancient Soldiers add an Activate Action to their Location."
       },
       {
         "title": "Making Cauldron Born",
-        "text": "You need Ancient Soldiers to make the Cauldron Born.\n\nWith The Power of The Black Cauldron revealed, you can now replace Ancient Soldiers with Cauldron Born. On your turn, before you move to a new location, you may pay 2 Power and discard an Ancient Soldier from your Realm to place a Cauldron Born from your hand into any location."
+        "text": "You need Ancient Soldiers to make the Cauldron Born.\n\nWith The Power of The Black Cauldron revealed, you can now replace Ancient Soldiers with Cauldron Born. On your turn, before you move to a new Location, you may pay 2 Power and discard an Ancient Soldier from your Realm to place a Cauldron Born from your hand into any Location."
       },
       {
         "title": "Gurgi's Sacrifice and The Black Cauldron",
-        "text": "Gurgi's Sacrifice flips The Power of The Black Cauldron back to The Black Cauldron. While The Black Cauldron side is showing, the Horned King discards one Cauldron Born in play at the start of every turn BEFORE moving to a new location. You will need to use an Activate action to flip The Black Cauldron back to The Power of The Black Cauldron to make more Cauldron Born."
+        "text": "Gurgi's Sacrifice flips The Power of The Black Cauldron back to The Black Cauldron. While The Black Cauldron side is showing, the Horned King discards one Cauldron Born in play at the start of every turn BEFORE moving to a new Location. You will need to use an Activate Action to flip The Black Cauldron back to The Power of The Black Cauldron to make more Cauldron Born."
       }
     ]
   },
@@ -484,11 +484,11 @@
       },
       {
         "title": "Remove Obstacles with Allies",
-        "text": "Monsieur D’Arque will help remove Obstacle Tokens by using an Activate action and paying 2 Power."
+        "text": "Monsieur D’Arque will help remove Obstacle Tokens by using an Activate Action and paying 2 Power."
       },
       {
         "title": "Remove Obstacles by Vanquishing Heroes",
-        "text": "Vanquishing Maurice and Beast allows Gaston to remove Obstacles from specific locations in his Realm. If there are no Obstacle Tokens in those locations, no Obstacles are removed."
+        "text": "Vanquishing Maurice and Beast allows Gaston to remove Obstacles from specific Locations in his Realm. If there are no Obstacle Tokens in those Locations, no Obstacles are removed."
       },
       {
         "title": "Replace Obstacles",
@@ -497,7 +497,7 @@
     ]
   },
   "Lady Tremaine": {
-    "objective": "To achieve Lady Tremaine's Objective, the Prince must be played from her Fate deck to The Ballroom, which must be unlocked by playing Invitation From the King, and you must move Ball Gown Drizella or Ball Gown Anastasia to The Ballroom. While there, you must activate the Wedding Bells card.",
+    "objective": "To achieve Lady Tremaine's Objective, the Prince must be played from her Fate Deck to The Ballroom, which must be unlocked by playing Invitation From the King, and you must move Ball Gown Drizella or Ball Gown Anastasia to The Ballroom. While there, you must activate the Wedding Bells card.",
     "sections": [
       {
         "title": "Special Setup",
@@ -505,11 +505,11 @@
       },
       {
         "title": "Going to the Ball",
-        "text": "Once The Ballroom is unlocked by playing Invitation From the King, The Ballroom cannot be re-locked.\n\nOnly four characters can be played or moved to The Ballroom: The Prince (who is played there immediately when revealed), Ball Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia.\n\nWhile in play, Ball Gown Cinderella prevents Ball Gown Drizella or Ball Gown Anastasia from entering The Ballroom. This card has no effect if they are already there.\n\nSweet Nightingale is a powerful Fate card that may slow your progress to The Ballroom by moving any Ally to a new location.\n\nBall Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia can only be played by first playing Cinderella, Drizella, or Anastasia in their everyday dresses then discarding them to play their Ball Gown versions to the same location. This swap requires a Play a Card action. There can never be two versions of a character in play at the same time.\n\nExample: Swap Drizella for Ball Gown Drizella, who is played to the same location.\n\nImportant: Fairy Godmother can play Ball Gown Cinderella even if Cinderella is not in play. If this occurs, you may play Ball Gown Cinderella to any unlocked location."
+        "text": "Once The Ballroom is unlocked by playing Invitation From the King, The Ballroom cannot be re-locked.\n\nOnly four characters can be played or moved to The Ballroom: The Prince (who is played there immediately when revealed), Ball Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia.\n\nWhile in play, Ball Gown Cinderella prevents Ball Gown Drizella or Ball Gown Anastasia from entering The Ballroom. This card has no effect if they are already there.\n\nSweet Nightingale is a powerful Fate card that may slow your progress to The Ballroom by moving any Ally to a new Location.\n\nBall Gown Cinderella, Ball Gown Drizella, and Ball Gown Anastasia can only be played by first playing Cinderella, Drizella, or Anastasia in their everyday dresses then discarding them to play their Ball Gown versions to the same Location. This swap requires a Play a Card Action. There can never be two versions of a character in play at the same time.\n\nExample: Swap Drizella for Ball Gown Drizella, who is played to the same Location.\n\nImportant: Fairy Godmother can play Ball Gown Cinderella even if Cinderella is not in play. If this occurs, you may play Ball Gown Cinderella to any unlocked Location."
       },
       {
         "title": "Trapped!",
-        "text": "Cards like Lucifer, The Key, and Trapped allow you to place a Trapped Token on a Hero in your Realm. When a Hero has a Trapped Token, their Ability is ignored, as if the card has no Ability at all. The card still remains in play and blocks your actions. If a Trapped Hero is removed and placed in the Fate discard pile, remove the Trapped Token as well.\n\nBall Gown Cinderella cannot be Trapped by any card, although she can still be moved using the Activate action of The Key.\n\nLady Tremaine has no Vanquish actions. However, players can use Activate actions to discard or defeat Fate cards from play. Cards such as Lady Tremaine’s Cane, Midnight, and You Little Thief all remove specific Hero and Item cards from your Realm."
+        "text": "Cards like Lucifer, The Key, and Trapped allow you to place a Trapped Token on a Hero in your Realm. When a Hero has a Trapped Token, their Ability is ignored, as if the card has no Ability at all. The card still remains in play and blocks your actions. If a Trapped Hero is removed and placed in the Fate discard pile, remove the Trapped Token as well.\n\nBall Gown Cinderella cannot be Trapped by any card, although she can still be moved using the Activate Action of The Key.\n\nLady Tremaine has no Vanquish Actions. However, players can use Activate Actions to discard or defeat Fate cards from play. Cards such as Lady Tremaine’s Cane, Midnight, and You Little Thief all remove specific Hero and Item cards from your Realm."
       },
       {
         "title": "Glass Slippers",
@@ -526,7 +526,7 @@
       },
       {
         "title": "How to Win",
-        "text": "Oogie Boogie knows the only way to become the ruler of Halloween Town is to defeat Jack Skellington, but Jack is the Impostor Sandy Claws. Oogie Boogie must play Impostor Sandy Claws cards from his Villain deck. The more Impostor Sandy Claws cards that are successfully played, the closer Jack is to remembering who he is and coming back to face Oogie Boogie."
+        "text": "Oogie Boogie knows the only way to become the ruler of Halloween Town is to defeat Jack Skellington, but Jack is the Impostor Sandy Claws. Oogie Boogie must play Impostor Sandy Claws cards from his Villain Deck. The more Impostor Sandy Claws cards that are successfully played, the closer Jack is to remembering who he is and coming back to face Oogie Boogie."
       },
       {
         "title": "Impostor Jack",
@@ -538,36 +538,36 @@
       },
       {
         "title": "Dice Hijinx",
-        "text": "Oogie Boogie cheats, especially when it comes to dice rolls. He even has cards that say so! After any dice rolls, Oogie Boogie may play Loaded Dice immediately (no Play a Card action needed). Loaded Dice allows Oogie Boogie to reroll one of the dice he just rolled.\n\nTo slow down the cheating Oogie Boogie, place the Fate card Hello, Oogie! under the Oogie Boogie mover. Hello, Oogie! reduces the next dice roll result by 2, after any rerolls. You may stack Hello, Oogie! cards and subtract that total. Discard Hello, Oogie! after rolling the dice."
+        "text": "Oogie Boogie cheats, especially when it comes to dice rolls. He even has cards that say so! After any dice rolls, Oogie Boogie may play Loaded Dice immediately (no Play a Card Action needed). Loaded Dice allows Oogie Boogie to reroll one of the dice he just rolled.\n\nTo slow down the cheating Oogie Boogie, place the Fate card Hello, Oogie! under the Oogie Boogie mover. Hello, Oogie! reduces the next dice roll result by 2, after any rerolls. You may stack Hello, Oogie! cards and subtract that total. Discard Hello, Oogie! after rolling the dice."
       },
       {
         "title": "Changes to Strength",
-        "text": "Use +1/-1 Strength tokens to indicate changes to Hero and Ally Strength."
+        "text": "Use +1/-1 Strength Tokens to indicate changes to Hero and Ally Strength."
       }
     ]
   },
   "Sanderson Sisters": {
-    "objective": "The Sanderson Sisters, Winifred, Mary and Sarah, all want one thing: to live forever! To do this cursed action, they must brew the Life Potion and give it to either Max, Dani, or Allison, the heroes trying to stop them. By cursing Salem and brewing the potion, the Sanderson Sisters will be younger, more beautiful, live forever and be the evilest Villains ever!",
+    "objective": "The Sanderson Sisters, Winifred, Mary and Sarah, all want one thing: to live forever! To do this cursed action, they must brew the Life Potion and give it to either Max, Dani, or Allison, the Heroes trying to stop them. By cursing Salem and brewing the potion, the Sanderson Sisters will be younger, more beautiful, live forever and be the evilest Villains ever!",
     "sections": [
       {
         "title": "Setup",
-        "text": "Stack the Recipe cards in numerical order near your Realm. Flip the top card so the cards look like a book. Place the Witches' Cauldron tile, the Ingredient tokens, and the Life Potion token near your Realm."
+        "text": "Stack the Recipe cards in numerical order near your Realm. Flip the top card so the cards look like a book. Place the Witches' Cauldron Tile, the Ingredient Tokens, and the Life Potion Token near your Realm."
       },
       {
         "title": "Sanderson Sisters",
-        "text": "In addition to the mover, each of the Sanderson Sisters has a Witch card. The Witches have an ability that gives them more strength the more Witches are in play. The Witches are considered Allies."
+        "text": "In addition to the mover, each of the Sanderson Sisters has a Witch card. The Witches have an Ability that gives them more Strength the more Witches are in play. The Witches are considered Allies."
       },
       {
         "title": "Brewing the Life Potion",
-        "text": "There are 6 pages to creating the Life Potion. You must complete the requirement on each card in order to brew the horrible elixir. When revealing cards, reveal them like a book.\n\nOnce the recipe for the ingredient is completed, take the corresponding token and place it in the Witches' Cauldron, then move on to the next recipe card to add the next ingredient. Only one ingredient can be added per turn.\n\n• Witches' Cauldron: When a Witch is played to the Sanderson Sisters' Cottage, place the Witches' Cauldron tile near your Realm.\n\n• Oil of Boil: When you spend 5 or more Power on your turn, place Oil of Boil token on the Witches' Cauldron tile.\n\n• Dead Man's Toe: When you Vanquish a Hero, place Dead Man's Toe token on the Witches' Cauldron tile.\n\n• Newt Saliva: When you have a Witch or Ally in three different locations, place Newt Saliva token on the Witches' Cauldron tile.\n\n• Dash of Pox: When you have two or more Heroes at Dennisons' House, place Dash of Pox token on the Witches' Cauldron tile.\n\n• Thine Own Tongue: When you perform three Activate actions on the same turn, place Thine Own Tongue token on the Witches' Cauldron tile."
+        "text": "There are 6 pages to creating the Life Potion. You must complete the requirement on each card in order to brew the horrible elixir. When revealing cards, reveal them like a book.\n\nOnce the recipe for the Ingredient is completed, take the corresponding token and place it in the Witches' Cauldron, then move on to the next recipe card to add the next Ingredient. Only one Ingredient can be added per turn.\n\n• Witches' Cauldron: When a Witch is played to the Sanderson Sisters' Cottage, place the Witches' Cauldron Tile near your Realm.\n\n• Oil of Boil: When you spend 5 or more Power on your turn, place Oil of Boil Token on the Witches' Cauldron Tile.\n\n• Dead Man's Toe: When you Vanquish a Hero, place Dead Man's Toe Token on the Witches' Cauldron Tile.\n\n• Newt Saliva: When you have a Witch or Ally in three different Locations, place Newt Saliva Token on the Witches' Cauldron Tile.\n\n• Dash of Pox: When you have two or more Heroes at Dennisons' House, place Dash of Pox Token on the Witches' Cauldron Tile.\n\n• Thine Own Tongue: When you perform three Activate Actions on the same turn, place Thine Own Tongue Token on the Witches' Cauldron Tile."
       },
       {
         "title": "Using the Life Potion",
-        "text": "When you have brewed the Life Potion, attach the token to a Hero in play. If there is no Hero in play, you must attach it to the next Hero played. If that Hero is somehow removed from play, attach it to next Hero that is played.\n\nAll three Witch cards (the Sisters themselves), the Life Potion, and the mover must be in the same location with a Hero. Vanquish the Hero to achieve your Objective.\n\nNote: Binx cannot be defeated with the Life Potion."
+        "text": "When you have brewed the Life Potion, attach the token to a Hero in play. If there is no Hero in play, you must attach it to the next Hero played. If that Hero is somehow removed from play, attach it to next Hero that is played.\n\nAll three Witch cards (the Sisters themselves), the Life Potion, and the mover must be in the same Location with a Hero. Vanquish the Hero to achieve your Objective.\n\nNote: Binx cannot be defeated with the Life Potion."
       },
       {
         "title": "Hallowed Ground and Salt",
-        "text": "Hallowed Ground has different Fate Item rules. It is attached to a location and not a Hero. It blocks any actions in that location as a Hero does. You cannot take a Vanquish action at a location with Hallowed Ground. Salt works just like any normal Fate Item."
+        "text": "Hallowed Ground has different Fate Item rules. It is attached to a Location and not a Hero. It blocks any actions in that Location as a Hero does. You cannot take a Vanquish Action at a Location with Hallowed Ground. Salt works just like any normal Fate Item."
       }
     ]
   },
@@ -576,27 +576,27 @@
     "sections": [
       {
         "title": "Setup",
-        "text": "Start the game with the Realm on the unfrozen side.\n\nPlace a Frozen Ring token over one action in each location. Place the rest near your board."
+        "text": "Start the game with the Realm on the unfrozen side.\n\nPlace a Frozen Ring Token over one action in each Location. Place the rest near your Board."
       },
       {
         "title": "The Freezing of Arendelle",
-        "text": "Elsa has lost control of her powers and is freezing Arendelle in an endless winter.\n\nPlace Frozen Ring tokens over the various actions in the Realm. Hans can use any uncovered action, frozen or not. You can place Frozen Ring tokens on actions covered by Heroes. Cards like Monster! and Sorcery! help Hans place Frozen Ring tokens on his Realm.\n\nNote: Prince Hans can play a Frozen Ring token to any location if he defeats a Hero in a Vanquish action."
+        "text": "Elsa has lost control of her powers and is freezing Arendelle in an endless winter.\n\nPlace Frozen Ring Tokens over the various actions in the Realm. Hans can use any uncovered action, frozen or not. You can place Frozen Ring Tokens on actions covered by Heroes. Cards like Monster! and Sorcery! help Hans place Frozen Ring Tokens on his Realm.\n\nNote: Prince Hans can play a Frozen Ring Token to any Location if he defeats a Hero in a Vanquish Action."
       },
       {
         "title": "The Endless Winter",
-        "text": "Once all sixteen actions on the Realm are covered with Frozen Ring tokens, remove all tokens, note the locations of Prince Hans, Allies and Heroes, then flip over the entire Realm. Place Prince Hans, Allies and Heroes back at the same locations in the Frozen Realm. Place Frozen Ring tokens over two actions in each location. This ends Prince Hans' turn.\n\nHans must again fill actions with Frozen Ring tokens. Once a frozen location has 4 Frozen Ring tokens on it, it is considered fully frozen."
+        "text": "Once all sixteen actions on the Realm are covered with Frozen Ring Tokens, remove all tokens, note the Locations of Prince Hans, Allies and Heroes, then flip over the entire Realm. Place Prince Hans, Allies and Heroes back at the same Locations in the Frozen Realm. Place Frozen Ring Tokens over two actions in each Location. This ends Prince Hans' turn.\n\nHans must again fill actions with Frozen Ring Tokens. Once a frozen Location has 4 Frozen Ring Tokens on it, it is considered fully frozen."
       },
       {
         "title": "The Duke and His Guards",
-        "text": "When Prince Hans moves to the Duke of Weselton's location, you may trigger the Duke's ability any time during that turn.\n\nFrancis' and Erik's abilities are always active and both can be triggered whenever an Effect is played."
+        "text": "When Prince Hans moves to the Duke of Weselton's Location, you may trigger the Duke's Ability any time during that turn.\n\nFrancis' and Erik's Abilities are always active and both can be triggered whenever an Effect is played."
       },
       {
         "title": "The Power of Elsa!",
-        "text": "Elsa has a very powerful ability. Prince Hans cannot perform an action at Elsa's location if it has a Frozen Ring token on it. Prince Hans can counter that restriction with I Love Crazy and So Desperate For Love to gain actions."
+        "text": "Elsa has a very powerful Ability. Prince Hans cannot perform an action at Elsa's Location if it has a Frozen Ring Token on it. Prince Hans can counter that restriction with I Love Crazy and So Desperate For Love to gain actions."
       },
       {
         "title": "The Sisters",
-        "text": "Once any location is fully frozen, Prince Hans may Vanquish Elsa or Anna there. If either sister is Vanquished at a fully frozen location, they are not discarded. Instead, they are given to Prince Hans to set aside. That character is no longer in the game. Once Prince Hans has both sisters, he truly is the most Villainous of Kings!\n\nNote: Anna and Elsa do not need to be defeated on the same turn or at the same fully frozen location to win the game."
+        "text": "Once any Location is fully frozen, Prince Hans may Vanquish Elsa or Anna there. If either sister is Vanquished at a fully frozen Location, they are not discarded. Instead, they are given to Prince Hans to set aside. That character is no longer in the game. Once Prince Hans has both sisters, he truly is the most Villainous of Kings!\n\nNote: Anna and Elsa do not need to be defeated on the same turn or at the same fully frozen Location to win the game."
       }
     ]
   },
@@ -605,24 +605,24 @@
     "sections": [
       {
         "title": "Setup",
-        "text": "Place the photo cards near Ernesto's realm as shown. The top right card should be face down to start the game."
+        "text": "Place the photo cards near Ernesto's Realm as shown. The top right card should be face down to start the game."
       },
       {
         "title": "The Photo",
-        "text": "The one item that can drag down the powerful Ernesto de la Cruz is the photo of Héctor, Mamá Imelda and Coco Rivera, so it must be destroyed. The photo is destroyed when all six cards are face down.\n\nErnesto has multiple cards in his deck to help him flip sections of the photo. One of the most powerful is Forgetting Me. Choose a card and flip all adjacent cards. It may be two or three cards, depending on what card is chosen.\n\nSeize Your Moment is a powerful card; it allows multiple photo cards to be flipped. Ernesto must discard at least one Ally before discarding any Heroes at that location (including Héctor Rivera)."
+        "text": "The one Item that can drag down the powerful Ernesto de la Cruz is the photo of Héctor, Mamá Imelda and Coco Rivera, so it must be destroyed. The photo is destroyed when all six cards are face down.\n\nErnesto has multiple cards in his deck to help him flip sections of the photo. One of the most powerful is Forgetting Me. Choose a card and flip all adjacent cards. It may be two or three cards, depending on what card is chosen.\n\nSeize Your Moment is a powerful card; it allows multiple photo cards to be flipped. Ernesto must discard at least one Ally before discarding any Heroes at that Location (including Héctor Rivera)."
       },
       {
         "title": "The Rivera Family",
-        "text": "Miguel is both helpful and harmful to Ernesto de la Cruz, depending on who is playing or moving the card. Flip a card when Miguel is played; he can reveal or hide photo cards. When Miguel is moved, he may reveal or hide photo cards based on his new location."
+        "text": "Miguel is both helpful and harmful to Ernesto de la Cruz, depending on who is playing or moving the card. Flip a card when Miguel is played; he can reveal or hide photo cards. When Miguel is moved, he may reveal or hide photo cards based on his new Location."
       },
       {
         "title": "Héctor Rivera",
-        "text": "Ernesto cannot win the game if Héctor is in play, even if all the photo cards are face down. Héctor's Strength is always equal to 1 plus the number of face-up photo cards. His Strength can and will change multiple times during Ernesto's turns. The card's Strength must be confirmed before any Vanquish action occurs."
+        "text": "Ernesto cannot win the game if Héctor is in play, even if all the photo cards are face down. Héctor's Strength is always equal to 1 plus the number of face-up photo cards. His Strength can and will change multiple times during Ernesto's turns. The card's Strength must be confirmed before any Vanquish Action occurs."
       }
     ]
   },
   "Lotso": {
-    "objective": "Lotso wants to keep new toys in the Caterpillar room.\n\nYou need access to all the Strength Modifier tokens.",
+    "objective": "Lotso wants to keep new toys in the Caterpillar room.\n\nYou need access to all the Strength Modifier Tokens.",
     "sections": [
       {
         "title": "Special Setup",
@@ -630,7 +630,7 @@
       },
       {
         "title": "Reducing Heroes' Strength",
-        "text": "Lotso has two ways to reduce Heroes' Strength: with Vanquish actions and with cards. To reduce a Hero's Strength, add Strength modifier tokens to the card. For example, to reduce a Hero's Strength to 0, put Strength tokens equal to the Hero's current total Strength on their card.\n\nImportant: Unlike the normal rules, if a Hero in Lotso's Realm is at 0 Strength, they cannot use their ability.\n\nWhen Lotso Vanquishes a Hero, he does not discard them from his Realm. Instead, he reduces their Strength to 0 using Strength tokens. The Hero stays on Lotso's Realm where they are. Lotso still discards the Ally or Allies used in the Vanquish action.\n\nLotso can also reduce Strength with specific cards like Patrolling All Night Long and New Toys Don't Stand A Chance. The Bookworm allows Lotso to lose Power to reduce a Hero's Strength by the same amount. Where's Your Kid Now? allows Lotso to reduce the Strength of any Hero in his location to 0. While Woody's Hat is in Lotso's Realm, it reduces the Strength of all Heroes in Lotso's Realm except Woody."
+        "text": "Lotso has two ways to reduce Heroes' Strength: with Vanquish Actions and with cards. To reduce a Hero's Strength, add Strength Modifier Tokens to the card. For example, to reduce a Hero's Strength to 0, put Strength Tokens equal to the Hero's current total Strength on their card.\n\nImportant: Unlike the normal rules, if a Hero in Lotso's Realm is at 0 Strength, they cannot use their Ability.\n\nWhen Lotso Vanquishes a Hero, he does not discard them from his Realm. Instead, he reduces their Strength to 0 using Strength Tokens. The Hero stays on Lotso's Realm where they are. Lotso still discards the Ally or Allies used in the Vanquish Action.\n\nLotso can also reduce Strength with specific cards like Patrolling All Night Long and New Toys Don't Stand A Chance. The Bookworm allows Lotso to lose Power to reduce a Hero's Strength by the same amount. Where's Your Kid Now? allows Lotso to reduce the Strength of any Hero in his Location to 0. While Woody's Hat is in Lotso's Realm, it reduces the Strength of all Heroes in Lotso's Realm except Woody."
       },
       {
         "title": "The Caterpillar Room",
@@ -638,11 +638,11 @@
       },
       {
         "title": "Controlling Lotso's Fate",
-        "text": "Some Heroes are more difficult for Lotso to subdue. For example, Rex's Strength can only be reduced by cards or by a Vanquish action if he is the only Hero in a location. Hamm can only be Vanquished by two or more Allies."
+        "text": "Some Heroes are more difficult for Lotso to subdue. For example, Rex's Strength can only be reduced by cards or by a Vanquish Action if he is the only Hero in a Location. Hamm can only be Vanquished by two or more Allies."
       },
       {
         "title": "Buzz Lightyear",
-        "text": "Depending on his settings, Buzz Lightyear can be either Lotso's Ally or a Guardian of Heroes.\n\nBuzz Lightyear starts as a Guardian. He is not considered a Hero and cannot be targeted by Vanquish actions. Original Factory Settings flips Buzz Lightyear to Demo Mode Buzz Lightyear, Lotso's Ally. Flip over the tile and move Demo Mode Buzz Lightyear to the bottom of Lotso's Realm.\n\nDemo Mode Buzz Lightyear cannot be discarded from Lotso's Realm. Cards targeting Allies, such as Jessie and Lotso Was Special, do not affect Demo Mode Buzz Lightyear. Spanish Mode can flip Buzz Lightyear back to his Guardian side. Flip over the tile and move it back to the top of Lotso's Realm.\n\nEither Buzz Lightyear or Demo Mode Buzz Lightyear must be in the Caterpillar Room for Lotso to win."
+        "text": "Depending on his settings, Buzz Lightyear can be either Lotso's Ally or a Guardian of Heroes.\n\nBuzz Lightyear starts as a Guardian. He is not considered a Hero and cannot be targeted by Vanquish Actions. Original Factory Settings flips Buzz Lightyear to Demo Mode Buzz Lightyear, Lotso's Ally. Flip over the Tile and move Demo Mode Buzz Lightyear to the bottom of Lotso's Realm.\n\nDemo Mode Buzz Lightyear cannot be discarded from Lotso's Realm. Cards targeting Allies, such as Jessie and Lotso Was Special, do not affect Demo Mode Buzz Lightyear. Spanish Mode can flip Buzz Lightyear back to his Guardian side. Flip over the Tile and move it back to the top of Lotso's Realm.\n\nEither Buzz Lightyear or Demo Mode Buzz Lightyear must be in the Caterpillar Room for Lotso to win."
       }
     ]
   },
@@ -651,23 +651,23 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Separate Merlin's Transformation deck from Madam Mim's Fate deck. Take the top card from Merlin's Transformation deck and place it face up at the Dueling Ground."
+        "text": "Separate Merlin's Transformation Deck from Madam Mim's Fate Deck. Take the top card from Merlin's Transformation Deck and place it face up at the Dueling Ground."
       },
       {
         "title": "Madam Mim's Transformations",
-        "text": "Madam Mim does not have Allies. Instead, she has Transformations, the different animal forms she takes in the Wizard's Duel against Merlin. Merlin also has Transformations, each of which can be defeated by specific Mim Transformations. There are no Heroes in Madam Mim's Fate deck.\n\nMim's Transformations are counted as Allies for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Mim Transformations on her Realm to determine how many \"Allies\" are in her Realm.\n\nThe Move an Item or Ally action allows you to move a Mim Transformation card."
+        "text": "Madam Mim does not have Allies. Instead, she has Transformations, the different animal forms she takes in the Wizard's Duel against Merlin. Merlin also has Transformations, each of which can be defeated by specific Mim Transformations. There are no Heroes in Madam Mim's Fate Deck.\n\nMim's Transformations are counted as Allies for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Mim Transformations on her Realm to determine how many \"Allies\" are in her Realm.\n\nThe Move an Item or Ally Action allows you to move a Mim Transformation card."
       },
       {
         "title": "Merlin's Transformations",
-        "text": "Merlin's Transformation deck only contains Merlin Transformations. There will always be at least one Merlin Transformation card in Madam Mim's Realm. Once a Merlin Transformation card is defeated, discard the card from your Realm into a separate discard pile just for Merlin Transformation cards. Then, immediately reveal and play a new Merlin Transformation card to the Dueling Ground. If there are no more cards in Merlin's Transformation deck and no Merlin Transformations in Madam Mim's Realm, Madam Mim wins the game.\n\nMerlin's Transformations are counted as Heroes for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Merlin Transformations on her Realm to determine how many \"Heroes\" are in her Realm. Also, if Madam Mim defeats a Merlin Transformation, this counts as defeating a Hero. The Move a Hero action allows you to move a Merlin Transformation card."
+        "text": "Merlin's Transformation Deck only contains Merlin Transformations. There will always be at least one Merlin Transformation card in Madam Mim's Realm. Once a Merlin Transformation card is defeated, discard the card from your Realm into a separate discard pile just for Merlin Transformation cards. Then, immediately reveal and play a new Merlin Transformation card to the Dueling Ground. If there are no more cards in Merlin's Transformation Deck and no Merlin Transformations in Madam Mim's Realm, Madam Mim wins the game.\n\nMerlin's Transformations are counted as Heroes for the sake of opponents' Condition cards. For example, Madam Mim's opponents should count the number of Merlin Transformations on her Realm to determine how many \"Heroes\" are in her Realm. Also, if Madam Mim defeats a Merlin Transformation, this counts as defeating a Hero. The Move a Hero Action allows you to move a Merlin Transformation card."
       },
       {
         "title": "Madam Mim's Fate Deck",
-        "text": "Madam Mim has few Fate cards. When Madam Mim is the target of a Fate action, her opponent draws from this deck. Since there are so few cards, it may need to be reshuffled often.\n\nArchimedes can interfere with Madam Mim's plans by replacing one Merlin Transformation with another. First, a Merlin Transformation is played to the same location as a Merlin Transformation (or Transformations) already in your Realm. Then, your opponent will choose one of the Merlin Transformations at that location and shuffle it back into Merlin's deck."
+        "text": "Madam Mim has few Fate cards. When Madam Mim is the target of a Fate Action, her opponent draws from this deck. Since there are so few cards, it may need to be reshuffled often.\n\nArchimedes can interfere with Madam Mim's plans by replacing one Merlin Transformation with another. First, a Merlin Transformation is played to the same Location as a Merlin Transformation (or Transformations) already in your Realm. Then, your opponent will choose one of the Merlin Transformations at that Location and shuffle it back into Merlin's deck."
       },
       {
         "title": "A Wizard's Duel",
-        "text": "Madam Mim has no Vanquish actions. Instead, each of her Transformations adds a Vanquish action to its location.\n\nEach of Mim's Transformations can only defeat specific Merlin Transformations:\n\n• Crocodile Mim Vanquishes Turtle Merlin\n\n• Fox Mim Vanquishes Rabbit Merlin\n\n• Chicken Mim Vanquishes Caterpillar Merlin\n\n• Elephant Mim Vanquishes Walrus Merlin\n\n• Tiger Mim Vanquishes Mouse Merlin\n\n• Rattlesnake Mim Vanquishes Mouse Merlin\n\n• Rhinoceros Mim Vanquishes Crab Merlin\n\n• Purple Dragon Mim Vanquishes Goat Merlin\n\nI'll Make the Rules allows Madam Mim to defeat any Merlin Transformation in play."
+        "text": "Madam Mim has no Vanquish Actions. Instead, each of her Transformations adds a Vanquish Action to its Location.\n\nEach of Mim's Transformations can only defeat specific Merlin Transformations:\n\n• Crocodile Mim Vanquishes Turtle Merlin\n\n• Fox Mim Vanquishes Rabbit Merlin\n\n• Chicken Mim Vanquishes Caterpillar Merlin\n\n• Elephant Mim Vanquishes Walrus Merlin\n\n• Tiger Mim Vanquishes Mouse Merlin\n\n• Rattlesnake Mim Vanquishes Mouse Merlin\n\n• Rhinoceros Mim Vanquishes Crab Merlin\n\n• Purple Dragon Mim Vanquishes Goat Merlin\n\nI'll Make the Rules allows Madam Mim to defeat any Merlin Transformation in play."
       }
     ]
   },
@@ -675,52 +675,52 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Place Omnidroid v.X8 at Nomanisan Island at the bottom of Syndrome's Realm. Set the Omnidroid v.X9 tile on top of the Omnidroid v.10 tile and place both to the right side of your Realm."
+        "text": "Place Omnidroid v.X8 at Nomanisan Island at the bottom of Syndrome's Realm. Set the Omnidroid v.X9 Tile on top of the Omnidroid v.10 Tile and place both to the right side of your Realm."
       },
       {
         "title": "Using Omnidroids",
-        "text": "Syndrome can use Omnidroids in a Vanquish action, along with any Allies. All Omnidroids can be moved using the Move an Item or Ally action while at the bottom of Syndrome's Realm. Syndrome cannot move Omnidroids at the top of his Realm."
+        "text": "Syndrome can use Omnidroids in a Vanquish Action, along with any Allies. All Omnidroids can be moved using the Move an Item or Ally Action while at the bottom of Syndrome's Realm. Syndrome cannot move Omnidroids at the top of his Realm."
       },
       {
         "title": "Defeating an Omnidroid",
-        "text": "Omnidroid v.X8 and Omnidroid v.X9 have a unique ability that triggers only after they have been defeated in a Vanquish action. Once Vanquished, use their Ability before removing the tile. That tile will no longer be used in this game. Omnidroid v.X8 must be defeated before Omnidroid v.X9 is played, and Omnidroid v.X9 must be defeated before Omnidroid v.10 can be played."
+        "text": "Omnidroid v.X8 and Omnidroid v.X9 have a unique Ability that triggers only after they have been defeated in a Vanquish Action. Once Vanquished, use their Ability before removing the Tile. That Tile will no longer be used in this game. Omnidroid v.X8 must be defeated before Omnidroid v.X9 is played, and Omnidroid v.X9 must be defeated before Omnidroid v.10 can be played."
       },
       {
         "title": "Upgrading Omnidroids",
-        "text": "Upgrade to Omnidroid v.X9 or v.10 by removing the correct number of Major Modifications from your Realm and placing the new Omnidroid tile in the location indicated. This is a free action with no Power Cost and can be done anytime during Syndrome's turn. Place removed cards into the discard pile.\n\nImportant: There can never be more than one Omnidroid card in Syndrome's Realm at any time."
+        "text": "Upgrade to Omnidroid v.X9 or v.10 by removing the correct number of Major Modifications from your Realm and placing the new Omnidroid Tile in the Location indicated. This is a free action with no Power Cost and can be done anytime during Syndrome's turn. Place removed cards into the discard pile.\n\nImportant: There can never be more than one Omnidroid card in Syndrome's Realm at any time."
       },
       {
         "title": "Syndrome's Remote",
-        "text": "Syndrome cannot win the game unless Syndrome's Remote is in his Realm. When Syndrome is in Omnidroid v.10's location and Syndrome's Remote is at the bottom of his Realm, he must activate the Remote to defeat Omnidroid v.10.\n\nWhen a Hero is played to Syndrome's Realm, attach Syndrome's Remote to them and immediately move Omnidroid v.10 to the bottom of Syndrome's Realm at the same location of the Hero with Syndrome's Remote.\n\nOnce a Hero with Syndrome's Remote has been defeated, Syndrome's Remote moves back to the bottom of Syndrome's Realm. Omnidroid v.10 then moves to the top of Syndrome's Realm.\n\nSyndrome's Remote can be moved using the Move an Item or Ally action while on the bottom of Syndrome's Realm."
+        "text": "Syndrome cannot win the game unless Syndrome's Remote is in his Realm. When Syndrome is in Omnidroid v.10's Location and Syndrome's Remote is at the bottom of his Realm, he must activate the Remote to defeat Omnidroid v.10.\n\nWhen a Hero is played to Syndrome's Realm, attach Syndrome's Remote to them and immediately move Omnidroid v.10 to the bottom of Syndrome's Realm at the same Location of the Hero with Syndrome's Remote.\n\nOnce a Hero with Syndrome's Remote has been defeated, Syndrome's Remote moves back to the bottom of Syndrome's Realm. Omnidroid v.10 then moves to the top of Syndrome's Realm.\n\nSyndrome's Remote can be moved using the Move an Item or Ally Action while on the bottom of Syndrome's Realm."
       },
       {
         "title": "Omnidroid v.10",
-        "text": "Omnidroid v.10 is initially played to Downtown Metroville. If Syndrome's Remote is not in Syndrome's Realm, play Omnidroid v.10 to the top of Syndrome's Realm. Omnidroid v.10 is not discarded when used in a Vanquish action.\n\nWhen Omnidroid v.10 has been defeated by using Syndrome's Remote, flip the tile over. Omnidroid v.10 can no longer be moved."
+        "text": "Omnidroid v.10 is initially played to Downtown Metroville. If Syndrome's Remote is not in Syndrome's Realm, play Omnidroid v.10 to the top of Syndrome's Realm. Omnidroid v.10 is not discarded when used in a Vanquish Action.\n\nWhen Omnidroid v.10 has been defeated by using Syndrome's Remote, flip the Tile over. Omnidroid v.10 can no longer be moved."
       },
       {
         "title": "Reducing Strength",
-        "text": "To reduce a Hero's Strength, add Strength tokens to the Hero card. For example, to reduce a Hero's Strength to 0, put Strength tokens equal to their current total Strength on their card."
+        "text": "To reduce a Hero's Strength, add Strength Tokens to the Hero card. For example, to reduce a Hero's Strength to 0, put Strength Tokens equal to their current total Strength on their card."
       }
     ]
   },
   "Davy Jones": {
-    "objective": "The near-immortal Davy Jones, captain of the Flying Dutchman, is the judge over life and death on the seas. When he has control of all his mystic items, he not only controls the seas, but is worshiped and feared by all who sail those waters. Now Jack Sparrow has launched a series of events forcing Davy Jones to find and reclaim his treasures scattered among the Heroes. Davy Jones must find the Heroes and collect his treasures to take his rightful place as the ultimate ruler of all the seas!",
+    "objective": "The near-immortal Davy Jones, captain of the Flying Dutchman, is the judge over life and death on the seas. When he has control of all his mystic Items, he not only controls the seas, but is worshiped and feared by all who sail those waters. Now Jack Sparrow has launched a series of events forcing Davy Jones to find and reclaim his Treasures scattered among the Heroes. Davy Jones must find the Heroes and collect his Treasures to take his rightful place as the ultimate ruler of all the seas!",
     "sections": [
       {
         "title": "Lost Treasures Setup",
-        "text": "Place the five Treasure tokens face down off to the side of your realm, then mix them up. Davy Jones places a facedown Treasure token on Heroes when he plays the cards Do You Fear Death? and They're Here."
+        "text": "Place the five Treasure Tokens face down off to the side of your Realm, then mix them up. Davy Jones places a facedown Treasure Token on Heroes when he plays the cards Do You Fear Death? and They're Here."
       },
       {
         "title": "Collecting Treasure",
-        "text": "To collect a Treasure, Davy Jones must first reveal it and then defeat the Hero that Treasure is attached to. Certain cards, such as Bootstrap Bill, Hadras, and The Black Spot, reveal facedown tokens.\n\nIf Davy Jones defeats a Hero with a facedown Treasure token, that token is returned to the starting supply of tokens.\n\nNote: A Hero may only have one Treasure token attached to them at a time."
+        "text": "To collect a Treasure, Davy Jones must first reveal it and then defeat the Hero that Treasure is attached to. Certain cards, such as Bootstrap Bill, Hadras, and The Black Spot, reveal facedown tokens.\n\nIf Davy Jones defeats a Hero with a facedown Treasure Token, that token is returned to the starting supply of tokens.\n\nNote: A Hero may only have one Treasure Token attached to them at a time."
       },
       {
         "title": "The Power of the Treasures",
-        "text": "Each Treasure token has a unique ability. When the token is revealed, that ability will affect the Hero or make it harder for Davy Jones to retrieve his property. The Treasure tokens take effect immediately when they are revealed.\n\n• The Key: When The Key is revealed docard your hand.\n\n• The Heart: When The Heart is collected lose all Power.\n\n• Treasure Chest: Allies cannot be played to this location.\n\n• Music Box: The Kraken cannot be used to defeat this Hero.\n\n• Jack's Compass: This Hero gets +2 Strength."
+        "text": "Each Treasure Token has a unique Ability. When the token is revealed, that Ability will affect the Hero or make it harder for Davy Jones to retrieve his property. The Treasure Tokens take effect immediately when they are revealed.\n\n• The Key: When The Key is revealed docard your hand.\n\n• The Heart: When The Heart is collected lose all Power.\n\n• Treasure Chest: Allies cannot be played to this Location.\n\n• Music Box: The Kraken cannot be used to defeat this Hero.\n\n• Jack's Compass: This Hero gets +2 Strength."
       },
       {
         "title": "Those Pesky Heroes",
-        "text": "Heroes can make it difficult for Davy Jones to find his treasures. Where Does It Point? and Curse You, Jack Sparrow keep Davy Jones guessing on where the Heroes might be and what Treasure they may hold."
+        "text": "Heroes can make it difficult for Davy Jones to find his Treasures. Where Does It Point? and Curse You, Jack Sparrow keep Davy Jones guessing on where the Heroes might be and what Treasure they may hold."
       }
     ]
   },
@@ -729,32 +729,32 @@
     "sections": [
       {
         "title": "Special Setup",
-        "text": "Tamatoa uses a third deck called the Maui deck. Place the deck close to your Villain deck."
+        "text": "Tamatoa uses a third deck called the Maui Deck. Place the deck close to your Villain Deck."
       },
       {
         "title": "The Maui Deck",
-        "text": "The Maui deck is a mysterious bag of effects. Tamatoa draws a Maui card while Maui is in play and before Tamatoa moves to a new location. The effects of the Maui card are immediate and may change what happens during that turn. Tamatoa also may play Not Exactly Maui Time to reveal a card and either play or discard it."
+        "text": "The Maui Deck is a mysterious bag of effects. Tamatoa draws a Maui card while Maui is in play and before Tamatoa moves to a new Location. The effects of the Maui card are immediate and may change what happens during that turn. Tamatoa also may play Not Exactly Maui Time to reveal a card and either play or discard it."
       },
       {
         "title": "Maui's Hook",
-        "text": "Maui's Hook can be found in Tamatoa's Villain deck. Tamatoa can play it as an Item card that is not attached to an Ally. While Maui's Hook is on Tamatoa's side of the Realm, Tamatoa gains 2 Power cach time he is Fated. The Fate card Maui Time finds Maui and automatically finds and attaches Maui's Hook to him. If Maui is defeated while Maui's Hook is attached to him, move Maui's Hook to Tamatoa's side of the Realm at that location."
+        "text": "Maui's Hook can be found in Tamatoa's Villain Deck. Tamatoa can play it as an Item card that is not attached to an Ally. While Maui's Hook is on Tamatoa's side of the Realm, Tamatoa gains 2 Power cach time he is Fated. The Fate card Maui Time finds Maui and automatically finds and attaches Maui's Hook to him. If Maui is defeated while Maui's Hook is attached to him, move Maui's Hook to Tamatoa's side of the Realm at that Location."
       },
       {
         "title": "Heart of Te Fiti",
-        "text": "When the Fate card Heart of Te Fit is drawn, it finds Moana and is attached to her. Tamatoa needs to defeat Moana while the Heart of Te Fiti is attached to her to gain the Item and win the game. Heart of Te Fiti can be moved using a Move Ally or Item action when it is on Tamatoa's side of the Realm."
+        "text": "When the Fate card Heart of Te Fit is drawn, it finds Moana and is attached to her. Tamatoa needs to defeat Moana while the Heart of Te Fiti is attached to her to gain the Item and win the game. Heart of Te Fiti can be moved using a Move Ally or Item Action when it is on Tamatoa's side of the Realm."
       },
       {
         "title": "...But it's a Fake!",
-        "text": "Something Shiny is the ultimate trick Moana plays on Tamatoa. The Item is not attached to a Hero but is played like a Hero to cover actions. A Hero at the same location as Something Shiny cannot be defeated. Something Shiny is discarded when Tamatoa ends his turn in the same location as Something Shiny."
+        "text": "Something Shiny is the ultimate trick Moana plays on Tamatoa. The Item is not attached to a Hero but is played like a Hero to cover actions. A Hero at the same Location as Something Shiny cannot be defeated. Something Shiny is discarded when Tamatoa ends his turn in the same Location as Something Shiny."
       },
       {
         "title": "Heihei",
-        "text": "The Fate card Heihei has no additional ability."
+        "text": "The Fate card Heihei has no additional Ability."
       }
     ]
   },
   "Shere Khan": {
-    "objective": "Fierce Shere Khan controls the jungle, but he has a weakness: Man's Red Fire! When he discovers a Man-Cub in his jungle, he must stop the boy before he destroys everything. Mowgli wants to stay in the jungle and is protected by his friends, including Baloo the bear, the elephants of the Jungle Patrol, and even the great panther Bagheera. Shere Khan must clear his realm of fire and defeat Mowgli to prove he is still King of the Jungle.",
+    "objective": "Fierce Shere Khan controls the jungle, but he has a weakness: Man's Red Fire! When he discovers a Man-Cub in his jungle, he must stop the boy before he destroys everything. Mowgli wants to stay in the jungle and is protected by his friends, including Baloo the bear, the elephants of the Jungle Patrol, and even the great panther Bagheera. Shere Khan must clear his Realm of fire and defeat Mowgli to prove he is still King of the Jungle.",
     "sections": [
       {
         "title": "Setup",
@@ -762,23 +762,23 @@
       },
       {
         "title": "Kaa, His Eyes and His Coils",
-        "text": "Shere Khan's Ally, Kaa, has muttiple ways to help Shere Khan. You can attach Kaas Eyes and Kare Coils to Kaa as Items to increase his Strength to 4 or even 6! When used in a Vanquish action, you can remove those Items instead of Kaa. You can use Kaa's Activate action to find those Items in the discard pile."
+        "text": "Shere Khan's Ally, Kaa, has multiple ways to help Shere Khan. You can attach Kaa's Eyes and Kaa's Coils to Kaa as Items to increase his Strength to 4 or even 6! When used in a Vanquish Action, you can remove those Items instead of Kaa. You can use Kaa's Activate Action to find those Items in the discard pile."
       },
       {
         "title": "Man's Red Fire",
-        "text": "Fire tokens are placed using the Fate cards Mowgli and Man's Red Fire. A Fire token can be placed on a single action, which is treated as if covered by a Hero card. The Fire token can be placed on any action in the top or bottom row of Shere Khan's Realm. If a card is played to or already exists at that location, the token can still be placed on an action, but both will need to be removed before that action can be taken.\n\nBravo! Bravo! will let you perform a blocked action, even if it's covered by a Fire token."
+        "text": "Fire Tokens are placed using the Fate cards Mowgli and Man's Red Fire. A Fire Token can be placed on a single action, which is treated as if covered by a Hero card. The Fire Token can be placed on any action in the top or bottom row of Shere Khan's Realm. If a card is played to or already exists at that Location, the token can still be placed on an action, but both will need to be removed before that action can be taken.\n\nBravo! Bravo! will let you perform a blocked action, even if it's covered by a Fire Token."
       },
       {
         "title": "Manipulating Cards",
-        "text": "Hey Cuz and Trust In Me allow you to manipulate the cards in your Villain deck and discard pile. Hey Cuz lets you reveal cards until you find an Ally. Trust in Me lets you shuffle three cards from your discard pile into your deck."
+        "text": "Hey Cuz and Trust In Me allow you to manipulate the cards in your Villain Deck and discard pile. Hey Cuz lets you reveal cards until you find an Ally. Trust In Me lets you shuffle three cards from your discard pile into your deck."
       },
       {
         "title": "Removing Fire Tokens",
-        "text": "To remove Fire tokens, use the Activate action on Monkeys. It's Me, Shere Khan removes a token without sacrificing an Ally."
+        "text": "To remove Fire Tokens, use the Activate Action on Monkeys. It's Me, Shere Khan removes a token without sacrificing an Ally."
       },
       {
         "title": "Fight Like a Bear",
-        "text": "Baloo has a unique power that affects defeating and vanquishing all other Heroes. While Baloo is in play, if Shere Khan defeats a Hero, that Hero is not removed. Instead, place a Power token on Baloo. When Baloo has three Power tokens on him, he is defeated. Baloo can protect Heroes this way before he is defeated and discarded."
+        "text": "Baloo has a unique power that affects defeating and vanquishing all other Heroes. While Baloo is in play, if Shere Khan defeats a Hero, that Hero is not removed. Instead, place a Power Token on Baloo. When Baloo has three Power Tokens on him, he is defeated. Baloo can protect Heroes this way before he is defeated and discarded."
       }
     ]
   },
@@ -787,19 +787,19 @@
     "sections": [
       {
         "title": "Special Setup and Movement",
-        "text": "Place King Candy's mover on the Start/Finish. Set the Vanellope von Schweetz Racer token off to the side of your Realm. King Candy moves like no other Villain; he races through the entire Sugar Rush Speedway, moving from action space to action space in the figure-8 pattern shown below. He passes the center Gain 3 Power twice on a single circuit.\n\nEach tum before King Candy moves, declare the number of action spaces you want to move, between 1 and 4. An action space counts for movement even if covered."
+        "text": "Place King Candy's mover on the Start/Finish. Set the Vanellope von Schweetz Racer Token off to the side of your Realm. King Candy moves like no other Villain; he races through the entire Sugar Rush Speedway, moving from action space to action space in a figure-8 pattern. He passes the center Gain 3 Power twice on a single circuit.\n\nEach turn before King Candy moves, declare the number of action spaces you want to move, between 1 and 4. An action space counts for movement even if covered."
       },
       {
         "title": "Special Free Actions",
-        "text": "King Candy has access to cards that he can play without a Play a Card action. Pay to Race is paid and played before King Candy declares his movement. Turbo-Tastic allows King Candy to perform actions that are currently covered."
+        "text": "King Candy has access to cards that he can play without a Play a Card Action. Pay to Race is paid and played before King Candy declares his movement. Turbo-Tastic allows King Candy to perform actions that are currently covered."
       },
       {
         "title": "Performing Actions",
-        "text": "Once King Candy has moved, he may perform the action he is on, the action in front of him on the track and the action behind him, for a total of three actions on his tum. They can be performed in any order. If an action is covered. King Candy cannot perform that action. King Candy may end up with no available actions.\n\nStart/Finish is a Play a Card action.\n\nEven though King Candy's Realm is one continuous speedway, each panel represents a location that is used in Vanquish actions."
+        "text": "Once King Candy has moved, he may perform the action he is on, the action in front of him on the track and the action behind him, for a total of three actions on his turn. They can be performed in any order. If an action is covered, King Candy cannot perform that action. King Candy may end up with no available actions.\n\nStart/Finish is a Play a Card Action.\n\nEven though King Candy's Realm is one continuous speedway, each panel represents a Location that is used in Vanquish Actions."
       },
       {
         "title": "The Big Race",
-        "text": "When a Glitch is played on Vanellope von Schweetz, begin the Big Race by placing the Racer token and the King Candy mover on Start/Finish. End King Candy's turn. Note that multiple Glitches can be stacked on Vanellope von Schweetz, but the Big Race only begins if a Glitch is placed on her when she has no other Glitches attached.\n\nIf King Candy reaches Start/Finish before the Racer token, he wins the game. If the Racer token reaches Start/Finish first, remove all the Glitches from Vanellope von Schweetz and place them in King Candy's hand."
+        "text": "When a Glitch is played on Vanellope von Schweetz, begin the Big Race by placing the Racer Token and the King Candy mover on Start/Finish. End King Candy's turn. Note that multiple Glitches can be stacked on Vanellope von Schweetz, but the Big Race only begins if a Glitch is placed on her when she has no other Glitches attached.\n\nIf King Candy reaches Start/Finish before the Racer Token, he wins the game. If the Racer Token reaches Start/Finish first, remove all the Glitches from Vanellope von Schweetz and place them in King Candy's hand."
       }
     ]
   }

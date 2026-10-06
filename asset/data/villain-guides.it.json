@@ -4,15 +4,15 @@
     "sections": [
       {
         "title": "Preparazione speciale",
-        "text": "Metti la carta di Babbo Nachele a faccia in su ne La Tana del Bau Bau. Piazza i dadi del Bau Bau vicino alla plancia del tuo Reame."
+        "text": "Metti la carta di Babbo Nachele a faccia in su ne La Tana del Bau Bau. Piazza i dadi del Bau Bau vicino alla Plancia del tuo Reame."
       },
       {
         "title": "Come vincere",
-        "text": "Il Bau Bau sa che l'unico modo di diventare il sovrano del Paese di Halloween è sconfiggere Jack Skeletron, ma Jack è un Finto Babbo Nachele. Il Bau Bau deve giocare le carte Finto Babbo Nachele dal suo mazzo Cattivo. Più carte Finto Babbo Nachele vengono giocate con successo, più sarà vicino il momento in cui Jack si ricorderà chi è e sarà pronto a sfidare il Bau Bau."
+        "text": "Il Bau Bau sa che l'unico modo di diventare il sovrano del Paese di Halloween è sconfiggere Jack Skeletron, ma Jack è un Finto Babbo Nachele. Il Bau Bau deve giocare le carte Finto Babbo Nachele dal suo Mazzo Cattivo. Più carte Finto Babbo Nachele vengono giocate con successo, più sarà vicino il momento in cui Jack si ricorderà chi è e sarà pronto a sfidare il Bau Bau."
       },
       {
         "title": "Jack l'impostore",
-        "text": "Dopo che il Bau Bau ha rimosso con successo quattro carte Finto Babbo Nachele dal suo mazzo e le ha messe in una pila accanto a Babbo Nachele, rimuovi Babbo Nachele dal gioco. Trova Jack Skeletron e mettilo ne La Tana del Bau Bau. Metti i quattro Finti Babbo Nachele nella pila degli scarti del mazzo Cattivo del Bau Bau."
+        "text": "Dopo che il Bau Bau ha rimosso con successo quattro carte Finto Babbo Nachele dal suo mazzo e le ha messe in una pila accanto a Babbo Nachele, rimuovi Babbo Nachele dal gioco. Trova Jack Skeletron e mettilo ne La Tana del Bau Bau. Metti i quattro Finti Babbo Nachele nella pila degli scarti del Mazzo Cattivo del Bau Bau."
       },
       {
         "title": "Lanciare i dadi",
@@ -20,11 +20,11 @@
       },
       {
         "title": "Scherzetti con i dadi",
-        "text": "Il Bau Bau imbroglia, specialmente quando si tratta di dadi. Ha anche diverse carte che lo confermano! Dopo un qualunque lancio di dadi, il Bau Bau può immediatamente giocare la carta Dadi Truccati (non è necessario usare l'azione Gioca una Carta). I Dadi Truccati permettono al Bau Bau di ritirare uno dei dadi appena lanciati.\n\nPer cercare di rallentare quell'imbroglione del Bau Bau, piazza la carta Fato Salve, Bau! sotto la pedina del Bau Bau. Salve, Bau! riduce di 2 il successivo lancio di dadi, dopo eventuali rilanci. Puoi piazzare più di una carta Salve, Bau! e sottrarre dal lancio la somma di tutte le carte. Scarta Salve, Bau! dopo il lancio dei dadi."
+        "text": "Il Bau Bau imbroglia, specialmente quando si tratta di dadi. Ha anche diverse carte che lo confermano! Dopo un qualunque lancio di dadi, il Bau Bau può immediatamente giocare la carta Dadi Truccati (non è necessario usare l'Azione Gioca una Carta). I Dadi Truccati permettono al Bau Bau di ritirare uno dei dadi appena lanciati.\n\nPer cercare di rallentare quell'imbroglione del Bau Bau, piazza la carta Fato Salve, Bau! sotto la pedina del Bau Bau. Salve, Bau! riduce di 2 il successivo lancio di dadi, dopo eventuali rilanci. Puoi piazzare più di una carta Salve, Bau! e sottrarre dal lancio la somma di tutte le carte. Scarta Salve, Bau! dopo il lancio dei dadi."
       },
       {
         "title": "Modifiche alla Forza",
-        "text": "Usa i gettoni Forza +1/-1 per indicare i cambiamenti alla Forza degli Eroi e degli Alleati."
+        "text": "Usa i Gettoni Forza +1/-1 per indicare i cambiamenti alla Forza degli Eroi e degli Alleati."
       }
     ]
   },
@@ -41,11 +41,11 @@
       },
       {
         "title": "Amo di Maui",
-        "text": "L'Amo di Maui si trova nel Mazzo Cattivo di Tamatoa. Tamatoa può giocarlo come carta Oggetto non assegnata a un Alleato. Finché l'Amo di Maui è sul lato di Tamatoa del Reame questo ottiene 2 gettoni Potere ogni volta che è bersaglio di un'azione Fato. La carta Fato L'Ora di Maui trova Maui e immediatamente trova l'Amo di Maui e glielo assegna. Se Maui viene sconfitto mentre l'Amo di Maui è assegnato a lui, sposta l'Amo di Maui sul lato di Tamatoa del Reame in quello stesso luogo."
+        "text": "L'Amo di Maui si trova nel Mazzo Cattivo di Tamatoa. Tamatoa può giocarlo come carta Oggetto non assegnata a un Alleato. Finché l'Amo di Maui è sul lato di Tamatoa del Reame questo ottiene 2 Gettoni Potere ogni volta che è bersaglio di un'Azione Fato. La carta Fato L'Ora di Maui trova Maui e immediatamente trova l'Amo di Maui e glielo assegna. Se Maui viene sconfitto mentre l'Amo di Maui è assegnato a lui, sposta l'Amo di Maui sul lato di Tamatoa del Reame in quello stesso Luogo."
       },
       {
         "title": "Cuore di Te Fiti",
-        "text": "Quando viene pescata la carta Fato Cuore di Te Fiti, Vaiana viene trovata e il Cuore di Te Fiti assegnato a lei. Tamatoa deve sconfiggere Vaiana mentre il Cuore di Te Fiti è assegnato a lei per ottenere l'Oggetto e vincere la partita. Il Cuore di Te Fiti può essere mosso usando un'azione Muovere Oggetto o Alleato quando si trova sul lato di Tamatoa del Reame."
+        "text": "Quando viene pescata la carta Fato Cuore di Te Fiti, Vaiana viene trovata e il Cuore di Te Fiti assegnato a lei. Tamatoa deve sconfiggere Vaiana mentre il Cuore di Te Fiti è assegnato a lei per ottenere l'Oggetto e vincere la partita. Il Cuore di Te Fiti può essere mosso usando un'Azione Muovere Oggetto o Alleato quando si trova sul lato di Tamatoa del Reame."
       },
       {
         "title": "...ma è un falso!",
@@ -53,7 +53,7 @@
       },
       {
         "title": "Heihei",
-        "text": "La carta Fato Heihei non ha abilità aggiuntive."
+        "text": "La carta Fato Heihei non ha Abilità aggiuntive."
       }
     ]
   },
@@ -69,7 +69,7 @@
       },
       {
         "title": "Fare il Tiro",
-        "text": "Se c'è almeno un Archetto in ogni Luogo del tuo Reame, puoi giocare la carta Tirare per tentare di vincere la partita.\n\nRivela le prime cinque carte del tuo Mazzo Cattivo e somma tra loro i costi delle carte pescate. Se il totale è più basso della Forza totale di tutti gli Archetti nel Reame, allora sei riuscito a Tirare e vinci la partita!\n\nSe non riesci a Tirare con successo, scarta la carta, assieme alle cinque che hai rivelato. Potrai ritentare giocando un'altra carta Tirare. Ce ne sono tre nel mazzo."
+        "text": "Se c'è almeno un Archetto in ogni Luogo del tuo Reame, puoi giocare la carta Tirare per tentare di vincere la partita.\n\nRivela le prime cinque carte del tuo Mazzo Cattivo e somma tra loro i Costi delle carte pescate. Se il totale è più basso della Forza totale di tutti gli Archetti nel Reame, allora sei riuscito a Tirare e vinci la partita!\n\nSe non riesci a Tirare con successo, scarta la carta, assieme alle cinque che hai rivelato. Potrai ritentare giocando un'altra carta Tirare. Ce ne sono tre nel mazzo."
       },
       {
         "title": "Eroi Rimpiccioliti",
@@ -82,7 +82,7 @@
     ]
   },
   "Jafar": {
-    "objective": "Per raggiungere l'obiettivo di Jafar, dovrai sbloccare la Caverna delle Meraviglie con l'Amuleto dello Scarabeo. Dopodiché la Lampada dovrà essere giocata nella Caverna delle Meraviglie, che porterà il Genio nello stesso Luogo. Dovrai Ipnotizzare il Genio, portandolo sotto il controllo di Jafar, e muovere la Lampada Magica nel Palazzo del Sultano.\n\nImportante: Per vincere, la Lampada Magica deve essere nel tuo lato della Plancia.",
+    "objective": "Per raggiungere l'Obiettivo di Jafar, dovrai sbloccare la Caverna delle Meraviglie con l'Amuleto dello Scarabeo. Dopodiché la Lampada dovrà essere giocata nella Caverna delle Meraviglie, che porterà il Genio nello stesso Luogo. Dovrai Ipnotizzare il Genio, portandolo sotto il controllo di Jafar, e muovere la Lampada Magica nel Palazzo del Sultano.\n\nImportante: Per vincere, la Lampada Magica deve essere nel tuo lato della Plancia.",
     "sections": [
       {
         "title": "Preparazione speciale",
@@ -115,23 +115,23 @@
     ]
   },
   "Davy Jones": {
-    "objective": "Il quasi immortale Davy Jones, capitano dell'Olandese Volante, è il giudice della vita e della morte sui mari. Quando ha il controllo di tutti i suoi oggetti mistici, non solo governa i mari, ma è venerato e temuto da tutti coloro che navigano in quelle acque. Ora Jack Sparrow ha dato il via a una serie di eventi che costringono Davy Jones a trovare e recuperare i suoi tesori sparsi tra gli Eroi. Davy Jones deve trovare gli Eroi e raccogliere i suoi tesori per prendere il posto che gli spetta come sovrano assoluto di tutti i mari!",
+    "objective": "Il quasi immortale Davy Jones, capitano dell'Olandese Volante, è il giudice della vita e della morte sui mari. Quando ha il controllo di tutti i suoi Oggetti mistici, non solo governa i mari, ma è venerato e temuto da tutti coloro che navigano in quelle acque. Ora Jack Sparrow ha dato il via a una serie di eventi che costringono Davy Jones a trovare e recuperare i suoi Tesori sparsi tra gli Eroi. Davy Jones deve trovare gli Eroi e raccogliere i suoi Tesori per prendere il posto che gli spetta come sovrano assoluto di tutti i mari!",
     "sections": [
       {
         "title": "Preparazione dei Tesori Perduti",
-        "text": "Posiziona i cinque segnalini Tesoro a faccia in giù al lato del tuo Reame e poi mescolali. Davy Jones piazza un segnalino Tesoro a faccia in giù sugli Eroi quando gioca le carte Temi tu la morte? e Sono qui."
+        "text": "Posiziona i cinque Segnalini Tesoro a faccia in giù al lato del tuo Reame e poi mescolali. Davy Jones piazza un Segnalino Tesoro a faccia in giù sugli Eroi quando gioca le carte Temi tu la morte? e Sono qui."
       },
       {
         "title": "Raccogliere il Tesoro",
-        "text": "Per raccogliere un Tesoro, Davy Jones deve prima rivelarlo e poi sconfiggere l'Eroe a cui è assegnato. Alcune carte, come Sputafuoco Bill, Hadras e La Macchia Nera, rivelano i segnalini a faccia in giù. Un Eroe può avere un solo segnalino Tesoro assegnato per volta.\n\nSe Davy Jones sconfigge un Eroe con un segnalino Tesoro a faccia in giù, quel segnalino torna nella riserva di segnalini iniziale."
+        "text": "Per raccogliere un Tesoro, Davy Jones deve prima rivelarlo e poi sconfiggere l'Eroe a cui è assegnato. Alcune carte, come Sputafuoco Bill, Hadras e La Macchia Nera, rivelano i segnalini a faccia in giù. Un Eroe può avere un solo Segnalino Tesoro assegnato per volta.\n\nSe Davy Jones sconfigge un Eroe con un Segnalino Tesoro a faccia in giù, quel segnalino torna nella riserva di segnalini iniziale."
       },
       {
         "title": "Il Potere dei Tesori",
-        "text": "Ogni segnalino Tesoro ha un'abilità unica. Quando il segnalino viene rivelato, quell'abilità influenzerà l'Eroe o renderà più difficile per Davy Jones recuperare i suoi averi. I segnalini Tesoro hanno effetto immediato quando vengono rivelati.\n\n• La Chiave: Quando La Chiave viene rivelata, scarta la tua mano.\n\n• Il Cuore: Quando Il Cuore viene raccolto, perdi tutto il Potere.\n\n• Forziere del Tesoro: Non si possono giocare Alleati in questo Luogo.\n\n• Carillon: Il Kraken non può essere utilizzato per sconfiggere questo Eroe.\n\n• Bussola di Jack: Questo Eroe ottiene +2 Forza."
+        "text": "Ogni Segnalino Tesoro ha un'Abilità unica. Quando il segnalino viene rivelato, quell'Abilità influenzerà l'Eroe o renderà più difficile per Davy Jones recuperare i suoi averi. I Segnalini Tesoro hanno effetto immediato quando vengono rivelati.\n\n• La Chiave: Quando La Chiave viene rivelata, scarta la tua mano.\n\n• Il Cuore: Quando Il Cuore viene raccolto, perdi tutto il Potere.\n\n• Forziere del Tesoro: Non si possono giocare Alleati in questo Luogo.\n\n• Carillon: Il Kraken non può essere utilizzato per sconfiggere questo Eroe.\n\n• Bussola di Jack: Questo Eroe ottiene +2 Forza."
       },
       {
         "title": "Quei Fastidiosi Eroi",
-        "text": "Gli Eroi possono rendere difficile per Davy Jones la ricerca dei suoi tesori. E dove punta? e Maledetto Jack Sparrow costringono Davy Jones a tirare ad indovinare su dove potrebbero trovarsi gli Eroi e quale Tesoro potrebbero custodire."
+        "text": "Gli Eroi possono rendere difficile per Davy Jones la ricerca dei suoi Tesori. E dove punta? e Maledetto Jack Sparrow costringono Davy Jones a tirare ad indovinare su dove potrebbero trovarsi gli Eroi e quale Tesoro potrebbero custodire."
       }
     ]
   },
@@ -139,7 +139,7 @@
     "sections": [
       {
         "title": "Le Maledizioni",
-        "text": "La Maledizione è un tipo di carta unico e disponibile solo a Malefica. Le Maledizioni vanno giocate sui Luoghi e hanno degli effetti che influenzano gli Eroi presenti negli stessi Luoghi. Tuttavia, ogni Maledizione presenta anche una condizione che ti obbligherà a scartarla, quindi dovrai stare attento a dove e quando giocare ogni Maledizione.\n\nPuoi giocare una Maledizione in un Luogo qualsiasi, anche se ci sono già uno o più Eroi. È possibile giocare più di una Maledizione nello stesso Luogo. Puoi spostare una Maledizione con l'azione Muovere un Oggetto o un Alleato.\n\nLe tre Maledizioni sono Foresta di Rovi, Fuoco Verde e Sonno senza Sogni."
+        "text": "La Maledizione è un tipo di carta unico e disponibile solo a Malefica. Le Maledizioni vanno giocate sui Luoghi e hanno degli effetti che influenzano gli Eroi presenti negli stessi Luoghi. Tuttavia, ogni Maledizione presenta anche una condizione che ti obbligherà a scartarla, quindi dovrai stare attento a dove e quando giocare ogni Maledizione.\n\nPuoi giocare una Maledizione in un Luogo qualsiasi, anche se ci sono già uno o più Eroi. È possibile giocare più di una Maledizione nello stesso Luogo. Puoi spostare una Maledizione con l'Azione Muovere un Oggetto o un Alleato.\n\nLe tre Maledizioni sono Foresta di Rovi, Fuoco Verde e Sonno senza Sogni."
       },
       {
         "title": "Foresta di Rovi",
@@ -155,20 +155,20 @@
       },
       {
         "title": "Altre Carte",
-        "text": "Svanire permette a Malefica di rimanere nel Luogo in cui si trova, consentendole di svolgere le stesse azioni del turno precedente.\n\nIl Corvo è un potente Alleato, da giocare il prima possibile. All'inizio di ogni turno, prima di muovere la Pedina, puoi muovere il Corvo in un Luogo qualsiasi e svolgere una delle azioni lì disponibili.\n\nNota: Il Corvo non può svolgere le azioni Fato."
+        "text": "Svanire permette a Malefica di rimanere nel Luogo in cui si trova, consentendole di svolgere le stesse azioni del turno precedente.\n\nIl Corvo è un potente Alleato, da giocare il prima possibile. All'inizio di ogni turno, prima di muovere la pedina, puoi muovere il Corvo in un Luogo qualsiasi e svolgere una delle azioni lì disponibili.\n\nNota: Il Corvo non può svolgere le Azioni Fato."
       }
     ]
   },
   "Captain Hook": {
-    "objective": "Per raggiungere questo obiettivo, dovrai sbloccare l'Albero dell'Impiccato, giocando la Mappa dell'Isola che non c'è. Peter Pan deve essere giocato, da te o da un avversario, sull'Albero dell'Impiccato. A quel punto dovrai spostarlo alla Laguna delle Sirene, poi alla Roccia del Teschio e infine alla Jolly Roger, dove dovrai sconfiggerlo per vincere la partita.",
+    "objective": "Per raggiungere questo Obiettivo, dovrai sbloccare l'Albero dell'Impiccato, giocando la Mappa dell'Isola che non c'è. Peter Pan deve essere giocato, da te o da un avversario, sull'Albero dell'Impiccato. A quel punto dovrai spostarlo alla Laguna delle Sirene, poi alla Roccia del Teschio e infine alla Jolly Roger, dove dovrai sconfiggerlo per vincere la partita.",
     "sections": [
       {
         "title": "Preparazione speciale",
-        "text": "Piazza un segnalino Lucchetto sull'Albero dell'Impiccato, perché questo luogo è bloccato all'inizio della partita."
+        "text": "Piazza un Segnalino Lucchetto sull'Albero dell'Impiccato, perché questo Luogo è bloccato all'inizio della partita."
       },
       {
         "title": "Peter Pan",
-        "text": "Quando Peter Pan viene rivelato, deve essere immediatamente giocato sull'Albero dell'Impiccato, anche se questo è ancora bloccato. Se Peter Pan è una delle due carte Fato pescate da un giocatore durante un'azione Fato che ha te come bersaglio, l'avversario deve per forza giocare Peter Pan e scartare l'altra carta."
+        "text": "Quando Peter Pan viene rivelato, deve essere immediatamente giocato sull'Albero dell'Impiccato, anche se questo è ancora bloccato. Se Peter Pan è una delle due carte Fato pescate da un giocatore durante un'Azione Fato che ha te come bersaglio, l'avversario deve per forza giocare Peter Pan e scartare l'altra carta."
       },
       {
         "title": "La Mappa dell'Isola che non c'è",
@@ -176,11 +176,11 @@
       },
       {
         "title": "Controllare il tuo Fato",
-        "text": "A differenza degli altri Cattivi, Capitan Uncino può giocare e scartare carte dal proprio Mazzo Fato usando le carte Degno Avversario, Spaventare e Ossessione. Usando queste carte, sarà più facile rivelare Peter Pan e giocarlo all'Albero dell'Impiccato il prima possibile. Se usi queste carte per giocare un qualsiasi altro Eroe nel tuo Reame, potrai giocarlo in un luogo a tua scelta."
+        "text": "A differenza degli altri Cattivi, Capitan Uncino può giocare e scartare carte dal proprio Mazzo Fato usando le carte Degno Avversario, Spaventare e Ossessione. Usando queste carte, sarà più facile rivelare Peter Pan e giocarlo all'Albero dell'Impiccato il prima possibile. Se usi queste carte per giocare un qualsiasi altro Eroe nel tuo Reame, potrai giocarlo in un Luogo a tua scelta."
       },
       {
         "title": "Azioni Extra",
-        "text": "Le carte Cannone, Uncino da Cerimonia e Dispositivo Ingegnoso sono Oggetti che aggiungono un simbolo azione extra al tuo Reame. Dopo aver giocato l'Oggetto in un Luogo, potrai eseguire l'azione extra in aggiunta alle altre azioni disponibili in quel Luogo.\n\nEsempio: Se il Cannone viene giocato sulla Roccia del Teschio, potrai svolgere cinque azioni quando sarai in quel Luogo: i suoi quattro simboli azione più l'azione Scontro del Cannone."
+        "text": "Le carte Cannone, Uncino da Cerimonia e Dispositivo Ingegnoso sono Oggetti che aggiungono un simbolo azione extra al tuo Reame. Dopo aver giocato l'Oggetto in un Luogo, potrai eseguire l'azione extra in aggiunta alle altre azioni disponibili in quel Luogo.\n\nEsempio: Se il Cannone viene giocato sulla Roccia del Teschio, potrai svolgere cinque azioni quando sarai in quel Luogo: i suoi quattro simboli azione più l'Azione Scontro del Cannone."
       }
     ]
   },
@@ -201,16 +201,16 @@
       },
       {
         "title": "Contratti Vincolanti",
-        "text": "Ursula è unica nel fatto che non ha l'azione Scontro sulla sua plancia. In compenso, sconfigge gli Eroi utilizzando i Contratti Vincolanti.\n\nQuando giochi un Contratto Vincolante, assegnalo a un Eroe. (I Contratti Vincolanti sono uno dei rari casi in cui è possibile assegnare un Oggetto dal Mazzo Cattivo a un Eroe.)\n\nOgni Contratto Vincolante è legato a uno dei Luoghi del Reame di Ursula. Un Eroe con un Contratto Vincolante viene sconfitto quando è mosso sul Luogo indicato dalla carta.\n\nScarta l'Eroe nella pila degli scarti del Mazzo Fato, e il Contratto Vincolante nella pila degli scarti del Mazzo Cattivo.\n\nEsempio: Un Eroe con il Contratto Vincolante della Riva assegnato viene sconfitto quando lo muovi sulla Riva."
+        "text": "Ursula è unica nel fatto che non ha l'Azione Scontro sulla sua Plancia. In compenso, sconfigge gli Eroi utilizzando i Contratti Vincolanti.\n\nQuando giochi un Contratto Vincolante, assegnalo a un Eroe. (I Contratti Vincolanti sono uno dei rari casi in cui è possibile assegnare un Oggetto dal Mazzo Cattivo a un Eroe.)\n\nOgni Contratto Vincolante è legato a uno dei Luoghi del Reame di Ursula. Un Eroe con un Contratto Vincolante viene sconfitto quando è mosso sul Luogo indicato dalla carta.\n\nScarta l'Eroe nella pila degli scarti del Mazzo Fato, e il Contratto Vincolante nella pila degli scarti del Mazzo Cattivo.\n\nEsempio: Un Eroe con il Contratto Vincolante della Riva assegnato viene sconfitto quando lo muovi sulla Riva."
       }
     ]
   },
   "Prince John": {
-    "objective": "Il Principe Giovanni è estremamente avido, quindi ha bisogno di accumulare Potere. Tuttavia, per quanto ti possa tentare, giocare al risparmio con i Gettoni potrebbe non essere la strada giusta per raggiungere la vittoria. Il Potere va anche usato!\n\nMolti Eroi possono ostacolare la capacità del Principe Giovanni di ottenere Potere. Giocare Alleati è quindi sempre una buona idea, anche prima che gli Eroi vengano giocati dai tuoi avversari. Facendo così, sarai preparato a sconfiggere un Eroe che ti sta rallentando non appena ne avrai bisogno.",
+    "objective": "Il Principe Giovanni è estremamente avido, quindi ha bisogno di accumulare Potere. Tuttavia, per quanto ti possa tentare, giocare al risparmio con i gettoni potrebbe non essere la strada giusta per raggiungere la vittoria. Il Potere va anche usato!\n\nMolti Eroi possono ostacolare la capacità del Principe Giovanni di ottenere Potere. Giocare Alleati è quindi sempre una buona idea, anche prima che gli Eroi vengano giocati dai tuoi avversari. Facendo così, sarai preparato a sconfiggere un Eroe che ti sta rallentando non appena ne avrai bisogno.",
     "sections": [
       {
         "title": "La Prigione",
-        "text": "Nel Reame del Principe Giovanni c'è un Luogo che può essere usato a suo vantaggio. La Prigione infatti non ha alcun simbolo che possa essere coperto da un Eroe, rendendo quindi gli Eroi in quel Luogo meno problematici. Il Principe Giovanni ha a disposizione delle carte Imprigionare, che gli consentono di spostare gli Eroi nella Prigione, per riottenere la disponibilità di azioni in altri Luoghi.\n\nNota: Anche nella Prigione, le abilità degli Eroi continuano ad avere effetto."
+        "text": "Nel Reame del Principe Giovanni c'è un Luogo che può essere usato a suo vantaggio. La Prigione infatti non ha alcun simbolo che possa essere coperto da un Eroe, rendendo quindi gli Eroi in quel Luogo meno problematici. Il Principe Giovanni ha a disposizione delle carte Imprigionare, che gli consentono di spostare gli Eroi nella Prigione, per riottenere la disponibilità di azioni in altri Luoghi.\n\nNota: Anche nella Prigione, le Abilità degli Eroi continuano ad avere effetto."
       },
       {
         "title": "È bello essere il Re!",
@@ -226,7 +226,7 @@
       },
       {
         "title": "Little John",
-        "text": "Quando Little John viene giocato, si possono prendere fino a 4 Gettoni Potere al Principe Giovanni, che finiscono sulla carta di Little John. Quando Little John viene sconfitto, il Principe Giovanni si riprende tutti i Gettoni. Aspettare il momento giusto per sconfiggere Little John può essere la chiave per una vittoria improvvisa!"
+        "text": "Quando Little John viene giocato, si possono prendere fino a 4 Gettoni Potere al Principe Giovanni, che finiscono sulla carta di Little John. Quando Little John viene sconfitto, il Principe Giovanni si riprende tutti i gettoni. Aspettare il momento giusto per sconfiggere Little John può essere la chiave per una vittoria improvvisa!"
       }
     ]
   },
@@ -235,7 +235,7 @@
     "sections": [
       {
         "title": "Preparazione Speciale",
-        "text": "Piazza un segnalino Lucchetto sulla Casetta dei Nani, perché questo Luogo è bloccato all'inizio della partita."
+        "text": "Piazza un Segnalino Lucchetto sulla Casetta dei Nani, perché questo Luogo è bloccato all'inizio della partita."
       },
       {
         "title": "Ingredienti",
@@ -247,19 +247,19 @@
       },
       {
         "title": "Specchio Magico",
-        "text": "La Regina Cattiva può usare il suo Specchio Magico per trovare Biancaneve. Per attivare questa Abilità, svolgi un'azione Attivare e paga 3 Segnalini Potere. Dopodiché trova Biancaneve e giocala nella Casetta dei Nani, anche se questo Luogo è ancora bloccato.\n\nInoltre, finché lo Specchio Magico è nel tuo Reame, ogni volta che sei il bersaglio di un'azione Fato, puoi pescare una carta."
+        "text": "La Regina Cattiva può usare il suo Specchio Magico per trovare Biancaneve. Per attivare questa Abilità, svolgi un'Azione Attivare e paga 3 Segnalini Potere. Dopodiché trova Biancaneve e giocala nella Casetta dei Nani, anche se questo Luogo è ancora bloccato.\n\nInoltre, finché lo Specchio Magico è nel tuo Reame, ogni volta che sei il bersaglio di un'Azione Fato, puoi pescare una carta."
       },
       {
         "title": "Mele Avvelenate",
-        "text": "La Regina Cattiva non possiede l'azione Scontro all'interno del suo Reame. In compenso, per sconfiggere gli Eroi, utilizza le Mele Avvelenate. Per farlo, deve Preparare il Veleno e poi far sì che l'Eroe dia un morso alla mela."
+        "text": "La Regina Cattiva non possiede l'Azione Scontro all'interno del suo Reame. In compenso, per sconfiggere gli Eroi, utilizza le Mele Avvelenate. Per farlo, deve Preparare il Veleno e poi far sì che l'Eroe dia un morso alla mela."
       },
       {
         "title": "Azione Preparare il Veleno",
-        "text": "L'azione Preparare il Veleno è disponibile unicamente alla Regina Cattiva ed è disponibile nel Laboratorio. Ogni volta che svolgi questa azione, puoi convertire quanti Segnalini Potere vuoi in Veleno. Sposta i segnalini sulla tua Plancia per indicare che ora sono Veleno.\n\nNota: Il Veleno non è più considerato potere. Il Veleno non può quindi essere usato per pagare il costo di una carta o di un'Abilità attivata. Avere Veleno, o aggiungere dei Segnalini Potere dalla Riserva per ottenere Veleno, non contano nell'attivare Abilità che richiedono di avere o ottenere Segnalini Potere."
+        "text": "L'Azione Preparare il Veleno è disponibile unicamente alla Regina Cattiva ed è disponibile nel Laboratorio. Ogni volta che svolgi questa azione, puoi convertire quanti Segnalini Potere vuoi in Veleno. Sposta i segnalini sulla tua Plancia per indicare che ora sono Veleno.\n\nNota: Il Veleno non è più considerato Potere. Il Veleno non può quindi essere usato per pagare il Costo di una carta o di un'Abilità attivata. Avere Veleno, o aggiungere dei Segnalini Potere dalla Riserva per ottenere Veleno, non contano nell'attivare Abilità che richiedono di avere o ottenere Segnalini Potere."
       },
       {
         "title": "Dalle un Morso",
-        "text": "Quando giochi Dalle un Morso, la Regina Cattiva deve essere nello stesso Luogo dell'Eroe che vuoi sconfiggere.\n\nDevi anche pagare Veleno pari alla Forza di quell'Eroe, che può essere modificata da altre carte nel Reame. Rimuovi la stessa quantità di Segnalini dalla riserva di Veleno sulla tua Plancia. Scarta l'eroe sconfitto nella pila degli scarti del tuo Mazzo Fato e scarta Dalle un Morso nella pila degli scarti del tuo Mazzo Cattivo.\n\nNota: Se non hai abbastanza Veleno per sconfiggere un Eroe, non puoi giocare Dalle un Morso."
+        "text": "Quando giochi Dalle un Morso, la Regina Cattiva deve essere nello stesso Luogo dell'Eroe che vuoi sconfiggere.\n\nDevi anche pagare Veleno pari alla Forza di quell'Eroe, che può essere modificata da altre carte nel Reame. Rimuovi la stessa quantità di segnalini dalla riserva di Veleno sulla tua Plancia. Scarta l'Eroe sconfitto nella pila degli scarti del tuo Mazzo Fato e scarta Dalle un Morso nella pila degli scarti del tuo Mazzo Cattivo.\n\nNota: Se non hai abbastanza Veleno per sconfiggere un Eroe, non puoi giocare Dalle un Morso."
       }
     ]
   },
@@ -293,7 +293,7 @@
     "sections": [
       {
         "title": "I Titani",
-        "text": "Il Titano è un tipo di carta disponibile unicamente per Ade. Devi guidare almeno tre Titani al Monte Olimpo per ottenere la vittoria. Ci sono cinque Titani nel tuo mazzo e ognuno di essi ha delle Abilità molto potenti.\n\nI Titani funzionano come i tuoi Alleati, ma devono essere giocati nell'Oltretomba. Puoi muovere un Titano usando l'azione Muovi un Oggetto o Alleato. Non dimenticare di usare l'Abilità del Titano ogni volta che questo si muove.\n\nCome gli alleati, i Titani possono essere usati per sconfiggere gli Eroi usando l'azione Scontro. Tuttavia, siccome verranno comunque scartati alla fine dello Scontro, questo potrebbe rallentare la tua scalata al Monte Olimpo."
+        "text": "Il Titano è un tipo di carta disponibile unicamente per Ade. Devi guidare almeno tre Titani al Monte Olimpo per ottenere la vittoria. Ci sono cinque Titani nel tuo mazzo e ognuno di essi ha delle Abilità molto potenti.\n\nI Titani funzionano come i tuoi Alleati, ma devono essere giocati nell'Oltretomba. Puoi muovere un Titano usando l'Azione Muovi un Oggetto o Alleato. Non dimenticare di usare l'Abilità del Titano ogni volta che questo si muove.\n\nCome gli Alleati, i Titani possono essere usati per sconfiggere gli Eroi usando l'Azione Scontro. Tuttavia, siccome verranno comunque scartati alla fine dello Scontro, questo potrebbe rallentare la tua scalata al Monte Olimpo."
       },
       {
         "title": "In trappola",
@@ -305,11 +305,11 @@
       },
       {
         "title": "Guida il tuo Carro",
-        "text": "Il Carro ti dà azioni extra durante la partita. Dopo aver svolto le tue azioni normali, se il Carro si trova nello stesso Luogo di Ade, puoi \"guidarlo\" verso un altro Luogo, e svolgere un'azione lì disponibile. Il Carro può essere usato solo una volta per turno, e non può essere usato per svolgere un'azione Fato. Puoi usare il Carro nello stesso turno in cui lo giochi."
+        "text": "Il Carro ti dà azioni extra durante la partita. Dopo aver svolto le tue azioni normali, se il Carro si trova nello stesso Luogo di Ade, puoi \"guidarlo\" verso un altro Luogo, e svolgere un'azione lì disponibile. Il Carro può essere usato solo una volta per turno, e non può essere usato per svolgere un'Azione Fato. Puoi usare il Carro nello stesso turno in cui lo giochi."
       },
       {
         "title": "Prepariamoci al Primo Round",
-        "text": "In aggiunta all'azione Muovi Alleato o Oggetto, puoi usare Prepariamoci al Primo Round! per muovere i Titani verso il Monte Olimpo. Puoi scegliere di pagare 2 Segnalini Potere per muovere un Titano di un passo, oppure di pagare 5 Segnalini Potere per muovere un Titano di due passi. Puoi muovere un solo Titano con questa carta e non puoi muovere Titani in trappola.\n\nNota: Se muovi un Titano di due passi, conta come un unico movimento e il Titano di fatto salta il primo Luogo che attraversa. Vengono attivate le Abilità dei Titani solamente nel Luogo di arrivo. Il Luogo saltato rimane illeso."
+        "text": "In aggiunta all'Azione Muovi Alleato o Oggetto, puoi usare Prepariamoci al Primo Round! per muovere i Titani verso il Monte Olimpo. Puoi scegliere di pagare 2 Segnalini Potere per muovere un Titano di un passo, oppure di pagare 5 Segnalini Potere per muovere un Titano di due passi. Puoi muovere un solo Titano con questa carta e non puoi muovere Titani in trappola.\n\nNota: Se muovi un Titano di due passi, conta come un unico movimento e il Titano di fatto salta il primo Luogo che attraversa. Vengono attivate le Abilità dei Titani solamente nel Luogo di arrivo. Il Luogo saltato rimane illeso."
       }
     ]
   },
@@ -318,11 +318,11 @@
     "sections": [
       {
         "title": "Preparazione Speciale",
-        "text": "Gira i cinque segnalini Obiettivo a faccia in giù, mescolali e piazzane uno in ogni Luogo. Rimetti nella scatola il quinto segnalino. Puoi guardare i segnalini Obiettivo in qualsiasi momento, ma tienili nascosti agli altri giocatori.\n\nNota: Una volta che un segnalino Obiettivo è stato rivelato, non potrà più essere rimesso a faccia in giù."
+        "text": "Gira i cinque Segnalini Obiettivo a faccia in giù, mescolali e piazzane uno in ogni Luogo. Rimetti nella scatola il quinto segnalino. Puoi guardare i Segnalini Obiettivo in qualsiasi momento, ma tienili nascosti agli altri giocatori.\n\nNota: Una volta che un Segnalino Obiettivo è stato rivelato, non potrà più essere rimesso a faccia in giù."
       },
       {
         "title": "Obiettivo: Gioco di Forza",
-        "text": "Spendi almeno 6 Gettoni Potere in un turno mentre Gambadilegno si trova in questo Luogo.\n\nPer completare questo Obiettivo facilmente, dovrai essere in grado di giocare più di una carta nello stesso Luogo. Se questo Obiettivo si trova in un Luogo con multiple azioni Giocare una Carta, avrai più opzioni per completare l'Obiettivo. Tuttavia, se solo un'azione di questo tipo è disponibile, puoi usare l'Abilità del Bandito per giocare almeno tre Banditi con una sola azione."
+        "text": "Spendi almeno 6 Gettoni Potere in un turno mentre Gambadilegno si trova in questo Luogo.\n\nPer completare questo Obiettivo facilmente, dovrai essere in grado di giocare più di una carta nello stesso Luogo. Se questo Obiettivo si trova in un Luogo con multiple Azioni Giocare una Carta, avrai più opzioni per completare l'Obiettivo. Tuttavia, se solo un'azione di questo tipo è disponibile, puoi usare l'Abilità del Bandito per giocare almeno tre Banditi con una sola azione."
       },
       {
         "title": "Obiettivo: Domina il Reame",
@@ -330,7 +330,7 @@
       },
       {
         "title": "Obiettivo: Vittoria Totale",
-        "text": "Ottieni almeno 4 Gettoni Potere giocando la carta Giochiamo in questo Luogo.\n\nCompleti questo Obiettivo quando, giocando la carta Giochiamo, riveli carte con un costo totale di almeno 4 Gettoni Potere.\n\nPuoi aumentare le tue possibilità usando Misfatto o Subdolo per mettere in cima al mazzo carte con un costo elevato."
+        "text": "Ottieni almeno 4 Gettoni Potere giocando la carta Giochiamo in questo Luogo.\n\nCompleti questo Obiettivo quando, giocando la carta Giochiamo, riveli carte con un Costo totale di almeno 4 Gettoni Potere.\n\nPuoi aumentare le tue possibilità usando Misfatto o Subdolo per mettere in cima al mazzo carte con un Costo elevato."
       },
       {
         "title": "Obiettivo: Fai i Soldi",
@@ -347,23 +347,23 @@
     ]
   },
   "Cruella de Vil": {
-    "objective": "Per raggiungere l'Obiettivo di Crudelia De Mon, devi giocare segnalini Cucciolo dalla Riserva al tuo Reame, e poi catturarli.",
+    "objective": "Per raggiungere l'Obiettivo di Crudelia De Mon, devi giocare Segnalini Cucciolo dalla Riserva al tuo Reame, e poi catturarli.",
     "sections": [
       {
         "title": "Preparazione Speciale",
-        "text": "Mescola e impila a faccia in giù (con il lato rosso verso l'alto) i segnalini Cucciolo e tienili vicino alla tua Plancia a formare una Riserva."
+        "text": "Mescola e impila a faccia in giù (con il lato rosso verso l'alto) i Segnalini Cucciolo e tienili vicino alla tua Plancia a formare una Riserva."
       },
       {
-        "title": "I segnalini Cucciolo",
-        "text": "I segnalini Cucciolo rappresentano i cuccioli che Crudelia De Mon deve catturare. Ogni segnalino rappresenta o 11 o 22 cuccioli.\n\nPer essere catturati, i segnalini Cucciolo devono prima essere giocati dalla Riserva al tuo Reame. Ogni segnalino indica uno dei quattro Luoghi nel tuo Reame. Quando aggiungi un segnalino Cucciolo al tuo Reame, rivelalo e giocalo a faccia in su nel Luogo specificato.\n\nNota: Ogni volta che aggiungi un segnalino Cucciolo al tuo Reame, puoi sceglierne uno nella Riserva che sia a faccia in su o a faccia in giù. Una volta che un segnalino è stato rivelato, non può più essere girato nuovamente a faccia in giù, anche se viene rimesso nella Riserva.\n\nNota: Posiziona i Cuccioli catturati sotto alla tua Plancia, tenendoli scoperti in modo che tutti i giocatori possano vedere quanti ne hai accumulati."
+        "title": "I Segnalini Cucciolo",
+        "text": "I Segnalini Cucciolo rappresentano i cuccioli che Crudelia De Mon deve catturare. Ogni segnalino rappresenta o 11 o 22 cuccioli.\n\nPer essere catturati, i Segnalini Cucciolo devono prima essere giocati dalla Riserva al tuo Reame. Ogni segnalino indica uno dei quattro Luoghi nel tuo Reame. Quando aggiungi un Segnalino Cucciolo al tuo Reame, rivelalo e giocalo a faccia in su nel Luogo specificato.\n\nNota: Ogni volta che aggiungi un Segnalino Cucciolo al tuo Reame, puoi sceglierne uno nella Riserva che sia a faccia in su o a faccia in giù. Una volta che un segnalino è stato rivelato, non può più essere girato nuovamente a faccia in giù, anche se viene rimesso nella Riserva.\n\nNota: Posiziona i Cuccioli catturati sotto alla tua Plancia, tenendoli scoperti in modo che tutti i giocatori possano vedere quanti ne hai accumulati."
       },
       {
         "title": "Abilità Attivate",
-        "text": "Crudelia De Mon possiede alcune carte con Abilità Attivate. Leggi il regolamento per i dettagli sul funzionamento delle carte con Abilità Attivate.\n\nLa Torcia e Orazio portano i segnalini Cucciolo nel tuo Reame. Orazio e Gaspare catturano i segnalini Cucciolo che si trovano nel tuo Reame. Il Telefono può aiutare a riportare Orazio e Gaspare in gioco dalla tua pila degli scarti."
+        "text": "Crudelia De Mon possiede alcune carte con Abilità Attivate. Leggi il regolamento per i dettagli sul funzionamento delle carte con Abilità Attivate.\n\nLa Torcia e Orazio portano i Segnalini Cucciolo nel tuo Reame. Orazio e Gaspare catturano i Segnalini Cucciolo che si trovano nel tuo Reame. Il Telefono può aiutare a riportare Orazio e Gaspare in gioco dalla tua pila degli scarti."
       },
       {
         "title": "Decappottabile",
-        "text": "La Decappottabile può aiutarti a muovere i segnalini Cucciolo nei Luoghi dove è più facile catturarli. Quando viene mossa, la Decappottabile si può muovere in un Luogo qualsiasi."
+        "text": "La Decappottabile può aiutarti a muovere i Segnalini Cucciolo nei Luoghi dove è più facile catturarli. Quando viene mossa, la Decappottabile si può muovere in un Luogo qualsiasi."
       },
       {
         "title": "Orazio e Gaspare",
@@ -375,23 +375,23 @@
     "sections": [
       {
         "title": "Preparazione Speciale",
-        "text": "Piazza la tessera Rapunzel nella Torre di Rapunzel."
+        "text": "Piazza la Tessera Rapunzel nella Torre di Rapunzel."
       },
       {
         "title": "Fiducia",
-        "text": "Madre Gothel vuole tenere Rapunzel vicino a sé, quindi ha bisogno che la principessa si fidi di lei. Se una carta ti dice di ottenere Fiducia, prendi dei segnalini Potere dalla Riserva in base a quanto ti viene indicato e piazzali sulla tua Plancia per indicare che quella ora è la Fiducia che hai accumulato.\n\nNota: La Fiducia non conta più come Potere. Non può quindi mai essere usata per pagare il costo di una carta o di un'Abilità. Avere segnalini Fiducia o aggiungerli dalla Riserva non fanno attivare Condizioni che richiedono l'avere o il guadagnare Potere."
+        "text": "Madre Gothel vuole tenere Rapunzel vicino a sé, quindi ha bisogno che la principessa si fidi di lei. Se una carta ti dice di ottenere Fiducia, prendi dei Segnalini Potere dalla Riserva in base a quanto ti viene indicato e piazzali sulla tua Plancia per indicare che quella ora è la Fiducia che hai accumulato.\n\nNota: La Fiducia non conta più come Potere. Non può quindi mai essere usata per pagare il Costo di una carta o di un'Abilità. Avere Segnalini Fiducia o aggiungerli dalla Riserva non fanno attivare Condizioni che richiedono l'avere o il guadagnare Potere."
       },
       {
         "title": "Rapunzel",
-        "text": "Rapunzel è un Eroe unico, perché si trova già nel tuo Reame all'inizio della partita e non può mai essere scartata. Come gli altri Eroi, blocca le azioni nel Luogo in cui si trova e può essere sconfitta usando l'azione Scontro. Tuttavia, quando viene sconfitta, invece che essere scartata, Rapunzel va mossa nella Torre di Rapunzel.\n\nImportante: Alla fine del turno di Madre Gothel, muovi Rapunzel di un Luogo verso Corona. Se non puoi muovere Rapunzel perché si trova già a Corona, Madre Gothel perde 1 segnalino Fiducia."
+        "text": "Rapunzel è un Eroe unico, perché si trova già nel tuo Reame all'inizio della partita e non può mai essere scartata. Come gli altri Eroi, blocca le azioni nel Luogo in cui si trova e può essere sconfitta usando l'Azione Scontro. Tuttavia, quando viene sconfitta, invece che essere scartata, Rapunzel va mossa nella Torre di Rapunzel.\n\nImportante: Alla fine del turno di Madre Gothel, muovi Rapunzel di un Luogo verso Corona. Se non puoi muovere Rapunzel perché si trova già a Corona, Madre Gothel perde 1 Segnalino Fiducia."
       },
       {
         "title": "Controllare Rapunzel",
-        "text": "Madre Gothel è in grado di guadagnare Fiducia facilmente quando Rapunzel si trova nella Torre, quindi è molto importante riuscire a tenerla lontana da Corona. Madre Gothel ha vari mezzi per controllare la posizione di Rapunzel.\n\nResta con Me impedisce a Rapunzel di muoversi verso Corona alla fine del turno in cui viene giocata.\n\nI fratelli Stabbington fanno muovere Rapunzel alla Torre di Rapunzel e sono Alleati potenti che possono essere usati per sconfiggere gli Eroi.\n\nOra mi Trasformo nella Cattiva fa muovere Rapunzel alla Torre di Rapunzel. Madre Gothel però perde 1 segnalino Fiducia. Nonostante ciò, a volte questa carta può essere d'aiuto in combinazione con altre azioni."
+        "text": "Madre Gothel è in grado di guadagnare Fiducia facilmente quando Rapunzel si trova nella Torre, quindi è molto importante riuscire a tenerla lontana da Corona. Madre Gothel ha vari mezzi per controllare la posizione di Rapunzel.\n\nResta con Me impedisce a Rapunzel di muoversi verso Corona alla fine del turno in cui viene giocata.\n\nI fratelli Stabbington fanno muovere Rapunzel alla Torre di Rapunzel e sono Alleati potenti che possono essere usati per sconfiggere gli Eroi.\n\nOra mi Trasformo nella Cattiva fa muovere Rapunzel alla Torre di Rapunzel. Madre Gothel però perde 1 Segnalino Fiducia. Nonostante ciò, a volte questa carta può essere d'aiuto in combinazione con altre azioni."
       },
       {
         "title": "Ottenere Fiducia",
-        "text": "Ci sono diverse carte che ti concedono Fiducia.\n\nQuando la Spazzola viene giocata o mossa nel Luogo dove si trova Rapunzel, ottieni 1 segnalino Fiducia. Questo Oggetto è specialmente utile se giocato all'inizio, visto che ti consente di continuare ad accumulare Fiducia finché si trova nel tuo Reame.\n\nTi Voglio Talmente Bene ti fa guadagnare 1 segnalino Fiducia se Madre Gothel si trova nello stesso Luogo di Rapunzel. È ancora più utile se la giochi quando ti trovi con Rapunzel alla Torre, visto che ti fa guadagnare ulteriore Fiducia.\n\nSciogli i Tuoi Capelli ti fa guadagnare Fiducia o muovere Rapunzel per tenerla lontana da Corona.\n\nInganno ti fa ottenere 1 segnalino Fiducia, ma Rapunzel si muove verso Corona, quindi va usato in modo strategico per non rischiare di perdere Fiducia più avanti.\n\nIl Diadema può essere usato per ottenere Potere ogni volta che un Eroe viene sconfitto nel Luogo in cui si trova. Altrimenti, puoi decidere di scartare il Diadema per ottenere 1 segnalino Fiducia.\n\nVendetta ti permette di svolgere un'azione Scontro e ottenere 1 segnalino Fiducia se un Eroe diverso da Rapunzel viene sconfitto."
+        "text": "Ci sono diverse carte che ti concedono Fiducia.\n\nQuando la Spazzola viene giocata o mossa nel Luogo dove si trova Rapunzel, ottieni 1 Segnalino Fiducia. Questo Oggetto è specialmente utile se giocato all'inizio, visto che ti consente di continuare ad accumulare Fiducia finché si trova nel tuo Reame.\n\nTi Voglio Talmente Bene ti fa guadagnare 1 Segnalino Fiducia se Madre Gothel si trova nello stesso Luogo di Rapunzel. È ancora più utile se la giochi quando ti trovi con Rapunzel alla Torre, visto che ti fa guadagnare ulteriore Fiducia.\n\nSciogli i Tuoi Capelli ti fa guadagnare Fiducia o muovere Rapunzel per tenerla lontana da Corona.\n\nInganno ti fa ottenere 1 Segnalino Fiducia, ma Rapunzel si muove verso Corona, quindi va usato in modo strategico per non rischiare di perdere Fiducia più avanti.\n\nIl Diadema può essere usato per ottenere Potere ogni volta che un Eroe viene sconfitto nel Luogo in cui si trova. Altrimenti, puoi decidere di scartare il Diadema per ottenere 1 Segnalino Fiducia.\n\nVendetta ti permette di svolgere un'Azione Scontro e ottenere 1 Segnalino Fiducia se un Eroe diverso da Rapunzel viene sconfitto."
       },
       {
         "title": "Consigli Strategici",
@@ -404,19 +404,19 @@
     "sections": [
       {
         "title": "Preparazione speciale e Movimento",
-        "text": "Metti la pedina di Re Candito sulla casella Partenza/Traguardo contrassegnata dalle bandierine. Metti il segnalino Corsa di Vanellope von Schweetz vicino alla plancia del tuo Reame. Re Candito si muove diversamente dagli altri Cattivi; gareggia sull'intera Pista di Sugar Rush, muovendosi da uno spazio azione all'altro disegnando una forma a 8. In un singolo giro passerà due volte per la casella centrale Ottenere 3 gettoni Potere.\n\nOgni turno, prima che Re Candito si muova con la sua pedina, dichiara di quanti spazi azione ti vuoi muovere, tra 1 e 4. Uno spazio azione conta come movimento anche se è coperto."
+        "text": "Metti la pedina di Re Candito sulla casella Partenza/Traguardo contrassegnata dalle bandierine. Metti il Segnalino Corsa di Vanellope von Schweetz vicino alla Plancia del tuo Reame. Re Candito si muove diversamente dagli altri Cattivi; gareggia sull'intera Pista di Sugar Rush, muovendosi da uno spazio azione all'altro disegnando una forma a 8. In un singolo giro passerà due volte per la casella centrale Ottenere 3 Gettoni Potere.\n\nOgni turno, prima che Re Candito si muova con la sua pedina, dichiara di quanti spazi azione ti vuoi muovere, tra 1 e 4. Uno spazio azione conta come movimento anche se è coperto."
       },
       {
         "title": "Azioni Speciali Gratuite",
-        "text": "Re Candito dispone di carte che può giocare senza svolgere un'azione Giocare una Carta. La Tassa d'Iscrizione per la Corsa va pagata e giocata prima che Re Candito dichiari il suo movimento. Turbastico permette a Re Candito di svolgere anche azioni che in quel momento sono coperte."
+        "text": "Re Candito dispone di carte che può giocare senza svolgere un'Azione Giocare una Carta. La Tassa d'Iscrizione per la Corsa va pagata e giocata prima che Re Candito dichiari il suo movimento. Turbastico permette a Re Candito di svolgere anche azioni che in quel momento sono coperte."
       },
       {
         "title": "Svolgere le Azioni",
-        "text": "Quando Re Candito si muove, può svolgere l'azione su cui si trova, quella che ha davanti a sé lungo la pista e quella che ha dietro di sé, per un totale di tre azioni durante il suo turno. Possono essere svolte in qualsiasi ordine. Se un'azione è coperta, Re Candito non può svolgere quell'azione. Può anche succedere che Re Candito non abbia azioni disponibili.\n\nLa Partenza/Traguardo è un'azione Giocare una Carta.\n\nAnche se il Reame di Re Candito è una pista continua, ciascuna sezione rappresenta un Luogo dove si può svolgere un'azione Scontro."
+        "text": "Quando Re Candito si muove, può svolgere l'azione su cui si trova, quella che ha davanti a sé lungo la pista e quella che ha dietro di sé, per un totale di tre azioni durante il suo turno. Possono essere svolte in qualsiasi ordine. Se un'azione è coperta, Re Candito non può svolgere quell'azione. Può anche succedere che Re Candito non abbia azioni disponibili.\n\nLa Partenza/Traguardo è un'Azione Giocare una Carta.\n\nAnche se il Reame di Re Candito è una pista continua, ciascuna sezione rappresenta un Luogo dove si può svolgere un'Azione Scontro."
       },
       {
         "title": "La Grande Corsa",
-        "text": "Quando un Glitch viene assegnato a Vanellope von Schweetz, inizia la Grande Corsa mettendo il segnalino Corsa e la pedina di Re Candito sulla Partenza/Traguardo. Il turno di Re Candito termina. Fai attenzione al fatto che più Glitch possono essere assegnati a Vanellope von Schweetz, ma la Grande Corsa inizia solo se le viene assegnato un Glitch in un momento in cui non ne ha già altri assegnati.\n\nSe Re Candito raggiunge la casella Partenza/Traguardo prima del segnalino Corsa, ha vinto la partita. Se il segnalino Corsa raggiunge la casella Partenza/Traguardo per primo, rimuovi tutti i Glitch assegnati a Vanellope von Schweetz e aggiungili alla mano di Re Candito."
+        "text": "Quando un Glitch viene assegnato a Vanellope von Schweetz, inizia la Grande Corsa mettendo il Segnalino Corsa e la pedina di Re Candito sulla Partenza/Traguardo. Il turno di Re Candito termina. Fai attenzione al fatto che più Glitch possono essere assegnati a Vanellope von Schweetz, ma la Grande Corsa inizia solo se le viene assegnato un Glitch in un momento in cui non ne ha già altri assegnati.\n\nSe Re Candito raggiunge la casella Partenza/Traguardo prima del Segnalino Corsa, ha vinto la partita. Se il Segnalino Corsa raggiunge la casella Partenza/Traguardo per primo, rimuovi tutti i Glitch assegnati a Vanellope von Schweetz e aggiungili alla mano di Re Candito."
       }
     ]
   },
@@ -425,52 +425,52 @@
     "sections": [
       {
         "title": "Preparazione",
-        "text": "Metti i quattro segnalini Fuoco da parte vicino al tuo Reame."
+        "text": "Metti i quattro Segnalini Fuoco da parte vicino al tuo Reame."
       },
       {
         "title": "Kaa, i Suoi Occhi e le Sue Spire",
-        "text": "Kaa, l'alleato di Shere Khan, ha molti modi di aiutarlo. Puoi assegnare a Kaa gli Oggetti Gli Occhi di Kaa e Le Spire di Kaa per aumentare la sua Forza a 4 o addirittura a 6! Se Kaa viene usato in un'azione Scontro, puoi rimuovere questi Oggetti al suo posto. Puoi usare l'azione Attivare di Kaa per trovare questi Oggetti nella pila degli scarti."
+        "text": "Kaa, l'Alleato di Shere Khan, ha molti modi di aiutarlo. Puoi assegnare a Kaa gli Oggetti Gli Occhi di Kaa e Le Spire di Kaa per aumentare la sua Forza a 4 o addirittura a 6! Se Kaa viene usato in un'Azione Scontro, puoi rimuovere questi Oggetti al suo posto. Puoi usare l'Azione Attivare di Kaa per trovare questi Oggetti nella pila degli scarti."
       },
       {
         "title": "Il Rosso Fuoco dell'Uomo",
-        "text": "I segnalini Fuoco vengono piazzati con le carte Fato Mowgli e Il Rosso Fuoco dell'Uomo. Un segnalino Fuoco può coprire una singola azione, che viene considerata come se fosse coperta da una carta Eroe. Il segnalino Fuoco può essere messo su una qualunque azione sia della parte alta che della parte bassa del Reame di Shere Khan. Se viene giocata una carta o se è già presente una carta in un Luogo, il segnalino può comunque essere messo su un'azione, e sarà necessario rimuoverli entrambi per poter svolgere quell'Azione.\n\nBravi! Bravi! ti permette di svolgere un'Azione bloccata, anche se è coperta da un segnalino Fuoco."
+        "text": "I Segnalini Fuoco vengono piazzati con le carte Fato Mowgli e Il Rosso Fuoco dell'Uomo. Un Segnalino Fuoco può coprire una singola azione, che viene considerata come se fosse coperta da una carta Eroe. Il Segnalino Fuoco può essere messo su una qualunque azione sia della parte alta che della parte bassa del Reame di Shere Khan. Se viene giocata una carta o se è già presente una carta in un Luogo, il segnalino può comunque essere messo su un'azione, e sarà necessario rimuoverli entrambi per poter svolgere quell'Azione.\n\nBravi! Bravi! ti permette di svolgere un'Azione bloccata, anche se è coperta da un Segnalino Fuoco."
       },
       {
         "title": "Manipolare le Carte",
-        "text": "Ehi Cugino e Spera in Me ti permettono di manipolare le carte nel tuo mazzo Cattivo e nella pila degli scarti. Ehi Cugino ti permette di rivelare carte finché non trovi un Alleato. Spera in Me ti permette di rimescolare tre carte dalla tua pila degli scarti nel tuo mazzo."
+        "text": "Ehi Cugino e Spera in Me ti permettono di manipolare le carte nel tuo Mazzo Cattivo e nella pila degli scarti. Ehi Cugino ti permette di rivelare carte finché non trovi un Alleato. Spera in Me ti permette di rimescolare tre carte dalla tua pila degli scarti nel tuo mazzo."
       },
       {
         "title": "Rimuovere Segnalini Fuoco",
-        "text": "Per rimuovere i segnalini Fuoco, usa l'azione Attivare sulla carta Scimmie. Sono Io, Shere Khan rimuove un segnalino senza dover sacrificare un alleato."
+        "text": "Per rimuovere i Segnalini Fuoco, usa l'Azione Attivare sulla carta Scimmie. Sono Io, Shere Khan rimuove un segnalino senza dover sacrificare un Alleato."
       },
       {
         "title": "Combatti da Orso",
-        "text": "Baloo ha un potere unico che influenza la sconfitta e lo scontro con tutti gli altri Eroi. Fintanto che Baloo è in gioco, se Shere Khan sconfigge un Eroe, quell'Eroe non viene scartato. Viene invece piazzato un gettone Potere su Baloo. Quando sulla carta di Baloo ci sono tre gettoni Potere, allora è sconfitto. Baloo protegge gli Eroi in questo modo, prima di essere sconfitto e scartato."
+        "text": "Baloo ha un potere unico che influenza la sconfitta e lo scontro con tutti gli altri Eroi. Fintanto che Baloo è in gioco, se Shere Khan sconfigge un Eroe, quell'Eroe non viene scartato. Viene invece piazzato un Gettone Potere su Baloo. Quando sulla carta di Baloo ci sono tre Gettoni Potere, allora è sconfitto. Baloo protegge gli Eroi in questo modo, prima di essere sconfitto e scartato."
       }
     ]
   },
   "Ratigan": {
-    "objective": "Importante: L'Obiettivo di Rattigan potrebbe cambiare. Se la Regina Robot viene scartata dal tuo Reame, il tuo nuovo obiettivo sarà sconfiggere Basil.",
+    "objective": "Importante: L'Obiettivo di Rattigan potrebbe cambiare. Se la Regina Robot viene scartata dal tuo Reame, il tuo nuovo Obiettivo sarà sconfiggere Basil.",
     "sections": [
       {
         "title": "Preparazione Speciale",
-        "text": "Posiziona la tessera Obiettivo di Rattigan sul lato sinistro della Plancia, in modo che sia visibile La Mente Superiore."
+        "text": "Posiziona la Tessera Obiettivo di Rattigan sul lato sinistro della Plancia, in modo che sia visibile La Mente Superiore."
       },
       {
         "title": "La Regina Robot",
-        "text": "Per raggiungere l'Obiettivo di Rattigan, devi prima trovare la Regina Robot, per poi giocarla e muoverla fino a Buckingham Palace. Preparati a pagare il costo elevato della Regina Robot, che di solito è 15 Gettoni Potere.\n\nAlcune carte servono ad aiutarti a trovare la Regina Robot. Se giochi la Lista di Vampirello, puoi in seguito attivarla per pescare il prossimo Oggetto nel tuo mazzo. Giocare La Più Grande Mente Criminale, ti permette invece di ottenere Potere aggiuntivo, oppure di pescare carte extra.\n\nAltre carte ti aiutano invece a ridurre il costo della Regina Robot. Per esempio, è bene giocare la carta Utensili il prima possibile, perché riduce il costo di tutti gli Oggetti. La carta Ingranaggi riduce a sua volta il costo di un Oggetto, ma va poi scartata dopo l'uso."
+        "text": "Per raggiungere l'Obiettivo di Rattigan, devi prima trovare la Regina Robot, per poi giocarla e muoverla fino a Buckingham Palace. Preparati a pagare il Costo elevato della Regina Robot, che di solito è 15 Gettoni Potere.\n\nAlcune carte servono ad aiutarti a trovare la Regina Robot. Se giochi la Lista di Vampirello, puoi in seguito attivarla per pescare il prossimo Oggetto nel tuo mazzo. Giocare La Più Grande Mente Criminale, ti permette invece di ottenere Potere aggiuntivo, oppure di pescare carte extra.\n\nAltre carte ti aiutano invece a ridurre il Costo della Regina Robot. Per esempio, è bene giocare la carta Utensili il prima possibile, perché riduce il Costo di tutti gli Oggetti. La carta Ingranaggi riduce a sua volta il Costo di un Oggetto, ma va poi scartata dopo l'uso."
       },
       {
         "title": "La Trappola Meravigliosa",
-        "text": "La Trappola Meravigliosa è una carta molto forte, che può sconfiggere tutti gli Eroi che si trovano nel suo stesso Luogo, ma deve prima essere preparata e richiede tempo per essere attivata.\n\nPrima di tutto, gioca la trappola in qualsiasi Luogo. Poi, quando svolgi l'azione Attivare, puoi pagare 1 Gettone Potere per attivare la carta. Lascia il Gettone sulla carta per indicare che è stata attivata e che avrà effetto all'inizio del tuo prossimo turno.\n\nSe non ci sono Eroi nel Luogo in cui c'è la trappola quando questa ha effetto, scarta comunque la trappola. Se questa viene scartata prima di avere effetto, nessun Eroe verrà sconfitto. Quando la Trappola Meravigliosa viene scartata, rimetti il Gettone Potere nella Riserva.\n\nNota: Se la Regina Robot si trova a Buckingham Palace e la Regina dei Topi viene sconfitta con la trappola, non vinci immediatamente. Dovrai aspettare l'inizio del prossimo turno per vedere se l'Obiettivo sarà ancora raggiungibile."
+        "text": "La Trappola Meravigliosa è una carta molto forte, che può sconfiggere tutti gli Eroi che si trovano nel suo stesso Luogo, ma deve prima essere preparata e richiede tempo per essere attivata.\n\nPrima di tutto, gioca la trappola in qualsiasi Luogo. Poi, quando svolgi l'Azione Attivare, puoi pagare 1 Gettone Potere per attivare la carta. Lascia il gettone sulla carta per indicare che è stata attivata e che avrà effetto all'inizio del tuo prossimo turno.\n\nSe non ci sono Eroi nel Luogo in cui c'è la trappola quando questa ha effetto, scarta comunque la trappola. Se questa viene scartata prima di avere effetto, nessun Eroe verrà sconfitto. Quando la Trappola Meravigliosa viene scartata, rimetti il Gettone Potere nella Riserva.\n\nNota: Se la Regina Robot si trova a Buckingham Palace e la Regina dei Topi viene sconfitta con la trappola, non vinci immediatamente. Dovrai aspettare l'inizio del prossimo turno per vedere se l'Obiettivo sarà ancora raggiungibile."
       },
       {
         "title": "L'Investigatopo",
-        "text": "Basil è l'avversario più temibile di Rattigan. Quando Basil viene giocato o mosso, scarta un Oggetto dal Luogo in cui arriva. Alcune carte Fato possono far muovere Basil, rendendolo una costante minaccia per i tuoi Oggetti, inclusa la Regina Robot.\n\nSe Basil fa scartare la Regina Robot, capovolgi la tessera Obiettivo in modo che sia visibile il Ratto. Il tuo nuovo Obiettivo sarà sconfiggere Basil.\n\nNota: Una volta che l'Obiettivo di Rattigan cambia, non potrà cambiare di nuovo. Dovrai sconfiggere Basil per vincere."
+        "text": "Basil è l'avversario più temibile di Rattigan. Quando Basil viene giocato o mosso, scarta un Oggetto dal Luogo in cui arriva. Alcune carte Fato possono far muovere Basil, rendendolo una costante minaccia per i tuoi Oggetti, inclusa la Regina Robot.\n\nSe Basil fa scartare la Regina Robot, capovolgi la Tessera Obiettivo in modo che sia visibile il Ratto. Il tuo nuovo Obiettivo sarà sconfiggere Basil.\n\nNota: Una volta che l'Obiettivo di Rattigan cambia, non potrà cambiare di nuovo. Dovrai sconfiggere Basil per vincere."
       },
       {
         "title": "Il Covo Segreto",
-        "text": "Rattigan ha a disposizione un Luogo che può essere usato a suo vantaggio. Il Covo Segreto non ha simboli Azione sulla sua parte superiore, rendendo meno dannosi gli Eroi posizionati su questo Luogo. Rattigan ha a disposizione le carte Rapimento, che gli permettono di spostare gli Eroi nel Covo Segreto.\n\nSe rapisci l'Eroe Flaversham, il costo per giocare la Regina Robot si riduce. Il tuo Alleato Vampirello ti sarà utile per trovare e giocare Flaversham, in modo da poterlo poi rapire.\n\nNota: Le Abilità degli Eroi restano attive anche se si trovano nel Covo Segreto."
+        "text": "Rattigan ha a disposizione un Luogo che può essere usato a suo vantaggio. Il Covo Segreto non ha simboli Azione sulla sua parte superiore, rendendo meno dannosi gli Eroi posizionati su questo Luogo. Rattigan ha a disposizione le carte Rapimento, che gli permettono di spostare gli Eroi nel Covo Segreto.\n\nSe rapisci l'Eroe Flaversham, il Costo per giocare la Regina Robot si riduce. Il tuo Alleato Vampirello ti sarà utile per trovare e giocare Flaversham, in modo da poterlo poi rapire.\n\nNota: Le Abilità degli Eroi restano attive anche se si trovano nel Covo Segreto."
       }
     ]
   },
@@ -483,15 +483,15 @@
       },
       {
         "title": "La pila della Successione",
-        "text": "Scar ha una pila della Successione che è separata dai suoi Mazzi e dalle pile degli scarti. Quando sconfiggi Mufasa, mettilo nella pila della Successione invece che nella pila degli scarti del Mazzo Fato. Per il resto della partita, tutti gli altri Eroi che verranno sconfitti vanno messi nella pila della Successione. Tieni la pila della Successione a faccia in su sotto la Plancia. Le carte all'interno della pila sono liberamente consultabili da tutti.\n\nGli oggetti non vanno messi nella pila della Successione. Quando un Eroe ha assegnata a sé la Profezia e viene sconfitto, la Profezia va scartata nella pila degli scarti del Mazzo Fato.\n\nImportante: La pila della Successione non viene considerata parte del tuo Reame. Le Abilità degli Eroi al suo interno vanno ignorate e nessuna carta può essere giocata direttamente nella pila della Successione."
+        "text": "Scar ha una pila della Successione che è separata dai suoi mazzi e dalle pile degli scarti. Quando sconfiggi Mufasa, mettilo nella pila della Successione invece che nella pila degli scarti del Mazzo Fato. Per il resto della partita, tutti gli altri Eroi che verranno sconfitti vanno messi nella pila della Successione. Tieni la pila della Successione a faccia in su sotto la Plancia. Le carte all'interno della pila sono liberamente consultabili da tutti.\n\nGli Oggetti non vanno messi nella pila della Successione. Quando un Eroe ha assegnata a sé la Profezia e viene sconfitto, la Profezia va scartata nella pila degli scarti del Mazzo Fato.\n\nImportante: La pila della Successione non viene considerata parte del tuo Reame. Le Abilità degli Eroi al suo interno vanno ignorate e nessuna carta può essere giocata direttamente nella pila della Successione."
       },
       {
         "title": "Le Iene",
-        "text": "Le Iene sono gli alleati che userai più spesso per sconfiggere gli Eroi. Più Iene ci sono, più queste diventano forti. Le Iene Affamate ottengono Forza aggiuntiva per ogni altra Iena nello stesso Luogo.\n\nSimba è un Eroe che limita la Forza di tutte le Iene nel tuo Reame. Se una Iena può ottenere una Forza superiore a 2, la sua Forza rimane 2 fintanto che Simba non viene sconfitto.\n\nEsempio: Ci sono tre Iene alla Rupe dei Re, incluso Ed. Di solito, la Forza delle Iene Affamate sarebbe 3, mentre quella di Ed sarebbe 2. Tuttavia, Simba limita la Forza di ciascuna Iena a 2. Se svolgi un'azione Scontro per sconfiggere Simba, la cui Forza è 5, dovrai scartare tutti e tre gli Alleati."
+        "text": "Le Iene sono gli Alleati che userai più spesso per sconfiggere gli Eroi. Più Iene ci sono, più queste diventano forti. Le Iene Affamate ottengono Forza aggiuntiva per ogni altra Iena nello stesso Luogo.\n\nSimba è un Eroe che limita la Forza di tutte le Iene nel tuo Reame. Se una Iena può ottenere una Forza superiore a 2, la sua Forza rimane 2 fintanto che Simba non viene sconfitto.\n\nEsempio: Ci sono tre Iene alla Rupe dei Re, incluso Ed. Di solito, la Forza delle Iene Affamate sarebbe 3, mentre quella di Ed sarebbe 2. Tuttavia, Simba limita la Forza di ciascuna Iena a 2. Se svolgi un'Azione Scontro per sconfiggere Simba, la cui Forza è 5, dovrai scartare tutti e tre gli Alleati."
       },
       {
         "title": "Capibranco",
-        "text": "Le Iene Shenzi, Ed e Banzai sono Alleati che ti aiutano a ottenere o risparmiare Potere. Giocandole il prima possibile, puoi usare le loro Abilità per giocare altre Iene, che potrai poi usare per sconfiggere gli Eroi.\n\nShenzi ti consente di giocare un'altra Iena senza pagarne il costo.\n\nBanzai ti fa guadagnare Gettoni Potere ogni volta che altre Iene nello stesso Luogo vengono scartate, anche se Banzai è tra le Iene scartate in quell'azione. Per esempio, se svolgi un'azione Scontro usando Banzai e due Iene Affamate, ottieni 2 Gettoni Potere.\n\nEd riduce il costo per giocare le Iene nel suo stesso Luogo.\n\nNota: Shenzi, Ed e Banzai sono Iene. Qualsiasi carta che fa riferimento alle Iene si riferisce anche a loro."
+        "text": "Le Iene Shenzi, Ed e Banzai sono Alleati che ti aiutano a ottenere o risparmiare Potere. Giocandole il prima possibile, puoi usare le loro Abilità per giocare altre Iene, che potrai poi usare per sconfiggere gli Eroi.\n\nShenzi ti consente di giocare un'altra Iena senza pagarne il Costo.\n\nBanzai ti fa guadagnare Gettoni Potere ogni volta che altre Iene nello stesso Luogo vengono scartate, anche se Banzai è tra le Iene scartate in quell'azione. Per esempio, se svolgi un'Azione Scontro usando Banzai e due Iene Affamate, ottieni 2 Gettoni Potere.\n\nEd riduce il Costo per giocare le Iene nel suo stesso Luogo.\n\nNota: Shenzi, Ed e Banzai sono Iene. Qualsiasi carta che fa riferimento alle Iene si riferisce anche a loro."
       }
     ]
   },
@@ -507,11 +507,11 @@
       },
       {
         "title": "Controllare Kronk",
-        "text": "Kronk è un potente Alleato ed è essenziale per il tuo Obiettivo, ma può ritorcersi contro di te. Ogni volta che Kronk viene mosso, sia per effetto di un'azione o di un'Abilità, metti 1 Gettone Potere dalla riserva sulla sua carta. Quando ha 3 o più Gettoni, diventa un Eroe. Spostalo sulla parte superiore della tua Plancia, lasciandolo nello stesso Luogo. Ha la stessa Forza, ma ignora la sua Abilità - muoverlo mentre è un Eroe non fa aggiungere Gettoni Potere.\n\nLa Via dello Sballo ti consente di guadagnare i Gettoni Potere di Kronk, che sia o meno un Alleato o un Eroe. Braccio Destro può essere invece usata per riprendere in mano Kronk, a prescindere che sia un Eroe o meno, o che sia ancora nel mazzo.\n\nNota: Rimuovere Gettoni Potere da Kronk quando è un Eroe non lo trasforma di nuovo in un Alleato."
+        "text": "Kronk è un potente Alleato ed è essenziale per il tuo Obiettivo, ma può ritorcersi contro di te. Ogni volta che Kronk viene mosso, sia per effetto di un'azione o di un'Abilità, metti 1 Gettone Potere dalla riserva sulla sua carta. Quando ha 3 o più gettoni, diventa un Eroe. Spostalo sulla parte superiore della tua Plancia, lasciandolo nello stesso Luogo. Ha la stessa Forza, ma ignora la sua Abilità - muoverlo mentre è un Eroe non fa aggiungere Gettoni Potere.\n\nLa Via dello Sballo ti consente di guadagnare i Gettoni Potere di Kronk, che sia o meno un Alleato o un Eroe. Braccio Destro può essere invece usata per riprendere in mano Kronk, a prescindere che sia un Eroe o meno, o che sia ancora nel mazzo.\n\nNota: Rimuovere Gettoni Potere da Kronk quando è un Eroe non lo trasforma di nuovo in un Alleato."
       },
       {
         "title": "Il Fato di Yzma",
-        "text": "Quando un avversario ti sceglie come bersaglio di un'azione Fato, deve scegliere uno dei Mazzi Fato di Yzma, guardarne in segreto tutte le carte, e sceglierne una da giocare. Se sceglie di giocare un Eroe, quello deve essere giocato nel Luogo di riferimento di quel Mazzo Fato. Tutte le altre carte vengono mescolate e rimesse al loro posto, per riformare il Mazzo Fato. Se nessuna delle carte può essere giocata, semplicemente rimescolale tutte e ricomponi il Mazzo.\n\nNota: Siccome l'avversario non deve rivelare le carte all'interno di un Mazzo Fato, può anche scegliere di non giocare l'Altra Leva! a meno che non ci siano altre carte tra cui scegliere.\n\nSe uno dei Mazzi Fato termina, non rimescolare la pila degli scarti. L'avversario dovrà scegliere uno dei Mazzi Fato rimasti. Tuttavia, se tutti i Mazzi Fato terminano, rimescola la pila degli scarti e distribuisci di nuovo le carte il più equamente possibile, per riformare quattro Mazzi Fato.\n\nEsempio: Un avversario ti sceglie come bersaglio di un'azione Fato. Sceglie il Mazzo Fato legato al Palazzo e guarda tutte le carte che contiene. Sceglie quindi di giocare Pidocchio, che deve essere posizionato al Palazzo.\n\nNota: Non c'è limite al numero di Eroi in un dato Luogo. Sposta il Mazzo Fato il più in alto possibile per fare spazio e sovrapponi solo parzialmente gli Eroi uno sull'altro, in modo che si possano vedere tutte le carte."
+        "text": "Quando un avversario ti sceglie come bersaglio di un'Azione Fato, deve scegliere uno dei Mazzi Fato di Yzma, guardarne in segreto tutte le carte, e sceglierne una da giocare. Se sceglie di giocare un Eroe, quello deve essere giocato nel Luogo di riferimento di quel Mazzo Fato. Tutte le altre carte vengono mescolate e rimesse al loro posto, per riformare il Mazzo Fato. Se nessuna delle carte può essere giocata, semplicemente rimescolale tutte e ricomponi il mazzo.\n\nNota: Siccome l'avversario non deve rivelare le carte all'interno di un Mazzo Fato, può anche scegliere di non giocare l'Altra Leva! a meno che non ci siano altre carte tra cui scegliere.\n\nSe uno dei Mazzi Fato termina, non rimescolare la pila degli scarti. L'avversario dovrà scegliere uno dei Mazzi Fato rimasti. Tuttavia, se tutti i Mazzi Fato terminano, rimescola la pila degli scarti e distribuisci di nuovo le carte il più equamente possibile, per riformare quattro Mazzi Fato.\n\nEsempio: Un avversario ti sceglie come bersaglio di un'Azione Fato. Sceglie il Mazzo Fato legato al Palazzo e guarda tutte le carte che contiene. Sceglie quindi di giocare Pidocchio, che deve essere posizionato al Palazzo.\n\nNota: Non c'è limite al numero di Eroi in un dato Luogo. Sposta il Mazzo Fato il più in alto possibile per fare spazio e sovrapponi solo parzialmente gli Eroi uno sull'altro, in modo che si possano vedere tutte le carte."
       }
     ]
   },
@@ -519,27 +519,27 @@
     "sections": [
       {
         "title": "Preparazione speciale",
-        "text": "Posiziona l'Omnidroide v.X8 sull'Isola Nonceunanima, sulla parte bassa del Reame di Sindrome. Metti la tessera Omnidroide v.X9 sopra a quella dell'Omnidroide v.10 e posizionale entrambe alla destra del tuo Reame."
+        "text": "Posiziona l'Omnidroide v.X8 sull'Isola Nonceunanima, sulla parte bassa del Reame di Sindrome. Metti la Tessera Omnidroide v.X9 sopra a quella dell'Omnidroide v.10 e posizionale entrambe alla destra del tuo Reame."
       },
       {
         "title": "Usare gli Omnidroidi",
-        "text": "Sindrome può usare gli Omnidroidi nelle azioni Scontro, insieme a qualsiasi altro Alleato. Tutti gli Omnidroidi possono essere mossi usando l'azione Muovi un Oggetto o un Alleato, se si trovano sulla parte bassa del Reame di Sindrome. Sindrome non può muovere gli Omnidroidi che si trovano sulla parte alta del suo Reame."
+        "text": "Sindrome può usare gli Omnidroidi nelle Azioni Scontro, insieme a qualsiasi altro Alleato. Tutti gli Omnidroidi possono essere mossi usando l'Azione Muovi un Oggetto o un Alleato, se si trovano sulla parte bassa del Reame di Sindrome. Sindrome non può muovere gli Omnidroidi che si trovano sulla parte alta del suo Reame."
       },
       {
         "title": "Sconfiggere un Omnidroide",
-        "text": "Gli Omnidroidi v.X8 e v.X9 possiedono Abilità uniche che si attivano solo dopo che sono stati sconfitti con un'azione Scontro. Una volta sconfitti, usa la loro Abilità prima di rimuovere la tessera. Le loro tessere non serviranno più per la partita in corso. L'Omnidroide v.X8 deve essere sconfitto prima che tu possa giocare l'Omnidroide v.X9 e quest'ultimo deve a sua volta essere sconfitto prima che l'Omnidroide v.10 possa essere giocato."
+        "text": "Gli Omnidroidi v.X8 e v.X9 possiedono Abilità uniche che si attivano solo dopo che sono stati sconfitti con un'Azione Scontro. Una volta sconfitti, usa la loro Abilità prima di rimuovere la Tessera. Le loro Tessere non serviranno più per la partita in corso. L'Omnidroide v.X8 deve essere sconfitto prima che tu possa giocare l'Omnidroide v.X9 e quest'ultimo deve a sua volta essere sconfitto prima che l'Omnidroide v.10 possa essere giocato."
       },
       {
         "title": "Aggiornare gli Omnidroidi",
-        "text": "Aggiorna l'Omnidroide alla v.X9 o v.10 rimuovendo il numero corretto di carte Ulteriori Modifiche dal tuo Reame e posizionando la nuova tessera Omnidroide nel Luogo indicato. Questa è un'azione gratuita che non richiede Gettoni Potere e può essere svolta in qualsiasi momento durante il turno di Sindrome. Metti le carte rimosse nella pila degli scarti.\n\nImportante: Non ci può mai essere più di una tessera Omnidroide nel Reame di Sindrome nello stesso momento."
+        "text": "Aggiorna l'Omnidroide alla v.X9 o v.10 rimuovendo il numero corretto di carte Ulteriori Modifiche dal tuo Reame e posizionando la nuova Tessera Omnidroide nel Luogo indicato. Questa è un'azione gratuita che non richiede Gettoni Potere e può essere svolta in qualsiasi momento durante il turno di Sindrome. Metti le carte rimosse nella pila degli scarti.\n\nImportante: Non ci può mai essere più di una Tessera Omnidroide nel Reame di Sindrome nello stesso momento."
       },
       {
         "title": "Il Telecomando di Sindrome",
-        "text": "Sindrome non può vincere la partita a meno che il Telecomando di Sindrome non si trovi nel suo Reame. Quando Sindrome si trova nello stesso Luogo dell'Omnidroide v.10 e il Telecomando di Sindrome si trova nella parte bassa del suo Reame, allora può attivare l'Oggetto e sconfiggere l'Omnidroide v.10.\n\nQuando un Eroe viene giocato nel Reame di Sindrome, assegnagli il Telecomando di Sindrome e muovi immediatamente l'Omnidroide v.10 (se questo è già in gioco) sulla parte bassa del Reame di Sindrome, nello stesso Luogo in cui si trova l'Eroe con il Telecomando di Sindrome.\n\nUna volta che un Eroe con il Telecomando di Sindrome viene sconfitto, il Telecomando di Sindrome si muove di nuovo sulla parte bassa del Reame di Sindrome. L'Omnidroide v.10 a quel punto si muove nuovamente sulla parte alta del Reame di Sindrome.\n\nIl Telecomando di Sindrome può essere mosso usando l'azione Muovi un Oggetto o un Alleato, fintanto che si trova nella parte bassa del Reame di Sindrome."
+        "text": "Sindrome non può vincere la partita a meno che il Telecomando di Sindrome non si trovi nel suo Reame. Quando Sindrome si trova nello stesso Luogo dell'Omnidroide v.10 e il Telecomando di Sindrome si trova nella parte bassa del suo Reame, allora può attivare l'Oggetto e sconfiggere l'Omnidroide v.10.\n\nQuando un Eroe viene giocato nel Reame di Sindrome, assegnagli il Telecomando di Sindrome e muovi immediatamente l'Omnidroide v.10 (se questo è già in gioco) sulla parte bassa del Reame di Sindrome, nello stesso Luogo in cui si trova l'Eroe con il Telecomando di Sindrome.\n\nUna volta che un Eroe con il Telecomando di Sindrome viene sconfitto, il Telecomando di Sindrome si muove di nuovo sulla parte bassa del Reame di Sindrome. L'Omnidroide v.10 a quel punto si muove nuovamente sulla parte alta del Reame di Sindrome.\n\nIl Telecomando di Sindrome può essere mosso usando l'Azione Muovi un Oggetto o un Alleato, fintanto che si trova nella parte bassa del Reame di Sindrome."
       },
       {
         "title": "L'Omnidroide v.10",
-        "text": "L'Omnidroide v.10 va inizialmente giocato nel Centro di Metroville. Se il Telecomando di Sindrome non si trova nel Reame di Sindrome, gioca l'Omnidroide v.10 nella parte alta del Reame. Se nel Reame sono già presenti un Eroe con il Telecomando di Sindrome assegnato, gioca l'Omnidroide v.10 direttamente sul lato opposto del Reame, nello stesso Luogo dell'Eroe. L'Omnidroide v.10 non va mai scartato quando viene usato nelle azioni Scontro.\n\nQuando l'Omnidroide v.10 viene sconfitto usando il Telecomando di Sindrome, capovolgi la tessera. L'Omnidroide v.10 a quel punto non potrà più essere mosso."
+        "text": "L'Omnidroide v.10 va inizialmente giocato nel Centro di Metroville. Se il Telecomando di Sindrome non si trova nel Reame di Sindrome, gioca l'Omnidroide v.10 nella parte alta del Reame. Se nel Reame sono già presenti un Eroe con il Telecomando di Sindrome assegnato, gioca l'Omnidroide v.10 direttamente sul lato opposto del Reame, nello stesso Luogo dell'Eroe. L'Omnidroide v.10 non va mai scartato quando viene usato nelle Azioni Scontro.\n\nQuando l'Omnidroide v.10 viene sconfitto usando il Telecomando di Sindrome, capovolgi la Tessera. L'Omnidroide v.10 a quel punto non potrà più essere mosso."
       },
       {
         "title": "Ridurre la Forza",
@@ -552,23 +552,23 @@
     "sections": [
       {
         "title": "Preparazione speciale",
-        "text": "Separa il mazzo delle Trasformazioni di Merlino dal Mazzo Fato di Maga Magò. Prendi la prima carta del mazzo delle Trasformazioni di Merlino e mettila scoperta sulla Radura del Duello."
+        "text": "Separa il Mazzo delle Trasformazioni di Merlino dal Mazzo Fato di Maga Magò. Prendi la prima carta del Mazzo delle Trasformazioni di Merlino e mettila scoperta sulla Radura del Duello."
       },
       {
         "title": "Le Trasformazioni di Maga Magò",
-        "text": "Maga Magò non ha Alleati a disposizione. Al loro posto possiede le sue Trasformazioni - le diverse forme animali che assume durante il Duello di Magia contro Merlino. Anche Merlino ha le sue Trasformazioni, ognuna delle quali può essere sconfitta solo da una specifica Trasformazione di Maga Magò. Non ci sono Eroi nel Mazzo Fato di Maga Magò.\n\nLe Trasformazioni di Maga Magò contano come Alleati per quanto riguarda le Condizioni degli avversari. Per esempio, un avversario di Maga Magò dovrebbe contare il numero di Trasformazioni di Maga Magò presenti nel suo Reame per determinare quanti \"Alleati\" ci sono.\n\nL'azione Muovere un Oggetto o un Alleato ti permette inoltre di muovere una Trasformazione di Maga Magò."
+        "text": "Maga Magò non ha Alleati a disposizione. Al loro posto possiede le sue Trasformazioni - le diverse forme animali che assume durante il Duello di Magia contro Merlino. Anche Merlino ha le sue Trasformazioni, ognuna delle quali può essere sconfitta solo da una specifica Trasformazione di Maga Magò. Non ci sono Eroi nel Mazzo Fato di Maga Magò.\n\nLe Trasformazioni di Maga Magò contano come Alleati per quanto riguarda le Condizioni degli avversari. Per esempio, un avversario di Maga Magò dovrebbe contare il numero di Trasformazioni di Maga Magò presenti nel suo Reame per determinare quanti \"Alleati\" ci sono.\n\nL'Azione Muovere un Oggetto o un Alleato ti permette inoltre di muovere una Trasformazione di Maga Magò."
       },
       {
         "title": "Le Trasformazioni di Merlino",
-        "text": "Il mazzo Trasformazioni di Merlino contiene soltanto questo tipo di carte. Ci deve sempre essere almeno una Trasformazione di Merlino nel Reame di Maga Magò. Una volta che una carta Trasformazione di Merlino viene sconfitta, scartala dal tuo Reame in una pila degli scarti separata. Poi rivela e gioca immediatamente una nuova Trasformazione di Merlino nella Radura del Duello. Se non ci sono più carte nel mazzo Trasformazioni di Merlino e non ci sono più Trasformazioni di Merlino sul Reame di Maga Magò, hai vinto la partita.\n\nLe Trasformazioni di Merlino contano come Eroi per quanto riguarda le Condizioni dei tuoi avversari. Per esempio, un avversario di Maga Magò dovrebbe contare il numero di Trasformazioni di Merlino presenti nel suo Reame per determinare quanti \"Eroi\" ci sono. Inoltre, se Maga Magò sconfigge una Trasformazione di Merlino, questo conta come aver sconfitto un Eroe. L'azione Muovere un Eroe ti permette di muovere una Trasformazione di Merlino."
+        "text": "Il Mazzo Trasformazioni di Merlino contiene soltanto questo tipo di carte. Ci deve sempre essere almeno una Trasformazione di Merlino nel Reame di Maga Magò. Una volta che una carta Trasformazione di Merlino viene sconfitta, scartala dal tuo Reame in una pila degli scarti separata. Poi rivela e gioca immediatamente una nuova Trasformazione di Merlino nella Radura del Duello. Se non ci sono più carte nel Mazzo Trasformazioni di Merlino e non ci sono più Trasformazioni di Merlino sul Reame di Maga Magò, hai vinto la partita.\n\nLe Trasformazioni di Merlino contano come Eroi per quanto riguarda le Condizioni dei tuoi avversari. Per esempio, un avversario di Maga Magò dovrebbe contare il numero di Trasformazioni di Merlino presenti nel suo Reame per determinare quanti \"Eroi\" ci sono. Inoltre, se Maga Magò sconfigge una Trasformazione di Merlino, questo conta come aver sconfitto un Eroe. L'Azione Muovere un Eroe ti permette di muovere una Trasformazione di Merlino."
       },
       {
         "title": "Il Mazzo Fato di Maga Magò",
-        "text": "Maga Magò ha meno carte Fato degli altri Cattivi. Quando è il bersaglio di un'azione Fato, il suo avversario pesca dal suo Mazzo Fato ridotto. Siccome è più piccolo degli altri, potrebbe essere necessario rimescolarlo più spesso.\n\nAnacleto può interferire con i piani di Maga Magò sostituendo una delle Trasformazioni di Merlino con un'altra. Prima, va giocata una Trasformazione di Merlino nello stesso Luogo del tuo Reame in cui se ne trova già almeno un'altra. Poi, il tuo avversario sceglierà una delle Trasformazioni di Merlino in quel Luogo e la rimescolerà nel Mazzo Trasformazioni di Merlino."
+        "text": "Maga Magò ha meno carte Fato degli altri Cattivi. Quando è il bersaglio di un'Azione Fato, il suo avversario pesca dal suo Mazzo Fato ridotto. Siccome è più piccolo degli altri, potrebbe essere necessario rimescolarlo più spesso.\n\nAnacleto può interferire con i piani di Maga Magò sostituendo una delle Trasformazioni di Merlino con un'altra. Prima, va giocata una Trasformazione di Merlino nello stesso Luogo del tuo Reame in cui se ne trova già almeno un'altra. Poi, il tuo avversario sceglierà una delle Trasformazioni di Merlino in quel Luogo e la rimescolerà nel Mazzo Trasformazioni di Merlino."
       },
       {
         "title": "Un Duello di Magia",
-        "text": "Maga Magò non dispone di azioni Scontro. Al loro posto, ognuna delle sue Trasformazioni aggiunge un'azione Scontro al Luogo in cui si trova.\n\nOgnuna delle Trasformazioni di Maga Magò può sconfiggere solo una specifica Trasformazione di Merlino.\n\n\n• Magò Coccodrillo sconfigge Merlino Tartaruga\n\n• Magò Volpe sconfigge Merlino Coniglio\n\n• Magò Gallina sconfigge Merlino Bruco\n\n• Magò Elefante sconfigge Merlino Tricheco\n\n• Magò Tigre sconfigge Merlino Topo\n\n• Magò Serpente sconfigge Merlino Topo\n\n• Magò Rinoceronte sconfigge Merlino Granchio\n\n• Magò Drago Viola sconfigge Merlino Capra\n\nDetterò Io le Regole permette a Maga Magò di sconfiggere qualsiasi Trasformazione di Merlino in gioco."
+        "text": "Maga Magò non dispone di Azioni Scontro. Al loro posto, ognuna delle sue Trasformazioni aggiunge un'Azione Scontro al Luogo in cui si trova.\n\nOgnuna delle Trasformazioni di Maga Magò può sconfiggere solo una specifica Trasformazione di Merlino.\n\n\n• Magò Coccodrillo sconfigge Merlino Tartaruga\n\n• Magò Volpe sconfigge Merlino Coniglio\n\n• Magò Gallina sconfigge Merlino Bruco\n\n• Magò Elefante sconfigge Merlino Tricheco\n\n• Magò Tigre sconfigge Merlino Topo\n\n• Magò Serpente sconfigge Merlino Topo\n\n• Magò Rinoceronte sconfigge Merlino Granchio\n\n• Magò Drago Viola sconfigge Merlino Capra\n\nDetterò Io le Regole permette a Maga Magò di sconfiggere qualsiasi Trasformazione di Merlino in gioco."
       }
     ]
   },
@@ -581,7 +581,7 @@
       },
       {
         "title": "Ridurre la Forza degli Eroi",
-        "text": "Lotso ha due modi per ridurre la Forza degli Eroi: utilizzando azioni Scontro e con le carte. Per ridurre la Forza di un Eroe, metti sopra la sua carta Gettoni Forza. Per esempio, per ridurre la Forza di un Eroe a 0, mettici sopra tanti Gettoni Forza (negativi) quanta è la Forza corrente dell'Eroe.\n\nImportante: Al contrario delle normali regole, se un Eroe nel Reame di Lotso finisce a Forza 0, questo non può usare nemmeno le sue Abilità.\n\nQuando Lotso sconfigge un Eroe, non lo scarta dal proprio Reame. Invece riduce la sua Forza a 0 usando Gettoni Forza. L'Eroe rimane nel Reame di Lotso, nello stesso Luogo in cui è stato sconfitto. Lotso deve comunque scartare gli Alleati usati nell'azione Scontro.\n\nLotso può anche ridurre la Forza degli Eroi usando carte specifiche come Pattugliare per Tutta la Notte e I Nuovi Giocattoli non Hanno Speranza di Farcela. Bookworm inoltre permette a Lotso di pagare Gettoni Potere per ridurre la Forza di un Eroe dello stesso ammontare. Dov'è il Tuo Bambino Adesso? permette a Lotso di ridurre la Forza di qualsiasi Eroe nel suo stesso Luogo a 0. Finché Il Cappello di Woody si trova nel Reame di Lotso, la Forza di tutti gli Eroi (tranne Woody) nel Reame di Lotso è ridotta di 1."
+        "text": "Lotso ha due modi per ridurre la Forza degli Eroi: utilizzando Azioni Scontro e con le carte. Per ridurre la Forza di un Eroe, metti sopra la sua carta Gettoni Forza. Per esempio, per ridurre la Forza di un Eroe a 0, mettici sopra tanti Gettoni Forza (negativi) quanta è la Forza corrente dell'Eroe.\n\nImportante: Al contrario delle normali regole, se un Eroe nel Reame di Lotso finisce a Forza 0, questo non può usare nemmeno le sue Abilità.\n\nQuando Lotso sconfigge un Eroe, non lo scarta dal proprio Reame. Invece riduce la sua Forza a 0 usando Gettoni Forza. L'Eroe rimane nel Reame di Lotso, nello stesso Luogo in cui è stato sconfitto. Lotso deve comunque scartare gli Alleati usati nell'Azione Scontro.\n\nLotso può anche ridurre la Forza degli Eroi usando carte specifiche come Pattugliare per Tutta la Notte e I Nuovi Giocattoli non Hanno Speranza di Farcela. Bookworm inoltre permette a Lotso di pagare Gettoni Potere per ridurre la Forza di un Eroe dello stesso ammontare. Dov'è il Tuo Bambino Adesso? permette a Lotso di ridurre la Forza di qualsiasi Eroe nel suo stesso Luogo a 0. Finché Il Cappello di Woody si trova nel Reame di Lotso, la Forza di tutti gli Eroi (tranne Woody) nel Reame di Lotso è ridotta di 1."
       },
       {
         "title": "L'Aula Bruco",
@@ -589,28 +589,28 @@
       },
       {
         "title": "Controllare il Fato di Lotso",
-        "text": "Alcuni Eroi sono più difficili da sottomettere. Per esempio, la Forza di Rex può essere ridotta da carte o da azioni Scontro solo se è l'unico Eroe presente in quel Luogo. Hamm invece può essere sconfitto solo utilizzando due o più Alleati nell'azione Scontro."
+        "text": "Alcuni Eroi sono più difficili da sottomettere. Per esempio, la Forza di Rex può essere ridotta da carte o da Azioni Scontro solo se è l'unico Eroe presente in quel Luogo. Hamm invece può essere sconfitto solo utilizzando due o più Alleati nell'Azione Scontro."
       },
       {
         "title": "Buzz Lightyear",
-        "text": "In base alle sue impostazioni, Buzz Lightyear può essere un Alleato di Lotso o un Guardiano di Eroi.\n\nBuzz Lightyear inizia la partita come Guardiano. Non va considerato come un Eroe e non può essere il bersaglio di azioni Scontro. Impostazioni Originali di Fabbrica fa capovolgere Buzz Lightyear sul lato Buzz Lightyear in Modalità Demo, che è un Alleato di Lotso. Quando ciò succede, capovolgi la tessera e muovi Buzz Lightyear in Modalità Demo sulla parte bassa del Reame di Lotso.\n\nBuzz Lightyear in Modalità Demo non può essere mai scartato dal Reame di Lotso. Le carte che hanno come bersaglio gli Alleati, come Jessie e Lotso Era Speciale, non influenzano Buzz Lightyear in Modalità Demo. La carta Modalità Spagnola può far capovolgere nuovamente Buzz Lightyear sul suo lato Guardiano. Quando ciò succede, capovolgi la tessera e riportala sulla parte alta del Reame di Lotso.\n\nPer far sì che Lotso possa vincere, uno tra Buzz Lightyear o Buzz Lightyear in Modalità Demo deve trovarsi nell'Aula Bruco."
+        "text": "In base alle sue impostazioni, Buzz Lightyear può essere un Alleato di Lotso o un Guardiano di Eroi.\n\nBuzz Lightyear inizia la partita come Guardiano. Non va considerato come un Eroe e non può essere il bersaglio di Azioni Scontro. Impostazioni Originali di Fabbrica fa capovolgere Buzz Lightyear sul lato Buzz Lightyear in Modalità Demo, che è un Alleato di Lotso. Quando ciò succede, capovolgi la Tessera e muovi Buzz Lightyear in Modalità Demo sulla parte bassa del Reame di Lotso.\n\nBuzz Lightyear in Modalità Demo non può essere mai scartato dal Reame di Lotso. Le carte che hanno come bersaglio gli Alleati, come Jessie e Lotso Era Speciale, non influenzano Buzz Lightyear in Modalità Demo. La carta Modalità Spagnola può far capovolgere nuovamente Buzz Lightyear sul suo lato Guardiano. Quando ciò succede, capovolgi la Tessera e riportala sulla parte alta del Reame di Lotso.\n\nPer far sì che Lotso possa vincere, uno tra Buzz Lightyear o Buzz Lightyear in Modalità Demo deve trovarsi nell'Aula Bruco."
       }
     ]
   },
   "Horned King": {
-    "objective": "Nei panni di Re Cornelius, il tuo Obiettivo è di controllare il mondo intero usando i tuoi guerrieri Nati dalla Pentola. Per farlo, devi prima ottenere La Pentola Magica. Una volta in tuo possesso, devi attivarla per ottenerne il Potere. Infine, devi usare l'abilità della Pentola Magica per sostituire i tuoi Soldati Antichi con dei Nati dalla Pentola. Quando avrai dei Nati dalla Pentola in tutti e quattro i Luoghi del tuo Reame, controllerai il mondo e vincerai la partita!",
+    "objective": "Nei panni di Re Cornelius, il tuo Obiettivo è di controllare il mondo intero usando i tuoi guerrieri Nati dalla Pentola. Per farlo, devi prima ottenere La Pentola Magica. Una volta in tuo possesso, devi attivarla per ottenerne il Potere. Infine, devi usare l'Abilità della Pentola Magica per sostituire i tuoi Soldati Antichi con dei Nati dalla Pentola. Quando avrai dei Nati dalla Pentola in tutti e quattro i Luoghi del tuo Reame, controllerai il mondo e vincerai la partita!",
     "sections": [
       {
         "title": "Preparazione speciale",
-        "text": "La tessera La Pentola Magica è una Reliquia, un tipo di carta unico per Re Cornelius. Metti la tessera La Pentola Magica a fianco del tuo Reame. Una volta che l'avrai ottenuta, mettila sopra al tuo ritratto sulla parte sinistra della Plancia, con il lato La Pentola Magica visibile."
+        "text": "La Tessera La Pentola Magica è una Reliquia, un tipo di carta unico per Re Cornelius. Metti la Tessera La Pentola Magica a fianco del tuo Reame. Una volta che l'avrai ottenuta, mettila sopra al tuo ritratto sulla parte sinistra della Plancia, con il lato La Pentola Magica visibile."
       },
       {
         "title": "Ottenere la Pentola Magica",
-        "text": "Devi possedere La Pentola Magica per poter vincere. Non puoi perderla una volta ottenuta. Mostrami La Pentola Magica ti permette di ottenere il controllo della Pentola Magica immediatamente.\n\nNoi Abbiamo Fatto un Patto ti permette invece di rimuovere Dyrnwyn dal tuo Reame e di scambiarla con La Pentola Magica.\n\nNon Riuscirai a Scappare, Guardiano di Porci ti permette di trovare e giocare Ewy. Sconfiggere Ewy ti permette di ottenere La Pentola Magica.\n\nQueste tre carte hanno abilità aggiuntive oltre a farti ottenere La Pentola Magica. Quindi prova a pianificare su come usarle nel modo migliore."
+        "text": "Devi possedere La Pentola Magica per poter vincere. Non puoi perderla una volta ottenuta. Mostrami La Pentola Magica ti permette di ottenere il controllo della Pentola Magica immediatamente.\n\nNoi Abbiamo Fatto un Patto ti permette invece di rimuovere Dyrnwyn dal tuo Reame e di scambiarla con La Pentola Magica.\n\nNon Riuscirai a Scappare, Guardiano di Porci ti permette di trovare e giocare Ewy. Sconfiggere Ewy ti permette di ottenere La Pentola Magica.\n\nQueste tre carte hanno Abilità aggiuntive oltre a farti ottenere La Pentola Magica. Quindi prova a pianificare su come usarle nel modo migliore."
       },
       {
         "title": "Attivare la Pentola Magica",
-        "text": "Puoi attivare il potere della Pentola Magica o giocando La Nostra Ora è Arrivata, oppure utilizzando un'azione Attivare per capovolgere la tessera e rivelare Il Potere della Pentola Magica.\n\nNon ci sono azioni Attivare nel Reame di Re Cornelius. I Soldati Antichi aggiungono però un'azione Attivare al Luogo in cui si trovano."
+        "text": "Puoi attivare il potere della Pentola Magica o giocando La Nostra Ora è Arrivata, oppure utilizzando un'Azione Attivare per capovolgere la Tessera e rivelare Il Potere della Pentola Magica.\n\nNon ci sono Azioni Attivare nel Reame di Re Cornelius. I Soldati Antichi aggiungono però un'Azione Attivare al Luogo in cui si trovano."
       },
       {
         "title": "Creare Nati dalla Pentola",
@@ -618,7 +618,7 @@
       },
       {
         "title": "Il Sacrificio di Gurghi e La Pentola Magica",
-        "text": "Il Sacrificio di Gurghi fa capovolgere Il Potere della Pentola Magica sul lato de La Pentola Magica. Finché il lato La Pentola Magica è visibile, Re Cornelius deve scartare un Nati dalla Pentola in gioco all'inizio di ogni suo turno PRIMA di muoversi in un nuovo Luogo. Avrai bisogno di usare un'azione Attivare per capovolgere nuovamente La Pentola Magica sul lato de Il Potere della Pentola Magica per poter creare nuovi Nati dalla Pentola."
+        "text": "Il Sacrificio di Gurghi fa capovolgere Il Potere della Pentola Magica sul lato de La Pentola Magica. Finché il lato La Pentola Magica è visibile, Re Cornelius deve scartare un Nati dalla Pentola in gioco all'inizio di ogni suo turno PRIMA di muoversi in un nuovo Luogo. Avrai bisogno di usare un'Azione Attivare per capovolgere nuovamente La Pentola Magica sul lato de Il Potere della Pentola Magica per poter creare nuovi Nati dalla Pentola."
       }
     ]
   },
@@ -635,7 +635,7 @@
       },
       {
         "title": "Rimuovere gli Ostacoli con gli Alleati",
-        "text": "Monsieur D'Arque ti aiuterà a rimuovere Segnalini Ostacolo utilizzando un'azione Attivare e pagando 2 Gettoni Potere."
+        "text": "Monsieur D'Arque ti aiuterà a rimuovere Segnalini Ostacolo utilizzando un'Azione Attivare e pagando 2 Gettoni Potere."
       },
       {
         "title": "Rimuovere gli Ostacoli sconfiggendo gli Eroi",
@@ -656,11 +656,11 @@
       },
       {
         "title": "Andare al Ballo",
-        "text": "Una volta che La Sala da Ballo viene sbloccata giocando l'Invito del Re, La Sala da Ballo non potrà più essere bloccata di nuovo.\n\nSolo quattro personaggi possono essere mossi ne La Sala da Ballo: Il Principe (che deve esserci giocato immediatamente dopo essere stato rivelato), Cenerentola col Vestito da Ballo, Anastasia col Vestito da Ballo e Genoveffa col Vestito da Ballo.\n\nMentre è in gioco, Cenerentola col Vestito da Ballo impedisce ad Anastasia e Genoveffa col Vestito da Ballo di entrare ne La Sala da Ballo. Questa carta non ha effetto se però loro si trovano già lì.\n\nCanta Usignol è una carta Fato potente che potrebbe rallentare i tuoi progressi, facendo muovere un Alleato in un nuovo Luogo e potenzialmente allontanando le sorelle da La Sala da Ballo.\n\nCenerentola, Anastasia e Genoveffa col Vestito da Ballo possono essere giocate solo se prima sono state giocate Cenerentola, Anastasia e Genoveffa nei loro abiti comuni. Queste vanno scartate per poter giocare la loro versione in Vestito da Ballo. Questo scambio richiede un'azione Giocare una Carta. Non ci possono mai essere due versioni di uno stesso personaggio contemporaneamente in gioco.\n\nEsempio: Scambia Genoveffa con Genoveffa col Vestito da Ballo, che andrà giocata nello stesso Luogo.\n\nImportante: La Fata Smemorina può far giocare Cenerentola col Vestito da Ballo anche se Cenerentola non è in gioco. Se questo succede, puoi giocare Cenerentola col Vestito da Ballo in un qualsiasi Luogo sbloccato."
+        "text": "Una volta che La Sala da Ballo viene sbloccata giocando l'Invito del Re, La Sala da Ballo non potrà più essere bloccata di nuovo.\n\nSolo quattro personaggi possono essere mossi ne La Sala da Ballo: Il Principe (che deve esserci giocato immediatamente dopo essere stato rivelato), Cenerentola col Vestito da Ballo, Anastasia col Vestito da Ballo e Genoveffa col Vestito da Ballo.\n\nMentre è in gioco, Cenerentola col Vestito da Ballo impedisce ad Anastasia e Genoveffa col Vestito da Ballo di entrare ne La Sala da Ballo. Questa carta non ha effetto se però loro si trovano già lì.\n\nCanta Usignol è una carta Fato potente che potrebbe rallentare i tuoi progressi, facendo muovere un Alleato in un nuovo Luogo e potenzialmente allontanando le sorelle da La Sala da Ballo.\n\nCenerentola, Anastasia e Genoveffa col Vestito da Ballo possono essere giocate solo se prima sono state giocate Cenerentola, Anastasia e Genoveffa nei loro abiti comuni. Queste vanno scartate per poter giocare la loro versione in Vestito da Ballo. Questo scambio richiede un'Azione Giocare una Carta. Non ci possono mai essere due versioni di uno stesso personaggio contemporaneamente in gioco.\n\nEsempio: Scambia Genoveffa con Genoveffa col Vestito da Ballo, che andrà giocata nello stesso Luogo.\n\nImportante: La Fata Smemorina può far giocare Cenerentola col Vestito da Ballo anche se Cenerentola non è in gioco. Se questo succede, puoi giocare Cenerentola col Vestito da Ballo in un qualsiasi Luogo sbloccato."
       },
       {
         "title": "In trappola!",
-        "text": "Le carte come Lucifero, La Chiave e In Trappola, ti permettono di piazzare un Segnalino Trappola su un Eroe del tuo Reame. Quando un Eroe ha un Segnalino Trappola, le sue abilità vengono ignorate, come se la carta non ne possedesse affatto. La carta resta comunque in gioco e blocca le tue azioni. Se un Eroe in trappola viene rimosso e messo nella pila degli scarti del tuo Mazzo Fato, rimuovi anche il Segnalino Trappola.\n\nCenerentola col Vestito da Ballo non può essere intrappolata da nessuna carta, anche se può comunque essere mossa usando l'azione Attivare de La Chiave.\n\nLa Matrigna non ha a disposizione alcuna azione Scontro. Tuttavia, i giocatori possono usare le azioni Attivare per scartare o sconfiggere le carte Fato, rimuovendole dal gioco. Le carte come Il Bastone della Matrigna, Mezzanotte e Brutta Ladruncola! sono in grado di rimuovere degli Eroi e degli Oggetti specifici dal tuo Reame."
+        "text": "Le carte come Lucifero, La Chiave e In Trappola, ti permettono di piazzare un Segnalino Trappola su un Eroe del tuo Reame. Quando un Eroe ha un Segnalino Trappola, le sue Abilità vengono ignorate, come se la carta non ne possedesse affatto. La carta resta comunque in gioco e blocca le tue azioni. Se un Eroe in trappola viene rimosso e messo nella pila degli scarti del tuo Mazzo Fato, rimuovi anche il Segnalino Trappola.\n\nCenerentola col Vestito da Ballo non può essere intrappolata da nessuna carta, anche se può comunque essere mossa usando l'Azione Attivare de La Chiave.\n\nLa Matrigna non ha a disposizione alcuna Azione Scontro. Tuttavia, i giocatori possono usare le Azioni Attivare per scartare o sconfiggere le carte Fato, rimuovendole dal gioco. Le carte come Il Bastone della Matrigna, Mezzanotte e Brutta Ladruncola! sono in grado di rimuovere degli Eroi e degli Oggetti specifici dal tuo Reame."
       },
       {
         "title": "Scarpette di Cristallo",
@@ -673,32 +673,32 @@
     "sections": [
       {
         "title": "Per prima cosa, trova Peter Pan",
-        "text": "Peter Pan si nasconde nel tuo mazzo Fato. Potrebbe comparire quando i tuoi avversari useranno azioni Fato contro di te, ma anche tu puoi rivelare carte Fato giocando Degno Avversario, Ossessione o Mappa dell'Isola che Non C'è."
+        "text": "Peter Pan si nasconde nel tuo Mazzo Fato. Potrebbe comparire quando i tuoi avversari useranno Azioni Fato contro di te, ma anche tu puoi rivelare carte Fato giocando Degno Avversario, Ossessione o Mappa dell'Isola che Non C'è."
       },
       {
         "title": "Poi, muovilo sulla Jolly Roger",
-        "text": "Quando Peter Pan viene giocato, va messo sul Nascondiglio dei Bimbi Sperduti. Dovrai muoverlo di un Luogo alla volta verso la Jolly Roger con l'azione Muovere un Eroe sulla tua Plancia.\n\nGiocare Dispositivo Ingegnoso ti permette di aggiungere l'azione Muovere un Eroe a qualsiasi Luogo."
+        "text": "Quando Peter Pan viene giocato, va messo sul Nascondiglio dei Bimbi Sperduti. Dovrai muoverlo di un Luogo alla volta verso la Jolly Roger con l'Azione Muovere un Eroe sulla tua Plancia.\n\nGiocare Dispositivo Ingegnoso ti permette di aggiungere l'Azione Muovere un Eroe a qualsiasi Luogo."
       },
       {
         "title": "Infine, sconfiggi Peter Pan",
-        "text": "Usa i tuoi Alleati per sconfiggere Peter Pan (e altri Eroi) con l'azione Scontro.\n\nGioca il Cannone per aggiungere un'azione Scontro a qualsiasi Luogo."
+        "text": "Usa i tuoi Alleati per sconfiggere Peter Pan (e altri Eroi) con l'Azione Scontro.\n\nGioca il Cannone per aggiungere un'Azione Scontro a qualsiasi Luogo."
       }
     ]
   },
   "Prince John [I2E]": {
-    "objective": "In assenza di Re Riccardo, il malvagio Principe Giovanni vuole accaparrarsi tutto il denaro e il potere minuscolo o maiuscolo? Sfortunatamente, P.G. viene costantemente tormentato da quel buonista di Robin Hood e dalla sua banda di Eroi. Il piano del Principe Giovanni è di sbattere Robin Hood in prigione, prendere tutto il Potere e mostrare che è lui il più grande cattivo di sempre.\n\nNei panni del Principe Giovanni, dovrai trovare un equilibrio tra l'accumulare gettoni Potere per raggiungere il tuo Obiettivo e spenderli per giocare Alleati ed Effetti, per far comparire Robin Hood nella Foresta di Sherwood e sconfiggerlo. Dovrai farcela prima che gli altri Cattivi completino i loro Obiettivi se vorrai essere il vincitore!",
+    "objective": "In assenza di Re Riccardo, il malvagio Principe Giovanni vuole accaparrarsi tutto il denaro e il potere. Sfortunatamente, P.G. viene costantemente tormentato da quel buonista di Robin Hood e dalla sua banda di Eroi. Il piano del Principe Giovanni è di sbattere Robin Hood in prigione, prendere tutto il Potere e mostrare che è lui il più grande cattivo di sempre.\n\nNei panni del Principe Giovanni, dovrai trovare un equilibrio tra l'accumulare Gettoni Potere per raggiungere il tuo Obiettivo e spenderli per giocare Alleati ed Effetti, per far comparire Robin Hood nella Foresta di Sherwood e sconfiggerlo. Dovrai farcela prima che gli altri Cattivi completino i loro Obiettivi se vorrai essere il vincitore!",
     "sections": [
       {
         "title": "Ottenere Potere",
-        "text": "Ci sono molti modi tramite cui il Principe Giovanni può guadagnare gettoni Potere. Innanzitutto, puoi muoverlo in un Luogo del tuo Reame che contenga l'icona di Ottenere 1, 2 o 3 gettoni Potere. Puoi anche guadagnare ulteriori gettoni dagli Eroi nel tuo Reame tramite le carte Taglia, Sceriffo di Nottingham e Bellissime, Adorabili Tasse, oppure dal gioco dei tuoi avversari utilizzando Avidità."
+        "text": "Ci sono molti modi tramite cui il Principe Giovanni può guadagnare Gettoni Potere. Innanzitutto, puoi muoverlo in un Luogo del tuo Reame che contenga l'icona di Ottenere 1, 2 o 3 Gettoni Potere. Puoi anche guadagnare ulteriori gettoni dagli Eroi nel tuo Reame tramite le carte Taglia, Sceriffo di Nottingham e Bellissime, Adorabili Tasse, oppure dal gioco dei tuoi avversari utilizzando Avidità."
       },
       {
         "title": "Preparati a sconfiggere gli Eroi",
-        "text": "Nel tuo mazzo Fato, la carta Rubare ai Ricchi ti ruberà gettoni Potere, che finiranno agli Eroi. Potrai però riottenere i gettoni sconfiggendo questi Eroi, quindi vorrai avere Alleati pronti allo Scontro nel momento del bisogno! Little John inoltre è in grado di ridurre il Potere che puoi ottenere ogni turno, quindi dovrai cercare di sconfiggerlo il prima possibile."
+        "text": "Nel tuo Mazzo Fato, la carta Rubare ai Ricchi ti ruberà Gettoni Potere, che finiranno agli Eroi. Potrai però riottenere i gettoni sconfiggendo questi Eroi, quindi vorrai avere Alleati pronti allo Scontro nel momento del bisogno! Little John inoltre è in grado di ridurre il Potere che puoi ottenere ogni turno, quindi dovrai cercare di sconfiggerlo il prima possibile."
       },
       {
         "title": "Trova Robin Hood e sconfiggilo!",
-        "text": "Robin Hood può comparire quando un avversario usa un'azione Fato contro di te ma, se non succede puoi giocare Tendere una Trappola e Codardia per trovarlo. In alternativa puoi anche sconfiggere Lady Marian. Quando sconfiggi Robin Hood, viene automaticamente spedito in Prigione."
+        "text": "Robin Hood può comparire quando un avversario usa un'Azione Fato contro di te ma, se non succede puoi giocare Tendere una Trappola e Codardia per trovarlo. In alternativa puoi anche sconfiggere Lady Marian. Quando sconfiggi Robin Hood, viene automaticamente spedito in Prigione."
       }
     ]
   },
@@ -707,15 +707,15 @@
     "sections": [
       {
         "title": "Per prima cosa, trova il Tridente e la Corona",
-        "text": "Ci sono diverse carte nel tuo mazzo che ti aiuteranno a trovare altre carte, tra cui Vortice, Divinazione e Opportunista. Muovendoti in un Luogo che contiene l'azione Scartare Carte e scartando molte carte dalla tua mano, potrai far girare con facilità la maggior parte delle carte del tuo mazzo!"
+        "text": "Ci sono diverse carte nel tuo mazzo che ti aiuteranno a trovare altre carte, tra cui Vortice, Divinazione e Opportunista. Muovendoti in un Luogo che contiene l'Azione Scartare Carte e scartando molte carte dalla tua mano, potrai far girare con facilità la maggior parte delle carte del tuo mazzo!"
       },
       {
         "title": "Poi, muovi gli Oggetti nel Covo di Ursula",
-        "text": "Una volta trovati e giocati il Tridente e la Corona, usa l'azione Muovere un Oggetto per muoverli verso il Covo di Ursula."
+        "text": "Una volta trovati e giocati il Tridente e la Corona, usa l'Azione Muovere un Oggetto per muoverli verso il Covo di Ursula."
       },
       {
         "title": "Levati gli Eroi dai tentacoli",
-        "text": "Diversi Eroi nel tuo mazzo Fato cercheranno di ostacolare i tuoi piani muovendo Oggetti e bloccando azioni. Di solito, gli Eroi vengono sconfitti dagli Alleati con le azioni Scontro. Ursula non ha azioni Scontro sulla sua plancia. Dovrà giocare i Contratti Vincolanti nei vari Luoghi per ottenere delle azioni Scontro utilizzabili una sola volta."
+        "text": "Diversi Eroi nel tuo Mazzo Fato cercheranno di ostacolare i tuoi piani muovendo Oggetti e bloccando azioni. Di solito, gli Eroi vengono sconfitti dagli Alleati con le Azioni Scontro. Ursula non ha Azioni Scontro sulla sua Plancia. Dovrà giocare i Contratti Vincolanti nei vari Luoghi per ottenere delle Azioni Scontro utilizzabili una sola volta."
       }
     ]
   },
@@ -724,11 +724,11 @@
     "sections": [
       {
         "title": "Maledizioni!",
-        "text": "Le Maledizioni sono carte specifiche del mazzo di Malefica, e ognuna di esse ha un beneficio diverso quando entra in gioco nel tuo Reame. Tuttavia, le carte nel tuo mazzo Fato e altre azioni ti faranno scartare le Maledizioni. Puoi giocare una Maledizione in qualsiasi Luogo, fintanto che un Alleato si trova in quel Luogo. Non puoi giocare Maledizioni nel Luogo in cui si trova il Corvo. Più Maledizioni possono essere giocate nello stesso Luogo e, una volta giocate, potrai muoverle usando l'azione Muovere un Oggetto o un Alleato.\n\nPer trovare le Maledizioni o gli Alleati nel tuo mazzo, dovrai muoverti in un Luogo dove si trova l'azione Scartare Carte, e scartare diverse carte dalla tua mano per far girare le carte del mazzo il più possibile. Giocare carte come Tirannia ti potrà essere di ulteriore aiuto!"
+        "text": "Le Maledizioni sono carte specifiche del mazzo di Malefica, e ognuna di esse ha un beneficio diverso quando entra in gioco nel tuo Reame. Tuttavia, le carte nel tuo Mazzo Fato e altre azioni ti faranno scartare le Maledizioni. Puoi giocare una Maledizione in qualsiasi Luogo, fintanto che un Alleato si trova in quel Luogo. Non puoi giocare Maledizioni nel Luogo in cui si trova il Corvo. Più Maledizioni possono essere giocate nello stesso Luogo e, una volta giocate, potrai muoverle usando l'Azione Muovere un Oggetto o un Alleato.\n\nPer trovare le Maledizioni o gli Alleati nel tuo mazzo, dovrai muoverti in un Luogo dove si trova l'Azione Scartare Carte, e scartare diverse carte dalla tua mano per far girare le carte del mazzo il più possibile. Giocare carte come Tirannia ti potrà essere di ulteriore aiuto!"
       },
       {
         "title": "Sii Pronta ad affrontare gli Eroi",
-        "text": "Gli Eroi nel tuo mazzo Fato ti rallenteranno. Gioca Alleati sulla parte bassa del tuo Reame per giocare le Maledizioni e per sconfiggere gli Eroi con l'azione Scontro. Malignità e Forma di Drago ti potranno aiutare a sconfiggere gli Eroi."
+        "text": "Gli Eroi nel tuo Mazzo Fato ti rallenteranno. Gioca Alleati sulla parte bassa del tuo Reame per giocare le Maledizioni e per sconfiggere gli Eroi con l'Azione Scontro. Malignità e Forma di Drago ti potranno aiutare a sconfiggere gli Eroi."
       }
     ]
   }
