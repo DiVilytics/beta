@@ -147,6 +147,70 @@
       }
     ]
   },
+  "Captain Hook [I2E]": {
+    "objective": "The Villainous Captain Hook's only goal in life is to defeat pesky Peter Pan, but it's not a simple task! Peter Pan is a tricky foe and has the Lost Boys and Tinker Bell to protect him. He's even recruited Heroes like Wendy and her brothers from London.\n\nAs Captain Hook, you must lure Peter Pan into the Lost Boys Hideout. Then, you need to get him to your ship, the Jolly Roger, where you will surely have the edge. With the help of your Allies, especially Smee and Mr. Starkey, try to defeat Peter Pan before any of the other villains complete their objective and prove that you are the greatest Pirate Captain of them all!",
+    "sections": [
+      {
+        "title": "First, Find Peter Pan",
+        "text": "Peter Pan is hiding in your Fate deck. He might appear when your opponents Fate you, but you can also reveal cards from your Fate deck by playing Worthy Opponent, Obsession, or Neverland Map."
+      },
+      {
+        "title": "Then, Move Peter Pan to Jolly Roger",
+        "text": "When Peter Pan is played, he's played to the Lost Boys Hideout. You'll have to move him one location at a time to the Jolly Roger with the Move Hero action on your board.\n\nPlaying Ingenious Device allows you to add the Move Hero action to any location."
+      },
+      {
+        "title": "Finally, Defeat Peter Pan",
+        "text": "Use your Allies to defeat Peter Pan (and other Heroes) with the Vanquish action.\n\nPlay Cannon to add a Vanquish action to any location."
+      }
+    ]
+  },
+  "Maleficent [I2E]": {
+    "objective": "Maleficent wasn't invited to the christenin of Princess Aurora, and now she wants to take her revenge by cursing the entire kingdom.\n\nSpread your Allies - like the goons and the Raven - throughout the Realm so that you can play Curses to locations with an Ally. But you must be wary of the Heroes! The good fairies - Flora, Fauna, and Merryweather - as well as Prince Philip and Aurora will do their best to foil your plans.\n\nIf you can play a Curse at every location in the Realm before any other villain achieves their goal, then you'll prove that you're the Mistress of All Evil!",
+    "sections": [
+      {
+        "title": "Curses!",
+        "text": "Curses are unique to Maleficent's deck and each type has a unique benefit when it's in your Realm. However, cards in your Fate deck and other actions will cause the Curses to be discarded. You may play a Curse to any location, as long as there's an Ally at the location. You cannot play Curses to Ravens current location. Multiple Curses may be played to the same location, and, once played, you may move Curses using the Move an Item or Ally action.\n\nTo find the Curses or Allies in your deck, you can move to a location with the Discard action and discard multiple cards from your hand to help you cycle through your cards. Playing cards like Tyranny will also help!"
+      },
+      {
+        "title": "Be Ready for the Heroes",
+        "text": "The Heroes in your Fate deck will slow you down. Play Allies to the bottom of your Realm to play Curses and to defeat Heroes with the Vanquish action. Malice and Dragon Form also help you defeat Heroes."
+      }
+    ]
+  },
+  "Prince John [I2E]": {
+    "objective": "While King Richard is away, the Villainous Prince John wants to grab all the money and Power. Unfortunately, P.J. is constantly plagued by the do-gooder Robin Hood and his band of Heroes. Prince John's plan is to put Robin Hood in jail, take all the power, and show that he is the greatest villain ever.\n\nAs Prince John, you must balance hoarding Power to reach your goal and spending it on Ally and Effect cards to draw Robin Hood into Sherwood Forest and defeat him. Do it all before the other villains complete their objectives to be the winner!",
+    "sections": [
+      {
+        "title": "Gain Power",
+        "text": "There are several ways for Prince John to gain Power. First, you can move to a location on your board with a Gain Power action to gain 1, 2, or 3 Power. You can also gain Power from Heroes in your Realm with Warrant, Sheriff of Nottingham, and Beautiful, Lovely Taxes and from other players with Greed."
+      },
+      {
+        "title": "Be Ready to Vanquish Heroes",
+        "text": "In your Fate deck, Steal from the Rich will take Power from you and give it to the Heroes. But you can gain it back when you defeat those Heroes, so you'll want to have Allies played and ready to Vanquish when you need to! Little John actually reduces the Power Prince John can gain each turn so you'll want to Vanquish him as well."
+      },
+      {
+        "title": "Find Robin Hood and Defeat Him!",
+        "text": "Robin Hood may turn up when an opponent Fates you, but if he doesn't, you can play Set a Trap and Cowardice to find him or defeat Maid Marian. When you defeat Robin Hood, he's automatically thrown in The Jail."
+      }
+    ]
+  },
+  "Ursula [I2E]": {
+    "objective": "Ursula, the Villainous Sea Witch, wants to rule the ocean. But first, she'll need to use her magic powers to claim the Crown and Trident - two of Triton's most prized possessions.\n\nThe Heroes, led by Ariel, Triton, and Eric, will do their best to stop her. Ursula will need to play Binding Contracts to Vanquish the Heroes with 'her babies', Flotsam and Jetsam, who never leave her side once played. If she can get Triton's Items to her Lair before the other villains complete their objectives, she'll prove that she's the true Queen of the Ocean and greatest villain of them all!",
+    "sections": [
+      {
+        "title": "First, Find the Trident and Crown",
+        "text": "There are several cards in your deck that will help you find other cards, including Whirlpool, Divination, and Opportunist. Moving to the location with the Discard action and discarding multiple cards from your hand will also help you cycle through your cards!"
+      },
+      {
+        "title": "Then, Move the Items to Ursula's Lair",
+        "text": "Once you've found and played the Trident and the Crown, use the Move Item action to move them to Ursula's Lair."
+      },
+      {
+        "title": "Keep Heroes Out of Your Way!",
+        "text": "Several of the Heroes in your Fate deck will try to mess with your plan by moving Items and blocking actions. Normally, Heroes are defeated with Allies using the Vanquish action. Ursula doesn't have any Vanquish actions on her board. She will need to play Binding Contracts to locations to gain one-time-use Vanquish actions."
+      }
+    ]
+  },
   "Evil Queen": {
     "objective": "In order to achieve Evil Queen's Objective, you must unlock the Dwarfs' Cottage by playing four different Ingredients. You will also need to Brew Poison, which is used to defeat Heroes in your Realm, including Snow White. Snow White must be played, either by you or an opponent. Finally, you will need to play Take a Bite when you are at Snow White's location in order to defeat her and win the game.",
     "sections": [
