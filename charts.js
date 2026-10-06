@@ -280,9 +280,12 @@ const CHARTS = [
     desc: 'Number of games recorded on each weekday, by play date. Weekday is derived from your local time zone.',
     async render() {
       const counts = new Array(7).fill(0);   // 0 = Sunday
+      const since  = new Date(2024, 11, 1);  // older games (BGG imports) carry a placeholder date
       for (const g of await _gamesLite()) {
         if (!g.played_at) continue;
-        counts[new Date(g.played_at).getDay()]++;
+        const d = new Date(g.played_at);
+        if (d < since) continue;
+        counts[d.getDay()]++;
       }
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
       // Weekday names in the current language (5 Jan 2025 was a Sunday).
