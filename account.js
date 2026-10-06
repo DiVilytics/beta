@@ -87,7 +87,7 @@ function _renderPage() {
         </div>
       </div>
       <div class="avatar-tab-row">
-        <div class="seg" role="tablist">
+        <div class="seg seg-sm" role="tablist">
           <button class="seg-btn on" id="avatarTabPhotos"  type="button" onclick="_showAvatarTab('photos')">${t('Photos')}</button>
           <button class="seg-btn"    id="avatarTabBuilder" type="button" onclick="_showAvatarTab('builder')">${t('Build')}</button>
         </div>

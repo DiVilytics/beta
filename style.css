@@ -38,7 +38,7 @@
    (negatives too), never rem: 1 (hairline), 2, 4, 6, 8, 10, 12, 14, 16, 20,
    24, 28, 32, 40, 48, 64, 80. em is kept only where spacing should follow the
    text size.
-   Control heights: 25 (small: .btn-sm, pills, filter switches), 30 (compact:
+   Control heights: 25 (small: .btn-sm, pills, .seg-sm switches), 30 (compact:
    nav items, switches, toggles, compact selects), 38 (standard: .btn, fields,
    selects), 48 (large: sign-in, live controls). Switches are a 2px frame
    around 24px buttons.
@@ -127,9 +127,6 @@
    the later `.char-portrait` rule (18px) when both classes are applied. */
 .identity-portrait,
 .char-portrait.identity-portrait { width: 40px; height: 40px; flex-shrink: 0; }
-
-/* Tight spinner for inline reloads. */
-.spinner-inline { padding: 16px 0; }
 
 /* QR-copy "✓" success flash on the copy button. */
 .copy-success { color: #4ade80; }
@@ -1427,7 +1424,6 @@ select:disabled {
 .row-val   { font-size: calc(14px * var(--ts)); font-weight: 700; text-align: right; white-space: nowrap; }
 /* Leaderboard / player tables: the value sits on top of its bar, which spans the column. */
 .row-val-stack { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-.row-games { font-size: calc(12px * var(--ts)); color: var(--muted); text-align: right; }
 /* Value cell: the value and "(games)" as two right-aligned sub-columns. The games
    part has the table's fixed width (--sv-games, from its largest count) and the
    digits are tabular, so values and games each line up from row to row. */
@@ -1579,7 +1575,6 @@ select:disabled {
 @media (max-width: 430px) {
   .avatar-tab-row { gap: 6px; }
   .avatar-actions { gap: 4px; }
-  .avatar-tab-row .seg-btn { padding-left: 8px; padding-right: 8px; }
   .avatar-tab-row .btn-sm  { padding-left: 6px; padding-right: 6px; }
 }
 .builder-wrap {
@@ -1587,22 +1582,6 @@ select:disabled {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-}
-.builder-preview {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-}
-/* In the Presets pane the preview sits above the grid (no flex-gap parent), so
-   give it its own spacing. */
-#photosPreview { margin-bottom: 14px; }
-.builder-preview-av {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--s2);
-  object-fit: cover;   /* crop preset photos to the circle (ignored by composites) */
 }
 .builder-controls {
   width: 100%;
@@ -1747,11 +1726,6 @@ select:disabled {
 .box-option-year { font-size: calc(11px * var(--ts)); }
 .box-option.selected { color: var(--text); }
 .box-option.selected img { filter: none; opacity: 1; }
-.ach-hint {
-  font-size: calc(12px * var(--ts));
-  color: var(--muted);
-  margin: 0 0 8px;
-}
 .ach-grid {
   /* auto-fill (not auto-fit) keeps a fixed ~80px tile size: empty columns are
      preserved rather than collapsed, so a player with only a few achievements
@@ -1807,7 +1781,6 @@ select:disabled {
 .gl-badge-emoji { font-size: calc(22px * var(--ts)); font-weight: 400; }
 .gl-badge { transition: filter 0.2s, opacity 0.2s; }
 .ach-tile.dim .gl-badge { filter: grayscale(1); opacity: 0.45; }
-.ach-row-icon { font-size: calc(12px * var(--ts)); opacity: 0.7; }
 .ach-medal {
   font-size: calc(13px * var(--ts));
   line-height: 1;
@@ -1906,17 +1879,6 @@ select:disabled {
   margin-bottom: 16px;
 }
 .draw-mode-row .seg-btn { padding: 0 8px; }
-.draw-mode-select {
-  width: auto;
-  height: 30px;
-  min-height: 30px;
-  max-height: 30px;
-  padding: 0 24px 0 10px;
-  font-size: calc(12px * var(--ts));
-  font-weight: 600;
-  flex-shrink: 0;
-  background-position: right 8px center;
-}
 .pace-colors { display: flex; gap: 4px; flex-shrink: 0; }
 .pace-color {
   width: 25px;
@@ -1974,12 +1936,11 @@ select:disabled {
   gap: 10px;
   margin-bottom: 10px;
 }
-/* Small switches: a switch in a row of small buttons (.btn-sm) is as tall as
-   they are. Filter switches (Pace / Pace+, Among / With these) and the pace
-   dots next to Done; Photos / Build next to Default / Random / Apply. */
-.filter-bulk-row .seg, .gl-char-mode, .avatar-tab-row .seg { padding: 2px; gap: 2px; height: 25px; box-sizing: border-box; align-items: stretch; }
-.filter-bulk-row .seg-btn, .gl-char-mode .seg-btn, .avatar-tab-row .seg-btn { height: auto; padding: 0 8px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
-.filter-bulk-row .pace-color { width: 25px; height: 25px; }
+/* Small switch (.seg.seg-sm): as tall as the small buttons (.btn-sm) it sits
+   next to, e.g. Pace / Pace+ and Among / With these beside Done, Photos / Build
+   beside Default / Random / Apply. */
+.seg.seg-sm { padding: 2px; gap: 2px; height: 25px; box-sizing: border-box; align-items: stretch; }
+.seg-sm .seg-btn { height: auto; padding: 0 8px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
 .owned-toggle.on { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
