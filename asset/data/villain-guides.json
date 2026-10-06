@@ -752,5 +752,55 @@
         "text": "The Fate card Heihei has no additional ability."
       }
     ]
+  },
+  "Shere Khan": {
+    "objective": "Fierce Shere Khan controls the jungle, but he has a weakness: Man's Red Fire! When he discovers a Man-Cub in his jungle, he must stop the boy before he destroys everything. Mowgli wants to stay in the jungle and is protected by his friends, including Baloo the bear, the elephants of the Jungle Patrol, and even the great panther Bagheera. Shere Khan must clear his realm of fire and defeat Mowgli to prove he is still King of the Jungle.",
+    "sections": [
+      {
+        "title": "Setup",
+        "text": "Place the four Fire Tokens off to the side of your Realm."
+      },
+      {
+        "title": "Kaa, His Eyes and His Coils",
+        "text": "Shere Khan's Ally, Kaa, has muttiple ways to help Shere Khan. You can attach Kaas Eyes and Kare Coils to Kaa as Items to increase his Strength to 4 or even 6! When used in a Vanquish action, you can remove those Items instead of Kaa. You can use Kaa's Activate action to find those Items in the discard pile."
+      },
+      {
+        "title": "Man's Red Fire",
+        "text": "Fire tokens are placed using the Fate cards Mowgli and Man's Red Fire. A Fire token can be placed on a single action, which is treated as if covered by a Hero card. The Fire token can be placed on any action in the top or bottom row of Shere Khan's Realm. If a card is played to or already exists at that location, the token can still be placed on an action, but both will need to be removed before that action can be taken.\n\nBravo! Bravo! will let you perform a blocked action, even if it's covered by a Fire token."
+      },
+      {
+        "title": "Manipulating Cards",
+        "text": "Hey Cuz and Trust In Me allow you to manipulate the cards in your Villain deck and discard pile. Hey Cuz lets you reveal cards until you find an Ally. Trust in Me lets you shuffle three cards from your discard pile into your deck."
+      },
+      {
+        "title": "Removing Fire Tokens",
+        "text": "To remove Fire tokens, use the Activate action on Monkeys. It's Me, Shere Khan removes a token without sacrificing an Ally."
+      },
+      {
+        "title": "Fight Like a Bear",
+        "text": "Baloo has a unique power that affects defeating and vanquishing all other Heroes. While Baloo is in play, if Shere Khan defeats a Hero, that Hero is not removed. Instead, place a Power token on Baloo. When Baloo has three Power tokens on him, he is defeated. Baloo can protect Heroes this way before he is defeated and discarded."
+      }
+    ]
+  },
+  "King Candy": {
+    "objective": "King Candy is the ultimate ruler of Sugar Rush, but one thing stands in the way of him controlling the game and his world forever: Vanellope von Schweetz. He needs to attach a Glitch to Vanellope von Schweetz, then beat her in a Sugar Rush race. Wreck-It Ralph and her other new friends will try to slow him down, but King Candy has his own tricks; not just to win the race, but to be King forever!",
+    "sections": [
+      {
+        "title": "Special Setup and Movement",
+        "text": "Place King Candy's mover on the Start/Finish. Set the Vanellope von Schweetz Racer token off to the side of your Realm. King Candy moves like no other Villain; he races through the entire Sugar Rush Speedway, moving from action space to action space in the figure-8 pattern shown below. He passes the center Gain 3 Power twice on a single circuit.\n\nEach tum before King Candy moves, declare the number of action spaces you want to move, between 1 and 4. An action space counts for movement even if covered."
+      },
+      {
+        "title": "Special Free Actions",
+        "text": "King Candy has access to cards that he can play without a Play a Card action. Pay to Race is paid and played before King Candy declares his movement. Turbo-Tastic allows King Candy to perform actions that are currently covered."
+      },
+      {
+        "title": "Performing Actions",
+        "text": "Once King Candy has moved, he may perform the action he is on, the action in front of him on the track and the action behind him, for a total of three actions on his tum. They can be performed in any order. If an action is covered. King Candy cannot perform that action. King Candy may end up with no available actions.\n\nStart/Finish is a Play a Card action.\n\nEven though King Candy's Realm is one continuous speedway, each panel represents a location that is used in Vanquish actions."
+      },
+      {
+        "title": "The Big Race",
+        "text": "When a Glitch is played on Vanellope von Schweetz, begin the Big Race by placing the Racer token and the King Candy mover on Start/Finish. End King Candy's turn. Note that multiple Glitches can be stacked on Vanellope von Schweetz, but the Big Race only begins if a Glitch is placed on her when she has no other Glitches attached.\n\nIf King Candy reaches Start/Finish before the Racer token, he wins the game. If the Racer token reaches Start/Finish first, remove all the Glitches from Vanellope von Schweetz and place them in King Candy's hand."
+      }
+    ]
   }
 }
