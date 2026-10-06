@@ -702,5 +702,55 @@
         "text": "To reduce a Hero's Strength, add Strength tokens to the Hero card. For example, to reduce a Hero's Strength to 0, put Strength tokens equal to their current total Strength on their card."
       }
     ]
+  },
+  "Davy Jones": {
+    "objective": "The near-immortal Davy Jones, captain of the Flying Dutchman, is the judge over life and death on the seas. When he has control of all his mystic items, he not only controls the seas, but is worshiped and feared by all who sail those waters. Now Jack Sparrow has launched a series of events forcing Davy Jones to find and reclaim his treasures scattered among the Heroes. Davy Jones must find the Heroes and collect his treasures to take his rightful place as the ultimate ruler of all the seas!",
+    "sections": [
+      {
+        "title": "Lost Treasures Setup",
+        "text": "Place the five Treasure tokens face down off to the side of your realm, then mix them up. Davy Jones places a facedown Treasure token on Heroes when he plays the cards Do You Fear Death? and They're Here."
+      },
+      {
+        "title": "Collecting Treasure",
+        "text": "To collect a Treasure, Davy Jones must first reveal it and then defeat the Hero that Treasure is attached to. Certain cards, such as Bootstrap Bill, Hadras, and The Black Spot, reveal facedown tokens.\n\nIf Davy Jones defeats a Hero with a facedown Treasure token, that token is returned to the starting supply of tokens.\n\nNote: A Hero may only have one Treasure token attached to them at a time."
+      },
+      {
+        "title": "The Power of the Treasures",
+        "text": "Each Treasure token has a unique ability. When the token is revealed, that ability will affect the Hero or make it harder for Davy Jones to retrieve his property. The Treasure tokens take effect immediately when they are revealed.\n\n• The Key: When The Key is revealed docard your hand.\n\n• The Heart: When The Heart is collected lose all Power.\n\n• Treasure Chest: Allies cannot be played to this location.\n\n• Music Box: The Kraken cannot be used to defeat this Hero.\n\n• Jack's Compass: This Hero gets +2 Strength."
+      },
+      {
+        "title": "Those Pesky Heroes",
+        "text": "Heroes can make it difficult for Davy Jones to find his treasures. Where Does It Point? and Curse You, Jack Sparrow keep Davy Jones guessing on where the Heroes might be and what Treasure they may hold."
+      }
+    ]
+  },
+  "Tamatoa": {
+    "objective": "Not only is Tamatoa the cleverest monster in the sea, he is also the shiniest. His power and ego are limitless as he hoards what everyone wants, including the demigod Maui's Hook. He needs to keep Maui from reclaiming his Hook and try to grab the Heart of Te Fiti from Moana. If he can overcome these Heroes and their plans, he can become the crustacean with the power of creation and the most feared monster ever!",
+    "sections": [
+      {
+        "title": "Special Setup",
+        "text": "Tamatoa uses a third deck called the Maui deck. Place the deck close to your Villain deck."
+      },
+      {
+        "title": "The Maui Deck",
+        "text": "The Maui deck is a mysterious bag of effects. Tamatoa draws a Maui card while Maui is in play and before Tamatoa moves to a new location. The effects of the Maui card are immediate and may change what happens during that turn. Tamatoa also may play Not Exactly Maui Time to reveal a card and either play or discard it."
+      },
+      {
+        "title": "Maui's Hook",
+        "text": "Maui's Hook can be found in Tamatoas Villain deck. Tamatoa can play it as an Item card that is not attached to an Ally. While Mauis Hook is on Tamatoas side of the Realm, Tamatoa gains 2 Power cach time he is Fated. The Fate card Maui Time finds Maui and autornatically finds and attaches Mauis Hook to him. If Maui is defeated while Maui's Hook is attached to him, move Maui's Hook to Tamatoa's side of the Realm at that location."
+      },
+      {
+        "title": "Heart of Te Fiti",
+        "text": "When the Fate card Heart of Te Fit is drawn, it finds Moana and is attached to her. Tamatoa needs to defeat Moana while the Heart of Te Fiti is attached to her to gain the Item and win the game. Heart of Te Fiti can be moved using a Move Ally or Item action when it is on Tamatoa's side of the Realm."
+      },
+      {
+        "title": "...But it's a Fake!",
+        "text": "Something Shiny is the ultimate trick Moana plays on Tamatoa. The Item is not attached to a Hero but is played like a Hero to cover actions. A Hero at the same location as Something Shiny cannot be defeated. Something Shiny is discarded when Tamatoa ends his turn in the same location as Something Shiny."
+      },
+      {
+        "title": "Heihei",
+        "text": "The Fate card Heihei has no additional ability."
+      }
+    ]
   }
 }
