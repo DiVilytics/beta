@@ -329,7 +329,7 @@ window.I18N.it = {
     "Exclude all": "Escludi tutti",
     "Done": "Fatto",
     "Pace+": "Velocità+",
-    "Shows games played <strong>only</strong> with the included villains.": "Mostra le partite giocate <strong>solo</strong> con i cattivi inclusi.",
+    "Shows games played <strong>only</strong> with the included villains (not necessarily all of them).": "Mostra le partite giocate <strong>solo</strong> con i cattivi inclusi (non necessariamente tutti).",
     "DiVilytics": "DiVilytics",
     "DiVilytics | Disney Villainous stats": "DiVilytics | Statistiche di Disney Villainous",
     "DiVilytics | Disney Villainous Analytics": "DiVilytics | Disney Villainous Analytics",

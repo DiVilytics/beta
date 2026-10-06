@@ -188,7 +188,7 @@ function _syncCharModeUI() {
   // What the mode does, its key words in bold (static strings, so innerHTML is safe).
   document.getElementById('glFilterHint').innerHTML = withMode
     ? t('Shows games played with <strong>at least</strong> the selected villains (others can play too).')
-    : t('Shows games played <strong>only</strong> with the included villains.');
+    : t('Shows games played <strong>only</strong> with the included villains (not necessarily all of them).');
   updateFilterUI();
   _syncResetBtn();
 }
