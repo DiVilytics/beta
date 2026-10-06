@@ -253,7 +253,7 @@
       },
       {
         "title": "Fortune Abilities",
-        "text": "Some cards in Dr. Faciliers deck have Fortune Abilities. These Abilities are ignored when the cards are played, and are only resolved when revealed from the Fortune pile by playing The Cards Will Tell.\n\nNote: Cards without Fortune Abilities may still be put into the Fortune pile. When revealed, they are discarded without any effect."
+        "text": "Some cards in Dr. Facilier's deck have Fortune Abilities. These Abilities are ignored when the cards are played, and are only resolved when revealed from the Fortune pile by playing The Cards Will Tell.\n\nNote: Cards without Fortune Abilities may still be put into the Fortune pile. When revealed, they are discarded without any effect."
       },
       {
         "title": "The Cards Will Tell",
@@ -434,7 +434,7 @@
       },
       {
         "title": "Controlling Rapunzel",
-        "text": "Mother Gothel is able to gain Trust easily when Rapunzel is at Rapunzel's Tower, and keeping her away from Corona is important. Mother Gothel has several ways she controls Rapunzel's location.\n\nMother Knows Best prevents Rapunzel from moving toward Corona at the end of that turn.\n\nPatchy Stabbington and Sideburns Stabbington move Rapunzel to Rapunzel's Tower and are powerful Allies that can be used to defeat Heroes.\n\nNow I'm The Bad Guy moves Rapunzel to Rapunzels Tower. Mother Gothel loses 1 Trust, but it might be helpful in combination with other actions."
+        "text": "Mother Gothel is able to gain Trust easily when Rapunzel is at Rapunzel's Tower, and keeping her away from Corona is important. Mother Gothel has several ways she controls Rapunzel's location.\n\nMother Knows Best prevents Rapunzel from moving toward Corona at the end of that turn.\n\nPatchy Stabbington and Sideburns Stabbington move Rapunzel to Rapunzel's Tower and are powerful Allies that can be used to defeat Heroes.\n\nNow I'm The Bad Guy moves Rapunzel to Rapunzel's Tower. Mother Gothel loses 1 Trust, but it might be helpful in combination with other actions."
       },
       {
         "title": "Gaining Trust",
@@ -737,7 +737,7 @@
       },
       {
         "title": "Maui's Hook",
-        "text": "Maui's Hook can be found in Tamatoas Villain deck. Tamatoa can play it as an Item card that is not attached to an Ally. While Mauis Hook is on Tamatoas side of the Realm, Tamatoa gains 2 Power cach time he is Fated. The Fate card Maui Time finds Maui and autornatically finds and attaches Mauis Hook to him. If Maui is defeated while Maui's Hook is attached to him, move Maui's Hook to Tamatoa's side of the Realm at that location."
+        "text": "Maui's Hook can be found in Tamatoa's Villain deck. Tamatoa can play it as an Item card that is not attached to an Ally. While Maui's Hook is on Tamatoa's side of the Realm, Tamatoa gains 2 Power cach time he is Fated. The Fate card Maui Time finds Maui and automatically finds and attaches Maui's Hook to him. If Maui is defeated while Maui's Hook is attached to him, move Maui's Hook to Tamatoa's side of the Realm at that location."
       },
       {
         "title": "Heart of Te Fiti",
