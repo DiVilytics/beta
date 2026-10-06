@@ -6,6 +6,7 @@ let orderSlots       = [];          // each: { id, char, isMe, isWinner }
 let orderNextId      = 0;
 let slotTimers       = {};          // slotId → setInterval id (active spin animation)
 let _shuffleTimer    = null;        // setInterval id for the shuffle-order animation
+let _drawsPending    = 0;           // drawAll rows scheduled but not spinning yet
 let _lastAuthId;                    // last auth user id the slots were rendered for (undefined = not baselined)
 
 // Live-game timers stay here because they tick the DOM directly. All other
@@ -359,7 +360,7 @@ function drawSlot(id) {
 
       // Once the whole draw has settled, re-render once to refresh the selects
       // and re-enable the buttons (nothing is spinning by then, so no flash).
-      if (Object.keys(slotTimers).length === 0) renderOrderSlots();
+      if (Object.keys(slotTimers).length === 0 && !_drawsPending) renderOrderSlots();
       else _updateActionBtns();
     }
   }, 50);
@@ -396,8 +397,17 @@ function drawAll() {
   const mode = _drawMode();
   if (mode !== 'rest') for (const s of orderSlots) s.char = '';
   const targets = mode === 'rest' ? orderSlots.filter(s => !s.char) : orderSlots;
+  // The rows start one by one: until each spins, it still counts as drawing, so
+  // the render below keeps the button's label ("Redraw all" stays, even though
+  // every row is empty for a moment).
+  _drawsPending = targets.length;
   renderOrderSlots();
-  targets.forEach((s, i) => setTimeout(() => drawSlot(s.id), i * 60));
+  targets.forEach((s, i) => setTimeout(() => {
+    _drawsPending--;
+    drawSlot(s.id);
+    // A row that couldn't draw starts no spin: make sure the draw still settles.
+    if (!_drawsPending && !Object.keys(slotTimers).length) renderOrderSlots();
+  }, i * 60));
 }
 
 function shuffleOrder() {
@@ -573,7 +583,7 @@ function _updateActionBtns() {
   // While a draw or shuffle is animating, hold the draw/shuffle/start/save
   // buttons disabled, so they don't flicker as slots fill in one by one, and
   // can't be re-triggered mid-animation. They're recomputed once it settles.
-  const animating = !!_shuffleTimer || Object.keys(slotTimers).length > 0;
+  const animating = !!_shuffleTimer || Object.keys(slotTimers).length > 0 || _drawsPending > 0;
 
   const filled     = orderSlots.filter(s => s.char).length;
 
