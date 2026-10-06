@@ -13,6 +13,8 @@
 //   onChange(), run after the excluded set changes (refresh the page's own
 //                badge / action buttons / etc.); pace UI is handled here.
 //   onError(msg), surface a guard message (e.g. not signed in).
+// `mineByDefault`: the pool starts limited to the user's boxes (New Game) rather
+// than every villain (Game Log). It's the starting point Reset goes back to.
 //
 // Depends on getCurrentUser() (shared.js) and db (db.js).
 
@@ -27,6 +29,7 @@ function createPaceFilter({
   mineTitles,
   onChange = () => {},
   onError  = () => {},
+  mineByDefault = false,
 }) {
   const excluded     = new Set();
   let   ownedBoxes   = new Set();
@@ -114,11 +117,12 @@ function createPaceFilter({
     return new Set(getChars().filter(c => !onNames.has(c.name)).map(c => c.name));
   }
 
-  // True when the pool is what a fresh page starts with: every villain, or only
-  // the user's boxes when they've marked some on the Account page.
+  // True when the pool is what a fresh page starts with: every villain, or (with
+  // mineByDefault) only the user's boxes when they've marked some. Pace / Pace+
+  // alone doesn't count: it only sets what the next color tap covers.
   function isDefault() {
-    const mineDefault = !!getCurrentUser() && ownedBoxes.size > 0;
-    if (selectedPace || pacePlus || mineOn !== mineDefault) return false;
+    const mineDefault = mineByDefault && !!getCurrentUser() && ownedBoxes.size > 0;
+    if (selectedPace || mineOn !== mineDefault) return false;
     const want = _excludedFor(null, mineDefault);
     return want.size === excluded.size && [...want].every(n => excluded.has(n));
   }
@@ -133,7 +137,7 @@ function createPaceFilter({
   function setPaceMode(plus) {
     pacePlus = plus;
     if (selectedPace) applyPaceSelection();  // re-apply with the wider/narrower band
-    else updatePaceUI();
+    else { updatePaceUI(); onChange(); }      // nothing to re-apply, but the state changed
   }
 
   function toggleMine() {
@@ -146,7 +150,7 @@ function createPaceFilter({
   // A fresh pool starts limited to the user's boxes when they've marked any on
   // the Account page. Only on an untouched pool: a restored draft keeps its own.
   function defaultToMine() {
-    if (mineOn || selectedPace || excluded.size) return;
+    if (!mineByDefault || mineOn || selectedPace || excluded.size) return;
     if (!getCurrentUser() || !ownedBoxes.size) return;
     mineOn = true;
     applyPaceSelection();
@@ -161,15 +165,6 @@ function createPaceFilter({
     onChange();
   }
 
-  function clearExcluded() {
-    selectedPace = null;
-    mineOn = false;
-    excluded.clear();
-    syncExcludePills();
-    updatePaceUI();
-    onChange();
-  }
-
   // Full reset (pace, Pace+ and My boxes too), e.g. discarding a draft.
   function reset() {
     excluded.clear();
@@ -179,6 +174,15 @@ function createPaceFilter({
     syncExcludePills();
     updatePaceUI();
     onChange();
+  }
+
+  // Reset: back to the pool the page starts with (see isDefault). Pace / Pace+
+  // stays as chosen, for the next color tap.
+  function resetToStart() {
+    excluded.clear();
+    selectedPace = null;
+    mineOn = mineByDefault && !!getCurrentUser() && ownedBoxes.size > 0;
+    applyPaceSelection();
   }
 
   // Re-seed the whole selection from a saved snapshot (the New Game draft).
@@ -208,8 +212,8 @@ function createPaceFilter({
     toggleMine,
     defaultToMine,
     isDefault,
+    resetToStart,
     excludeAll,
-    clearExcluded,
     reset,
     restoreState,
   };

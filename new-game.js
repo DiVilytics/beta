@@ -34,7 +34,8 @@ const pace = createPaceFilter({
     on:      t('Pool limited to your boxes'),
     off:     t('Limit the pool to your boxes'),
   },
-  onChange: () => { updateExcludeUI(); _updateActionBtns(); },
+  onChange: () => { updateExcludeUI(); _updateActionBtns(); _syncResetBtn(); },
+  mineByDefault: true,   // draw from your boxes when you've marked some
   onError:  showErr,
 });
 
@@ -86,7 +87,7 @@ async function init() {
     document.getElementById('excludeGrid'),
     chars,
     pace.excluded,
-    updateExcludeUI,
+    () => { updateExcludeUI(); _syncResetBtn(); },   // a single villain tapped in or out
     boxInfo
   );
   onBeforeSignIn(_saveDraft);
@@ -127,7 +128,9 @@ function _saveDraft() {
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
       fTurns:    val('fTurns'),
-      pool:      { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn },
+      // Pace+ is kept only with a selected color (it's then part of the pool):
+      // on its own it's a setting, and a new page load starts from Pace.
+      pool:      { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: !!pace.selectedPace && pace.pacePlus, mineOn: pace.mineOn },
     }));
   } catch (_) {}
 }
@@ -192,7 +195,12 @@ function updateExcludeUI() {
 // Bulk pool controls (wired to the filter toolbar) delegate to the shared
 // pace-filter controller.
 function excludeAll()    { pace.excludeAll(); }
-function clearExcluded() { pace.clearExcluded(); }
+function resetPool()     { pace.resetToStart(); }   // back to your boxes (or everyone)
+// Reset is off while the pool is already where it started.
+function _syncResetBtn() {
+  const btn = document.getElementById('resetPoolBtn');
+  if (btn) btn.disabled = pace.isDefault();
+}
 
 function applyExclude() {
   const body = document.getElementById('excludeBody');

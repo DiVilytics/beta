@@ -72,19 +72,20 @@
       </div>
     </button>
     <div class="filter-char-panel" id="charFilterPanel">
-      <div class="filter-actions">
-        <button class="txt-btn gl-only" onclick="glExcludeAll()" data-i18n>Exclude all</button>
-        <span class="sep gl-only">|</span>
-        <button class="txt-btn owned-toggle gl-only" id="glMineBtn" type="button" onclick="glToggleMine()" data-i18n>My boxes</button>
-        <span class="sep gl-only">|</span>
-        <button class="txt-btn" onclick="glClearExcluded()" data-i18n>Clear</button>
-        <div class="gl-actions-end">
-          <div class="seg seg-sm gl-char-mode hidden" id="glCharMode">
-            <button class="seg-btn on" type="button" data-mode="only" onclick="glSetCharMode('only')" title="Games whose villains are all among the selected ones" data-i18n data-i18n-attr="title">Among these</button>
-            <button class="seg-btn"    type="button" data-mode="with" onclick="glSetCharMode('with')" title="Games with all the selected villains at the table" data-i18n data-i18n-attr="title">With these</button>
-          </div>
-          <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyCharFilter()" data-i18n>Done</button>
+      <!-- The mode first (it decides what tapping a villain does) with Done, as
+           in the New Game draw pool's top line, then what the mode means. -->
+      <div class="filter-top">
+        <div class="seg seg-sm gl-char-mode hidden" id="glCharMode">
+          <button class="seg-btn on" type="button" data-mode="only" onclick="glSetCharMode('only')" title="Games whose villains are all among the selected ones" data-i18n data-i18n-attr="title">Among these</button>
+          <button class="seg-btn"    type="button" data-mode="with" onclick="glSetCharMode('with')" title="Games with all the selected villains at the table" data-i18n data-i18n-attr="title">With these</button>
         </div>
+        <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyCharFilter()" data-i18n>Done</button>
+      </div>
+      <p class="gl-filter-hint" id="glFilterHint" data-i18n>Shows games played <strong>only</strong> with the included villains.</p>
+      <div class="filter-actions">
+        <button class="btn btn-ghost btn-sm gl-only" type="button" onclick="glExcludeAll()" data-i18n>Exclude all</button>
+        <button class="btn btn-ghost btn-sm owned-toggle gl-only" id="glMineBtn" type="button" onclick="glToggleMine()" data-i18n>My boxes</button>
+        <button class="btn btn-ghost btn-sm" id="glResetBtn" type="button" onclick="glResetFilter()" disabled data-i18n>Reset</button>
       </div>
       <div class="filter-bulk-row gl-only">
         <div class="seg seg-sm pace-mode" id="glPaceMode">
@@ -98,7 +99,6 @@
           <button class="pace-color red"    data-pace="red"    onclick="glSelectPace('red')"    type="button" title="Only red villains" data-i18n-attr="title"></button>
         </div>
       </div>
-      <p class="gl-filter-hint" id="glFilterHint" data-i18n>Tap to exclude villains; games using any excluded villain are hidden.</p>
       <div id="charGrid"></div>
     </div>
   </div>

@@ -112,11 +112,9 @@
     </div>
     <div class="exclude-body" id="excludeBody">
       <div class="filter-actions">
-        <button class="txt-btn" onclick="excludeAll()" data-i18n>Exclude all</button>
-        <span class="sep">|</span>
-        <button class="txt-btn owned-toggle" id="ownedOnlyBtn" type="button" onclick="toggleMine()" data-i18n>My boxes</button>
-        <span class="sep">|</span>
-        <button class="txt-btn" onclick="clearExcluded()" data-i18n>Clear</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="excludeAll()" data-i18n>Exclude all</button>
+        <button class="btn btn-ghost btn-sm owned-toggle" id="ownedOnlyBtn" type="button" onclick="toggleMine()" data-i18n>My boxes</button>
+        <button class="btn btn-ghost btn-sm" id="resetPoolBtn" type="button" onclick="resetPool()" disabled data-i18n>Reset</button>
         <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyExclude()" data-i18n>Done</button>
       </div>
       <div class="filter-bulk-row">

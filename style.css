@@ -620,16 +620,19 @@ main {
 
 .filter-actions {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;   /* long labels (Italian) on a phone: Done drops to its own line, on the right */
+  gap: 6px;
   margin-bottom: 10px;
   align-items: center;
 }
+/* Game Log: the mode switch and Done share the panel's top line. */
+.filter-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .filter-apply-btn { margin-left: auto; }
 .gl-filter-hint { font-size: calc(11px * var(--ts)); color: var(--dim); margin: 0 0 8px; }
-/* Only these / With these: the second mode picks villains that must all be at
-   the table, so the pace and My-boxes tools (which shape a pool) step aside. */
-#charFilterPanel .filter-actions { flex-wrap: wrap; row-gap: 8px; }
-.gl-actions-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.gl-filter-hint strong { color: var(--muted); font-weight: 700; }   /* the mode's key words */
+/* Among these / With these: the mode opens the panel (full width on phones),
+   its hint right below. "With these" picks villains that must all be at the
+   table, so the pace and My-boxes tools (which shape a pool) step aside. */
 .filter-char-panel.with-mode .gl-only { display: none; }
 .txt-btn {
   font-family: inherit;
@@ -1944,7 +1947,7 @@ select:disabled {
    beside Default / Random / Apply. */
 .seg.seg-sm { padding: 2px; gap: 2px; height: 25px; box-sizing: border-box; align-items: stretch; }
 .seg-sm .seg-btn { height: auto; padding: 0 8px; font-size: calc(11px * var(--ts)); display: inline-flex; align-items: center; border-radius: 4px; }
-.owned-toggle.on { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.owned-toggle.on { color: var(--accent); background: var(--accent-d); border-color: var(--accent); }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
 #orderSlots { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
@@ -2957,6 +2960,13 @@ select:disabled {
 }
 
 @media (max-width: 480px) {
+  .gl-char-mode { flex: 1; }
+  .gl-char-mode .seg-btn { flex: 1; justify-content: center; }
+  /* Filter toolbars stay on one line: a long label (Italian) wraps onto two
+     lines inside its button, like the lineup buttons, instead of pushing Done
+     (or Reset) to a line of its own. The row's buttons share one height. */
+  .filter-actions { flex-wrap: nowrap; align-items: stretch; }
+  .filter-actions .btn { height: auto; min-height: 25px; padding: 1px 8px; font-size: calc(11px * var(--ts)); line-height: 1.18; white-space: normal; text-align: center; justify-content: center; flex: 0 1 auto; min-width: min-content; }   /* 25px, or 30px on two lines */
   .home-steps    { grid-template-columns: 1fr; }
   /* New Game rows: a smaller portrait leaves the villain name more room. */
   .order-slot-portrait { width: 26px; height: 26px; }

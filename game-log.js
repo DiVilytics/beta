@@ -31,7 +31,7 @@ const pace = createPaceFilter({
     on:      t('Limited to your boxes'),
     off:     t('Limit to villains in your boxes'),
   },
-  onChange: () => updateFilterUI(),
+  onChange: () => { updateFilterUI(); _syncResetBtn(); },
   onError:  showErr,
 });
 
@@ -55,7 +55,7 @@ async function init() {
     document.getElementById('charGrid'),
     glChars,
     pace.excluded,
-    () => updateFilterUI(),
+    () => { updateFilterUI(); _syncResetBtn(); },   // a single villain tapped in or out
     glBoxInfo
   );
   await Promise.all([loadLocationOptions(), _probeWithMode()]);
@@ -185,10 +185,12 @@ function _syncCharModeUI() {
   const withMode = glCharMode === 'with';
   document.getElementById('charFilterPanel').classList.toggle('with-mode', withMode);
   document.querySelectorAll('#glCharMode .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === glCharMode));
-  document.getElementById('glFilterHint').textContent = withMode
-    ? t('Tap the villains that must all be in the game.')
-    : t('Tap to exclude villains; games using any excluded villain are hidden.');
+  // What the mode does, its key words in bold (static strings, so innerHTML is safe).
+  document.getElementById('glFilterHint').innerHTML = withMode
+    ? t('Shows games played with <strong>at least</strong> the selected villains (others can play too).')
+    : t('Shows games played <strong>only</strong> with the included villains.');
   updateFilterUI();
+  _syncResetBtn();
 }
 
 // ── PACE / MY-BOXES SELECTION ──────────────────────────────────────────────────
@@ -204,8 +206,14 @@ function glSelectPace(color) { pace.selectPace(color); }
 function glSetPaceMode(plus) { pace.setPaceMode(plus); }
 function glToggleMine()      { pace.toggleMine(); }
 function glExcludeAll()      { pace.excludeAll(); }
-// "Clear" empties the filter: everyone back in ('only'), nobody picked ('with').
-function glClearExcluded()   { if (glCharMode === 'with') pace.excludeAll(); else pace.clearExcluded(); }
+// Reset: back to no filter, everyone in ('only') or nobody picked ('with').
+function glResetFilter()     { if (glCharMode === 'with') pace.excludeAll(); else pace.resetToStart(); }
+// Reset is off while the filter is already at its start.
+function _syncResetBtn() {
+  const btn = document.getElementById('glResetBtn');
+  if (!btn) return;
+  btn.disabled = glCharMode === 'with' ? pace.excluded.size >= glChars.length : pace.isDefault();
+}
 
 function showErr(msg) {
   showError('err', msg, { scroll: true });
