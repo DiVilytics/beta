@@ -89,7 +89,9 @@ async function fetchGamesByIds(ids, { orderByPlayedAtDesc = false } = {}) {
   if (!ids.length) return [];
   const games = await _fetchInChunks(ids, chunk => db.from('games').select('*').in('id', chunk));
   // Order is lost across chunks, so sort in JS when the caller wants newest-first.
-  if (orderByPlayedAtDesc) games.sort((a, b) => new Date(b.played_at) - new Date(a.played_at));
+  // Games with no date go last.
+  const at = g => (g.played_at ? new Date(g.played_at).getTime() : -Infinity);
+  if (orderByPlayedAtDesc) games.sort((a, b) => (at(b) - at(a)) || 0);
   return games;
 }
 

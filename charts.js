@@ -55,11 +55,6 @@ async function _playerStats() {
   return _data.playerStats;
 }
 
-// First month (YYYY-MM, inclusive) the "Games over time" chart shows. Earlier
-// months are only the imported BoardGameGeek games, whose dates are placeholders
-// spread over Apr 2020 - Nov 2024; real recorded games start in December 2024.
-const TIME_CHART_FROM = '2024-12';
-
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
 // Each: { id, icon, label, desc, render() -> SVG/HTML string }. label and desc
 // are English keys, translated where they are shown.
@@ -249,13 +244,12 @@ const CHARTS = [
   },
   {
     id: 'time', icon: '📈', label: 'Games over time',
-    desc: 'Games recorded per calendar month, by play date (labeled YYYY/MM), from December 2024. Shows the latest 12 months; drag sideways to see earlier ones.',
+    desc: 'Games recorded per calendar month, by play date (labeled YYYY/MM). Shows the latest 12 months; drag sideways to see earlier ones.',
     async render() {
       const byMonth = {};
       for (const g of await _gamesLite()) {
         if (!g.played_at) continue;
         const k = String(g.played_at).slice(0, 7);   // YYYY-MM
-        if (k < TIME_CHART_FROM) continue;
         byMonth[k] = (byMonth[k] || 0) + 1;
       }
       // Every calendar month from the first to the last, empty ones as 0, so the
@@ -280,12 +274,9 @@ const CHARTS = [
     desc: 'Number of games recorded on each weekday, by play date. Weekday is derived from your local time zone.',
     async render() {
       const counts = new Array(7).fill(0);   // 0 = Sunday
-      const since  = new Date(2024, 11, 1);  // older games (BGG imports) carry a placeholder date
       for (const g of await _gamesLite()) {
         if (!g.played_at) continue;
-        const d = new Date(g.played_at);
-        if (d < since) continue;
-        counts[d.getDay()]++;
+        counts[new Date(g.played_at).getDay()]++;
       }
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
       // Weekday names in the current language (5 Jan 2025 was a Sunday).

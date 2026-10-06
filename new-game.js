@@ -968,7 +968,7 @@ async function submitForm() {
     num_turns:        turns,
     location:         location,
     created_by:       user.id,
-    source:           'app',   // distinguishes app-recorded games from the 'csv' import script
+    source:           'divilytics',   // recorded in this app (other sources: the imports)
   };
 
   const { data: g, error } = await db.from('games').insert(gameData).select().single();

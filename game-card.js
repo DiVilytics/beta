@@ -16,12 +16,15 @@ function gameUserRole(g, gp, user) {
 // Pure HTML builder for a game card. The result is meant to be injected into
 // a `<div class="game-card">…</div>` host. Pass `locationClickable: true` to
 // render the location as a button (the caller wires the click handler).
-// `layout: 'rows'` lists the players one per row in play order (seat numbers,
-// crown at the row's end) instead of wrapping chips. The purple highlight
+// `layout: 'rows'` lists the players one per row in play order (seat numbers
+// when the order was recorded, crown at the row's end) instead of wrapping chips. The purple highlight
 // always marks the signed-in player (`isSelf`), on every page.
 function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips' } = {}) {
   const rows = layout === 'rows';
   if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  // Seat numbers only when the play order was recorded: every seat has its own
+  // position. Imported games without it keep the column, empty.
+  const ordered = gp.every(p => p.position != null) && new Set(gp.map(p => p.position)).size === gp.length;
   const locationPart = g.location
     ? (locationClickable ? `<button class="card-loc-btn">${_esc(g.location)}</button>` : _esc(g.location))
     : null;
@@ -41,7 +44,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     const cls = `chip ${p.is_winner ? 'winner' : ''}${isSelf(p) ? ' self' : ''}`;
     const star = p.is_winner ? '<span class="win-star">👑</span>' : '';
     return `<div class="${cls}">
-      ${rows ? `<span class="chip-seat">${i + 1}</span>` : star}
+      ${rows ? `<span class="chip-seat">${ordered ? i + 1 : ''}</span>` : star}
       <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
         <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${villainNameHTML(p.character)}</a></div>

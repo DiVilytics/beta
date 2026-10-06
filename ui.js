@@ -136,7 +136,9 @@ function buildExcludeGrid(container, chars, excludedSet, onChange, boxInfo) {
 
 // ── FORMATTING ────────────────────────────────────────────────────────────────
 
+// A game can have no date (historical imports): show that instead of 1970.
 function fmtDateTime(iso) {
+  if (!iso) return t('Date unknown');
   const d = new Date(iso);
   return (
     d.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short', year: 'numeric' }) +
@@ -154,6 +156,7 @@ function fmtDuration(min) {
 }
 
 function fmtDateShort(iso) {
+  if (!iso) return '';
   const d = new Date(iso);
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }

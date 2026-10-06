@@ -222,6 +222,7 @@ function _csvField(v) {
 // formatted `fmtDateTime` (ui.js): a spreadsheet sorts/parses this correctly
 // regardless of the viewer's locale, month names don't.
 function _csvDateTime(iso) {
+  if (!iso) return '';   // game with no recorded date
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -258,7 +259,7 @@ async function exportMyData() {
           g.num_turns ?? '',
           p.nickname || '',
           p.character,
-          p.position + 1,
+          p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
         ]);
       }
