@@ -80,9 +80,10 @@ function computeRanks(rows, mode) {
   return ranks;
 }
 
-// Bar width as a % of the largest value across rows in the current mode.
+// Bar width as a % of the largest value across rows in the current mode, capped
+// at 100 (unranked rows can be above the ranked maximum).
 function statBarWidth(r, mode, maxVal) {
-  return Math.round((statValue(r, mode) / (maxVal || 1)) * 100);
+  return Math.min(100, Math.round((statValue(r, mode) / (maxVal || 1)) * 100));
 }
 
 // Anchor id for a character's box group on the characters roster page.
@@ -108,18 +109,26 @@ function boxAnchorId(box) {
 //   selfKey       : highlight the row whose key matches; if that row falls beyond
 //                   `limit`, pin it at the bottom under a "Your position" divider
 //                   so the viewer always sees their standing for the current sort.
+//   minGames      : optional; rows with fewer games aren't ranked: they follow
+//                   the others under a "Fewer than {n} games" divider, dimmed and
+//                   with no position (for % Wins, where 1-2 games can sit at 100%
+//                   by luck).
 function renderStatTableHTML(rows, opts) {
   const { mode, headLabel, getKey, getName = k => k, getNameHTML, getHref, getIdentity, getSub, getSubHref,
-          wrapClass = '', limit = Infinity, selfKey = null } = opts;
-  const sorted = sortStatRows(rows, mode);
+          wrapClass = '', limit = Infinity, selfKey = null, minGames = 0 } = opts;
+  const all      = sortStatRows(rows, mode);
+  const ranked   = all.filter(r => r.games >= minGames);
+  const unranked = all.filter(r => r.games <  minGames);
+  const sorted   = ranked.concat(unranked);
 
-  const maxVal = Math.max(...sorted.map(r => statValue(r, mode))) || 1;
+  // Bars scale to the ranked rows (an unranked 100% shouldn't shrink them all).
+  const maxVal = Math.max(...(ranked.length ? ranked : unranked).map(r => statValue(r, mode))) || 1;
 
-  const ranks      = computeRanks(sorted, mode);
+  const ranks      = computeRanks(ranked, mode);
   const medalClass = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
 
   const rowHTML = (r, i) => {
-    const rank    = ranks[i];
+    const rank    = i < ranked.length ? ranks[i] : null;
     const key     = getKey(r);
     const barW    = statBarWidth(r, mode, maxVal);
     const dispVal = statCellHTML(r, mode);
@@ -129,8 +138,8 @@ function renderStatTableHTML(rows, opts) {
     // The name and the box are each their own link (to the character/player and to
     // the box), rather than one row-wide anchor, so each is independently clickable.
     return `
-      <div class="lb-row${selfCls}">
-        <div class="rank-num ${medalClass(rank)}">${rank}</div>
+      <div class="lb-row${selfCls}${rank == null ? ' lb-row-unranked' : ''}">
+        <div class="rank-num ${medalClass(rank)}">${rank ?? '-'}</div>
         <div class="row-identity">
           ${getIdentity(key, r)}
           <div class="row-id-text">
@@ -147,7 +156,9 @@ function renderStatTableHTML(rows, opts) {
       </div>`;
   };
 
-  let body = sorted.slice(0, limit).map((r, i) => rowHTML(r, i)).join('');
+  const unrankedSep = `<div class="lb-row-sep lb-row-sep-muted">${t('Fewer than {n} games', { n: minGames })}</div>`;
+  let body = sorted.slice(0, limit)
+    .map((r, i) => (i === ranked.length ? unrankedSep : '') + rowHTML(r, i)).join('');
 
   // Pin the viewer's row if it ranks below the visible cut.
   const selfIdx = selfKey != null ? sorted.findIndex(r => getKey(r) === selfKey) : -1;

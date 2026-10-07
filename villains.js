@@ -1,244 +1,6 @@
 // ── STATE ─────────────────────────────────────────────────────────────────────
 // Static character data (objectives, FAQ) is loaded from JSON via db.js.
 
-// Currently-selected month for the roster report (first day of that month).
-let csReportMonth = (() => {
-  const n = new Date();
-  return new Date(n.getFullYear(), n.getMonth(), 1);
-})();
-
-// Aggregates character stats from the games played in `monthStart`'s calendar
-// month. Returns { stats, label, gameCount } where stats matches the shape
-// used by the character_stats view ({ character, wins, games }).
-//
-// The per-character aggregation runs server-side (monthly_character_stats RPC)
-// rather than pulling every game_players row for the month into the browser,
-// consistent with the other stats surfaces, and immune to the ~1000-row cap.
-async function _loadMonthCharacterStats(monthStart) {
-  const start = new Date(monthStart.getFullYear(), monthStart.getMonth(),     1);
-  const end   = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
-  const label = start.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' });
-  const iso   = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-01`;
-
-  const [{ data: stats }, { count }] = await Promise.all([
-    db.rpc('monthly_character_stats', { month_start: iso }),
-    db.from('games')
-      .select('id', { count: 'exact', head: true })
-      .gte('played_at', start.toISOString())
-      .lt('played_at',  end.toISOString()),
-  ]);
-
-  return { stats: stats || [], label, gameCount: count || 0 };
-}
-
-function _isFutureMonth(d) {
-  const now = new Date();
-  return d.getFullYear() > now.getFullYear()
-      || (d.getFullYear() === now.getFullYear() && d.getMonth() > now.getMonth());
-}
-
-// The report starts at December 2024 (same start as the Charts' games-over-time);
-// earlier months only hold the bulk historical imports, not tracked play.
-const REPORT_FIRST_MONTH = new Date(2024, 11, 1);
-function _isBeforeFirstMonth(d) { return d < REPORT_FIRST_MONTH; }
-const _prevMonth = () => new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() - 1, 1);
-
-async function csShiftMonth(delta) {
-  const next = new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + delta, 1);
-  if (delta > 0 && _isFutureMonth(next)) return;
-  if (delta < 0 && _isBeforeFirstMonth(next)) return;
-  csReportMonth = next;
-  await _renderMonthlyReport();
-}
-
-let _csPickerYear = null;
-
-function csOpenMonthPicker(ev) {
-  ev?.stopPropagation();
-  const panel = document.getElementById('csMonthPickerPanel');
-  if (!panel) return;
-  const isOpen = panel.classList.contains('open');
-  if (isOpen) { csCloseMonthPicker(); return; }
-  _csPickerYear = csReportMonth.getFullYear();
-  _renderMonthPickerPanel();
-  panel.classList.add('open');
-  setTimeout(() => document.addEventListener('click', _csOutsideClick), 0);
-}
-
-function csCloseMonthPicker() {
-  const panel = document.getElementById('csMonthPickerPanel');
-  if (!panel) return;
-  panel.classList.remove('open');
-  document.removeEventListener('click', _csOutsideClick);
-}
-
-function _csOutsideClick(e) {
-  const panel = document.getElementById('csMonthPickerPanel');
-  if (!panel || panel.contains(e.target)) return;
-  csCloseMonthPicker();
-}
-
-function csPickerShiftYear(delta, ev) {
-  ev?.stopPropagation();
-  const now = new Date();
-  const next = _csPickerYear + delta;
-  if (next > now.getFullYear() || next < REPORT_FIRST_MONTH.getFullYear()) return;
-  _csPickerYear = next;
-  _renderMonthPickerPanel();
-}
-
-async function csPickerSelect(month, ev) {
-  ev?.stopPropagation();
-  const next = new Date(_csPickerYear, month, 1);
-  if (_isFutureMonth(next) || _isBeforeFirstMonth(next)) return;
-  csCloseMonthPicker();
-  csReportMonth = next;
-  await _renderMonthlyReport();
-}
-
-function _renderMonthPickerPanel() {
-  const panel = document.getElementById('csMonthPickerPanel');
-  if (!panel) return;
-  const now      = new Date();
-  const curY     = csReportMonth.getFullYear();
-  const curM     = csReportMonth.getMonth();
-  const nextYDis = _csPickerYear >= now.getFullYear();
-  const prevYDis = _csPickerYear <= REPORT_FIRST_MONTH.getFullYear();
-  const months   = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString(LOCALE, { month: 'short' }).replace('.', ''));
-  panel.innerHTML = `
-    <div class="cs-mp-year">
-      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(-1, event)" title="${t('Previous year')}"${prevYDis ? ' disabled' : ''}>‹</button>
-      <span class="cs-mp-year-text">${_csPickerYear}</span>
-      <button class="cs-month-nav" type="button" onclick="csPickerShiftYear(1, event)" title="${t('Next year')}"${nextYDis ? ' disabled' : ''}>›</button>
-    </div>
-    <div class="cs-mp-grid">
-      ${months.map((mn, i) => {
-        const disabled = _isFutureMonth(new Date(_csPickerYear, i, 1))
-                      || _isBeforeFirstMonth(new Date(_csPickerYear, i, 1));
-        const selected = _csPickerYear === curY && i === curM;
-        return `<button class="cs-mp-month${selected ? ' selected' : ''}" type="button" onclick="csPickerSelect(${i}, event)"${disabled ? ' disabled' : ''}>${mn}</button>`;
-      }).join('')}
-    </div>`;
-}
-
-let _csLoadToken = 0;
-
-async function _renderMonthlyReport() {
-  const host = document.getElementById('csSummary');
-  if (!host) return;
-
-  const label = csReportMonth.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' });
-  const token = ++_csLoadToken;
-
-  // On a month change the cards already exist, keep them in place (dimmed) and
-  // just retarget the header, so the layout never collapses while loading. Only
-  // the very first load (no cards yet) shows the spinner scaffold.
-  if (host.querySelector('.cs-summary')) {
-    _setReportHeader(label, null);
-    host.classList.add('cs-report-loading');
-  } else {
-    host.innerHTML = _renderRosterSummary([], label, null, true);
-  }
-
-  const monthly = await _loadMonthCharacterStats(csReportMonth);
-  if (token !== _csLoadToken) return;   // a newer month was requested, ignore stale result
-  host.classList.remove('cs-report-loading');
-  host.innerHTML = _renderRosterSummary(monthly.stats, monthly.label, monthly.gameCount, false);
-}
-
-// Retarget the report header (month label + game count + next-nav state) in place,
-// without rebuilding the cards below it.
-function _setReportHeader(label, gameCount) {
-  const host = document.getElementById('csSummary');
-  if (!host) return;
-  const btn = host.querySelector('.cs-month-text');
-  if (btn) {
-    const countTxt = gameCount == null ? '…' : tn(gameCount, '{n} game', '{n} games');
-    btn.textContent = t('Monthly report: {month} ({count})', { month: label, count: countTxt });
-  }
-  const navs = host.querySelectorAll('.cs-summary-header .cs-month-nav');
-  if (navs[0]) navs[0].disabled = _isBeforeFirstMonth(_prevMonth());
-  if (navs[1]) navs[1].disabled = _isFutureMonth(
-    new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + 1, 1)
-  );
-}
-
-function _renderRosterSummary(rows, monthLabel, gameCount, loading = false) {
-  const nextDisabled = _isFutureMonth(
-    new Date(csReportMonth.getFullYear(), csReportMonth.getMonth() + 1, 1)
-  );
-  const prevDisabled = _isBeforeFirstMonth(_prevMonth());
-  const countTxt = gameCount == null
-    ? '…'
-    : tn(gameCount, '{n} game', '{n} games');
-  const header = monthLabel
-    ? `<div class="cs-summary-header">
-         <button class="cs-month-nav" type="button" onclick="csShiftMonth(-1)" title="${t('Previous month')}"${prevDisabled ? ' disabled' : ''}>‹</button>
-         <span class="cs-month-picker-wrap">
-           <button class="cs-month-text" type="button" onclick="csOpenMonthPicker(event)" title="${t('Pick month')}">${_esc(t('Monthly report: {month} ({count})', { month: monthLabel, count: countTxt }))}</button>
-           <div class="cs-month-picker-panel" id="csMonthPickerPanel" role="dialog" aria-label="${t('Pick month')}"></div>
-         </span>
-         <button class="cs-month-nav" type="button" onclick="csShiftMonth(1)" title="${t('Next month')}"${nextDisabled ? ' disabled' : ''}>›</button>
-       </div>`
-    : '';
-
-  // Loaded month with no games: keep the header, drop the cards for a short note.
-  if (!loading && !rows.length) {
-    return `${header}<div class="cs-summary-empty">${t('No games recorded this month.')}</div>`;
-  }
-
-  const withPct = rows.map(r => ({
-    name:  r.character,
-    wins:  r.wins  || 0,
-    games: r.games || 0,
-    pct:   r.games ? r.wins / r.games : 0,
-  }));
-
-  const sortedPct   = [...withPct].sort((a, b) => b.pct   - a.pct   || b.wins - a.wins);
-  const sortedWins  = [...withPct].sort((a, b) => b.wins  - a.wins  || b.pct  - a.pct);
-  const sortedGames = [...withPct].sort((a, b) => b.games - a.games || b.wins - a.wins);
-
-  const fmtPct   = r => Math.round(r.pct * 100) + '%';
-  const fmtWins  = r => String(r.wins);
-  const fmtGames = r => String(r.games);
-
-  // While loading, the body is a skeleton with the same structure (Top/Bottom +
-  // three rows each) so the card is already the right height, no first-load jump.
-  const skelRow  = `<div class="cs-mini-row cs-skel"><span class="cs-skel-dot"></span><span class="cs-skel-bar"></span></div>`;
-  const skelBody = `<div class="cs-mini-section-lbl">${t('Top')}</div>${skelRow.repeat(3)}<div class="cs-mini-section-lbl">${t('Bottom')}</div>${skelRow.repeat(3)}`;
-
-  const card = (title, sortedRows, fmt) => {
-    let body;
-    if (loading) {
-      body = skelBody;
-    } else {
-      const top    = sortedRows.slice(0, 3);
-      const bottom = sortedRows.slice(-3).reverse();
-      const row = r => `
-        <a class="cs-mini-row" href="villains.html?vil=${encodeURIComponent(r.name)}" title="${_esc(villainName(r.name))}">
-          <img class="char-portrait" src="${charImgSrc(r.name)}" onerror="this.src='asset/players/default.svg'" alt="${_esc(villainName(r.name))}">
-          <span class="cs-mini-val">${fmt(r)}</span>
-        </a>`;
-      body = `
-        <div class="cs-mini-section-lbl">${t('Top')}</div>
-        ${top.map(row).join('')}
-        ${bottom.length ? `<div class="cs-mini-section-lbl">${t('Bottom')}</div>${bottom.map(row).join('')}` : ''}`;
-    }
-    return `
-      <div class="cs-summary-card">
-        <div class="cs-summary-title">${title}</div>
-        ${body}
-      </div>`;
-  };
-
-  return `${header}
-    <div class="cs-summary">
-      ${card(t('% Wins'),  sortedPct,   fmtPct)}
-      ${card(t('# Wins'),  sortedWins,  fmtWins)}
-      ${card(t('# Games'), sortedGames, fmtGames)}
-    </div>`;
-}
-
 let csMode    = 'pct';   // 'pct' | 'count' | 'games'
 let csChar    = null;      // character record from DB
 let csBuckets = null;      // computed stats per player count
@@ -296,16 +58,21 @@ async function renderRosterPage(scrollBox) {
   const root = document.getElementById('csRoot');
   root.className = '';
   root.innerHTML =
-    `<div id="csSummary"></div>
-     <div class="cs-roster-controls">
+    `<div class="cs-roster-controls">
        <span class="cs-roster-controls-lbl">${t('Group by')}</span>
        ${_rosterViewSegHTML()}
      </div>
      <div id="csGroups">${_rosterGroupsHTML(csAllChars)}</div>`;
+  // Under the roster, the whole F.A.Q. (a villain's page links to its own topic).
+  document.getElementById('csFaq').innerHTML = `
+    <a class="home-section-link mt-1-5" href="faq.html">
+      <span class="home-section-icon">📜</span>
+      <div class="home-section-text">
+        <span class="home-section-name">${t('Disney Villainous F.A.Q.')}</span>
+        <span class="home-section-desc">${t('The official rules, plus clarifications, general and villain by villain.')}</span>
+      </div>
+    </a>`;
 
-  // Wait for the monthly report (it fills #csSummary above the groups and
-  // changes layout) before scrolling, so a ?box= jump lands at the right spot.
-  await _renderMonthlyReport();
   if (scrollBox) {
     requestAnimationFrame(() => document.getElementById(scrollBox)?.scrollIntoView({ block: 'start' }));
   }
@@ -587,8 +354,8 @@ function _adversariesSectionHTML() {
   const byLoss  = top5(adversaries.filter(a => a.losses > 0), lossKey, a => a.losses);
   const byGames = top5(adversaries, a => a.games, a => a.games);
 
-  // Rows show only the opponent's portrait and the selected value, like the
-  // monthly report; the name and both values are in the tooltip.
+  // Rows show only the opponent's portrait and the selected value; the name
+  // and both values are in the tooltip.
   const winsCol  = a => ({ val: isPct ? `${pct(a.wins, a.games)}%`   : a.wins,   tip: t('{wins} in {games} games ({pct}%)', { wins: tn(a.wins, '{n} win', '{n} wins'), games: a.games, pct: pct(a.wins, a.games) }) });
   const lossCol  = a => ({ val: isPct ? `${pct(a.losses, a.games)}%` : a.losses, tip: t('{wins} in {games} games ({pct}%)', { wins: tn(a.losses, '{n} loss', '{n} losses'), games: a.games, pct: pct(a.losses, a.games) }) });
   const gamesCol = a => ({ val: isPct ? `${pct(a.games, total)}%`    : a.games,  tip: t('{games} of {total} games ({pct}%)', { games: a.games, total, pct: pct(a.games, total) }) });
@@ -615,6 +382,7 @@ function _adversariesSectionHTML() {
       <span class="pf-games-title">${t('Rivalries')}</span>
       ${seg}
     </div>
+    <p class="results-hint">${t('Only opponents faced in at least {n} games.', { n: MIN_GAMES_FOR_RIVALRY })}</p>
     <div class="cs-adv">
       ${col(t('Beaten most'),  byWins,  winsCol)}
       ${col(t('Lost to most'), byLoss,  lossCol)}

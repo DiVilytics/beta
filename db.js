@@ -75,7 +75,7 @@ async function fetchAllProfiles(fields = 'nickname, avatar_url, default_avatar')
 
 // Fetch the player rows for a set of game ids, ordered by position. Returns []
 // for an empty input. Used wherever we already have a list of game ids and
-// want their participants (game-log, characters monthly report, etc).
+// want their participants (the game log, fetchGamesWithPlayers).
 async function fetchPlayersForGames(ids) {
   if (!ids.length) return [];
   // Chunked so a player/character with many games never hits the row cap.

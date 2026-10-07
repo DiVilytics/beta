@@ -1412,6 +1412,9 @@ select:disabled {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
+/* "Fewer than 5 games" divider (% Wins): the rows under it aren't ranked. */
+.lb-row-sep-muted { color: var(--muted); }
+.lb-row-unranked > :not(.rank-num) { opacity: 0.6; }
 
 .rank-num { font-size: calc(12px * var(--ts)); font-weight: 700; color: var(--dim); }
 .rank-num.gold   { color: var(--gold); }
@@ -2273,74 +2276,19 @@ select:disabled {
   white-space: nowrap;
 }
 
-/* Roster summary (top/bottom 3 per metric) */
-.cs-summary-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: calc(13px * var(--ts));
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-  letter-spacing: -0.01em;
+/* Leaderboard period: All time / Month under the player-count pills, and with
+   Month on its year and month menus beside them, as small as the pills. */
+.lb-period-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.lb-select {
+  width: auto; height: 25px; min-height: 25px; max-height: 25px;
+  padding: 0 26px 0 12px; border-radius: 999px;
+  font-size: calc(12px * var(--ts)); font-weight: 600;
+  background-position: right 9px center;
 }
-.cs-month-picker-wrap { flex: 1; position: relative; display: flex; justify-content: center; }
-.cs-month-text {
-  text-align: center;
-  cursor: pointer;
-  background: none;
-  border: 0;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-}
-@media (hover: hover) {
-  .cs-month-text:hover { color: var(--accent); }
-}
-.cs-month-picker-panel {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: var(--rs);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  padding: 10px;
-  min-width: 220px;
-}
-.cs-month-picker-panel.open { display: block; }
-.cs-mp-year {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.cs-mp-year-text { font-weight: 700; font-size: calc(14px * var(--ts)); }
-.cs-mp-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-.cs-mp-month {
-  background: var(--s2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: var(--rs);
-  padding: 6px 0;
-  font: inherit;
-  font-size: calc(12px * var(--ts));
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, opacity 0.15s;
-}
-.cs-mp-month.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
-.cs-mp-month:disabled { opacity: 0.35; cursor: not-allowed; }
-@media (hover: hover) {
-  .cs-mp-month:not(:disabled):not(.selected):hover { background: var(--s3); }
-}
+/* While another month (or filter) loads, the current numbers stay and dim. */
+.lb-loading { opacity: 0.45; transition: opacity 0.1s; }
+
+/* Small square ‹ › buttons (the avatar builder's part rows). */
 .cs-month-nav {
   background: var(--s2);
   border: 1px solid var(--border);
@@ -2359,75 +2307,6 @@ select:disabled {
 @media (hover: hover) {
   .cs-month-nav:not(:disabled):hover { background: var(--s3); }
 }
-.cs-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-bottom: 20px;
-}
-/* First-load skeleton: a placeholder row that mirrors a real .cs-mini-row so the
-   card is the right height before data arrives (no layout jump). */
-.cs-skel-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--s3); flex: none; }
-.cs-skel-bar { height: 12px; width: 34px; border-radius: 4px; background: var(--s3); margin-left: auto; }
-.cs-skel { pointer-events: none; }
-.cs-skel .cs-skel-dot, .cs-skel .cs-skel-bar { animation: csSkelPulse 1.2s ease-in-out infinite; }
-@keyframes csSkelPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
-/* While a new month loads, the existing cards stay put but dim for feedback. */
-.cs-report-loading .cs-summary { opacity: 0.45; transition: opacity 0.1s; }
-.cs-summary-empty { color: var(--muted); font-size: calc(13px * var(--ts)); padding: 14px 2px; margin-bottom: 20px; }
-.cs-summary-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 8px 8px 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-.cs-summary-title {
-  font-size: calc(10px * var(--ts));
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px;
-}
-.cs-mini-section-lbl {
-  font-size: calc(10px * var(--ts));
-  font-weight: 700;
-  color: var(--dim);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin: 4px 0 1px;
-}
-.cs-mini-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 2px;
-  border-radius: var(--rs);
-  text-decoration: none;
-  color: inherit;
-  min-width: 0;
-}
-.cs-mini-row .char-portrait { width: 28px; height: 28px; }
-.cs-mini-val {
-  margin-left: auto;
-  font-size: calc(11px * var(--ts));
-  font-weight: 700;
-  color: var(--text);
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-@media (hover: hover) {
-  .cs-mini-row:hover { background: var(--s2); }
-}
-
 .cs-roster-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .cs-roster-controls-lbl { font-size: calc(12px * var(--ts)); font-weight: 600; color: var(--muted); }
 
