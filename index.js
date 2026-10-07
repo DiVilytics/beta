@@ -66,14 +66,15 @@ _updateInstallBtn();
 
 // ── WHAT'S NEW ───────────────────────────────────────────────────────────────
 // The card under the F.A.Q. says when the last update was, and shows a dot
-// until changelog.html has been opened since it.
+// until the page has been opened, then again whenever the newest entry is
+// unseen (a new day, or new items on the day seen last).
 async function _initChangelogCard() {
-  const latest = Object.keys(await loadChangelog()).sort().pop();
+  const log    = await loadChangelog();
+  const latest = Object.keys(log).sort().pop();
   if (!latest) return;
   document.getElementById('changelogDesc').textContent = t('Last update: {date}', { date: fmtDayLong(latest) });
-  let seen = null;
-  try { seen = localStorage.getItem(CHANGELOG_SEEN_KEY); } catch (_) {}
-  document.getElementById('changelogDot').classList.toggle('hidden', !!seen && seen >= latest);
+  const seen = changelogSeen();
+  document.getElementById('changelogDot').classList.toggle('hidden', !!seen && !changelogUnseen(latest, log[latest], seen));
 }
 _initChangelogCard();
 

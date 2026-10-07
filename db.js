@@ -149,12 +149,36 @@ async function _fetchJsonLocalized(url, depth = 1) {
 // What's new (changelog.html, and the home card's date and dot): { 'YYYY-MM-DD':
 // { title, new?, improved?, fixed? } }, each group a list of items written for
 // players. changelog.it.json translates entries whole, like the other files.
-// The page stores the newest date it showed under CHANGELOG_SEEN_KEY.
+// Opening the page stores what it showed under CHANGELOG_SEEN_KEY: the newest
+// entry's date and its number of items ('2026-10-07#9'), so an entry extended
+// later the same day counts as new again. Item counts match in every language.
 const CHANGELOG_SEEN_KEY = 'changelogSeen';
 let _changelog = null;
 async function loadChangelog() {
   if (!_changelog) _changelog = await _fetchJsonLocalized(DATA_CHANGELOG_URL);
   return _changelog;
+}
+
+const _changelogItems = e => ['new', 'improved', 'fixed'].reduce((n, k) => n + (e[k]?.length || 0), 0);
+
+// The stamp of a log's newest entry, the value stored once it's been seen.
+function changelogStamp(log) {
+  const day = Object.keys(log).sort().pop();
+  return day ? `${day}#${_changelogItems(log[day])}` : null;
+}
+
+// The stamp seen last ('' = never; an old bare date counts as fully seen).
+function changelogSeen() {
+  try { return localStorage.getItem(CHANGELOG_SEEN_KEY) || ''; } catch (_) { return ''; }
+}
+
+// Whether an entry is newer than `seen`: a later day, or the seen day with more
+// items. Nothing counts as new before a first visit, so a newcomer's page isn't
+// all purple.
+function changelogUnseen(day, entry, seen) {
+  if (!seen) return false;
+  const [seenDay, seenCount] = seen.split('#');
+  return day > seenDay || (day === seenDay && seenCount != null && _changelogItems(entry) > +seenCount);
 }
 
 let _objectives = null;
