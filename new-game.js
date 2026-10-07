@@ -509,7 +509,7 @@ function renderOrderSlots() {
             ${charSelectHTML(available, s.char, boxInfo)}
           </select>
           <div class="order-slot-name">${nameTxt}</div>
-          <span class="order-slot-chevron" aria-hidden="true">▾</span>
+          <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>

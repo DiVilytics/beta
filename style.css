@@ -799,10 +799,10 @@ main {
 .page-intro { color: var(--muted); font-size: calc(14px * var(--ts)); line-height: 1.45; margin: 0 0 16px; }
 .chart-picker { margin-bottom: 16px; min-height: 38px; }   /* the select is injected by JS; hold its height so the card doesn't jump down */
 .chart-select-wrap { position: relative; width: 100%; }
+/* The site's ▼ (.chevron: size, color), placed inside the field. */
 .chart-chevron {
   position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  pointer-events: none; color: var(--muted); font-size: calc(18px * var(--ts));
-  transition: transform 0.2s;
+  pointer-events: none;
 }
 .chart-select:open ~ .chart-chevron { transform: translateY(-50%) rotate(180deg); }
 /* Inherits height/line-height/border/box-sizing/appearance from the global
@@ -2036,12 +2036,10 @@ select:disabled {
   text-overflow: ellipsis;
 }
 .order-slot-empty { color: var(--dim); font-weight: 400; font-style: italic; }
+/* The site's ▼ (.chevron: size, color), after the villain's name. */
 .order-slot-chevron {
   flex-shrink: 0;
-  font-size: calc(22px * var(--ts));
-  color: var(--muted);
   line-height: 1;
-  transition: transform 0.2s;
 }
 /* Progressive enhancement: rotate the chevron while the native picker is open.
    :open on <select> is supported in recent Chromium; the rule is a harmless
@@ -2276,16 +2274,28 @@ select:disabled {
   white-space: nowrap;
 }
 
-/* Leaderboard period: All time / Month under the player-count pills, and with
-   Month on its year and month menus beside them, as small as the pills. */
-.lb-period-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-.lb-select {
+/* Period filter (period-filter.js; Leaderboard and Game Log), under the
+   player-count pills: All time, then Year and Month, two menus drawn as pills
+   (highlighted like .pill.on once a year or month is picked). */
+.period-row { align-items: center; }
+.period-pill-wrap { position: relative; display: inline-flex; align-items: center; }
+.period-pill {
   width: auto; height: 25px; min-height: 25px; max-height: 25px;
-  padding: 0 26px 0 12px; border-radius: 999px;
+  padding: 0 24px 0 12px; border-radius: 999px;
+  border-color: var(--border); background: transparent; color: var(--muted);
   font-size: calc(12px * var(--ts)); font-weight: 600;
-  background-position: right 9px center;
 }
-/* While another month (or filter) loads, the current numbers stay and dim. */
+/* The same ▼ as New Game's player count (.count-select-wrap). */
+.period-pill-wrap .chevron { position: absolute; right: 10px; pointer-events: none; }
+.period-pill-wrap select:open + .chevron { transform: rotate(180deg); }
+.period-pill:disabled + .chevron { opacity: 0.45; }
+.period-pill.on { background: var(--s2); color: var(--text); border-color: var(--s4); }
+.period-pill:disabled { background: transparent; opacity: 0.45; }
+/* No field-style focus ring after a pick with the mouse; keyboard focus keeps it. */
+.period-pill:focus { box-shadow: none; border-color: var(--border); }
+.period-pill.on:focus { border-color: var(--s4); }
+.period-pill:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-d); }
+/* While another period (or filter) loads, the current numbers stay and dim. */
 .lb-loading { opacity: 0.45; transition: opacity 0.1s; }
 
 /* Small square ‹ › buttons (the avatar builder's part rows). */

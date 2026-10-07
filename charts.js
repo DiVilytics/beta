@@ -333,7 +333,7 @@ function _renderPicker() {
   document.getElementById('chartPicker').innerHTML =
     `<div class="chart-select-wrap"><select class="chart-select" aria-label="${t('Choose a chart')}" onchange="selectChart(this.value)">` +
     CHARTS.map(c => `<option value="${c.id}"${c.id === _selected ? ' selected' : ''}>${c.icon} ${_esc(t(c.label))}</option>`).join('') +
-    `</select><span class="chart-chevron">▾</span></div>`;
+    `</select><span class="chevron chart-chevron" aria-hidden="true">▼</span></div>`;
 }
 
 async function selectChart(id) {

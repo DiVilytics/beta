@@ -8,6 +8,9 @@ let glBoxInfo      = {};   // loadBoxInfo(), used to order box groups by release
 let glFilterCount    = 'all';   // 'all' | 2 | 3 | 4 | 5 | 6
 let glFilterLocation = null;
 
+// The period, All time / Year / Month (period-filter.js): any change reloads.
+const period = createPeriodFilter('glPeriod', { onChange: () => load(true) });
+
 // Villain filter mode. 'only': games played entirely within the included set
 // (the pool built by excluding, pace and My boxes). 'with': games that have
 // every selected villain at the table; the grid starts all struck through and
@@ -39,6 +42,9 @@ let _gameOffset     = 0;
 let _totalGames     = 0;
 let _hasMore        = false;
 let _loaded         = false;   // true once the first load() has fetched data
+// A filter can change again before its games arrive: only the latest load()
+// renders (a Load more too is dropped once a new list has been asked for).
+let _loadToken      = 0;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -58,7 +64,7 @@ async function init() {
     () => { updateFilterUI(); _syncResetBtn(); },   // a single villain tapped in or out
     glBoxInfo
   );
-  await Promise.all([loadLocationOptions(), _probeWithMode()]);
+  await Promise.all([loadLocationOptions(), _probeWithMode(), period.load()]);
   await load();
   updateFilterUI();      // show the included-character count from the start
   pace.updatePaceUI();   // initialize the pace swatches + My-boxes button
@@ -71,6 +77,7 @@ async function load(reset = true) {
     _gameOffset = 0;
     // Don't wipe the DOM yet. keep current cards visible while fetching
   }
+  const token = reset ? ++_loadToken : _loadToken;
 
   // 'only': char_filter is the INCLUDED set (everything not excluded). Nothing
   // excluded → null (no restriction); excluding everything → empty array → no
@@ -81,14 +88,17 @@ async function load(reset = true) {
   const countVal = glFilterCount !== 'all' ? glFilterCount : null;
   const locVal   = glFilterLocation || null;
 
+  // All time sends no range, the same calls as before the period existed.
+  const range   = period.isAll() ? {} : period.range();
   const filters = withArr
-    ? { with_filter: withArr, count_filter: countVal, location_filter: locVal }
-    : { char_filter: charArr, count_filter: countVal, location_filter: locVal };
+    ? { with_filter: withArr, count_filter: countVal, location_filter: locVal, ...range }
+    : { char_filter: charArr, count_filter: countVal, location_filter: locVal, ...range };
   const suffix  = withArr ? '_with' : '';
   const [{ data: newGames, error }, { data: total }] = await Promise.all([
     db.rpc('get_game_page' + suffix, { ...filters, page_offset: _gameOffset, page_size: PAGE_SIZE }),
     db.rpc('get_game_count' + suffix, filters),
   ]);
+  if (token !== _loadToken) return;
 
   if (error) {
     document.getElementById('root').innerHTML =
@@ -100,6 +110,7 @@ async function load(reset = true) {
   _totalGames = Number(total) || 0;
 
   const newPlayers = await fetchPlayersForGames(g.map(x => x.id));
+  if (token !== _loadToken) return;
 
   // Update state atomically so render() sees a consistent snapshot
   if (reset) {
@@ -275,7 +286,7 @@ function render() {
   if (!_loaded) return;
 
   const hint         = document.getElementById('resultsHint');
-  const filterActive = glFilterCount !== 'all' || _charFilterActive() || glFilterLocation !== null;
+  const filterActive = glFilterCount !== 'all' || _charFilterActive() || glFilterLocation !== null || !period.isAll();
   const root         = document.getElementById('root');
 
   const pillArea = document.getElementById('locationPillArea');

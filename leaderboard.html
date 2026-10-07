@@ -64,16 +64,8 @@
       <button class="pill"   onclick="setFilter(5)">5p</button>
       <button class="pill"   onclick="setFilter(6)">6p</button>
     </div>
-    <!-- Period: every game, or one month, picked in the year and month menus
-         shown next to it -->
-    <div class="lb-period-row">
-      <div class="pill-group" id="periodPills">
-        <button class="pill on" data-period="all"   onclick="setPeriod('all')" data-i18n>All time</button>
-        <button class="pill"    data-period="month" onclick="setPeriod('month')" data-i18n>Month</button>
-      </div>
-      <select class="lb-select hidden" id="lbYearSel"  onchange="lbPickYear(+this.value)"  aria-label="Year" data-i18n-attr="aria-label"></select>
-      <select class="lb-select hidden" id="lbMonthSel" onchange="lbPickMonth(+this.value)" aria-label="Month" data-i18n-attr="aria-label"></select>
-    </div>
+    <!-- Period: All time / Year / Month (period-filter.js) -->
+    <div id="lbPeriod"></div>
   </div>
 
   <!-- Summary stats -->
@@ -94,6 +86,7 @@
   <script src="search.js"></script>
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
+<script src="period-filter.js"></script>
 <script src="leaderboard.js"></script>
 </body>
 </html>

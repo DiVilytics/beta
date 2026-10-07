@@ -6,13 +6,11 @@ let lbNickAvatarMap = {};
 let lbTab    = 'characters';   // 'characters' | 'players'
 let lbMode   = 'pct';          // 'pct' | 'count' | 'games'
 let lbFilter = 'all';          // 'all' | 2 | 3 | 4 | 5 | 6
-let lbPeriod = 'all';          // 'all' (every game) | 'month' (the games of lbMonth)
 
-// The month shown with Month on: its first day, local time. It opens on the
-// current month; the menus reach back to the month of the oldest game with a
-// date (lbFirstMonth, read at load).
-let lbMonth = (() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); })();
-let lbFirstMonth = lbMonth;
+// The period, All time / Year / Month (period-filter.js): any change reloads.
+const period = createPeriodFilter('lbPeriod', {
+  onChange: () => { lbDisplayLimit = LB_PAGE_SIZE; loadAndRender(); },
+});
 
 const LB_PAGE_SIZE = 35;
 let lbDisplayLimit = LB_PAGE_SIZE;
@@ -23,11 +21,11 @@ let lbDisplayLimit = LB_PAGE_SIZE;
 // count there isn't misleading the same way). Intentionally not user-configurable.
 const MIN_GAMES_FOR_PCT = 5;
 
-// Cache: key `${lbTab}:${lbFilter}:${period}` → { rows, summary }, period being
-// 'all' or the month ('2026-10'). Avoids re-fetching when only the sort lbMode
-// changes, or when going back to a month already seen.
+// Cache: key `${lbTab}:${lbFilter}:${period.id()}` → { rows, summary }. Avoids
+// re-fetching when only the sort lbMode changes, or when going back to a
+// period already seen.
 const _lbCache = {};
-const _lbKey = () => `${lbTab}:${lbFilter}:${lbPeriod === 'month' ? _monthId(lbMonth) : 'all'}`;
+const _lbKey = () => `${lbTab}:${lbFilter}:${period.id()}`;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -35,14 +33,11 @@ async function init() {
   setActiveNav('leaderboard.html');
   await initAuth();
 
-  const [chars, profiles, oldest] = await Promise.all([
+  const [chars, profiles] = await Promise.all([
     loadCharacters(),
     fetchAllProfiles(),
-    db.from('games').select('played_at').not('played_at', 'is', null)
-      .order('played_at', { ascending: true }).limit(1),
+    period.load(),
   ]);
-  const first = oldest.data?.[0]?.played_at;
-  if (first) { const d = new Date(first); lbFirstMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
 
   lbCharBoxMap    = Object.fromEntries(chars.map(c => [c.name, c.box]));
   lbNickAvatarMap = Object.fromEntries(
@@ -75,72 +70,11 @@ function setFilter(f) {
   loadAndRender();
 }
 
-function setPeriod(p) {
-  if (p === lbPeriod) return;
-  lbPeriod = p;
-  lbDisplayLimit = LB_PAGE_SIZE;
-  document.querySelectorAll('#periodPills .pill').forEach(b => b.classList.toggle('on', b.dataset.period === p));
-  _renderMonthSelects();
-  loadAndRender();
-}
-
 function lbLoadMore() {
   lbDisplayLimit += LB_PAGE_SIZE;
   const cached = _lbCache[_lbKey()];
   if (cached) render(cached);
 }
-
-// ── MONTH ─────────────────────────────────────────────────────────────────────
-// With Month on, a year and a month menu next to the pills, listing only the
-// months that can have games: from the oldest dated game to the current month.
-
-const _addMonths = (d, n) => new Date(d.getFullYear(), d.getMonth() + n, 1);
-const _monthId   = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-
-// The months (0-11) of `year` between the first month and now.
-function _monthsOf(year) {
-  const now  = new Date();
-  const from = year === lbFirstMonth.getFullYear() ? lbFirstMonth.getMonth() : 0;
-  const to   = year === now.getFullYear() ? now.getMonth() : 11;
-  return Array.from({ length: to - from + 1 }, (_, i) => from + i);
-}
-
-function _renderMonthSelects() {
-  const yearSel  = document.getElementById('lbYearSel');
-  const monthSel = document.getElementById('lbMonthSel');
-  if (!yearSel || !monthSel) return;
-  const show = lbPeriod === 'month';
-  yearSel.classList.toggle('hidden', !show);
-  monthSel.classList.toggle('hidden', !show);
-  if (!show) return;
-  const year  = lbMonth.getFullYear();
-  const years = [];
-  for (let y = new Date().getFullYear(); y >= lbFirstMonth.getFullYear(); y--) years.push(y);
-  yearSel.innerHTML = years.map(y => `<option value="${y}"${y === year ? ' selected' : ''}>${y}</option>`).join('');
-  // Three-letter names (Sep, Set), so the row fits a phone; some locales'
-  // short form is longer ("Sept") or has a dot.
-  monthSel.innerHTML = _monthsOf(year).map(m => {
-    const name = new Date(2000, m, 1).toLocaleDateString(LOCALE, { month: 'short' }).replace('.', '').slice(0, 3);
-    return `<option value="${m}"${m === lbMonth.getMonth() ? ' selected' : ''}>${_esc(name.charAt(0).toUpperCase() + name.slice(1))}</option>`;
-  }).join('');
-}
-
-function _goToMonth(d) {
-  lbMonth = d;
-  lbDisplayLimit = LB_PAGE_SIZE;
-  _renderMonthSelects();
-  loadAndRender();
-}
-
-// A new year keeps the month when that year has it, else the nearest one it
-// has (October 2026 → 2024: December, its only month).
-function lbPickYear(year) {
-  const months = _monthsOf(year);
-  const m = lbMonth.getMonth();
-  _goToMonth(new Date(year, Math.min(Math.max(m, months[0]), months[months.length - 1]), 1));
-}
-
-function lbPickMonth(month) { _goToMonth(new Date(lbMonth.getFullYear(), month, 1)); }
 
 // ── DATA LOADING ──────────────────────────────────────────────────────────────
 
@@ -158,7 +92,7 @@ async function loadAndRender() {
   if (!_lbCache[key]) {
     lb.classList.add('lb-loading');
     summary.classList.add('lb-loading');
-    const data = await (lbPeriod === 'month' ? _fetchMonth() : _fetchAllTime());
+    const data = await (period.isAll() ? _fetchAllTime() : _fetchPeriod());
     if (token !== _lbLoadToken) return;
     if (!data) {
       summary.className = 'summary';
@@ -209,15 +143,10 @@ async function _fetchAllTime() {
   };
 }
 
-// One month: the same numbers from the period_* RPCs, for games played between
-// the month's first day and the next one's (local midnight). A villain or player
-// is listed only if they played that month.
-async function _fetchMonth() {
-  const range = {
-    player_count_filter: lbFilter === 'all' ? null : lbFilter,
-    from_ts: lbMonth.toISOString(),
-    to_ts:   _addMonths(lbMonth, 1).toISOString(),
-  };
+// A year or a month: the same numbers from the period_* RPCs, for the games
+// played in it. A villain or player is listed only if they played then.
+async function _fetchPeriod() {
+  const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
   const [stats, summary] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
     db.rpc('period_game_stats', range),
