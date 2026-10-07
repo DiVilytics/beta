@@ -2278,6 +2278,8 @@ select:disabled {
    player-count pills: All time, then Year and Month, two menus drawn as pills
    (highlighted like .pill.on once a year or month is picked). */
 .period-row { align-items: center; }
+/* Both pill rows 8px apart, as in the Game Log's filter bar. */
+.lb-controls { gap: 8px; }
 .period-pill-wrap { position: relative; display: inline-flex; align-items: center; }
 .period-pill {
   width: auto; height: 25px; min-height: 25px; max-height: 25px;
