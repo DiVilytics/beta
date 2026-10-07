@@ -1,0 +1,215 @@
+{
+  "2026-10-07": {
+    "title": "Classifica e Registro per anno e per mese",
+    "new": [
+      "Sempre, Anno e Mese nella Classifica e nel Registro: scegli un anno, poi un mese per restringere.",
+      "Il report mensile passa dalla pagina Cattivi alla Classifica, con la classifica completa invece dei primi e degli ultimi tre, anche per i giocatori e per numero di giocatori.",
+      "Questa pagina: le novità di DiVilytics, aggiornamento per aggiornamento."
+    ],
+    "improved": [
+      "% Vittorie non nasconde più chi ha meno di 5 partite: compare dopo la classifica, senza posizione.",
+      "Le rivalità indicano che contano solo gli avversari affrontati in almeno 5 partite.",
+      "La pagina Cattivi ha in fondo il link alle F.A.Q.",
+      "Tutti i menu usano la stessa ▼."
+    ]
+  },
+  "2026-10-06": {
+    "title": "Tutte le guide dei cattivi, più partite, scorciatoie da tastiera",
+    "new": [
+      "Una guida per ogni cattivo, Introduction to Evil compresa: l'obiettivo e come si gioca.",
+      "I registri di partite condivisi sul Subreddit di Disney Villainous. Le partite importate senza data riportano Data sconosciuta e compaiono per ultime nel Registro.",
+      "Scorciatoie da tastiera da computer: un tasto per ogni pagina e impostazione, / per la casella di ricerca. Premi ? per l'elenco."
+    ],
+    "improved": [
+      "Il contatore mostra il round in corso, partendo da 1, e − non scende sotto (anche dalla schermata di blocco).",
+      "Filtri dei cattivi: Ripristina torna alla situazione di partenza (le tue scatole, in Nuova partita), e i cattivi che contano sono colorati di viola invece di attenuare gli altri.",
+      "Il tuo cattivo ha un bordo viola ben visibile nelle partite e nella pagina per rivendicare.",
+      "Le partite di Villainous Italia mostrano solo la data, perché il foglio non ha l'ora."
+    ],
+    "fixed": [
+      "Una partita avviata per sbaglio e messa in pausa entro il primo minuto non salva più una durata e un round.",
+      "Il pulsante di pesca mantiene la sua scritta durante l'animazione.",
+      "Le righe di cattivi e giocatori hanno la stessa altezza con il testo Grande."
+    ]
+  },
+  "2026-10-05": {
+    "title": "Nuova partita più fluida, dimensione del testo e Installa",
+    "new": [
+      "Dimensione del testo nelle Impostazioni: Piccolo o Grande.",
+      "Installa nella home aggiunge DiVilytics alla schermata Home (o mostra i passaggi, su iPhone e Mac).",
+      "Registro: Con questi trova le partite in cui erano al tavolo tutti i cattivi che scegli."
+    ],
+    "improved": [
+      "Nuova partita tiene una partita alla volta: una partita in corso è lì quando torni, pronta per essere ripresa.",
+      "Il modulo e la Riserva cattivi restano salvati mentre li modifichi, e la Riserva cattivi parte dalle tue scatole.",
+      "Un solo pulsante di pesca, che riempie le righe vuote o le ripesca tutte, disattivato quando la Riserva cattivi non basta.",
+      "Le righe seguono il dito quando le trascini per cambiare l'ordine.",
+      "Se al ritorno i controlli della schermata di blocco hanno bisogno di un tocco, lo chiede \"Tocca per continuare\" a schermo intero.",
+      "Ogni pop-up si chiude trascinandolo verso il basso, o con Esc da computer.",
+      "I link Indietro riportano alla pagina da cui arrivi.",
+      "Nuova partita ha la sua icona ⚔️."
+    ]
+  },
+  "2026-10-04": {
+    "title": "DiVilytics in italiano, guide dei cattivi e Impostazioni",
+    "new": [
+      "DiVilytics in italiano, con F.A.Q., nomi delle carte, testi delle carte, obiettivi e guide come stampati nell'edizione italiana.",
+      "Guide dei cattivi: l'obiettivo e come si gioca il cattivo, con i link alle sue carte.",
+      "Impostazioni (⚙️ nella barra in alto): tema e lingua.",
+      "F.A.Q.: il regolamento ufficiale riassunto, e cosa cambia Introduction to Evil."
+    ],
+    "improved": [
+      "Le classifiche mostrano un solo valore per riga, con le partite tra parentesi.",
+      "I testi delle carte colorano i tipi di carta (Alleato, Eroe, Oggetto…).",
+      "Nuova partita ha comandi più semplici: un solo pulsante di pesca e Ordine casuale."
+    ]
+  },
+  "2026-10-03": {
+    "title": "Tutorial, F.A.Q. e mazzi dei cattivi",
+    "new": [
+      "Tutorial: dalla prima partita a dove trovare le tue statistiche.",
+      "F.A.Q.: i chiarimenti sulle regole delle F.A.Q. di Villainous Italia, generali e cattivo per cattivo, con una casella di ricerca.",
+      "Le pagine dei cattivi mostrano i mazzi Cattivo e Fato carta per carta; tocca una carta per leggerne il testo.",
+      "Le rivalità aggiungono Più affrontati, accanto a Più battuti e Più ostici."
+    ],
+    "improved": [
+      "I Personaggi ora si chiamano Cattivi.",
+      "Le partite elencano i giocatori nell'ordine di gioco, con il numero del posto.",
+      "Partite nel tempo mostra gli ultimi 12 mesi; trascina per vedere quelli precedenti. Gli assi dei grafici hanno numeri più tondi.",
+      "La Serie max di un giocatore diventa dorata mentre è nella sua serie migliore.",
+      "Le rivalità contano solo gli avversari affrontati in almeno 5 partite.",
+      "I nomi delle scatole mostrano l'anno di uscita."
+    ]
+  },
+  "2026-08-06": {
+    "title": "Introduction to Evil e Darkness Brewing",
+    "new": [
+      "Introduction to Evil: i suoi quattro cattivi rivisti sono cattivi a sé ([I2E]), con statistiche proprie.",
+      "Darkness Brewing: i cattivi ristampati compaiono anche sotto di essa, e puoi segnarla tra le tue scatole.",
+      "Scarica tutte le tue partite in CSV dal tuo Account."
+    ],
+    "improved": [
+      "Le scatole sono elencate ovunque in ordine di uscita.",
+      "La classifica per % Vittorie include solo chi ha almeno 5 partite, così una vittoria fortunata non basta per arrivare in cima.",
+      "I punti dei grafici sono più facili da toccare.",
+      "La home indica da dove arrivano le partite: il sync giornaliero con Villainous Italia e BoardGameGeek."
+    ],
+    "fixed": [
+      "Le mie scatole ora funziona cattivo per cattivo per i cattivi ristampati: uno resta disponibile se possiedi una qualsiasi delle sue scatole."
+    ]
+  },
+  "2026-07-21": {
+    "title": "Tre nuovi cattivi",
+    "new": [
+      "Ernesto de la Cruz e Principe Hans (Success at Any Cost), e le Sorelle Sanderson (Come, We Fly!)."
+    ],
+    "improved": [
+      "La Classifica mostra 30 righe alla volta, con Carica altre."
+    ],
+    "fixed": [
+      "Le righe della Classifica con nomi lunghi."
+    ]
+  },
+  "2026-06-24": {
+    "title": "Grafici e la pagina Giocatori",
+    "new": [
+      "Grafici: partite nel tempo e per giorno della settimana, giocatori per partita, durata e round, percentuale di vittorie per velocità, per scatola e rispetto alla popolarità, popolarità delle scatole, vantaggio dell'ordine di turno e altro.",
+      "Giocatori: cerca qualsiasi giocatore e apri il suo profilo, o condividi il tuo con un codice QR.",
+      "Cattivi: raggruppali per scatola o per velocità."
+    ]
+  },
+  "2026-06-18": {
+    "title": "Rivalità e amici",
+    "new": [
+      "Le pagine dei cattivi mostrano le rivalità di ognuno: i cattivi che batte di più e quelli contro cui perde di più.",
+      "Le pagine dei giocatori mostrano con chi giocano di più."
+    ]
+  },
+  "2026-06-16": {
+    "title": "Nuova pagina Account, filtri dei cattivi e nuovi traguardi",
+    "new": [
+      "Una nuova pagina Account: cambia il nickname, scegli l'avatar, condividi il profilo.",
+      "La Riserva cattivi di Nuova partita: escludi dei cattivi dalla pesca casuale, o limitala alle tue scatole.",
+      "Registro: filtra le partite per cattivo.",
+      "Cattivi: un report mensile con i cattivi in testa e in coda nel mese.",
+      "La Classifica mostra la tua posizione in fondo quando sei più in basso.",
+      "Nuovi traguardi: partite giocate, luoghi, ogni numero di giocatori e ogni posto, ogni velocità, giocatori con cui hai giocato e che hai battuto, serie di vittorie più lunga.",
+      "Animazioni quando peschi i cattivi e mescoli l'ordine di gioco.",
+      "I ringraziamenti nella home."
+    ],
+    "improved": [
+      "Il Registro carica altre partite man mano, con Carica altre."
+    ]
+  },
+  "2026-06-07": {
+    "title": "Crea il tuo avatar",
+    "new": [
+      "Crea il tuo avatar: corpo, viso, occhi, capelli e altro su un colore di sfondo, oppure scegli una delle foto.",
+      "Quando scrivi un luogo, in Nuova partita e quando modifichi una partita, ti vengono suggeriti quelli già usati."
+    ],
+    "improved": [
+      "L'icona della scheda del browser segue il tema chiaro o scuro."
+    ]
+  },
+  "2026-06-01": {
+    "title": "Un nuovo modo per rivendicare il tuo cattivo",
+    "new": [
+      "Inquadrare il codice QR di una partita apre la sua pagina per rivendicare: rivendica il cattivo che hai giocato, o rilascialo se hai scelto quello sbagliato.",
+      "I giocatori di una partita possono modificarne luogo, durata e round, e mostrare di nuovo il suo codice QR."
+    ],
+    "fixed": [
+      "I suggerimenti dei luoghi."
+    ]
+  },
+  "2026-05-17": {
+    "title": "Accedi con Google",
+    "new": [
+      "Accedi con Google oltre che con Discord, da una nuova pagina di accesso.",
+      "Collega entrambi allo stesso profilo dal tuo Account (almeno uno va tenuto)."
+    ],
+    "improved": [
+      "Pagine dei traguardi e del profilo più chiare."
+    ]
+  },
+  "2026-05-14": {
+    "title": "Le mie scatole e i traguardi",
+    "new": [
+      "Segna le scatole che possiedi nel tuo Account; Nuova partita può limitare la pesca casuale ai loro cattivi.",
+      "Traguardi: bronzo, argento e oro per ogni cattivo, per partite giocate e vinte (1, 5 e 10), nel tuo Account e nelle pagine dei giocatori.",
+      "Scegli l'icona del giocatore.",
+      "Mescola ordine rende casuale l'ordine di gioco."
+    ],
+    "improved": [
+      "I turni ora si chiamano round, come nel regolamento."
+    ]
+  },
+  "2026-05-10": {
+    "title": "Nuova partita e Registro",
+    "new": [
+      "Registrare una partita ha una pagina tutta sua, Nuova partita, e lo storico delle partite diventa il Registro.",
+      "La pesca casuale passa in Nuova partita: pesca tutti i cattivi o solo le righe vuote, e pesca per velocità (Velocità+ aggiunge i colori vicini).",
+      "Una partita in corso si può riprendere o scartare."
+    ]
+  },
+  "2026-05-07": {
+    "title": "Un nuovo nome e i chiarimenti sulle regole",
+    "new": [
+      "Il sito ora si chiama DiVilytics (è nato come DVS, Disney Villainous Stats).",
+      "La pagina di ogni cattivo mostra i chiarimenti sulle regole (F.A.Q.) di quel cattivo."
+    ],
+    "improved": [
+      "Lo storico filtrato scorre tra tutti i risultati.",
+      "Una pagina per i link non validi."
+    ]
+  },
+  "2026-04-23": {
+    "title": "DiVilytics va online",
+    "new": [
+      "Registra le tue partite: scegli i cattivi o peschili a caso, rendi casuale l'ordine di gioco e cronometra la partita con un contatore che funziona anche a schermo bloccato.",
+      "Salva la partita e condividi il suo codice QR, così gli altri giocatori possono collegare il loro profilo al cattivo che hanno giocato.",
+      "Lo storico delle partite, una classifica di cattivi e giocatori, e una pagina per ogni cattivo e ogni giocatore con percentuali di vittoria e statistiche.",
+      "Accedi con Discord e scegli un nickname unico.",
+      "Tema scuro, chiaro o automatico."
+    ]
+  }
+}

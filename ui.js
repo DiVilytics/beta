@@ -171,6 +171,12 @@ function fmtDuration(min) {
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
+// A calendar day ('2026-10-07') in words: "October 7, 2026" / "7 ottobre 2026".
+function fmtDayLong(day) {
+  const [y, m, d] = day.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(LOCALE, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 function fmtDateShort(iso) {
   if (!iso) return '';
   const d = new Date(iso);

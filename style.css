@@ -2619,6 +2619,19 @@ select:disabled {
 
 /* F.A.Q. entry on the home page, right under the Tutorial one. */
 .home-faq-link { margin-top: 8px; }
+/* What's new entry, under the F.A.Q. one; its purple dot marks an update not
+   seen yet (index.js). */
+.home-changelog-link { margin-top: 8px; }
+.home-new-dot { display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--accent); vertical-align: middle; }
+
+/* ── WHAT'S NEW PAGE (changelog.html) ─────────────────────────────── */
+.cl-entry { margin-bottom: 12px; padding: 16px; background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); }
+.cl-date  { font-size: calc(12px * var(--ts)); font-weight: 600; color: var(--muted); }
+.cl-title { margin: 4px 0 0; font-size: calc(16px * var(--ts)); font-weight: 700; color: var(--text); }
+.cl-group { margin-top: 12px; }
+.cl-group-lbl { margin-bottom: 4px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cl-list  { margin: 0; padding-left: 20px; font-size: calc(14px * var(--ts)); line-height: 1.5; color: var(--text); }
+.cl-list li + li { margin-top: 4px; }
 
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */

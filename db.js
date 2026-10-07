@@ -146,6 +146,17 @@ async function _fetchJsonLocalized(url, depth = 1) {
   } catch (_) { return base; }
 }
 
+// What's new (changelog.html, and the home card's date and dot): { 'YYYY-MM-DD':
+// { title, new?, improved?, fixed? } }, each group a list of items written for
+// players. changelog.it.json translates entries whole, like the other files.
+// The page stores the newest date it showed under CHANGELOG_SEEN_KEY.
+const CHANGELOG_SEEN_KEY = 'changelogSeen';
+let _changelog = null;
+async function loadChangelog() {
+  if (!_changelog) _changelog = await _fetchJsonLocalized(DATA_CHANGELOG_URL);
+  return _changelog;
+}
+
 let _objectives = null;
 async function loadObjectives() {
   if (!_objectives) _objectives = await _fetchJsonLocalized(DATA_OBJECTIVES_URL);

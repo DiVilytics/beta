@@ -64,5 +64,18 @@ async function installApp(mode = _installMode()) {
 
 _updateInstallBtn();
 
+// ── WHAT'S NEW ───────────────────────────────────────────────────────────────
+// The card under the F.A.Q. says when the last update was, and shows a dot
+// until changelog.html has been opened since it.
+async function _initChangelogCard() {
+  const latest = Object.keys(await loadChangelog()).sort().pop();
+  if (!latest) return;
+  document.getElementById('changelogDesc').textContent = t('Last update: {date}', { date: fmtDayLong(latest) });
+  let seen = null;
+  try { seen = localStorage.getItem(CHANGELOG_SEEN_KEY); } catch (_) {}
+  document.getElementById('changelogDot').classList.toggle('hidden', !!seen && seen >= latest);
+}
+_initChangelogCard();
+
 initAuth();
 
