@@ -57,7 +57,7 @@
 
   <div id="pfIdentity"></div>
 
-  <div class="controls hidden" id="pfControls">
+  <div class="controls period-controls hidden" id="pfControls">
     <div class="pill-group" id="pfFilterPills">
       <button class="pill on" onclick="pfSetFilter('all')" type="button" data-i18n>All</button>
       <button class="pill"    onclick="pfSetFilter(2)"     type="button">2p</button>
@@ -66,6 +66,8 @@
       <button class="pill"    onclick="pfSetFilter(5)"     type="button">5p</button>
       <button class="pill"    onclick="pfSetFilter(6)"     type="button">6p</button>
     </div>
+    <!-- Period: All time / Year / Month (period-filter.js) -->
+    <div id="pfPeriod"></div>
   </div>
 
   <div id="pfRoot" class="spinner" data-i18n>Loading…</div>
@@ -122,6 +124,7 @@
   <script src="search.js"></script>
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
+<script src="period-filter.js"></script>
 <script src="players.js"></script>
 </body>
 </html>

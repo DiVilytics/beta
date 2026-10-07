@@ -16,6 +16,11 @@ let pfFilter         = 'all';   // 'all' | 2..6
 let pfWinsOnly       = false;
 let pfLocationFilter = null;
 
+// The period, All time / Year / Month (period-filter.js), its menus starting
+// from this player's first dated game. It filters the stats, the villain table
+// and the games; achievements and Most played with stay all-time.
+const period = createPeriodFilter('pfPeriod', { onChange: () => render() });
+
 let pfDisplayLimit   = PAGE_SIZE;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -119,6 +124,8 @@ async function load() {
   pfAch     = computeCharacterAchievements(players.filter(p => p.nickname === pfNick));
   pfGlobal  = computeGlobalAchievements(games, players, p => p.nickname === pfNick, pfAllChars);
   pfFriends = await _loadFriends();
+  // Oldest first: the games come newest first, undated ones last.
+  period.setFirst(games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
 
   document.getElementById('pfRoot').className = '';
 
@@ -231,6 +238,11 @@ function pfFilteredGameIds() {
     games = games.filter(g => countMap[g.id] === pfFilter);
   }
   if (pfLocationFilter) games = games.filter(g => g.location === pfLocationFilter);
+  if (!period.isAll()) {
+    const { from_ts, to_ts } = period.range();
+    const from = new Date(from_ts), to = new Date(to_ts);
+    games = games.filter(g => g.played_at && new Date(g.played_at) >= from && new Date(g.played_at) < to);
+  }
   return new Set(games.map(g => g.id));
 }
 
@@ -276,15 +288,35 @@ function render() {
     else streakRun = 0;
   }
   // The loop ends on the latest game, so streakRun is the current streak. When it
-  // equals the best one the player is on their record run right now.
-  const onBestStreak = bestStreak > 0 && streakRun === bestStreak;
+  // equals the best one the player is on their record run right now: only said
+  // for a period that reaches today (All time, this year, this month).
+  const { to_ts } = period.range();
+  const reachesToday = !to_ts || new Date(to_ts) > new Date();
+  const onBestStreak = reachesToday && bestStreak > 0 && streakRun === bestStreak;
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
   const avgTurns = avg(games.map(g => g.num_turns));
 
+  setAchievementsContext({
+    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
+    title: pfNick ? `${t('Achievements')} | ${pfNick}` : t('Achievements'),
+  });
+  // All-time sections, shown whatever the filters.
+  const achHTML = achievementsSectionHTML({
+    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
+    // The profile shows only earned achievements (mirroring the characters grid).
+    onlyEarned: true,
+    header: (earned, total) => `
+      <div class="pf-games-header">
+        <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
+      </div>`,
+  });
+
   if (!nGames) {
     root.innerHTML =
-      `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the player count.')}</p></div>`;
+      `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
+      ${_friendsSectionHTML()}
+      ${achHTML}`;
     return;
   }
 
@@ -296,11 +328,6 @@ function render() {
     if (p.is_winner) charMap[p.character].wins++;
   }
   const charRows = Object.values(charMap);
-
-  setAchievementsContext({
-    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
-    title: pfNick ? `${t('Achievements')} | ${pfNick}` : t('Achievements'),
-  });
 
   root.innerHTML = `
     <div class="summary">
@@ -331,15 +358,7 @@ function render() {
 
     ${_friendsSectionHTML()}
 
-    ${achievementsSectionHTML({
-      ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
-      // The profile shows only earned achievements (mirroring the characters grid).
-      onlyEarned: true,
-      header: (earned, total) => `
-        <div class="pf-games-header">
-          <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
-        </div>`,
-    })}
+    ${achHTML}
 
     <div class="pf-games-header">
       <span class="pf-games-title">${t('Games')}</span>

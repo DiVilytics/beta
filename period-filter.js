@@ -10,7 +10,9 @@
 //
 // createPeriodFilter(rootId, { onChange }) builds the controls into #rootId,
 // calls onChange() on every change, and returns:
-//   load()  : reads the oldest dated game; call once at page init
+//   load()  : reads the site's oldest dated game; call once at page init
+//   setFirst(iso) : starts the menus from this date instead (a player page: that
+//             player's first dated game; null = this month)
 //   range() : { from_ts, to_ts }, ISO strings for the RPCs ([from, to), local
 //             midnight), both null for All time
 //   id()    : 'all' | '2025' | '2025-09', a key for caches
@@ -111,6 +113,11 @@ function createPeriodFilter(rootId, { onChange }) {
         .order('played_at', { ascending: true }).limit(1);
       const oldest = data?.[0]?.played_at;
       if (oldest) { const d = new Date(oldest); first = new Date(d.getFullYear(), d.getMonth(), 1); }
+      render();
+    },
+    setFirst(iso) {
+      const d = iso ? new Date(iso) : now;
+      first = new Date(d.getFullYear(), d.getMonth(), 1);
       render();
     },
     range() {

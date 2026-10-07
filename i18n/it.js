@@ -214,7 +214,6 @@ window.I18N.it = {
     "Most played with": "Con chi gioca di più",
     "{nick} hasn't played any recorded games.": "{nick} non ha ancora partite registrate.",
     "No games for this filter": "Nessuna partita con questo filtro",
-    "Try adjusting the player count.": "Prova a cambiare il numero di giocatori.",
     "Win rate": "% Vittorie",
     "Max streak": "Serie max",
     "Currently on this streak": "Serie ancora in corso",
