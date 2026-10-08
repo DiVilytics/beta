@@ -4,12 +4,12 @@ let pfNick      = '';
 let pfGames     = [];   // games this nickname appeared in
 let pfPlayers   = [];   // all players for those games
 let pfCharBoxMap  = {};
-let pfAvatarUrl = null;
 let pfAllChars  = [];
 let pfAch       = new Map();
 let pfBoxInfo   = {};
 let pfGlobal    = null;
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
+let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
 let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
 let pfFilter         = 'all';   // 'all' | 2..6
@@ -27,17 +27,26 @@ let pfDisplayLimit   = PAGE_SIZE;
 
 async function init() {
   setActiveNav('players.html');
-  await initAuth();
+  const authReady = initAuth();
   _attachPlayerSearch();
 
   const params = new URLSearchParams(location.search);
   pfNick = (params.get('nick') || '').trim();
 
-  if (!pfNick) {
+  // The nickname in the link is enough for the name, Share and the filters: they
+  // show at once, the avatar as soon as the profile arrives, the stats last. Your
+  // own page (no nickname in the link) waits for the sign-in, which brings your
+  // profile along.
+  let profileReady;
+  if (pfNick) {
+    profileReady = fetchProfile({ nickname: pfNick }, 'avatar_url, default_avatar, created_at');
+  } else {
+    await authReady;
     const loggedUser    = getCurrentUser();
     const loggedProfile = getCurrentProfile();
     if (loggedUser && loggedProfile?.nickname) {
       pfNick = loggedProfile.nickname;
+      profileReady = Promise.resolve(loggedProfile);
       history.replaceState(null, '', `players.html?nick=${encodeURIComponent(pfNick)}`);
     } else if (loggedUser && !loggedProfile) {
       document.title = `DiVilytics | ${t('Player')}`;
@@ -59,64 +68,56 @@ async function init() {
   }
 
   document.title = `DiVilytics | ${pfNick}`;
+  _renderIdentity();
+  setVisible('pfControls', true);
+  profileReady.then(_renderIdentity);
 
-  const [chars, viewedProfile, boxInfo] = await Promise.all([
-    loadCharacters(),
-    fetchProfile({ nickname: pfNick }, 'avatar_url, default_avatar, created_at'),
-    loadBoxInfo(),
-  ]);
-  pfAllChars  = chars;
-  pfBoxInfo   = boxInfo || {};
-  pfAvatarUrl = resolveAvatar(viewedProfile);
-  const sinceHTML = viewedProfile?.created_at
-    ? `<span class="pf-since">${t('Since {date}', { date: fmtDateShort(viewedProfile.created_at) })}</span>`
-    : '';
-  pfCharBoxMap  = Object.fromEntries(chars.map(c => [c.name, c.box]));
-
-  const profile = getCurrentProfile();
-  const isOwnProfile = profile && profile.nickname === pfNick;
-  const nameBlock = `<span class="pf-name-block"><span class="pf-nick">${_esc(pfNick)}</span>${sinceHTML}</span>`;
-  let identityEl = document.getElementById('pfIdentity');
-  if (!identityEl) {
-    identityEl = document.createElement('div');
-    identityEl.id = 'pfIdentity';
-    document.getElementById('pfControls').insertAdjacentElement('beforebegin', identityEl);
-  }
-  identityEl.innerHTML =
-    `<div class="pf-identity-row">
-      <span class="pf-identity">${avatarHTML(pfAvatarUrl, { cls: 'player-avatar-lg', extraClass: 'zoomable', id: 'pfAvatar', lightbox: true })}${nameBlock}</span>
-      <button class="btn btn-ghost btn-sm pf-share-btn" onclick="showProfileQR()">${t('Share')}</button>
-    </div>`;
+  const [chars, boxInfo] = await Promise.all([loadCharacters(), loadBoxInfo(), authReady]);
+  pfAllChars   = chars;
+  pfBoxInfo    = boxInfo || {};
+  pfCharBoxMap = Object.fromEntries(chars.map(c => [c.name, c.box]));
 
   await load();
 }
 
+// Avatar, nickname, "Since" and Share. Called first without the profile: an
+// empty circle holds the avatar's place and a blank line the date's, so nothing
+// moves when they arrive. A name without a profile gets the default avatar and
+// keeps the blank line.
+function _renderIdentity(profile) {
+  const avatar = profile === undefined
+    ? '<span class="player-avatar-lg pf-avatar-ph"></span>'
+    : avatarHTML(resolveAvatar(profile), { cls: 'player-avatar-lg', extraClass: 'zoomable', id: 'pfAvatar', lightbox: true });
+  const since = profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : '&nbsp;';
+  document.getElementById('pfIdentity').innerHTML =
+    `<div class="pf-identity-row">
+      <span class="pf-identity">${avatar}<span class="pf-name-block"><span class="pf-nick">${_esc(pfNick)}</span><span class="pf-since">${since}</span></span></span>
+      <button class="btn btn-ghost btn-sm pf-share-btn" onclick="showProfileQR()">${t('Share')}</button>
+    </div>`;
+}
+
 async function load() {
-  // 1) find all game_players rows matching this nickname
-  const { rows: myRows, error } = await _fetchAllRows(() =>
-    db.from('game_players').select('game_id').eq('nickname', pfNick));
+  // The games this nickname played and, on your own profile, the games you
+  // created, even ones you haven't claimed a villain in (e.g. after releasing
+  // your claim): otherwise such a game would vanish from your profile, taking
+  // its manage/QR actions with it. Both at once.
+  const me      = getCurrentUser();
+  const profile = getCurrentProfile();
+  const own     = me && profile && profile.nickname === pfNick;
+  const [{ rows: myRows, error }, created] = await Promise.all([
+    _fetchAllRows(() => db.from('game_players').select('game_id').eq('nickname', pfNick)),
+    own ? _fetchAllRows(() => db.from('games').select('id').eq('created_by', me.id)) : null,
+  ]);
 
   if (error) {
+    setVisible('pfControls', false);
     document.getElementById('pfRoot').className = '';
     document.getElementById('pfRoot').innerHTML =
       `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
     return;
   }
 
-  let gameIds = myRows.map(r => r.game_id);
-
-  // On your own profile, also include games you created, even ones you haven't
-  // claimed a character in (e.g. after releasing your claim). Otherwise such a
-  // game would vanish from your profile, taking its manage/QR actions with it.
-  const me      = getCurrentUser();
-  const profile = getCurrentProfile();
-  if (me && profile && profile.nickname === pfNick) {
-    const { rows: createdRows } = await _fetchAllRows(() =>
-      db.from('games').select('id').eq('created_by', me.id));
-    gameIds = gameIds.concat(createdRows.map(r => r.id));
-  }
-
-  gameIds = [...new Set(gameIds)];
+  const gameIds = [...new Set(myRows.map(r => r.game_id).concat((created?.rows || []).map(r => r.id)))];
 
   const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true });
   pfGames   = games;
@@ -124,6 +125,7 @@ async function load() {
   pfAch     = computeCharacterAchievements(players.filter(p => p.nickname === pfNick));
   pfGlobal  = computeGlobalAchievements(games, players, p => p.nickname === pfNick, pfAllChars);
   pfFriends = await _loadFriends();
+  pfLoaded  = true;
   // Oldest first: the games come newest first, undated ones last.
   period.setFirst(games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
 
@@ -259,17 +261,9 @@ function pfClearLocationFilter() {
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
 function render() {
+  if (!pfLoaded) return;
   pfDisplayLimit = PAGE_SIZE;
   const root = document.getElementById('pfRoot');
-
-  if (!pfGames.length) {
-    setVisible('pfControls', false);
-    root.innerHTML =
-      `<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
-    return;
-  }
-
-  setVisible('pfControls', true);
 
   const keepIds = pfFilteredGameIds();
   const games   = pfGames.filter(g => keepIds.has(g.id));
@@ -312,11 +306,14 @@ function render() {
       </div>`,
   });
 
+  // No games: the sentence takes the place of the stats, the filters stay. A
+  // player who never played has no achievements to show either.
   if (!nGames) {
-    root.innerHTML =
-      `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
-      ${_friendsSectionHTML()}
-      ${achHTML}`;
+    root.innerHTML = pfGames.length
+      ? `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
+        ${_friendsSectionHTML()}
+        ${achHTML}`
+      : `<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
     return;
   }
 

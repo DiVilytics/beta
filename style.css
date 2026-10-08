@@ -335,6 +335,8 @@ a.chip {
   gap: 12px;
 }
 .pf-share-btn { flex: none; }
+/* The avatar's place while the profile loads. */
+.pf-avatar-ph { display: inline-block; background: var(--s3); }
 
 .pf-name-block { display: flex; flex-direction: column; gap: 1px; }
 .pf-nick { font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
