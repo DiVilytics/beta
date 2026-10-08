@@ -1,4 +1,13 @@
 {
+  "2026-10-09": {
+    "title": "Correggi una partita registrata",
+    "new": [
+      "Chi ha registrato una partita può cambiarne cattivi e vincitore finché un altro giocatore non rivendica un cattivo, e può eliminarla dalla sua pagina."
+    ],
+    "improved": [
+      "Dopo aver salvato una partita si apre la sua pagina, con sopra il codice QR: chiudilo per controllare cattivi, vincitore e dettagli."
+    ]
+  },
   "2026-10-07": {
     "title": "Classifica e Registro per anno e per mese",
     "new": [

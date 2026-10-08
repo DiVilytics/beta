@@ -2255,7 +2255,12 @@ select:disabled {
 .claim-row.winner .claim-nick { color: rgba(240, 165, 0, 0.55); }
 [data-theme="light"] .claim-row.winner .claim-nick { color: var(--gold); }
 .claim-nick.unclaimed { font-style: italic; }
-.claim-share-row { display: flex; justify-content: flex-end; gap: 8px; margin: 4px 0 14px; }
+.claim-share-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 4px 0 14px; }
+/* The creator's Delete game, last on the page. */
+.claim-delete-row { display: flex; justify-content: center; margin-top: 28px; }
+/* Edit lineup: New Game's rows (.order-slot), without dragging or drawing. */
+#lineupSlots { display: flex; flex-direction: column; gap: 4px; }
+#lineupSlots .row-num { margin-right: 0; }
 .claim-success {
   text-align: center;
   font-size: calc(13px * var(--ts));

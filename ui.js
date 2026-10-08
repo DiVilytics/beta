@@ -284,9 +284,9 @@ function goBack(fallback) {
 // ── DRAG TO CLOSE ─────────────────────────────────────────────────────────────
 // Every bottom sheet can be dragged down by its handle or header: let go far
 // enough down (or flick it) and it closes the same way its × does, running that
-// sheet's own close logic (some also navigate, e.g. New Game's QR). A sheet with
-// no × (the required "Choose your nickname") snaps back, unless its overlay
-// provides `_dragClose()` returning true once it has closed.
+// sheet's own close logic. A sheet with no × (the required "Choose your
+// nickname") snaps back, unless its overlay provides `_dragClose()` returning
+// true once it has closed.
 const SHEET_DRAG_CLOSE_PX = 90;    // or a third of the sheet, whichever is smaller
 const SHEET_FLICK_PX_MS   = 0.6;   // a fast downward flick closes too
 

@@ -3,6 +3,36 @@
 let claimGame    = null;
 let claimPlayers = [];
 
+// Opened by New Game right after saving (claim.html?game=…&saved=1): the QR
+// sheet opens on top once, and Back leads to the Game Log.
+const claimJustSaved = new URLSearchParams(location.search).get('saved') === '1';
+let   claimOpenQR    = claimJustSaved;
+if (claimJustSaved) {
+  const url = new URL(location.href);
+  url.searchParams.delete('saved');
+  history.replaceState(null, '', url);   // a reload doesn't reopen the QR
+}
+
+// Seats change only through the database functions claim_villain,
+// release_villain and edit_lineup, which answer with these codes.
+const CLAIM_ERRORS = {
+  seat_changed:    'This villain was just changed or claimed. The page is up to date now.',
+  already_in_game: 'You already have a villain in this game.',
+  no_profile:      'You need a nickname before you can claim a villain.',
+  not_your_seat:   "This villain isn't yours to release.",
+  not_creator:     'Only the player who recorded the game can change it.',
+  lineup_locked:   'Another player has claimed a villain: the lineup can no longer be changed.',
+  invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
+};
+const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
+
+// The creator can change the villains and the winner while no other player has
+// claimed a villain (their own seat, marked 👤 in New Game, doesn't count).
+function lineupEditable(user) {
+  return !!user && !!claimGame && claimGame.created_by === user.id
+    && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init() {
@@ -40,6 +70,7 @@ async function init() {
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
 
   render();
+  if (claimOpenQR) { claimOpenQR = false; shareGame(); }
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -116,19 +147,23 @@ function render() {
     </div>
     <div class="claim-share-row">
       ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
+      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit lineup')}</button>` : ''}
       <button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>
     </div>
     <div class="section-label">${t('Players')}</div>
     <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}`;
+    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}
+    ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
 }
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
+// Where Back leads: the Game Log right after saving a game; otherwise wherever
+// we came from (e.g. the player profile), the profile page when the claim page
+// was opened cold (e.g. via a shared QR).
 function claimGoBack() {
-  // Back to wherever we came from (e.g. the player profile); the profile page
-  // when the claim page was opened cold (e.g. via a shared QR).
-  goBack('players.html');
+  if (claimJustSaved) location.href = 'game-log.html';
+  else goBack('players.html');
 }
 
 function shareGame() {
@@ -220,14 +255,12 @@ async function _doClaim(playerId) {
   const profile = getCurrentProfile();
   if (!user || !profile) return;
 
-  const { error } = await db
-    .from('game_players')
-    .update({ user_id: user.id, nickname: profile.nickname })
-    .eq('id', playerId)
-    .is('user_id', null);
-
-  if (error) { _showClaimRowError(error.message); return; }
+  // The villain you saw goes along: if the creator changed it meanwhile, the
+  // claim fails and the page reloads with the new one.
+  const player = claimPlayers.find(p => p.id === playerId);
+  const { error } = await db.rpc('claim_villain', { seat_id: playerId, villain: player?.character ?? '' });
   await init();
+  if (error) _showClaimRowError(_claimErrorMsg(error));
 }
 
 // ── RELEASE ───────────────────────────────────────────────────────────────────
@@ -254,14 +287,131 @@ async function _doRelease(playerId) {
   const user = getCurrentUser();
   if (!user) return;
 
-  const { error } = await db
-    .from('game_players')
-    .update({ user_id: null, nickname: null })
-    .eq('id', playerId)
-    .eq('user_id', user.id);
-
-  if (error) { _showClaimRowError(error.message); return; }
+  const { error } = await db.rpc('release_villain', { seat_id: playerId });
   await init();
+  if (error) _showClaimRowError(_claimErrorMsg(error));
+}
+
+// ── EDIT LINEUP ───────────────────────────────────────────────────────────────
+// The creator fixes the villains and the winner (see lineupEditable). Seats,
+// their order and claims stay as they are; the menus offer only villains not
+// used by another seat, and the crown moves from seat to seat (one winner).
+
+let lineupDraft  = [];   // [{ id, character, is_winner }] while the sheet is open
+let lineupChars  = [];
+let lineupBoxes  = {};
+
+async function editLineup() {
+  if (!lineupEditable(getCurrentUser())) return;
+  [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
+  clearError('lineupErr');
+  const btn = document.getElementById('lineupSaveBtn');
+  btn.disabled    = false;
+  btn.textContent = t('Save Changes');
+  _renderLineup();
+  openOverlay('lineupOverlay');
+}
+
+function closeLineup() {
+  closeOverlay('lineupOverlay');
+}
+
+function _renderLineup() {
+  document.getElementById('lineupSlots').innerHTML = lineupDraft.map((s, i) => {
+    const taken     = new Set(lineupDraft.filter(o => o.id !== s.id).map(o => o.character));
+    const available = lineupChars.filter(c => !taken.has(c.name));
+    return `
+      <div class="order-slot">
+        <span class="row-num">${i + 1}.</span>
+        <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
+        <div class="order-slot-info">
+          <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Select villain')}">
+            ${charSelectHTML(available, s.character, lineupBoxes)}
+          </select>
+          <div class="order-slot-name">${villainNameHTML(s.character)}</div>
+          <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
+        </div>
+        <div class="order-slot-actions">
+          <button class="pf-btn win${s.is_winner ? ' on' : ''}" type="button" onclick="setLineupWinner(${i})" title="${t('Winner')}">👑</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// Every seat keeps a villain: the menu's empty first entry changes nothing.
+function setLineupVillain(i, name) {
+  if (name) lineupDraft[i].character = name;
+  _renderLineup();
+}
+
+function setLineupWinner(i) {
+  lineupDraft.forEach((s, j) => { s.is_winner = j === i; });
+  _renderLineup();
+}
+
+async function saveLineup() {
+  const unchanged = lineupDraft.every(s => {
+    const p = claimPlayers.find(x => x.id === s.id);
+    return p && p.character === s.character && !!p.is_winner === s.is_winner;
+  });
+  if (unchanged) { closeLineup(); return; }
+
+  const btn   = document.getElementById('lineupSaveBtn');
+  const errEl = document.getElementById('lineupErr');
+  btn.disabled    = true;
+  btn.textContent = t('Saving…');
+
+  const { error } = await db.rpc('edit_lineup', { target_game: claimGame.id, lineup: lineupDraft });
+
+  if (error) {
+    // Someone claimed meanwhile: nothing left to edit, show the page as it is.
+    if (error.message === 'lineup_locked') {
+      closeLineup();
+      await init();
+      _showClaimRowError(_claimErrorMsg(error));
+      return;
+    }
+    showError(errEl, _claimErrorMsg(error));
+    btn.disabled    = false;
+    btn.textContent = t('Save Changes');
+    return;
+  }
+
+  closeLineup();
+  await init();
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+// The creator only (the database agrees). Players who claimed a villain are
+// named: the game leaves their profiles too.
+
+function deleteGame() {
+  const user = getCurrentUser();
+  if (!claimGame || !user || claimGame.created_by !== user.id) return;
+  const others = claimPlayers.filter(p => p.user_id && p.user_id !== user.id && p.nickname).map(p => p.nickname);
+  const names  = new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(others.map(_esc));
+  openConfirmSheet({
+    id:           'deleteGameOverlay',
+    title:        t('Delete game?'),
+    bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the game and all player records. This action cannot be undone.')}</p>`
+                + (others.length ? `<p class="confirm-text">${tn(others.length, '{names} claimed a villain in it: the game will disappear from their profile too.', '{names} claimed a villain in it: the game will disappear from their profiles too.', { names: `<strong class="text-emph">${names}</strong>` })}</p>` : ''),
+    confirmLabel: t('Delete game'),
+    busyLabel:    t('Deleting…'),
+    danger:       true,
+    onConfirm:    _doDeleteGame,
+  });
+}
+
+async function _doDeleteGame() {
+  const { error } = await db.from('games').delete().eq('id', claimGame.id);
+  if (error) { _showClaimRowError(error.message); return; }
+  // A fresh load of where we came from, so the game isn't shown there anymore.
+  let back = claimJustSaved ? 'game-log.html' : 'players.html';
+  try {
+    if (!claimJustSaved && document.referrer && new URL(document.referrer).origin === location.origin) back = document.referrer;
+  } catch (_) {}
+  location.replace(back);
 }
 
 // Surface a claim/release failure as a banner at the top of the page.

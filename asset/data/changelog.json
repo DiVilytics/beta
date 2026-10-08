@@ -1,4 +1,13 @@
 {
+  "2026-10-09": {
+    "title": "Fix a recorded game",
+    "new": [
+      "Whoever recorded a game can change its villains and its winner until another player claims a villain, and can delete the game from its page."
+    ],
+    "improved": [
+      "After saving a game, its page opens with the QR code on top: close it to check the villains, the winner and the details."
+    ]
+  },
   "2026-10-07": {
     "title": "Leaderboard and Game Log by year and month",
     "new": [

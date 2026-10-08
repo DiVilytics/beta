@@ -605,8 +605,7 @@ async function _saveNickname() {
     const { error } = await db.from('profiles').update({ nickname: nick }).eq('id', _currentUser.id);
     if (error) { showError(errEl, friendlyDupMsg(error)); return; }
 
-    await db.from('game_players').update({ nickname: nick }).eq('user_id', _currentUser.id);
-
+    // Your seats follow the new nickname by themselves (a database trigger).
     _currentProfile = { ..._currentProfile, nickname: nick };
   } else {
     const { error } = await db.from('profiles').insert({ id: _currentUser.id, nickname: nick });

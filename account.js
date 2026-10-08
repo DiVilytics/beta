@@ -454,9 +454,7 @@ async function confirmDeleteAccount() {
     btn.textContent = t('Delete my profile');
   };
 
-  const { error: gpErr } = await db.from('game_players').update({ nickname: null }).eq('user_id', user.id);
-  if (gpErr) return fail(gpErr.message);
-
+  // Deleting the profile also clears your name from your seats (a database trigger).
   const { error } = await db.from('profiles').delete().eq('id', user.id);
   if (error) return fail(error.message);
 

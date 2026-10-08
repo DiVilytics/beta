@@ -155,30 +155,6 @@
   </div>
 </main>
 
-<!-- QR Code overlay (after save) -->
-<div class="overlay" id="qrOverlay">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3 data-i18n>Share with players</h3>
-      <button class="sheet-close" onclick="closeQR()">×</button>
-    </div>
-    <div class="sheet-body">
-      <p class="modal-hint" data-i18n>Other players can scan this QR code to claim their villain and appear in the game record.</p>
-      <div class="qr-wrap">
-        <div id="qrCode"></div>
-      </div>
-      <div class="qr-url-row">
-        <div class="qr-url" id="qrUrlText"></div>
-        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
-      </div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn btn-primary" onclick="closeQR()" data-i18n>Done</button>
-    </div>
-  </div>
-</div>
-
 <audio id="bgAudio" src="asset/audio/empty.mp3" preload="metadata" loop></audio>
 
 <!-- A running game shown on page load: the browser won't start the lock-screen
@@ -192,7 +168,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
 <script src="db.js"></script>
 <script src="theme.js"></script>

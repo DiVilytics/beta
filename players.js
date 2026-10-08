@@ -439,9 +439,9 @@ function pfRememberReturn(id) {
 function pfDeleteGame(id) {
   openConfirmSheet({
     id:           'pfDeleteGameOverlay',
-    title:        t('Delete Game?'),
+    title:        t('Delete game?'),
     bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the game and all player records. This action cannot be undone.')}</p>`,
-    confirmLabel: t('Delete Game'),
+    confirmLabel: t('Delete game'),
     busyLabel:    t('Deleting…'),
     danger:       true,
     onConfirm:    () => _pfDeleteGame(id),

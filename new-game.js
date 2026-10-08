@@ -1014,10 +1014,13 @@ async function submitForm() {
     return showErr(error.message);
   }
 
-  await db.from('game_players').insert(ps.map(p => ({ game_id: g.id, ...p })));
-
-  btn.disabled    = false;
-  btn.textContent = t('Save game');
+  const { error: seatsErr } = await db.from('game_players').insert(ps.map(p => ({ game_id: g.id, ...p })));
+  if (seatsErr) {
+    await db.from('games').delete().eq('id', g.id);   // no game without its players
+    btn.disabled    = false;
+    btn.textContent = t('Save game');
+    return showErr(seatsErr.message);
+  }
 
   // Clear live state (we just saved the game) and notify hooks
   _clearLiveState();
@@ -1025,19 +1028,9 @@ async function submitForm() {
   _draftReady = false;   // and nothing on this page re-creates it
   liveGame.emit('close');
 
-  showQR(g.id);
-}
-
-// ── QR CODE ───────────────────────────────────────────────────────────────────
-
-function showQR(gameId) {
-  showQRModal(new URL(`claim.html?game=${gameId}`, location.href).href, 'qrCode', 'qrOverlay');
-}
-
-function closeQR() {
-  closeOverlay('qrOverlay');
-  // After saving, send the user to the game log to see their new entry
-  window.location.href = 'game-log.html';
+  // The game's page, with the QR code on top for the other players; there the
+  // lineup and the details can be checked and fixed (claim.js).
+  location.replace(`claim.html?game=${g.id}&saved=1`);
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

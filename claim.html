@@ -110,6 +110,26 @@
   </div>
 </div>
 
+<!-- Edit lineup sheet: the creator, until another player claims a villain -->
+<div class="overlay" id="lineupOverlay" onclick="if(event.target===this) closeLineup()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>Edit lineup</h3>
+      <button class="sheet-close" onclick="closeLineup()">×</button>
+    </div>
+    <div class="sheet-body">
+      <p class="modal-hint" data-i18n>You can change the villains and the winner until another player claims a villain.</p>
+      <div class="err" id="lineupErr"></div>
+      <div id="lineupSlots"></div>
+    </div>
+    <div class="sheet-footer sheet-footer-row">
+      <button class="btn btn-ghost"   onclick="closeLineup()" data-i18n>Cancel</button>
+      <button class="btn btn-primary" id="lineupSaveBtn" onclick="saveLineup()" data-i18n>Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
