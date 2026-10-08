@@ -972,7 +972,7 @@ async function submitForm() {
   const date     = document.getElementById('fDate').value;
   const dur      = parseInt(document.getElementById('fDur').value)   || null;
   const turns    = parseInt(document.getElementById('fTurns').value) || null;
-  const location = document.getElementById('fLocation').value.trim() || null;
+  const place    = document.getElementById('fLocation').value.trim() || null;   // not `location`: that would hide window.location
   const btn      = document.getElementById('submitBtn');
 
   if (!date) return showErr(t('Date and time is required.'));
@@ -1002,7 +1002,7 @@ async function submitForm() {
     played_at:        new Date(date).toISOString(),
     duration_minutes: dur,
     num_turns:        turns,
-    location:         location,
+    location:         place,
     created_by:       user.id,
     source:           'divilytics',   // recorded in this app (other sources: the imports)
   };
