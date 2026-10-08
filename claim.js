@@ -152,7 +152,7 @@ function render() {
     </div>
     <div class="section-label">${t('Players')}</div>
     <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">${t('You are playing as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}
+    ${myClaim ? `<p class="claim-success">${t('You played as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
 }
 

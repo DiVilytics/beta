@@ -29,10 +29,59 @@ document.documentElement.lang = LANG;
 try { if (localStorage.getItem('textSize') === 'large') document.documentElement.dataset.text = 'large'; } catch (_) {}
 
 // Pick a language (home page switch): remember it and redraw every page in it.
+// The page reloads; nothing else should change (see THE PAGE ACROSS A SWITCH).
 function setLang(lang) {
   if (!LANGS.includes(lang) || lang === LANG) return;
   try { localStorage.setItem('lang', lang); } catch (_) {}
+  let state = null;
+  try { state = _viewStateSave ? _viewStateSave() : null; } catch (_) {}
+  try {
+    sessionStorage.setItem(VIEW_STATE_KEY, JSON.stringify({ page: _viewPage(), state, scroll: Math.round(scrollY) }));
+  } catch (_) {}
   location.reload();
+}
+
+// ── THE PAGE ACROSS A SWITCH ──────────────────────────────────────────────────
+// Switching the language reloads the page, which would lose what it shows: a
+// tab, the filters, a period, a search. A page with state of its own hands it
+// over with keepViewState(() => ({ ...plain values })); setLang stores it for
+// this browser tab with the scroll position, and after the reload the page
+// takes it back once with takeViewState() (null otherwise) and applies it
+// before its first render. The scroll position is restored here, once the page
+// is tall enough again (its content loads after it).
+const VIEW_STATE_KEY = 'viewState';
+const _viewPage = () => location.pathname + location.search;
+let _viewStateSave = null;
+let _viewSaved = null;   // { page, state, scroll }, from the switch that reloaded this page
+try {
+  _viewSaved = JSON.parse(sessionStorage.getItem(VIEW_STATE_KEY) || 'null');
+  sessionStorage.removeItem(VIEW_STATE_KEY);
+  if (_viewSaved && _viewSaved.page !== _viewPage()) _viewSaved = null;
+} catch (_) { _viewSaved = null; }
+
+function keepViewState(save) { _viewStateSave = save; }
+
+function takeViewState() {
+  const state = _viewSaved?.state || null;
+  if (_viewSaved) _viewSaved.state = null;
+  return state;
+}
+
+// Back to the same scroll position: re-applied while the content loads (up to
+// a few seconds), and dropped as soon as the reader scrolls or taps themselves.
+if (_viewSaved?.scroll > 0) {
+  try { history.scrollRestoration = 'manual'; } catch (_) {}
+  const y = _viewSaved.scroll, until = Date.now() + 4000;
+  let stop = false;
+  for (const ev of ['wheel', 'touchstart', 'mousedown', 'keydown']) {
+    addEventListener(ev, () => { stop = true; }, { once: true, passive: true, capture: true });
+  }
+  const keep = () => {
+    if (stop || Date.now() > until) { try { history.scrollRestoration = 'auto'; } catch (_) {} return; }
+    if (document.documentElement.scrollHeight - innerHeight >= y && Math.round(scrollY) !== y) scrollTo(0, y);
+    setTimeout(keep, 100);
+  };
+  addEventListener('DOMContentLoaded', keep);
 }
 
 // The dictionary for the current language ({} for English).

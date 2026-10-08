@@ -583,7 +583,10 @@ async function init() {
     ].filter(Boolean);
     nodes.forEach((n, i) => { if (i) cap.append(' | '); cap.append(n); });
   });
-  selectChart(CHARTS[0].id);
+  // A language switch brings back the chart being shown (lang.js).
+  const saved = takeViewState();
+  keepViewState(() => ({ chart: _selected }));
+  selectChart(CHARTS.some(c => c.id === saved?.chart) ? saved.chart : CHARTS[0].id);
 }
 
 init();

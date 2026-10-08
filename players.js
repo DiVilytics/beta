@@ -72,12 +72,28 @@ async function init() {
   setVisible('pfControls', true);
   profileReady.then(_renderIdentity);
 
+  // A language switch brings back the filters and the games loaded (lang.js).
+  const saved = takeViewState();
+  if (saved) {
+    pfFilter = saved.filter; pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location;
+    updateFilterPills('#pfFilterPills .pill', pfFilter);
+    period.set(saved.period);
+  }
+  keepViewState(() => ({
+    filter: pfFilter, mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter,
+    period: period.get(), limit: pfDisplayLimit,
+  }));
+
   const [chars, boxInfo] = await Promise.all([loadCharacters(), loadBoxInfo(), authReady]);
   pfAllChars   = chars;
   pfBoxInfo    = boxInfo || {};
   pfCharBoxMap = Object.fromEntries(chars.map(c => [c.name, c.box]));
 
   await load();
+  if (saved?.limit > pfDisplayLimit && document.getElementById('pfGamesList')) {
+    pfDisplayLimit = saved.limit;
+    _renderGamesList();
+  }
 }
 
 // Avatar, nickname, "Since" and Share. Called first without the profile: an
@@ -360,7 +376,7 @@ function render() {
     <div class="pf-games-header">
       <span class="pf-games-title">${t('Games')}</span>
       ${pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : ''}
-      <button class="pill" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
+      <button class="pill${pfWinsOnly ? ' on' : ''}" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
     </div>
     <div class="games-list" id="pfGamesList"></div>
   `;

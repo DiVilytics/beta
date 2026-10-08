@@ -210,6 +210,9 @@ async function init() {
 
   const input = document.getElementById('faqSearchInput');
   input.disabled = false;
+  // A language switch brings back the search (lang.js).
+  input.value = takeViewState()?.search || '';
+  keepViewState(() => ({ search: input.value }));
   input.addEventListener('input', render);
   input.addEventListener('keydown', e => {
     // A first Escape clears the search, a second one leaves the box (shared.js).

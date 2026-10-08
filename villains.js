@@ -31,6 +31,11 @@ async function init() {
   if (charName) document.getElementById('csBack').classList.remove('hidden');
   await initAuth();
 
+  // A language switch brings back the grouping and the switches (lang.js).
+  const saved = takeViewState();
+  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; }
+  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode }));
+
   if (charName) { await renderDetailPage(charName); return; }
 
   // ?pace= opens the roster straight into pace view, scrolled to that band
@@ -40,6 +45,7 @@ async function init() {
     csRosterView = 'pace';
     await renderRosterPage(`pace-${pace}`);
   } else {
+    if (saved) csRosterView = saved.rosterView;
     await renderRosterPage((params.get('box') || '').trim());
   }
 }
@@ -361,7 +367,7 @@ function _adversariesSectionHTML() {
   const gamesCol = a => ({ val: isPct ? `${pct(a.games, total)}%`    : a.games,  tip: t('{games} of {total} games ({pct}%)', { games: a.games, total, pct: pct(a.games, total) }) });
   const seg = `<div class="seg cs-adv-seg">
     <button class="seg-btn ${isPct  ? 'on' : ''}" type="button" onclick="csSetRivalMode('pct')" title="${t('Show and rank by %')}">%</button>
-    <button class="seg-btn ${!isPct ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="${t('Show and rank by count')}">#</button>
+    <button class="seg-btn ${!isPct ? 'on' : ''}" type="button" onclick="csSetRivalMode('count')" title="${t('Show and rank by count')}">${t('#')}</button>
   </div>`;
   const row = (a, fmt) => {
     const { val, tip } = fmt(a);

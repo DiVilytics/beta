@@ -15,6 +15,8 @@ function statBoxesHTML(boxes) {
 }
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
+// (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
+// the part from achievements, shown in parentheses instead of the games)
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
 // the formatted value; statCellHTML → the table cell, "40% (12)" / "5 (12)" with
 // the games played in parentheses (two right-aligned sub-columns, so the digits
@@ -23,11 +25,13 @@ function statBoxesHTML(boxes) {
 // statValueLabel → its column header. statModeSegHTML renders the toggle
 // control (`fn` is the global handler name the buttons call, e.g. 'setMode').
 function statValue(r, mode) {
+  if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
   if (mode === 'games') return r.games;
   return r.games ? r.wins / r.games : 0;
 }
 function statValueDisplay(r, mode) {
+  if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
   if (mode === 'games') return r.games;
   return (r.games ? Math.round((r.wins / r.games) * 100) : 0) + '%';
@@ -41,26 +45,31 @@ function _headLabel(key) {
 }
 function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
+  if (mode === 'xp') return `${_headLabel('XP')} <span class="lb-head-sub">(${_headLabel('Achievements')})</span>`;
   return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
 }
+// The number in parentheses: the games, or for XP the XP from achievements.
+const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
 function statCellHTML(r, mode) {
   const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
-  return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${r.games})</span>`}</span>`;
+  return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${_statSub(r, mode)})</span>`}</span>`;
 }
 // Tabular digits are 0.6em wide in the app font, the two parentheses 0.6em together.
-function statGamesWidth(rows) {
-  const digits = String(Math.max(0, ...rows.map(r => r.games))).length;
+function statGamesWidth(rows, mode) {
+  const digits = String(Math.max(0, ...rows.map(r => _statSub(r, mode)))).length;
   return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
 }
 
-function statModeSegHTML(mode, fn) {
+// `xp: true` adds XP first (the players' Leaderboard).
+function statModeSegHTML(mode, fn, { xp = false } = {}) {
   const btn = (m, label) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg">${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg">${xp ? btn('xp', t('XP')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {
   const sorted = [...rows];
+  if (mode === 'xp')    return sorted.sort((a, b) => (b.xp || 0) - (a.xp || 0) || b.wins - a.wins || b.games - a.games);
   if (mode === 'count') return sorted.sort((a, b) => b.wins - a.wins || b.games - a.games);
   if (mode === 'games') return sorted.sort((a, b) => b.games - a.games || b.wins - a.wins);
   return sorted.sort((a, b) => {
@@ -96,7 +105,7 @@ function boxAnchorId(box) {
 // different shape and is built inline in villains.js).
 //
 // Required opts:
-//   mode          : 'pct' | 'count' | 'games'
+//   mode          : 'pct' | 'count' | 'games' | 'xp'
 //   headLabel     : column header for the identity column ("Character" | "Player")
 //   getKey(r)     : returns the row's key (villain name or nickname)
 //   getName(key)  : optional, the name shown for a key (villainName for villains)
@@ -167,7 +176,7 @@ function renderStatTableHTML(rows, opts) {
   }
 
   return `
-    <div class="lb-table${wrapClass ? ' ' + wrapClass : ''}" style="${statGamesWidth(sorted)}">
+    <div class="lb-table${wrapClass ? ' ' + wrapClass : ''}" style="${statGamesWidth(sorted, mode)}">
       <div class="lb-head">
         <span>#</span>
         <span>${headLabel}</span>

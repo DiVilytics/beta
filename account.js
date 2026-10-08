@@ -36,6 +36,16 @@ async function init() {
   _acctGlobal     = computeGlobalAchievements(games, players, p => p.user_id === user.id, _acctChars);
   await _loadIdentities();
   _renderPage();
+
+  // A language switch brings back the avatar tab and an image picked but not
+  // applied yet (the Build tab keeps its work itself, avatar-builder.js).
+  const saved = takeViewState();
+  if (saved?.avatarTab === 'builder') _showAvatarTab('builder');
+  else if (saved?.pending && saved.pending !== _acctAvatar) _previewAvatar(saved.pending);
+  keepViewState(() => ({
+    avatarTab: document.getElementById('avatarTabBuilder')?.classList.contains('on') ? 'builder' : 'photos',
+    pending:   _pendingAvatar,
+  }));
 }
 
 async function _loadIdentities() {
@@ -88,7 +98,7 @@ function _renderPage() {
       </div>
       <div class="avatar-tab-row">
         <div class="seg seg-sm" role="tablist">
-          <button class="seg-btn on" id="avatarTabPhotos"  type="button" onclick="_showAvatarTab('photos')">${t('Photos')}</button>
+          <button class="seg-btn on" id="avatarTabPhotos"  type="button" onclick="_showAvatarTab('photos')">${t('Images')}</button>
           <button class="seg-btn"    id="avatarTabBuilder" type="button" onclick="_showAvatarTab('builder')">${t('Build')}</button>
         </div>
         <div class="avatar-actions">

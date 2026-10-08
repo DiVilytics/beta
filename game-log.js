@@ -64,8 +64,32 @@ async function init() {
     () => { updateFilterUI(); _syncResetBtn(); },   // a single villain tapped in or out
     glBoxInfo
   );
+  // A language switch brings back the filters and the games loaded (lang.js).
+  const saved = takeViewState();
+  if (saved) {
+    glFilterCount = saved.count;
+    updateFilterPills('#countPills .pill', glFilterCount);
+    glFilterLocation = saved.location;
+    if (glFilterLocation) document.getElementById('locationSearchInput').value = glFilterLocation;
+    period.set(saved.period);
+    glCharMode    = saved.charMode;
+    _onlySnapshot = saved.onlySnapshot;
+    pace.restoreState(saved.pace);
+    _syncCharModeUI();
+  }
+  keepViewState(() => ({
+    count: glFilterCount, location: glFilterLocation, period: period.get(),
+    charMode: glCharMode, onlySnapshot: _onlySnapshot,
+    pace: { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn },
+    loaded: glGames.length,
+  }));
   await Promise.all([loadLocationOptions(), _probeWithMode(), period.load()]);
   await load();
+  // Load more until as many games are listed as before (stops if one fails).
+  for (let n = -1; saved && _hasMore && glGames.length < saved.loaded && glGames.length > n; ) {
+    n = glGames.length;
+    await load(false);
+  }
   updateFilterUI();      // show the included-character count from the start
   pace.updatePaceUI();   // initialize the pace swatches + My-boxes button
 }

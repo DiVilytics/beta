@@ -15,6 +15,7 @@
 //             player's first dated game; null = this month)
 //   range() : { from_ts, to_ts }, ISO strings for the RPCs ([from, to), local
 //             midnight), both null for All time
+//   get() / set(s) : the picked { year, month }, kept across a language switch
 //   id()    : 'all' | '2025' | '2025-09', a key for caches
 //   isAll() : true on All time
 
@@ -125,6 +126,14 @@ function createPeriodFilter(rootId, { onChange }) {
       const from = state.month == null ? new Date(state.year, 0, 1)     : new Date(state.year, state.month, 1);
       const to   = state.month == null ? new Date(state.year + 1, 0, 1) : new Date(state.year, state.month + 1, 1);
       return { from_ts: from.toISOString(), to_ts: to.toISOString() };
+    },
+    // The picked year and month ({ year, month }, null = not narrowed), to put
+    // back after a reload (keepViewState, lang.js); set() doesn't call onChange.
+    get: () => ({ year: state.year, month: state.month }),
+    set(s) {
+      state.year  = s?.year  ?? null;
+      state.month = state.year == null ? null : (s?.month ?? null);
+      render();
     },
     id() {
       if (state.year == null) return 'all';

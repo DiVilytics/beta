@@ -1,8 +1,10 @@
 {
   "2026-10-09": {
-    "title": "Correggi una partita registrata",
+    "title": "Gli XP, e come correggere una partita",
     "new": [
-      "Chi ha registrato una partita può cambiarne cattivi e vincitore finché un altro giocatore non rivendica un cattivo, e può eliminarla dalla sua pagina."
+      "La Classifica dei giocatori parte dagli XP: per ogni partita in cui hai rivendicato il tuo cattivo, 1 per ogni altro giocatore che ha rivendicato il suo, il doppio se hai vinto; più 1 per ogni traguardo.",
+      "Chi ha registrato una partita può cambiarne cattivi e vincitore finché un altro giocatore non rivendica un cattivo, e può eliminarla dalla sua pagina.",
+      "Sette nuove immagini per l'avatar."
     ],
     "improved": [
       "Dopo aver salvato una partita si apre la sua pagina, con sopra il codice QR: chiudilo per controllare cattivi, vincitore e dettagli."
@@ -138,7 +140,7 @@
   "2026-06-07": {
     "title": "Crea il tuo avatar",
     "new": [
-      "Crea il tuo avatar: corpo, viso, occhi, capelli e altro su un colore di sfondo, oppure scegli una delle foto.",
+      "Crea il tuo avatar: corpo, viso, occhi, capelli e altro su un colore di sfondo, oppure scegli una delle immagini.",
       "Quando scrivi un luogo, in Nuova partita e quando modifichi una partita, ti vengono suggeriti quelli già usati."
     ]
   },

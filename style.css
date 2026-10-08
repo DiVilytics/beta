@@ -1580,13 +1580,17 @@ select:disabled {
   flex-wrap: wrap;
   margin: 4px 0 12px;
 }
-.avatar-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+/* The three buttons stay together: if the row is too narrow they move under the
+   tabs as a group, never one alone. */
+.avatar-actions { display: flex; flex-wrap: nowrap; gap: 6px; }
 /* Phone widths (iPhone SE etc.): tighten gaps + horizontal padding so the tabs
-   and the Default/Random/Apply buttons stay on one row. */
+   and the Default/Random/Apply buttons stay on one row, in Italian and with
+   Large text too. */
 @media (max-width: 430px) {
-  .avatar-tab-row { gap: 6px; }
-  .avatar-actions { gap: 4px; }
-  .avatar-tab-row .btn-sm  { padding-left: 6px; padding-right: 6px; }
+  .avatar-tab-row { gap: 4px; }
+  .avatar-actions { gap: 3px; }
+  .avatar-tab-row .btn-sm  { padding-left: 5px; padding-right: 5px; }
+  .avatar-tab-row .seg-sm .seg-btn { padding-left: 5px; padding-right: 5px; }
 }
 .builder-wrap {
   display: flex;

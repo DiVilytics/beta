@@ -48,8 +48,8 @@ function computeCharacterAchievements(playerRows) {
 }
 
 // ── BOX COMPLETION ACHIEVEMENTS ────────────────────────────────────────────────
-// Two gold achievements per box: play every character in it, and win with every
-// character in it. Binary (gold at completion) rather than tiered, since box
+// Two one-step achievements per box: play every character in it, and win with
+// every character in it. Binary (done at completion) rather than tiered, since box
 // sizes are small (1–6) and "completion" is all-or-nothing.
 
 // Per-box completion from a character→{plays,wins} map. Returns rows in release
@@ -81,7 +81,7 @@ function countBoxAchievements(boxRows) {
 }
 
 // Compact strip of box covers, grayscale until the box is fully played (then
-// full color, mirroring the box picker), with a gold star (played all) and cup
+// full color, mirroring the box picker), with a star (played all) and cup
 // (won all) marker beneath.
 function renderBoxStripHTML(boxRows, onClickFn = '_showBoxDetail') {
   const tiles = boxRows.map(r => {
@@ -109,7 +109,7 @@ function renderBoxDetailHTML(boxRow, boxChars, charAch) {
 
   const trackRow = (done, count, label, kind) => {
     const isCup = kind === 'cup';
-    const tierCls = isCup ? ' ach-cup ach-cup-gold' : ' ach-star ach-star-gold';
+    const tierCls = isCup ? ' ach-cup' : ' ach-star';
     return `
     <div class="ach-track-tier${done ? ' earned' : ''}">
       <span class="ach-track-icon${tierCls}">${isCup ? '🏆' : '⭐'}</span>
@@ -125,8 +125,8 @@ function renderBoxDetailHTML(boxRow, boxChars, charAch) {
         <img class="char-portrait" src="${charImgSrc(c.name)}" onerror="this.src='asset/players/default.svg'" alt="">
         <span class="box-detail-char-name">${villainNameInline(c.name)}</span>
         <span class="box-detail-marks">
-          <span class="${s.plays > 0 ? 'on ach-star ach-star-gold' : ''}">${s.plays > 0 ? '⭐' : '·'}</span>
-          <span class="${s.wins  > 0 ? 'on ach-cup ach-cup-gold' : ''}">${s.wins  > 0 ? '🏆' : '·'}</span>
+          <span class="${s.plays > 0 ? 'on ach-star' : ''}">${s.plays > 0 ? '⭐' : '·'}</span>
+          <span class="${s.wins  > 0 ? 'on ach-cup' : ''}">${s.wins  > 0 ? '🏆' : '·'}</span>
         </span>
       </div>`;
   }).join('');
@@ -152,7 +152,7 @@ const VOLUME_TIERS = [
   { id: 'silver', threshold: 50,  label: 'Silver' },
   { id: 'gold',   threshold: 100, label: 'Gold' },
 ];
-const DONE_TIER = [{ id: 'gold', threshold: 1, label: 'Done' }];  // binary: gold at 1
+const DONE_TIER = [{ id: 'done', threshold: 1, label: 'Done' }];  // binary: one step, plain ⭐ / 🏆 (no tier tint)
 
 function _tierIndex(count, tiers) {
   let t = -1;
@@ -175,12 +175,12 @@ const PACE_KEYS = ['green', 'yellow', 'orange', 'red'];
 const SEAT_KEYS = [0, 1, 2, 3, 4, 5];
 
 // Detail panel for a binary "do X for every member of a set" achievement (table
-// sizes, pace rainbow, starting position): two gold tracks plus a per-member
-// played/won checklist. `members` is [{ label, played, won }].
+// sizes, pace rainbow, starting position): two one-step tracks plus a
+// per-member played/won checklist. `members` is [{ label, played, won }].
 function _setCompletionDetailHTML(emojiTitle, members, playedLabel, wonLabel) {
-  const goldRow = (done, label, kind) => {
+  const doneRow = (done, label, kind) => {
     const isCup = kind === 'cup';
-    const tierCls = isCup ? ' ach-cup ach-cup-gold' : ' ach-star ach-star-gold';
+    const tierCls = isCup ? ' ach-cup' : ' ach-star';
     return `
       <div class="ach-track-tier${done ? ' earned' : ''}">
         <span class="ach-track-icon${tierCls}">${isCup ? '🏆' : '⭐'}</span>
@@ -192,15 +192,15 @@ function _setCompletionDetailHTML(emojiTitle, members, playedLabel, wonLabel) {
     <div class="box-detail-char">
       <span class="box-detail-char-name">${m.label}</span>
       <span class="box-detail-marks">
-        <span class="${m.played > 0 ? 'on ach-star ach-star-gold' : ''}">${m.played > 0 ? '⭐' : '·'}</span>
-        <span class="${m.won  > 0 ? 'on ach-cup ach-cup-gold' : ''}">${m.won  > 0 ? '🏆' : '·'}</span>
+        <span class="${m.played > 0 ? 'on ach-star' : ''}">${m.played > 0 ? '⭐' : '·'}</span>
+        <span class="${m.won  > 0 ? 'on ach-cup' : ''}">${m.won  > 0 ? '🏆' : '·'}</span>
       </span>
     </div>`).join('');
   return `
     <div class="ach-detail-head"><div class="ach-detail-name">${emojiTitle}</div></div>
     <div class="ach-track">
-      ${goldRow(members.every(m => m.played > 0), playedLabel, 'medal')}
-      ${goldRow(members.every(m => m.won    > 0), wonLabel,    'cup')}
+      ${doneRow(members.every(m => m.played > 0), playedLabel, 'medal')}
+      ${doneRow(members.every(m => m.won    > 0), wonLabel,    'cup')}
     </div>
     <div class="box-detail-list">${rows}</div>`;
 }
@@ -266,30 +266,48 @@ function computeGlobalAchievements(games, players, isMine, chars = []) {
   };
 }
 
+// The global achievements as tracks, { count, tiers }: a tier is earned when
+// `count` reaches its threshold. Table sizes (across 2p–6p), the pace rainbow and
+// the starting positions are a single binary play-all + win-all each (DONE_TIER,
+// count 1 when done). Shared by the "earned / total" counter and the XP.
+function globalAchievementTracks(g) {
+  const sizes = [2, 3, 4, 5, 6];
+  const done  = ok => ({ count: ok ? 1 : 0, tiers: DONE_TIER });
+  return [
+    done(sizes.every(s => g.tableSizes[s].played > 0)),
+    done(sizes.every(s => g.tableSizes[s].won    > 0)),
+    { count: g.volume.games,     tiers: VOLUME_TIERS },
+    { count: g.volume.wins,      tiers: VOLUME_TIERS },
+    { count: g.locations.played, tiers: ACH_TIERS },
+    { count: g.locations.won,    tiers: ACH_TIERS },
+    { count: g.players.played,   tiers: ACH_TIERS },
+    { count: g.players.won,      tiers: ACH_TIERS },
+    done(PACE_KEYS.every(k => g.pace[k].played > 0)),
+    done(PACE_KEYS.every(k => g.pace[k].won    > 0)),
+    done(SEAT_KEYS.every(i => g.positions[i].played > 0)),
+    done(SEAT_KEYS.every(i => g.positions[i].won    > 0)),
+  ];
+}
+
 function countGlobalAchievements(g) {
   let earned = 0, total = 0;
-  // Table sizes: a single binary play-all + win-all (across 2p–6p).
-  const sizes = [2, 3, 4, 5, 6];
-  total += 2;
-  if (sizes.every(s => g.tableSizes[s].played > 0)) earned++;
-  if (sizes.every(s => g.tableSizes[s].won    > 0)) earned++;
-  total += VOLUME_TIERS.length * 2;
-  const vg = _tierIndex(g.volume.games, VOLUME_TIERS); if (vg >= 0) earned += vg + 1;
-  const vw = _tierIndex(g.volume.wins,  VOLUME_TIERS); if (vw >= 0) earned += vw + 1;
-  total += ACH_TIERS.length * 2;
-  const lp = _tierIndex(g.locations.played, ACH_TIERS); if (lp >= 0) earned += lp + 1;
-  const lw = _tierIndex(g.locations.won,    ACH_TIERS); if (lw >= 0) earned += lw + 1;
-  total += ACH_TIERS.length * 2;
-  const pp = _tierIndex(g.players.played, ACH_TIERS); if (pp >= 0) earned += pp + 1;
-  const pw = _tierIndex(g.players.won,    ACH_TIERS); if (pw >= 0) earned += pw + 1;
-  // Pace rainbow + starting position: a single binary play-all + win-all each.
-  total += 2;
-  if (PACE_KEYS.every(k => g.pace[k].played > 0)) earned++;
-  if (PACE_KEYS.every(k => g.pace[k].won    > 0)) earned++;
-  total += 2;
-  if (SEAT_KEYS.every(i => g.positions[i].played > 0)) earned++;
-  if (SEAT_KEYS.every(i => g.positions[i].won    > 0)) earned++;
+  for (const { count, tiers } of globalAchievementTracks(g)) {
+    total  += tiers.length;
+    earned += _tierIndex(count, tiers) + 1;
+  }
   return { earned, total };
+}
+
+// ── XP ────────────────────────────────────────────────────────────────────────
+// Achievements also give XP (the players' Leaderboard): 1 for every achievement
+// earned, whatever its tier (bronze, silver and gold are one each, as is a
+// one-step achievement), the same number as the profile's "earned / total".
+// charAch from computeCharacterAchievements, global from
+// computeGlobalAchievements.
+function achievementXp(charAch, chars, boxInfo, global) {
+  return countAchievements(charAch, chars).earned
+       + countBoxAchievements(computeBoxCompletion(charAch, chars, boxInfo)).earned
+       + countGlobalAchievements(global).earned;
 }
 
 function renderGlobalStripHTML(global, onlyEarned = false, onClickFn = '_showGlobalDetail') {

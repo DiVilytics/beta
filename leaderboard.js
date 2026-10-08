@@ -1,11 +1,15 @@
 // ── STATE ─────────────────────────────────────────────────────────────────────
 
+let lbChars         = [];
 let lbCharBoxMap    = {};
 let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
-let lbMode   = 'pct';          // 'pct' | 'count' | 'games'
+let lbMode   = 'pct';          // 'pct' | 'count' | 'games', or 'xp' (players only)
 let lbFilter = 'all';          // 'all' | 2 | 3 | 4 | 5 | 6
+
+// Each tab keeps its own ranking: villains open on % Wins, players on XP.
+const _lbModeByTab = { characters: 'pct', players: 'xp' };
 
 // The period, All time / Year / Month (period-filter.js): any change reloads.
 const period = createPeriodFilter('lbPeriod', {
@@ -39,22 +43,53 @@ async function init() {
     period.load(),
   ]);
 
+  lbChars         = chars;
   lbCharBoxMap    = Object.fromEntries(chars.map(c => [c.name, c.box]));
   lbNickAvatarMap = Object.fromEntries(
     profiles.filter(p => p.nickname).map(p => [p.nickname, resolveAvatar(p)])
   );
 
+  // The tab is kept in the address (?tab=players), so a reload or a link
+  // reopens it; a language switch also brings back the rankings, the table size,
+  // the period and the rows loaded (keepViewState, lang.js).
+  const saved = takeViewState();
+  if (saved) {
+    Object.assign(_lbModeByTab, saved.modes);
+    lbMode = _lbModeByTab[lbTab];
+  }
+  if ((saved?.tab || new URLSearchParams(location.search).get('tab')) === 'players') _applyTab('players');
+  if (saved) {
+    lbFilter = saved.filter;
+    updateFilterPills('#filterPills .pill', lbFilter);
+    period.set(saved.period);
+    lbDisplayLimit = saved.limit || LB_PAGE_SIZE;
+  }
+  keepViewState(() => ({
+    tab: lbTab, modes: { ..._lbModeByTab, [lbTab]: lbMode },
+    filter: lbFilter, period: period.get(), limit: lbDisplayLimit,
+  }));
   await loadAndRender();
+  _loadXpLedger();   // in the background, so the Players tab opens at once
 }
 
 // ── CONTROLS ──────────────────────────────────────────────────────────────────
 
 function setTab(t) {
-  lbTab = t;
+  _applyTab(t);
+  const url = new URL(location.href);
+  if (t === 'players') url.searchParams.set('tab', 'players');
+  else url.searchParams.delete('tab');
+  history.replaceState(null, '', url);
+  loadAndRender();
+}
+
+function _applyTab(t) {
+  _lbModeByTab[lbTab] = lbMode;
+  lbTab  = t;
+  lbMode = _lbModeByTab[t];
   lbDisplayLimit = LB_PAGE_SIZE;
   document.getElementById('tabChars').classList.toggle('on',   t === 'characters');
   document.getElementById('tabPlayers').classList.toggle('on', t === 'players');
-  loadAndRender();
 }
 
 function setMode(m) {
@@ -123,10 +158,12 @@ async function _fetchAllTime() {
     ? db.from(view).select('*')
     : db.from(view).select('*').eq('player_count', lbFilter);
 
-  const [{ rows }, { data: summary }] = await Promise.all([
+  const [{ rows }, { data: summary }, xp] = await Promise.all([
     _fetchAllRows(buildRows),
     db.rpc('game_stats', lbFilter === 'all' ? {} : { player_count_filter: lbFilter }),
+    _fetchXp(),
   ]);
+  if (xp === null) return null;
 
   let lbRows = rows;
   // Overall players board: also list registered players who've never played,
@@ -138,7 +175,7 @@ async function _fetchAllTime() {
   }
 
   return {
-    rows:    lbRows,
+    rows:    _addXp(lbRows, xp),
     summary: (summary || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
   };
 }
@@ -147,17 +184,91 @@ async function _fetchAllTime() {
 // played in it. A villain or player is listed only if they played then.
 async function _fetchPeriod() {
   const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
-  const [stats, summary] = await Promise.all([
+  const [stats, summary, xp] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
     db.rpc('period_game_stats', range),
+    _fetchXp(),
   ]);
-  if (stats.error || summary.error) return null;
+  if (stats.error || summary.error || xp === null) return null;
   const nameKey = lbTab === 'characters' ? 'character' : 'nickname';
   return {
-    rows:    (stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })),
+    rows:    _addXp((stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })), xp),
     summary: (summary.data || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
   };
 }
+
+// ── XP ────────────────────────────────────────────────────────────────────────
+// Every game a player claimed a villain in earns them XP: 1 for each other
+// player who claimed one in that game, 2 if they won (so a loss is worth
+// claiming when the others claim too, and a game claimed alone gives none);
+// plus the XP of the achievements that game unlocked (achievementXp, achievements.js:
+// their achievements after it minus before it, in play order). So a table size
+// or a period counts the XP of its own games, achievements included.
+// The ledger, { nickname: [{ at, size, xp, ach }] } (ach: the part of xp from
+// achievements), is built once from every game with a claim; null if it
+// couldn't load.
+let _xpLedger = null;
+
+function _loadXpLedger() {
+  return _xpLedger ||= (async () => {
+    const { rows, error } = await _fetchAllRows(() => db.from('game_players').select('game_id').not('nickname', 'is', null));
+    if (error) return null;
+    const ids = [...new Set(rows.map(r => r.game_id))];
+    const [{ games, players }, boxInfo] = await Promise.all([fetchGamesWithPlayers(ids), loadBoxInfo()]);
+
+    const gameById = Object.fromEntries(games.map(g => [g.id, g]));
+    const seats    = {};   // game id → its seats
+    for (const p of players) (seats[p.game_id] ||= []).push(p);
+    const claims = id => seats[id].filter(p => p.nickname).length;
+    // Play order; games without a date first (they never fall in a period).
+    const at = id => gameById[id]?.played_at ? new Date(gameById[id].played_at).getTime() : -Infinity;
+
+    const mineByNick = {};
+    for (const p of players) if (p.nickname) (mineByNick[p.nickname] ||= []).push(p);
+
+    const ledger = {};
+    for (const [nick, mine] of Object.entries(mineByNick)) {
+      mine.sort((a, b) => at(a.game_id) - at(b.game_id) || (a.game_id < b.game_id ? -1 : 1));
+      const isMine = p => p.nickname === nick;
+      const sofar  = [];
+      let achBefore = 0;
+      ledger[nick] = mine.map(p => {
+        sofar.push(p);
+        const global   = computeGlobalAchievements(sofar.map(s => gameById[s.game_id]), sofar.flatMap(s => seats[s.game_id]), isMine, lbChars);
+        const achAfter = achievementXp(computeCharacterAchievements(sofar), lbChars, boxInfo, global);
+        const ach = achAfter - achBefore;
+        achBefore = achAfter;
+        const others = claims(p.game_id) - 1;
+        return { at: gameById[p.game_id]?.played_at || null, size: seats[p.game_id].length, xp: others * (p.is_winner ? 2 : 1) + ach, ach };
+      });
+    }
+    return ledger;
+  })().then(l => { if (!l) _xpLedger = null; return l; });   // a failed load is retried
+}
+
+// Players only: each nickname's XP for the current table size and period, a
+// { nickname: { xp, ach } } map; {} for villains, null on an error.
+async function _fetchXp() {
+  if (lbTab !== 'players') return {};
+  const ledger = await _loadXpLedger();
+  if (!ledger) return null;
+  const { from_ts, to_ts } = period.range();
+  const from = from_ts ? new Date(from_ts) : null, to = to_ts ? new Date(to_ts) : null;
+  const out = {};
+  for (const [nick, entries] of Object.entries(ledger)) {
+    out[nick] = { xp: 0, ach: 0 };
+    for (const e of entries) {
+      if (lbFilter !== 'all' && e.size !== lbFilter) continue;
+      if (from && !(e.at && new Date(e.at) >= from && new Date(e.at) < to)) continue;
+      out[nick].xp  += e.xp;
+      out[nick].ach += e.ach;
+    }
+  }
+  return out;
+}
+const _addXp = (rows, xp) => lbTab === 'players'
+  ? rows.map(r => ({ ...r, xp: xp[r.nickname]?.xp || 0, xpAch: xp[r.nickname]?.ach || 0 }))
+  : rows;
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
@@ -196,8 +307,9 @@ function render({ rows, summary }) {
   const hasMore = rows.length > lbDisplayLimit;
 
   document.getElementById('lb').innerHTML = `
-    ${statModeSegHTML(lbMode, 'setMode')}
+    ${statModeSegHTML(lbMode, 'setMode', { xp: !isChar })}
     ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
+    ${lbMode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each other player who claimed theirs, doubled if you won. Plus 1 for each achievement.')}</p>` : ''}
     ${renderStatTableHTML(rows, {
       mode:        lbMode,
       headLabel:   isChar ? t('Villain') : t('Player'),
