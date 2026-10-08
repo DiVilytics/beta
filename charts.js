@@ -289,7 +289,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'seatorder', icon: '🪑', label: 'Turn-order advantage',
+    id: 'seatorder', icon: '🪑', label: 'Play-order advantage',
     desc: "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
     async render() {
       const { data, error } = await db.rpc('position_stats');

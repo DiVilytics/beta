@@ -8,9 +8,6 @@
     ],
     "improved": [
       "% Wins no longer hides entries with fewer than 5 games: they're listed after the ranking, without a position.",
-      "Rivalries say that they count only opponents faced in at least 5 games.",
-      "The Villains page links the F.A.Q. at the bottom.",
-      "Every menu uses the same ▼.",
       "What's new tints in purple what changed since your last visit."
     ]
   },
@@ -23,14 +20,11 @@
     ],
     "improved": [
       "The round counter shows the current round, starting from 1, and − can't go below it (on the lock screen too).",
-      "Villain filters: Reset goes back to where you started (your boxes, in New Game), and the villains that count are tinted purple instead of graying out the others.",
-      "Your own villain has a clear purple ring on game cards and on the claim page.",
+      "Villain filters: Reset goes back to where you started (your boxes, in New Game).",
       "Villainous Italia games show only their date, since the sheet has no time."
     ],
     "fixed": [
-      "A game started by mistake and paused within the first minute no longer saves a duration and one round.",
-      "The draw button keeps its label during the draw animation.",
-      "Villain and player rows have the same height with Large text."
+      "A game started by mistake and paused within the first minute no longer saves a duration and one round."
     ]
   },
   "2026-10-05": {
@@ -44,7 +38,6 @@
       "New Game keeps one game at a time: a game in progress is there when you come back, ready to resume.",
       "The form and the draw pool are kept while you edit, and the draw pool starts from your boxes.",
       "One draw button that fills the empty rows or redraws them all, disabled when the draw pool is too small.",
-      "Rows follow your finger when you drag them to reorder.",
       "If the lock-screen controls need a tap after you come back, a full-screen \"Tap to continue\" asks for it.",
       "Every pop-up closes by dragging it down, or with Esc on a computer.",
       "Back links return to the page you came from.",
@@ -60,8 +53,6 @@
       "F.A.Q.: the official rules summarized, and what Introduction to Evil changes."
     ],
     "improved": [
-      "Rankings show one value per row, with the games in parentheses.",
-      "Card texts color the card types (Ally, Hero, Item…).",
       "New Game has simpler lineup controls: one draw button and Random order."
     ]
   },
@@ -76,7 +67,7 @@
     "improved": [
       "Characters are now called Villains.",
       "Game cards list the players in play order, with their seat numbers.",
-      "Games over time shows the last 12 months; drag to see earlier ones. Charts have rounder axis numbers.",
+      "Games over time shows the last 12 months; drag to see earlier ones.",
       "A player's Max streak turns gold while they're on their best streak.",
       "Rivalries count only opponents faced in at least 5 games.",
       "Box names show their release year."
@@ -90,10 +81,7 @@
       "Download all your games as a CSV from your Account."
     ],
     "improved": [
-      "Boxes are listed in release order everywhere.",
-      "The % Wins ranking only includes entries with at least 5 games, so one lucky win can't top it.",
-      "Chart dots are easier to tap.",
-      "The home page credits where the games come from: the daily sync with Villainous Italia and BoardGameGeek."
+      "The % Wins ranking only includes entries with at least 5 games, so one lucky win can't top it."
     ],
     "fixed": [
       "My boxes now works villain by villain for reprinted villains: one still counts if you own any of its boxes."
@@ -106,15 +94,12 @@
     ],
     "improved": [
       "The Leaderboard shows 30 rows at a time, with Load more."
-    ],
-    "fixed": [
-      "Leaderboard rows with long names."
     ]
   },
   "2026-06-24": {
     "title": "Charts and the Players page",
     "new": [
-      "Charts: games over time and by weekday, players per game, game length and rounds, win rate by pace, by box and against popularity, box popularity, turn-order advantage and more.",
+      "Charts: games over time and by weekday, players per game, game length and rounds, win rate by pace, by box and against popularity, box popularity, play-order advantage and more.",
       "Players: search for any player and open their profile, or share yours with a QR code.",
       "Villains: group them by box or by pace."
     ]
@@ -135,7 +120,6 @@
       "Villains: a monthly report with the top and bottom villains of the month.",
       "The Leaderboard shows your position at the bottom when you're further down.",
       "New achievements: games played, locations, every table size and every seat, every pace, players played with and beaten, longest win streak.",
-      "Animations when drawing the villains and shuffling the play order.",
       "Acknowledgments on the home page."
     ],
     "improved": [
@@ -147,9 +131,6 @@
     "new": [
       "Build your own avatar: body, face, eyes, hair and more over a background color, or pick one of the photos.",
       "Places you've already used are suggested when you type a location, in New Game and when editing a game."
-    ],
-    "improved": [
-      "The browser tab icon follows the light or dark theme."
     ]
   },
   "2026-06-01": {
@@ -167,9 +148,6 @@
     "new": [
       "Sign in with Google as well as Discord, from a new sign-in page.",
       "Link both to the same profile from your Account (you need to keep at least one)."
-    ],
-    "improved": [
-      "Clearer achievements and profile pages."
     ]
   },
   "2026-05-14": {
@@ -181,7 +159,7 @@
       "Shuffle order randomizes the play order."
     ],
     "improved": [
-      "Turns are now called rounds, as in the rulebook."
+      "The counter says rounds instead of turns: a round ends when every player has had their turn."
     ]
   },
   "2026-05-10": {
@@ -199,12 +177,11 @@
       "Each villain's page shows the rules clarifications (F.A.Q.) for that villain."
     ],
     "improved": [
-      "Filtered game history pages through every result.",
-      "A page for broken links."
+      "Filtered game history pages through every result."
     ]
   },
   "2026-04-23": {
-    "title": "DiVilytics goes online",
+    "title": "DVS goes online",
     "new": [
       "Record your games: pick the villains or draw them at random, randomize the play order, and time the game with a counter that keeps working with the screen locked.",
       "Save the game and share its QR code, so the other players can link their profiles to the villains they played.",

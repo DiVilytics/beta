@@ -8,9 +8,6 @@
     ],
     "improved": [
       "% Vittorie non nasconde più chi ha meno di 5 partite: compare dopo la classifica, senza posizione.",
-      "Le rivalità indicano che contano solo gli avversari affrontati in almeno 5 partite.",
-      "La pagina Cattivi ha in fondo il link alle F.A.Q.",
-      "Tutti i menu usano la stessa ▼.",
       "Novità colora di viola quello che è cambiato dalla tua ultima visita."
     ]
   },
@@ -23,14 +20,11 @@
     ],
     "improved": [
       "Il contatore mostra il round in corso, partendo da 1, e − non scende sotto (anche dalla schermata di blocco).",
-      "Filtri dei cattivi: Ripristina torna alla situazione di partenza (le tue scatole, in Nuova partita), e i cattivi che contano sono colorati di viola invece di attenuare gli altri.",
-      "Il tuo cattivo ha un bordo viola ben visibile nelle partite e nella pagina per rivendicare.",
+      "Filtri dei cattivi: Ripristina torna alla situazione di partenza (le tue scatole, in Nuova partita).",
       "Le partite di Villainous Italia mostrano solo la data, perché il foglio non ha l'ora."
     ],
     "fixed": [
-      "Una partita avviata per sbaglio e messa in pausa entro il primo minuto non salva più una durata e un round.",
-      "Il pulsante di pesca mantiene la sua scritta durante l'animazione.",
-      "Le righe di cattivi e giocatori hanno la stessa altezza con il testo Grande."
+      "Una partita avviata per sbaglio e messa in pausa entro il primo minuto non salva più una durata e un round."
     ]
   },
   "2026-10-05": {
@@ -44,7 +38,6 @@
       "Nuova partita tiene una partita alla volta: una partita in corso è lì quando torni, pronta per essere ripresa.",
       "Il modulo e la Riserva cattivi restano salvati mentre li modifichi, e la Riserva cattivi parte dalle tue scatole.",
       "Un solo pulsante di pesca, che riempie le righe vuote o le ripesca tutte, disattivato quando la Riserva cattivi non basta.",
-      "Le righe seguono il dito quando le trascini per cambiare l'ordine.",
       "Se al ritorno i controlli della schermata di blocco hanno bisogno di un tocco, lo chiede \"Tocca per continuare\" a schermo intero.",
       "Ogni pop-up si chiude trascinandolo verso il basso, o con Esc da computer.",
       "I link Indietro riportano alla pagina da cui arrivi.",
@@ -60,8 +53,6 @@
       "F.A.Q.: il regolamento ufficiale riassunto, e cosa cambia Introduction to Evil."
     ],
     "improved": [
-      "Le classifiche mostrano un solo valore per riga, con le partite tra parentesi.",
-      "I testi delle carte colorano i tipi di carta (Alleato, Eroe, Oggetto…).",
       "Nuova partita ha comandi più semplici: un solo pulsante di pesca e Ordine casuale."
     ]
   },
@@ -76,7 +67,7 @@
     "improved": [
       "I Personaggi ora si chiamano Cattivi.",
       "Le partite elencano i giocatori nell'ordine di gioco, con il numero del posto.",
-      "Partite nel tempo mostra gli ultimi 12 mesi; trascina per vedere quelli precedenti. Gli assi dei grafici hanno numeri più tondi.",
+      "Partite nel tempo mostra gli ultimi 12 mesi; trascina per vedere quelli precedenti.",
       "La Serie max di un giocatore diventa dorata mentre è nella sua serie migliore.",
       "Le rivalità contano solo gli avversari affrontati in almeno 5 partite.",
       "I nomi delle scatole mostrano l'anno di uscita."
@@ -90,10 +81,7 @@
       "Scarica tutte le tue partite in CSV dal tuo Account."
     ],
     "improved": [
-      "Le scatole sono elencate ovunque in ordine di uscita.",
-      "La classifica per % Vittorie include solo chi ha almeno 5 partite, così una vittoria fortunata non basta per arrivare in cima.",
-      "I punti dei grafici sono più facili da toccare.",
-      "La home indica da dove arrivano le partite: il sync giornaliero con Villainous Italia e BoardGameGeek."
+      "La classifica per % Vittorie include solo chi ha almeno 5 partite, così una vittoria fortunata non basta per arrivare in cima."
     ],
     "fixed": [
       "Le mie scatole ora funziona cattivo per cattivo per i cattivi ristampati: uno resta disponibile se possiedi una qualsiasi delle sue scatole."
@@ -106,15 +94,12 @@
     ],
     "improved": [
       "La Classifica mostra 30 righe alla volta, con Carica altre."
-    ],
-    "fixed": [
-      "Le righe della Classifica con nomi lunghi."
     ]
   },
   "2026-06-24": {
     "title": "Grafici e la pagina Giocatori",
     "new": [
-      "Grafici: partite nel tempo e per giorno della settimana, giocatori per partita, durata e round, percentuale di vittorie per velocità, per scatola e rispetto alla popolarità, popolarità delle scatole, vantaggio dell'ordine di turno e altro.",
+      "Grafici: partite nel tempo e per giorno della settimana, giocatori per partita, durata e round, percentuale di vittorie per velocità, per scatola e rispetto alla popolarità, popolarità delle scatole, vantaggio dell'ordine di gioco e altro.",
       "Giocatori: cerca qualsiasi giocatore e apri il suo profilo, o condividi il tuo con un codice QR.",
       "Cattivi: raggruppali per scatola o per velocità."
     ]
@@ -135,7 +120,6 @@
       "Cattivi: un report mensile con i cattivi in testa e in coda nel mese.",
       "La Classifica mostra la tua posizione in fondo quando sei più in basso.",
       "Nuovi traguardi: partite giocate, luoghi, ogni numero di giocatori e ogni posto, ogni velocità, giocatori con cui hai giocato e che hai battuto, serie di vittorie più lunga.",
-      "Animazioni quando peschi i cattivi e mescoli l'ordine di gioco.",
       "I ringraziamenti nella home."
     ],
     "improved": [
@@ -147,9 +131,6 @@
     "new": [
       "Crea il tuo avatar: corpo, viso, occhi, capelli e altro su un colore di sfondo, oppure scegli una delle foto.",
       "Quando scrivi un luogo, in Nuova partita e quando modifichi una partita, ti vengono suggeriti quelli già usati."
-    ],
-    "improved": [
-      "L'icona della scheda del browser segue il tema chiaro o scuro."
     ]
   },
   "2026-06-01": {
@@ -167,9 +148,6 @@
     "new": [
       "Accedi con Google oltre che con Discord, da una nuova pagina di accesso.",
       "Collega entrambi allo stesso profilo dal tuo Account (almeno uno va tenuto)."
-    ],
-    "improved": [
-      "Pagine dei traguardi e del profilo più chiare."
     ]
   },
   "2026-05-14": {
@@ -181,7 +159,7 @@
       "Mescola ordine rende casuale l'ordine di gioco."
     ],
     "improved": [
-      "I turni ora si chiamano round, come nel regolamento."
+      "Il contatore indica i round invece dei turni: un round finisce quando tutti i giocatori hanno giocato il proprio turno."
     ]
   },
   "2026-05-10": {
@@ -199,12 +177,11 @@
       "La pagina di ogni cattivo mostra i chiarimenti sulle regole (F.A.Q.) di quel cattivo."
     ],
     "improved": [
-      "Lo storico filtrato scorre tra tutti i risultati.",
-      "Una pagina per i link non validi."
+      "Lo storico filtrato scorre tra tutti i risultati."
     ]
   },
   "2026-04-23": {
-    "title": "DiVilytics va online",
+    "title": "DVS va online",
     "new": [
       "Registra le tue partite: scegli i cattivi o peschili a caso, rendi casuale l'ordine di gioco e cronometra la partita con un contatore che funziona anche a schermo bloccato.",
       "Salva la partita e condividi il suo codice QR, così gli altri giocatori possono collegare il loro profilo al cattivo che hanno giocato.",
