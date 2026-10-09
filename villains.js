@@ -316,10 +316,9 @@ function render() {
   const solo  = csSoloStats || { games: 0, wins: 0 };
   const stats = key => key === 'solo' ? solo : csBuckets[key];
   const keys  = [...rows.map(r => r.key), 'solo'];
-  // The bars: a win rate on its own scale, 0 to 100%, so no row stretches the
-  // others (Solo included); a count against the official rows' largest
-  // (Overall), Solo on that same scale (a full bar at most).
-  const maxVal = csMode === 'pct' ? 1 : Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
+  // The bars scale to the largest official row, as everywhere; Solo has no bar
+  // (it's not measured against the official games).
+  const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
 
@@ -331,16 +330,16 @@ function render() {
     const b       = stats(key);
     const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
     const dispVal = b.games ? statCellHTML(b, csMode) : '-';
+    const bar     = key === 'solo' ? '' : `
+          <div class="bar-bg">
+            <div class="bar-fill" style="width:${barW}%"></div>
+          </div>`;
     const arg     = typeof key === 'number' ? key : `'${key}'`;
     return `
       <div class="lb-row cs-row${csRow === key ? ' on' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
            onclick="csSelectRow(${arg})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();csSelectRow(${arg})}">
         <div class="row-label">${label}</div>
-        <div class="bar-cell">
-          <div class="bar-bg">
-            <div class="bar-fill" style="width:${barW}%"></div>
-          </div>
-        </div>
+        <div class="bar-cell">${bar}</div>
         <div class="row-val">${csLoading ? '-' : dispVal}</div>
       </div>`;
   };
