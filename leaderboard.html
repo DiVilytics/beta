@@ -68,6 +68,18 @@
   <div id="lb" class="spinner" data-i18n>Loading…</div>
 </main>
 
+<!-- The XP table (leaderboard.js openXpTable) -->
+<div class="overlay" id="xpOverlay" onclick="if(event.target===this) closeOverlay('xpOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>XP per game</h3>
+      <button class="sheet-close" onclick="closeOverlay('xpOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="xpBody"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="db.js"></script>

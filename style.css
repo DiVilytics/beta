@@ -358,6 +358,18 @@ a.chip {
   font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; white-space: nowrap;
 }
 
+/* The XP table (leaderboard.js): one game's XP by table size and claims, lost
+   in purple, won in gold. */
+.xp-table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+.xp-table th, .xp-table td { padding: 8px 2px; text-align: center; border-bottom: 1px solid var(--border); font-size: calc(13px * var(--ts)); white-space: nowrap; }
+.xp-table thead th { color: var(--dim); font-size: calc(11px * var(--ts)); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.xp-table thead tr:first-child th { white-space: normal; }   /* the columns' heading may wrap */
+.xp-table tbody th { text-align: left; color: var(--muted); font-weight: 600; }
+.xp-lost { color: var(--accent); font-weight: 700; }
+.xp-won  { color: var(--gold); font-weight: 700; }
+.xp-none { color: var(--dim); }
+.xp-table td .xp-won { margin-left: 0.4em; }   /* lost and won apart: "6 11", not "611" */
+
 /* Villain Guide sheet: a heading per section, card names in their type color. */
 .guide-title { margin: 16px 0 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .guide-title:first-child { margin-top: 0; }
@@ -395,16 +407,12 @@ a.pace-dot:hover { transform: scale(1.3); }
 
 /* Villain Movers (ui.js moverImgHTML): the villain page's, beside the portrait
    and the name (not zoomable); the game in progress's row, at one common scale
-   so they compare as on the table; a player's compact collection, the villains
-   not played yet faded. */
+   so they compare as on the table. */
 .mover { display: block; flex: none; }
 .cs-mover { height: 40px; width: auto; }
 .live-movers { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 8px; margin-top: 14px; }
 /* One scale for all: six of the widest still fit a phone's line. */
 .live-movers .mover { zoom: 0.32; }
-.pf-movers { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3px; margin-bottom: 1.25rem; }
-.pf-movers .mover { height: 22px; width: auto; }
-.pf-movers .mover.off { opacity: 0.25; filter: grayscale(1); }
 
 /* ── LIVE GAME PANEL ──────────────────────────────────────────────── */
 .live-status {

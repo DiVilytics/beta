@@ -18,6 +18,10 @@ let _lastAuthId;                    // last auth user id the slots were rendered
 let liveTimerId     = null;        // 1s clock ticker
 let _saveIntervalId = null;        // 30s background-persist
 let _turnBumped     = false;       // + or − used since the last start (see stopLive)
+// The rounds count for this game: + or − used at some point, or rounds already
+// set before it started. Otherwise Pause leaves them empty (a game timed without
+// the counter isn't one round long). Kept with the game in progress.
+let _roundsCounted  = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
@@ -805,7 +809,8 @@ function _renderTurnCount() {
 function bumpTurn(delta) {
   if (delta < 0 && liveGame.turns <= 1) return;   // round 1 is the lowest (also from the lock screen)
   if (delta > 0 && soloMode && liveGame.turns >= SOLO_MAX_TURNS) return;
-  _turnBumped = true;
+  _turnBumped    = true;
+  _roundsCounted = true;
   liveGame.bumpTurns(delta);
   _renderTurnCount();
   if (!liveTimerId) {
@@ -842,8 +847,10 @@ function startLive() {
   if (!resuming) _setDateToNow();
 
   // The counter shows the current round: a new game starts at 1, a resumed one
-  // carries on from its rounds.
-  liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 1);
+  // carries on from its rounds (and rounds set before the start count).
+  const rounds = parseInt(document.getElementById('fTurns').value);
+  liveGame.setTurns(rounds || 1);
+  if (rounds) _roundsCounted = true;
   _turnBumped = false;
   _renderTurnCount();
 
@@ -865,10 +872,11 @@ function stopLive() {
   const ms = liveGame.elapsedMs;
   // Paused within the first minute without + or −: most likely an accidental
   // start, so duration and rounds stay as they were (empty) instead of "1 min"
-  // and "1 round". The exact time is kept, so Resume carries on from it.
+  // and "1 round". The exact time is kept, so Resume carries on from it. The
+  // rounds only when the counter was used (_roundsCounted).
   if (ms >= 60000 || _turnBumped) {
-    document.getElementById('fDur').value   = Math.max(1, Math.round(ms / 60000));
-    document.getElementById('fTurns').value = liveGame.turns;
+    document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
+    if (_roundsCounted) document.getElementById('fTurns').value = liveGame.turns;
   }
   liveGame.markStopped(ms);
 
@@ -886,6 +894,7 @@ function _saveLiveState() {
   liveGame.persist({
     slots:     orderSlots,
     solo:      soloMode,
+    roundsCounted: _roundsCounted,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
@@ -961,6 +970,7 @@ function _doDiscard() {
   slotTimers = {};
   orderSlots = [];
   soloMode   = false;
+  _roundsCounted = false;
   addOrderSlot();
   addOrderSlot();
 
@@ -1001,6 +1011,8 @@ function _checkResume() {
     isWinner: !!s.isWinner,
   }));
   soloMode   = !!state.solo;
+  // Games saved before the flag: the counter was used if it moved past 1.
+  _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
   renderOrderSlots();
 
   if (state.liveStart) {

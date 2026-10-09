@@ -281,6 +281,28 @@ const _addXp = (rows, xp) => lbTab === 'players'
   ? rows.map(r => ({ ...r, xp: xp[r.nickname]?.xp || 0, xpAch: xp[r.nickname]?.ach || 0 }))
   : rows;
 
+// The XP table (XP table ›, under the explanation): what one game gives, C +
+// (C - 1) * W, by table size (rows) and players who claimed their villain, you
+// included (columns), lost in purple and won in gold; a size can't have more
+// claims than players.
+function openXpTable() {
+  const claims = [1, 2, 3, 4, 5, 6];
+  const cell = (size, c) => c > size
+    ? '<td class="xp-none">-</td>'
+    : `<td><span class="xp-lost">${c}</span> <span class="xp-won">${2 * c - 1}</span></td>`;
+  document.getElementById('xpBody').innerHTML = `
+    <p class="modal-hint">${t('The XP of one game, by table size and players who claimed their villain: <span class="xp-lost">lost</span> and <span class="xp-won">won</span>.')}</p>
+    <table class="xp-table">
+      <thead>
+        <tr><th></th><th colspan="${claims.length}">${t('Players who claimed, you included')}</th></tr>
+        <tr><th></th>${claims.map(c => `<th>${c}</th>`).join('')}</tr>
+      </thead>
+      <tbody>${TABLE_SIZES.map(size => `<tr><th>${size}p</th>${claims.map(c => cell(size, c)).join('')}</tr>`).join('')}</tbody>
+    </table>
+    <p class="modal-hint">${t('Plus 1 XP for each achievement.')}</p>`;
+  openOverlay('xpOverlay');
+}
+
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
 function render({ rows, summary }) {
@@ -328,7 +350,7 @@ function render({ rows, summary }) {
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo })}
     ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')}</p>` : ''}
+    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
       headLabel:   isChar ? t('Villain') : t('Player'),

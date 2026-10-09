@@ -203,38 +203,6 @@ function _friendsSectionHTML() {
     <div class="pf-friends">${rows}</div>`;
 }
 
-// Every villain's mover in release order, in color once this player has played
-// it (official games, all time, like the achievements), faded otherwise: a
-// compact collection. Not on Solo.
-function _moversSectionHTML() {
-  const played = new Set(pfPlayers.filter(p => p.nickname === pfNick).map(p => p.character));
-  if (!pfAllChars.length) return '';
-  const n = pfAllChars.filter(c => played.has(c.name)).length;
-  return `
-    <div class="pf-games-header"><span class="pf-games-title">${t('Movers')} | ${n} / ${pfAllChars.length}</span></div>
-    <div class="pf-movers">${pfAllChars.map(c => moverImgHTML(c.name, played.has(c.name) ? '' : 'off')).join('')}</div>`;
-}
-
-// The achievements: the earned ones, or every one with Show all (the pill in
-// their header, like Wins only on the games).
-function _achievementsHTML() {
-  return achievementsSectionHTML({
-    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
-    onlyEarned: !pfAchAll,
-    header: (earned, total) => `
-      <div class="pf-games-header">
-        <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
-        <button class="pill${pfAchAll ? ' on' : ''}" onclick="pfToggleAchAll()" type="button">${t('Show all')}</button>
-      </div>`,
-  });
-}
-
-function pfToggleAchAll() {
-  pfAchAll = !pfAchAll;
-  const box = document.getElementById('pfAch');
-  if (box) box.innerHTML = _achievementsHTML();
-}
-
 // ── CONTROLS ──────────────────────────────────────────────────────────────────
 
 function pfSetMode(m) {
@@ -354,7 +322,6 @@ function render() {
 
   const soloHint = solo ? soloHintHTML() : '';
   const friends  = solo ? '' : _friendsSectionHTML();
-  const movers   = solo ? '' : _moversSectionHTML();
 
   // No games: the sentence takes the place of the stats, the filters stay. A
   // player who never played has no achievements to show either.
@@ -407,8 +374,6 @@ function render() {
     })}
 
     ${friends}
-
-    ${movers}
 
     ${achHTML}
 
