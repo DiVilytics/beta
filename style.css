@@ -641,14 +641,9 @@ main {
    its hint right below. "With these" picks villains that must all be at the
    table, so the pace and My-boxes tools (which shape a pool) step aside. */
 .filter-char-panel.with-mode .gl-only { display: none; }
-/* Solo (game-log.js): just the villains, one picked by tapping; no mode, no
-   hint, and Reset on the top line beside Done (the actions row goes). */
-.filter-char-panel.solo-mode #glCharMode,
-.filter-char-panel.solo-mode #glFilterHint,
-.filter-char-panel.solo-mode .filter-actions,
-.filter-char-panel:not(.solo-mode) .gl-solo-only { display: none; }
-/* One villain at a time: a box name doesn't pick its whole box. */
-.filter-char-panel.solo-mode .box-name { pointer-events: none; }
+/* Solo, With these (game-log.js): one villain at a time, so a box name doesn't
+   pick its whole box. */
+.filter-char-panel.solo-mode.with-mode .box-name { pointer-events: none; }
 .txt-btn {
   font-family: inherit;
   font-size: calc(12px * var(--ts));
