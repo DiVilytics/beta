@@ -10,7 +10,7 @@ let glFilterLocation = null;
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
 // time / Year / Month (period-filter.js): any change reloads. Solo lists the
 // solo games only (solo.js), never with the others.
-const size   = createSizeFilter('glSize', { onChange: () => { _syncSoloFilter(); load(true); } });
+const size   = createSizeFilter('glSize', { onChange: () => { _capWithPicks(); _syncCharModeUI(); load(true); } });
 const period = createPeriodFilter('glPeriod', { onChange: () => load(true) });
 
 // Villain filter mode. 'only': games played entirely within the included set
@@ -22,13 +22,12 @@ const period = createPeriodFilter('glPeriod', { onChange: () => load(true) });
 let glCharMode     = 'only';
 let _onlySnapshot  = null;
 
-// Solo keeps a villain filter of its own, the same one (Among these, With
-// these, pace, My boxes): the official filter is set aside meanwhile and comes
-// back on leaving Solo, and the solo one comes back on returning to it. A solo
-// game has one villain, so With these picks one at a time (another pick
-// replaces it).
-let _officialFilter = null;   // the official filter while on Solo: { charMode, onlySnapshot, pace }
-let _soloFilter     = null;   // the solo one while off Solo (null: not used yet, starts fresh)
+// With these picks at most as many villains as the table holds: 6, the size
+// picked (2p…6p), or 1 on Solo (a solo game has one villain). At the limit the
+// other villains gray out; a smaller limit keeps the villains picked first.
+// The same filter serves the official games and Solo.
+const _withLimit = () => size.isSolo() ? 1 : typeof size.value() === 'number' ? size.value() : TABLE_SIZES[TABLE_SIZES.length - 1];
+let _withOrder = [];   // With these: the picked villains, in the order they were picked
 
 // The "included characters" filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -72,7 +71,7 @@ async function init() {
     glChars,
     pace.excluded,
     (name, excluded) => {   // a single villain tapped in or out
-      if (size.isSolo() && glCharMode === 'with' && !excluded) _soloPickOnly(name);
+      if (!excluded) _capWithPicks();   // a box name can pick past the limit: not the extra ones
       updateFilterUI();
       _syncResetBtn();
     },
@@ -82,8 +81,6 @@ async function init() {
   const saved = takeViewState();
   if (saved) {
     size.set(saved.count);
-    _officialFilter = saved.officialFilter || null;
-    _soloFilter     = saved.soloFilter || null;
     glFilterLocation = saved.location;
     if (glFilterLocation) document.getElementById('locationSearchInput').value = glFilterLocation;
     period.set(saved.period);
@@ -94,7 +91,7 @@ async function init() {
   }
   keepViewState(() => ({
     count: size.value(), location: glFilterLocation, period: period.get(),
-    charMode: glCharMode, onlySnapshot: _onlySnapshot, officialFilter: _officialFilter, soloFilter: _soloFilter,
+    charMode: glCharMode, onlySnapshot: _onlySnapshot,
     pace: _paceState(),
     loaded: glGames.length,
   }));
@@ -175,7 +172,7 @@ async function load(reset = true) {
 
 // Solo (solo.js): every solo game is loaded at once (they're few), then
 // filtered and paged here. Among these keeps the games of an included villain,
-// With these the picked villain's (none picked: every game).
+// With these the picked villain's (one at most; none picked: every game).
 async function _loadSolo(reset, token) {
   const solo = await loadSoloGames();
   if (token !== _loadToken) return;
@@ -214,6 +211,9 @@ function toggleCharFilter() {
 // when the panel closes (Done or the toggle), so toggling characters never
 // reloads mid-edit.
 function updateFilterUI() {
+  // With these at its limit: the villains not picked gray out.
+  _syncWithOrder();
+  document.getElementById('charFilterPanel').classList.toggle('with-capped', glCharMode === 'with' && _withOrder.length >= _withLimit());
   // The toggle sums the filter up: "Villains | among 12" or "Villains | with
   // Ursula, Jafar" (names up to two, then a count); nothing after it when off.
   const picked = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
@@ -240,35 +240,23 @@ async function _probeWithMode() {
   setVisible('glCharMode', !error);
 }
 
-// Solo, With these: picking a villain drops the one picked before.
-function _soloPickOnly(name) {
-  pace.restoreState({ ..._paceState(), excluded: glChars.map(c => c.name).filter(n => n !== name) });
-}
-
 // The filter's state, to set aside and bring back.
-const _paceState   = () => ({ excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn });
-const _filterState = () => ({ charMode: glCharMode, onlySnapshot: _onlySnapshot, pace: _paceState() });
-function _applyFilterState(f) {
-  glCharMode    = f.charMode;
-  _onlySnapshot = f.onlySnapshot;
-  pace.restoreState(f.pace);
+const _paceState = () => ({ excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn });
+
+// Keeps _withOrder in step with the picks (a new pick goes last).
+function _syncWithOrder() {
+  if (glCharMode !== 'with') { _withOrder = []; return; }
+  const picked = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
+  _withOrder = _withOrder.filter(n => picked.has(n));
+  for (const n of picked) if (!_withOrder.includes(n)) _withOrder.push(n);
 }
 
-// Into Solo: the official filter goes aside and the solo one comes back (the
-// first time, a fresh one: Among these, every villain in). Out of it, the other
-// way round.
-function _syncSoloFilter() {
-  const solo = size.isSolo();
-  if (solo && !_officialFilter) {
-    _officialFilter = _filterState();
-    _applyFilterState(_soloFilter || { charMode: 'only', onlySnapshot: null, pace: {} });
-    _soloFilter = null;
-  } else if (!solo && _officialFilter) {
-    _soloFilter = _filterState();
-    _applyFilterState(_officialFilter);
-    _officialFilter = null;
-  }
-  _syncCharModeUI();
+// With these: down to the limit, keeping the villains picked first.
+function _capWithPicks() {
+  _syncWithOrder();
+  if (_withOrder.length <= _withLimit()) return;
+  const keep = new Set(_withOrder.slice(0, _withLimit()));
+  pace.restoreState({ ..._paceState(), excluded: glChars.map(c => c.name).filter(n => !keep.has(n)) });
 }
 
 function glSetCharMode(mode) {
@@ -287,12 +275,11 @@ function glSetCharMode(mode) {
 function _syncCharModeUI() {
   const withMode = glCharMode === 'with';
   document.getElementById('charFilterPanel').classList.toggle('with-mode', withMode);
-  document.getElementById('charFilterPanel').classList.toggle('solo-mode', size.isSolo());
   document.querySelectorAll('#glCharMode .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === glCharMode));
   // What the mode does, its key words in bold (static strings, so innerHTML is safe).
   const solo = size.isSolo();
   document.getElementById('glFilterHint').innerHTML = withMode
-    ? (solo ? t('Shows the solo games of the <strong>selected</strong> villain, one at a time (a solo game has only one).')
+    ? (solo ? t('Shows the solo games of the <strong>selected</strong> villain (a solo game has only one).')
             : t('Shows games played with <strong>at least</strong> the selected villains (others can play too).'))
     : (solo ? t('Shows the solo games of the <strong>included</strong> villains.')
             : t('Shows games played <strong>only</strong> among the included villains (not necessarily all of them).'));

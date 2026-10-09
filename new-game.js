@@ -303,8 +303,10 @@ function _setSolo(on) {
 
 // What only Solo shows (what the variant is, its live hint and the 20 rounds)
 // and what it hides: Random order and Draw villains (one villain: its 🎲 does
-// it), + Add player, and the row's ❌ and 👤 (the villain is yours).
+// it), + Add player, and the row's ❌ and 👤 (the villain is yours). The one
+// row can't be dragged: its ⠿ grays out.
 function _syncSoloUI() {
+  document.getElementById('orderSlots')?.classList.toggle('solo', soloMode);
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
@@ -700,7 +702,7 @@ function _initDrag() {
 
   container.addEventListener('pointerdown', e => {
     const handle = e.target.closest('.drag-handle');
-    if (!handle || _dragSrc) return;
+    if (!handle || _dragSrc || soloMode) return;   // Solo: one row, nothing to reorder
     // Not mid-draw or mid-shuffle: those animations write into the rows and set
     // the order themselves when they settle, which would undo the drag.
     if (_shuffleTimer || Object.keys(slotTimers).length) { e.preventDefault(); return; }

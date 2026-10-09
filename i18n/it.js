@@ -618,7 +618,7 @@ window.I18N.it = {
     "A variant by {author}, from {link}.": "Una variante di {author}, da {link}.",
     "Nothing in the solo rules matches “{query}”.": "Nessuna regola del solitario corrisponde a “{query}”.",
     "Search the solo rules…": "Cerca nelle regole del solitario…",
-    "Shows the solo games of the <strong>selected</strong> villain, one at a time (a solo game has only one).": "Mostra le partite in solitario del cattivo <strong>selezionato</strong>, uno alla volta (una partita in solitario ne ha uno solo).",
+    "Shows the solo games of the <strong>selected</strong> villain (a solo game has only one).": "Mostra le partite in solitario del cattivo <strong>selezionato</strong> (una partita in solitario ne ha uno solo).",
     "Shows the solo games of the <strong>included</strong> villains.": "Mostra le partite in solitario dei cattivi <strong>inclusi</strong>.",
   },
 

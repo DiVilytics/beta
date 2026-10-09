@@ -641,9 +641,9 @@ main {
    its hint right below. "With these" picks villains that must all be at the
    table, so the pace and My-boxes tools (which shape a pool) step aside. */
 .filter-char-panel.with-mode .gl-only { display: none; }
-/* Solo, With these (game-log.js): one villain at a time, so a box name doesn't
-   pick its whole box. */
-.filter-char-panel.solo-mode.with-mode .box-name { pointer-events: none; }
+/* With these at its limit, as many villains as the table holds (game-log.js):
+   the villains not picked gray out. */
+.filter-char-panel.with-mode.with-capped .char-pill.excluded { opacity: 0.35; pointer-events: none; }
 .txt-btn {
   font-family: inherit;
   font-size: calc(12px * var(--ts));
@@ -1232,6 +1232,9 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 /* Mid-draw / mid-shuffle the rows can't be dragged (new-game.js): ⠿ grays out. */
 #orderSlots.busy .drag-dots { color: var(--dim); opacity: 0.5; }
 #orderSlots.busy .drag-handle { cursor: not-allowed; }
+/* Solo (new-game.js): one row, never dragged. */
+#orderSlots.solo .drag-dots { color: var(--dim); opacity: 0.5; }
+#orderSlots.solo .drag-handle { cursor: default; }
 
 .pf-btn.me.on {
   background: var(--accent-d);
