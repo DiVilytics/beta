@@ -595,6 +595,7 @@ window.I18N.it = {
     "Couldn't load the leaderboard.": "Impossibile caricare la classifica.",
     "Fewer than {n} games": "Meno di {n} partite",
     "Ranked only with at least {n} games.": "In classifica solo con almeno {n} partite.",
+    "Grayed out: fewer than {n} games.": "In grigio: meno di {n} partite.",
     "Only opponents faced in at least {n} games.": "Solo avversari affrontati in almeno {n} partite.",
     "<span class=\"tut-ico\">⚙️</span> Theme, text size and language": "<span class=\"tut-ico\">⚙️</span> Tema, dimensione del testo e lingua",
     "Tap <span class=\"tut-ico\">⚙️</span> in the top bar to choose the theme (<em>Auto</em> follows your device, or <em>Light</em> and <em>Dark</em>), the text size (<em>Small</em> or <em>Large</em>) and the language (English or Italiano).<br><br>On a computer, press <strong>?</strong> to see the keyboard shortcuts: a key for every page and setting.": "Tocca <span class=\"tut-ico\">⚙️</span> nella barra in alto per scegliere il tema (<em>Auto</em> segue il dispositivo, oppure <em>Chiaro</em> e <em>Scuro</em>), la dimensione del testo (<em>Piccolo</em> o <em>Grande</em>) e la lingua (English o Italiano).<br><br>Da computer, premi <strong>?</strong> per vedere le scorciatoie da tastiera: un tasto per ogni pagina e impostazione.",

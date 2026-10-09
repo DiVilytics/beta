@@ -319,9 +319,12 @@ function render() {
   // The bars scale to the largest official row, as everywhere; Solo has no bar
   // (it's not measured against the official games).
   const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
+  // In % Wins, a row with fewer than MIN_GAMES_FOR_PCT games is grayed out, as
+  // on the Leaderboard (stats-table.js).
+  const few = b => csMode === 'pct' && b.games < MIN_GAMES_FOR_PCT;   // none at all, too
   // Gold, as in the rankings, for the best table size (ties share it): not
-  // Overall, their total, which would always lead the counts.
-  const sizeVals = rows.filter(r => r.key !== 'all' && stats(r.key).games).map(r => statValue(stats(r.key), csMode));
+  // Overall, their total, which would always lead the counts, nor a grayed row.
+  const sizeVals = rows.filter(r => r.key !== 'all' && stats(r.key).games && !few(stats(r.key))).map(r => statValue(stats(r.key), csMode));
   const best     = sizeVals.length ? Math.max(...sizeVals) : 0;
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
@@ -334,14 +337,14 @@ function render() {
     const b       = stats(key);
     const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
     const dispVal = b.games ? statCellHTML(b, csMode) : '-';
-    const gold    = typeof key === 'number' && b.games && best > 0 && statValue(b, csMode) === best;
+    const gold    = typeof key === 'number' && b.games && !few(b) && best > 0 && statValue(b, csMode) === best;
     const bar     = key === 'solo' ? '' : `
           <div class="bar-bg">
             <div class="bar-fill${gold ? ' gold' : ''}" style="width:${barW}%"></div>
           </div>`;
     const arg     = typeof key === 'number' ? key : `'${key}'`;
     return `
-      <div class="lb-row cs-row${csRow === key ? ' on' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
+      <div class="lb-row cs-row${csRow === key ? ' on' : ''}${!csLoading && few(b) ? ' lb-row-unranked' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
            onclick="csSelectRow(${arg})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();csSelectRow(${arg})}">
         <div class="row-label">${label}</div>
         <div class="bar-cell">${bar}</div>
@@ -360,6 +363,7 @@ function render() {
       ])}
     </div>
     ${statModeSegHTML(csMode, 'csSetMode')}
+    ${!csLoading && keys.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
     <div class="lb-table cs-table" style="${widths}">
       <div class="lb-head">
         <span>${t('Players')}</span>

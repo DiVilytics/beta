@@ -14,6 +14,13 @@ function statBoxesHTML(boxes) {
   ).join('');
 }
 
+// A character/player with only a couple of games can sit at 100% (or 0%) win
+// rate purely by small-sample noise. In % Wins they're grayed out: listed after
+// everyone else, unranked, on the Leaderboard; dimmed, without the gold bar, in
+// a villain's table (raw # Wins / # Games stay unaffected, a low count there
+// isn't misleading the same way). Intentionally not user-configurable.
+const MIN_GAMES_FOR_PCT = 5;
+
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
 // the part from achievements, shown in parentheses instead of the games)

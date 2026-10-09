@@ -23,12 +23,6 @@ const period = createPeriodFilter('lbPeriod', {
 const LB_PAGE_SIZE = 35;
 let lbDisplayLimit = LB_PAGE_SIZE;
 
-// A character/player with only a couple of games can sit at 100% (or 0%) win
-// rate purely by small-sample noise; in the percentage ranking they're listed
-// after everyone else, unranked (raw # Wins / # Games stay unaffected, a low
-// count there isn't misleading the same way). Intentionally not user-configurable.
-const MIN_GAMES_FOR_PCT = 5;
-
 // Cache: key `${lbTab}:${size}:${period.id()}` → { rows, summary }. Avoids
 // re-fetching when only the sort lbMode changes, or when going back to a
 // period already seen.
@@ -309,7 +303,7 @@ function render({ rows, summary }) {
   // % Wins only: a 1-2 game sample can sit at 100% (or 0%) purely by noise, so
   // those rows follow the ranking under a divider, unranked. # Wins / # Games
   // rank everyone, a low count there isn't misleading the same way.
-  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : 0;
+  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : 0;   // stats-table.js
   // Registered players who never played have no % at all: only in the counts.
   if (mode === 'pct') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
