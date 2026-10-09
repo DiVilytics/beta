@@ -21,7 +21,7 @@ const CLAIM_ERRORS = {
   no_profile:      'You need a nickname before you can claim a villain.',
   not_your_seat:   "This villain isn't yours to release.",
   not_creator:     'Only the player who recorded the game can change it.',
-  lineup_locked:   'Another player has claimed a villain: the lineup can no longer be changed.',
+  lineup_locked:   'Another player has claimed a villain: the villains and the winner can no longer be changed.',
   invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
   solo_seat:       'A solo game is always its creator\'s.',
 };
@@ -158,7 +158,7 @@ function render() {
     </div>
     <div class="claim-share-row">
       ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
-      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit lineup')}</button>` : ''}
+      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${_lineupLabel()}</button>` : ''}
       ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
     <div class="section-label">${solo ? t('Player') : t('Players')}</div>
@@ -176,6 +176,10 @@ function _playedAsHTML(seat, solo) {
     ? t('You won this solo game with {villain}.', { villain })
     : t('You lost this solo game with {villain}.', { villain });
 }
+
+// The button and its sheet say what they change: the villains and the winner
+// (in a solo game, its one villain and whether it won).
+const _lineupLabel = () => claimIsSolo() ? t('Edit villain and winner') : t('Edit villains and winner');
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
@@ -331,6 +335,7 @@ async function editLineup() {
   if (!lineupEditable(getCurrentUser())) return;
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
+  document.getElementById('lineupTitle').textContent = _lineupLabel();
   document.getElementById('lineupHint').textContent = claimIsSolo()
     ? t('Change your villain, and whether you won (👑) or lost.')
     : t('You can change the villains and the winner until another player claims a villain.');

@@ -110,12 +110,12 @@
   </div>
 </div>
 
-<!-- Edit lineup sheet: the creator, until another player claims a villain -->
+<!-- Edit villains and winner: the creator, until another player claims a villain -->
 <div class="overlay" id="lineupOverlay" onclick="if(event.target===this) closeLineup()">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 data-i18n>Edit lineup</h3>
+      <h3 id="lineupTitle" data-i18n>Edit villains and winner</h3>
       <button class="sheet-close" onclick="closeLineup()">×</button>
     </div>
     <div class="sheet-body">

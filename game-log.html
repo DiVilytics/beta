@@ -75,6 +75,8 @@
           <button class="seg-btn on" type="button" data-mode="only" onclick="glSetCharMode('only')" title="Games whose villains are all among the selected ones" data-i18n data-i18n-attr="title">Among these</button>
           <button class="seg-btn"    type="button" data-mode="with" onclick="glSetCharMode('with')" title="Games with all the selected villains at the table" data-i18n data-i18n-attr="title">With these</button>
         </div>
+        <!-- Solo: Reset up here, beside Done (its villain filter has nothing else). -->
+        <button class="btn btn-ghost btn-sm gl-solo-only" id="glResetBtnSolo" type="button" onclick="glResetFilter()" disabled data-i18n>Reset</button>
         <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyCharFilter()" data-i18n>Done</button>
       </div>
       <p class="gl-filter-hint" id="glFilterHint" data-i18n>Shows games played <strong>only</strong> among the included villains (not necessarily all of them).</p>

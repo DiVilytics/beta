@@ -22,7 +22,7 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
 const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
-const SOLO_LEGEND_ITEMS = [t('👑 = winner')];   // Solo: the row's only button
+const SOLO_LEGEND_ITEMS = [t('🎲 = draw'), t('👑 = winner')];   // Solo: the row's two buttons
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -302,12 +302,13 @@ function _setSolo(on) {
 }
 
 // What only Solo shows (what the variant is, its live hint and the 20 rounds)
-// and what it hides: Random order, + Add player, and every row button but 👑
-// (one villain: Draw villain does what its 🎲 would, and the villain is yours).
+// and what it hides: Random order and Draw villains (one villain: its 🎲 does
+// it), + Add player, and the row's ❌ and 👤 (the villain is yours).
 function _syncSoloUI() {
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
+  setVisible('drawAllBtn', !soloMode);
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
@@ -552,8 +553,8 @@ function renderOrderSlots() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          ${soloMode ? '' : `
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          ${soloMode ? '' : `
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
@@ -649,9 +650,7 @@ function _updateActionBtns() {
     if (drawAllBtn) drawAllBtn.disabled = true;
     document.querySelectorAll('.order-slot .pf-btn.rand').forEach(b => { b.disabled = true; });
   } else if (drawAllBtn) {
-    const label = soloMode
-      ? (_drawMode() === 'redraw' ? t('Redraw villain') : t('Draw villain'))
-      : { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all') }[_drawMode()];
+    const label = { all: t('Draw villains'), rest: t('Draw the rest'), redraw: t('Redraw all') }[_drawMode()];
     const can   = !chars.length || _canDrawAll();   // chars still loading: don't flash it disabled
     _setBtnLabel(drawAllBtn, label);
     drawAllBtn.disabled = animating || !can;

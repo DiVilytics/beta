@@ -23,10 +23,10 @@ let glCharMode     = 'only';
 let _onlySnapshot  = null;
 
 // Solo has a villain filter of its own: just the villains, none picked at first
-// (every solo game), a tap picks one, and the list keeps the games of the
-// picked villains (one villain per game: no among / with, no pace or boxes).
-// It's the 'with' grid without its controls (.solo-mode); the official filter
-// is set aside meanwhile and comes back on leaving Solo.
+// (every solo game); a tap picks one, and only one (picking another moves the
+// pick), and the list keeps that villain's games. It's the 'with' grid without
+// its controls (.solo-mode), Reset beside Done; the official filter is set
+// aside meanwhile and comes back on leaving Solo.
 let _officialFilter = null;   // { charMode, onlySnapshot, pace } while on Solo
 
 // The "included characters" filter (excluded set + pace + My-boxes) lives in the
@@ -70,7 +70,11 @@ async function init() {
     document.getElementById('charGrid'),
     glChars,
     pace.excluded,
-    () => { updateFilterUI(); _syncResetBtn(); },   // a single villain tapped in or out
+    (name, excluded) => {   // a single villain tapped in or out
+      if (size.isSolo() && !excluded) _soloPickOnly(name);
+      updateFilterUI();
+      _syncResetBtn();
+    },
     glBoxInfo
   );
   // A language switch brings back the filters and the games loaded (lang.js).
@@ -235,6 +239,11 @@ async function _probeWithMode() {
   setVisible('glCharMode', !error);
 }
 
+// Solo: picking a villain drops the one picked before.
+function _soloPickOnly(name) {
+  pace.restoreState({ ..._paceState(), excluded: glChars.map(c => c.name).filter(n => n !== name) });
+}
+
 // The filter's state, to set aside and bring back.
 const _paceState = () => ({ excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn });
 
@@ -298,9 +307,11 @@ function glExcludeAll()      { pace.excludeAll(); }
 function glResetFilter()     { if (glCharMode === 'with') pace.excludeAll(); else pace.resetToStart(); }
 // Reset is off while the filter is already at its start.
 function _syncResetBtn() {
-  const btn = document.getElementById('glResetBtn');
-  if (!btn) return;
-  btn.disabled = glCharMode === 'with' ? pace.excluded.size >= glChars.length : pace.isDefault();
+  const off = glCharMode === 'with' ? pace.excluded.size >= glChars.length : pace.isDefault();
+  for (const id of ['glResetBtn', 'glResetBtnSolo']) {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = off;
+  }
 }
 
 function showErr(msg) {
