@@ -278,6 +278,55 @@
       ]
     }
   },
+  "solo": {
+    "title": "Variante in solitario (non ufficiale)",
+    "desc": "Un Cattivo contro il gioco",
+    "intro": "Un modo di giocare da soli, ideato da un giocatore e non dagli autori del gioco: la variante in solitario \"Quarantine\" di Matt Lowder (2020), riassunta con parole nostre. Tutto quello che non è indicato qui funziona come nel regolamento ufficiale.",
+    "author": "Matt Lowder",
+    "url": "https://boardgamegeek.com/thread/2399439/villainous-quarantine-solo-variant",
+    "groups": [
+      {
+        "title": "La variante",
+        "items": [
+          { "term": "Come funziona", "text": "Giochi un Cattivo contro il gioco. Senza avversari, un tiro di dado alla fine di ogni turno decide quando colpisce il tuo Mazzo Fato. Una partita dura circa 20 minuti." },
+          { "term": "Vincere e perdere", "text": "Hai 20 turni. Se raggiungi il tuo Obiettivo entro la fine del turno 20 vinci, altrimenti perdi. Da soli ogni turno è un round, quindi una partita in solitario dura al massimo 20 round." },
+          { "term": "Cosa serve", "text": "Il tuo Cattivo come in una partita normale, un dado a 10 facce (o due dadi a 6 facce) e un modo per contare i turni, per esempio un dado a 20 facce o un contatore." }
+        ]
+      },
+      {
+        "title": "Preparazione e turni",
+        "items": [
+          { "term": "Preparazione", "text": "Prepara il tuo Cattivo come al solito, ma inizia con 1 Potere. Pesca le tue quattro carte e gioca il primo turno." },
+          { "term": "Fine del turno", "text": "Pesca fino ad avere quattro carte, tira per il Fato (vedi sotto), poi conta un turno in meno e inizia il successivo." }
+        ]
+      },
+      {
+        "title": "Il Fato",
+        "items": [
+          { "term": "Il tiro del Fato", "text": "Alla fine di ogni turno tira il dado a 10 facce: con 1, 2, 3 o 4 subisci il Fato (40% di probabilità)." },
+          { "term": "Luoghi con il Fato", "text": "Senza avversari da bersagliare, il simbolo Fato cambia funzione: se la tua Pedina è in un Luogo con il simbolo Fato, subisci il Fato solo con 1 o 2 (20%)." },
+          { "term": "Subire il Fato", "text": "Rivela le prime due carte del tuo Mazzo Fato, gioca quella che ti danneggia di più e scarta l'altra." },
+          { "term": "Due dadi a 6 facce", "text": "Somma i dadi: subisci il Fato con 7, 8 o 9 (circa 41%), oppure solo con 9 o 10 (circa 19%) in un Luogo con il simbolo Fato. Un dado a 10 facce rispetta meglio le probabilità previste." },
+          { "term": "Quasi vinta", "text": "Se alla fine di un turno vedi che vincerai di sicuro al turno successivo, subisci il Fato automaticamente, ma riveli e giochi una sola carta Fato." }
+        ]
+      },
+      {
+        "title": "Le Condizioni",
+        "items": [
+          { "term": "Regola originale", "text": "Senza avversari che le attivino, le tue Condizioni le attivi tu: quando durante il tuo turno si verifica il requisito di una Condizione, scartala e fai quello che dice. Alla fine di quel turno pesca fino ad avere tre carte invece di quattro (due se hai attivato due Condizioni), come se avessi giocato una carta fuori dal tuo turno." },
+          { "term": "Regola alternativa", "text": "Un'opzione più semplice, proposta in seguito e preferita dall'autore: puoi giocare una Condizione dalla mano quando il tiro di fine turno è da 7 a 10." },
+          { "term": "Cattivi più recenti", "text": "La variante è nata con i primi Cattivi: per le Condizioni uscite dopo, accordatevi su una regola della casa che vi sembri giusta." }
+        ]
+      },
+      {
+        "title": "Su DiVilytics",
+        "items": [
+          { "term": "Registrare una partita in solitario", "text": "In Nuova partita scegli Solitario nel menu dei giocatori, scegli il tuo Cattivo e poi Vinta o Persa. I round sono i turni che hai giocato (20 se hai perso)." },
+          { "term": "Statistiche separate", "text": "Le partite in solitario non sono ufficiali, quindi non contano mai con le altre: né nelle classifiche, né nelle statistiche dei Cattivi, negli XP o nei traguardi. Hanno le loro, sotto il filtro tratteggiato Solitario della Classifica, del Registro e di ogni pagina di Cattivo e giocatore." }
+        ]
+      }
+    ]
+  },
   "general": [
     {
       "title": "Approfondimenti sulle regole base",

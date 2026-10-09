@@ -250,13 +250,14 @@ async function exportMyData() {
 
     // One row per player per game (not one row per game with player1/2/3…
     // columns), so every game's variable player count (2-6) fits without
-    // padding, and the file filters/pivots cleanly in a spreadsheet.
+    // padding, and the file filters/pivots cleanly in a spreadsheet. Solo games
+    // too, marked in their own column.
     const gameIds = [...new Set(gpAll.rows.map(r => r.game_id))];
-    const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true });
+    const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner'];
+    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo'];
     const rows = [header];
     for (const g of games) {
       const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
@@ -271,6 +272,7 @@ async function exportMyData() {
           p.character,
           p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
+          g.variant === 'solo' ? 'yes' : 'no',
         ]);
       }
     }

@@ -3,12 +3,15 @@
 // the topic menu, ?topic=<rulebook id> a rulebook (e.g. ?topic=rules),
 // ?topic=general the general rules and ?topic=<villain> one villain's entries.
 // The search box filters every entry across all topics; clearing it goes back
-// to that view.
+// to that view. ?topic=solo is the unofficial solo variant (solo.js), dashed:
+// apart from the rest, its entries are searched only from its own page, where
+// the box searches only them.
 
 const FAQ_GENERAL = 'general';
+const FAQ_SOLO    = 'solo';
 
 let faqData  = null;
-let faqTopic = null;   // null = menu | rulebook id | FAQ_GENERAL | villain name | undefined = unknown
+let faqTopic = null;   // null = menu | rulebook id | FAQ_GENERAL | FAQ_SOLO | villain name | undefined = unknown
 
 function _faqHref(topic) {
   return `faq.html?topic=${encodeURIComponent(topic)}`;
@@ -19,6 +22,7 @@ function _faqHref(topic) {
 function _resolveTopic(raw) {
   if (!raw) return null;
   if (raw.toLowerCase() === FAQ_GENERAL) return FAQ_GENERAL;
+  if (raw.toLowerCase() === FAQ_SOLO && faqData.solo) return FAQ_SOLO;
   const base  = raw.toLowerCase();
   return Object.keys(_rulebooks()).find(id => id === base)
     || Object.keys(faqData.villains).find(v => v.toLowerCase() === base);
@@ -65,17 +69,17 @@ function _matches(item, section, terms) {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
-function _entryHTML(item, re) {
+function _entryHTML(item, re, solo = false) {
   return `
-    <div class="home-faq-item faq-item">
+    <div class="home-faq-item faq-item${solo ? ' faq-solo' : ''}">
       <strong>${_hl(item.term, re)}${item.villain ? `<span class="faq-vil"> | ${_hl(_entryVillains(item), re)}</span>` : ''}</strong>
       <span>${_hl(item.text, re)}</span>
       ${item.source ? `<span class="faq-src">${_esc(t('Source: {source}', { source: item.source }))}</span>` : ''}
     </div>`;
 }
 
-function _listHTML(items, re) {
-  return `<div class="home-faq-list">${items.map(it => _entryHTML(it, re)).join('')}</div>`;
+function _listHTML(items, re, solo = false) {
+  return `<div class="home-faq-list">${items.map(it => _entryHTML(it, re, solo)).join('')}</div>`;
 }
 
 // The villains with entries, sorted by their name in the current language.
@@ -94,6 +98,14 @@ function _menuHTML() {
           <span class="home-section-desc">${_esc(rb.desc)} (${tn(_countItems(rb.groups), '{n} entry', '{n} entries')})</span>
         </div>
       </a>`).join('')}
+    ${faqData.solo ? `
+    <a class="home-section-link faq-rulebook-link faq-solo-link" href="${_faqHref(FAQ_SOLO)}">
+      <span class="home-section-icon">🎲</span>
+      <div class="home-section-text">
+        <span class="home-section-name">${_esc(faqData.solo.title)}</span>
+        <span class="home-section-desc">${_esc(faqData.solo.desc)} (${tn(_countItems(faqData.solo.groups), '{n} entry', '{n} entries')})</span>
+      </div>
+    </a>` : ''}
     <a class="home-section-link faq-general-link" href="${_faqHref(FAQ_GENERAL)}">
       <span class="home-section-icon">⚖️</span>
       <div class="home-section-text">
@@ -117,12 +129,12 @@ function _menuHTML() {
 // menu…), or the topic menu when the page was opened cold.
 const _BACK_HTML = `<a class="back-link" href="faq.html" onclick="goBack('faq.html'); return false;">${t('← Back')}</a>`;
 
-function _groupsHTML(groups) {
+function _groupsHTML(groups, solo = false) {
   return groups.map(g => `
     <div class="faq-group">
       <h2 class="home-faq-title">${_esc(g.title)}</h2>
       ${g.intro ? `<p class="faq-group-intro">${_esc(g.intro)}</p>` : ''}
-      ${_listHTML(g.items, null)}
+      ${_listHTML(g.items, null, solo)}
     </div>`).join('');
 }
 
@@ -136,6 +148,38 @@ function _rulebookHTML(id) {
     <h2 class="faq-rulebook-title">${_esc(rb.title)}</h2>
     ${rb.intro ? `<p class="faq-rulebook-intro">${_esc(rb.intro)}</p>` : ''}
     ${_groupsHTML(rb.groups)}`;
+}
+
+// The solo variant: its entries dashed, then who made it, linked.
+function _soloCreditHTML() {
+  const sv = faqData.solo;
+  return `<p class="faq-credit">${t('A variant by {author}, from {link}.', { author: _esc(sv.author), link: `<a href="${_esc(sv.url)}" target="_blank" rel="noopener">BoardGameGeek</a>` })}</p>`;
+}
+
+function _soloHTML() {
+  const sv = faqData.solo;
+  return `${_BACK_HTML}
+    <h2 class="faq-rulebook-title">${_esc(sv.title)}</h2>
+    <p class="faq-rulebook-intro">${_esc(sv.intro)}</p>
+    ${_groupsHTML(sv.groups, true)}
+    ${_soloCreditHTML()}`;
+}
+
+// Searching from the solo page: its entries only.
+function _soloResultsHTML(q) {
+  const terms = _searchTerms(q);
+  const re    = _termsRegex(terms);
+  const groups = faqData.solo.groups
+    .map(g => ({ title: g.title, items: g.items.filter(it => _matches(it, `${faqData.solo.title} ${g.title}`, terms)) }))
+    .filter(g => g.items.length);
+  const total = groups.reduce((n, g) => n + g.items.length, 0);
+  const head  = `${_BACK_HTML}<h2 class="faq-rulebook-title">${_esc(faqData.solo.title)}</h2>`;
+  if (!total) return `${head}<div class="empty"><h3>${t('No results')}</h3><p>${t('Nothing in the solo rules matches “{query}”.', { query: _esc(q.trim()) })}</p></div>`;
+  return `${head}<p class="faq-count">${tn(total, '{n} result', '{n} results')}</p>` + groups.map(g => `
+    <div class="faq-group">
+      <h2 class="home-faq-title">${_esc(g.title)}</h2>
+      ${_listHTML(g.items, re, true)}
+    </div>`).join('');
 }
 
 function _villainHTML(v) {
@@ -181,9 +225,10 @@ function render() {
   const root = document.getElementById('faqRoot');
   root.className = '';
   const q = document.getElementById('faqSearchInput').value;
-  if (q.trim())                   root.innerHTML = _resultsHTML(q);
+  if (q.trim())                   root.innerHTML = faqTopic === FAQ_SOLO ? _soloResultsHTML(q) : _resultsHTML(q);
   else if (faqTopic === null)     root.innerHTML = _menuHTML();
   else if (faqTopic === FAQ_GENERAL) root.innerHTML = _generalHTML();
+  else if (faqTopic === FAQ_SOLO)    root.innerHTML = _soloHTML();
   else if (_rulebooks()[faqTopic])   root.innerHTML = _rulebookHTML(faqTopic);
   else if (faqTopic)              root.innerHTML = _villainHTML(faqTopic);
   else root.innerHTML = `${_BACK_HTML}<div class="empty"><h3>${t('Topic not found')}</h3><p>${_esc(new URLSearchParams(location.search).get('topic') || '')}</p></div>`;
@@ -205,11 +250,13 @@ async function init() {
 
   faqTopic = _resolveTopic((new URLSearchParams(location.search).get('topic') || '').trim());
   if (faqTopic === FAQ_GENERAL) document.title = `DiVilytics | F.A.Q. | ${t('General')}`;
+  else if (faqTopic === FAQ_SOLO) document.title = `DiVilytics | F.A.Q. | ${faqData.solo.title}`;
   else if (_rulebooks()[faqTopic]) document.title = `DiVilytics | F.A.Q. | ${_rulebooks()[faqTopic].title}`;
   else if (faqTopic)            document.title = `DiVilytics | F.A.Q. | ${villainName(faqTopic)}`;
 
   const input = document.getElementById('faqSearchInput');
   input.disabled = false;
+  if (faqTopic === FAQ_SOLO) input.placeholder = t('Search the solo rules…');
   // A language switch brings back the search (lang.js).
   input.value = takeViewState()?.search || '';
   keepViewState(() => ({ search: input.value }));

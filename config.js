@@ -10,10 +10,17 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // game-log and player profile both list game cards in batches of this size.
 const PAGE_SIZE = 20;
 
+// ── BETA ─────────────────────────────────────────────────────────────────────
+// The beta (divilytics.github.io/beta/, the next version tried out before it
+// replaces this one) shares the browser's storage with the site: its game in
+// progress and its New Game draft are kept under keys of their own.
+const IS_BETA       = location.pathname.startsWith('/beta/');
+const STORAGE_SCOPE = IS_BETA ? '_beta' : '';
+
 // ── LIVE GAME PERSISTENCE ────────────────────────────────────────────────────
 // Key under which an in-progress recorded game is parked in localStorage,
 // and how long a snapshot stays valid before we discard it as stale.
-const LIVE_GAME_KEY        = 'divilytics_live_game';
+const LIVE_GAME_KEY        = 'divilytics_live_game' + STORAGE_SCOPE;
 const LIVE_GAME_MAX_AGE_MS = 48 * 60 * 60 * 1000;   // 48h: a paused game since its last save, a running one since it started
 
 // ── STATIC DATA ──────────────────────────────────────────────────────────────

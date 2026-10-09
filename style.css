@@ -182,6 +182,11 @@ nav {
   align-items: center;
 }
 .nav-brand img { height: 28px; width: auto; display: block; }
+/* The beta's tag next to the logo (shared.js), dashed like everything not yet official. */
+.beta-badge {
+  margin-left: 8px; padding: 1px 7px; border: 1px dashed var(--s4); border-radius: 999px;
+  font-size: calc(10px * var(--ts)); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
 .nav-auth  { display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }
@@ -2311,6 +2316,22 @@ select:disabled {
 .period-pill:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-d); }
 /* While another period (or filter) loads, the current numbers stay and dim. */
 .lb-loading { opacity: 0.45; transition: opacity 0.1s; }
+
+/* Solo, the unofficial variant (solo.js): dashed wherever it shows, so it's
+   never mistaken for the official game. The Solo pill (size-filter.js, the
+   villain page), solo game cards, the FAQ's solo section and its entries. */
+.pill-solo, .pill-solo.on { border-style: dashed; }
+.game-card.solo { border-style: dashed; border-color: var(--s4); }
+.home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
+/* New Game: Solo picked in the players menu, and its result (Won / Lost). */
+.players-count-select.solo { border-style: dashed; border-color: var(--s4); }
+.solo-result { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.solo-result-lbl { font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--muted); }
+#soloHintNg .solo-hint { margin: 10px 0 0; }
+.claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
+#claimRoot .solo-hint { text-align: center; }
+.solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
+.cs-variant-pills { margin-bottom: 12px; }
 
 /* Small square ‹ › buttons (the avatar builder's part rows). */
 .cs-month-nav {

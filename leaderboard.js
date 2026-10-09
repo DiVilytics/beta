@@ -6,12 +6,16 @@ let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
 let lbMode   = 'pct';          // 'pct' | 'count' | 'games', or 'xp' (players only)
-let lbFilter = 'all';          // 'all' | 2 | 3 | 4 | 5 | 6
 
 // Each tab keeps its own ranking: villains open on % Wins, players on XP.
 const _lbModeByTab = { characters: 'pct', players: 'xp' };
 
-// The period, All time / Year / Month (period-filter.js): any change reloads.
+// The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
+// time / Year / Month (period-filter.js): any change reloads. Solo ranks the
+// solo games only (solo.js), never with the others.
+const size = createSizeFilter('lbSize', {
+  onChange: () => { lbDisplayLimit = LB_PAGE_SIZE; loadAndRender(); },
+});
 const period = createPeriodFilter('lbPeriod', {
   onChange: () => { lbDisplayLimit = LB_PAGE_SIZE; loadAndRender(); },
 });
@@ -25,11 +29,11 @@ let lbDisplayLimit = LB_PAGE_SIZE;
 // count there isn't misleading the same way). Intentionally not user-configurable.
 const MIN_GAMES_FOR_PCT = 5;
 
-// Cache: key `${lbTab}:${lbFilter}:${period.id()}` → { rows, summary }. Avoids
+// Cache: key `${lbTab}:${size}:${period.id()}` → { rows, summary }. Avoids
 // re-fetching when only the sort lbMode changes, or when going back to a
 // period already seen.
 const _lbCache = {};
-const _lbKey = () => `${lbTab}:${lbFilter}:${period.id()}`;
+const _lbKey = () => `${lbTab}:${size.value()}:${period.id()}`;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -59,14 +63,13 @@ async function init() {
   }
   if ((saved?.tab || new URLSearchParams(location.search).get('tab')) === 'players') _applyTab('players');
   if (saved) {
-    lbFilter = saved.filter;
-    updateFilterPills('#filterPills .pill', lbFilter);
+    size.set(saved.filter);
     period.set(saved.period);
     lbDisplayLimit = saved.limit || LB_PAGE_SIZE;
   }
   keepViewState(() => ({
     tab: lbTab, modes: { ..._lbModeByTab, [lbTab]: lbMode },
-    filter: lbFilter, period: period.get(), limit: lbDisplayLimit,
+    filter: size.value(), period: period.get(), limit: lbDisplayLimit,
   }));
   await loadAndRender();
   _loadXpLedger();   // in the background, so the Players tab opens at once
@@ -98,13 +101,6 @@ function setMode(m) {
   if (cached) render(cached);
 }
 
-function setFilter(f) {
-  lbFilter = f;
-  lbDisplayLimit = LB_PAGE_SIZE;
-  updateFilterPills('#filterPills .pill', f);
-  loadAndRender();
-}
-
 function lbLoadMore() {
   lbDisplayLimit += LB_PAGE_SIZE;
   const cached = _lbCache[_lbKey()];
@@ -127,7 +123,7 @@ async function loadAndRender() {
   if (!_lbCache[key]) {
     lb.classList.add('lb-loading');
     summary.classList.add('lb-loading');
-    const data = await (period.isAll() ? _fetchAllTime() : _fetchPeriod());
+    const data = await (size.isSolo() ? _fetchSolo() : period.isAll() ? _fetchAllTime() : _fetchPeriod());
     if (token !== _lbLoadToken) return;
     if (!data) {
       summary.className = 'summary';
@@ -146,6 +142,7 @@ async function loadAndRender() {
 }
 
 async function _fetchAllTime() {
+  const lbFilter = size.value();
   const isChar  = lbTab === 'characters';
   const view    = lbFilter === 'all'
     ? (isChar ? 'character_stats' : 'player_stats')
@@ -183,6 +180,7 @@ async function _fetchAllTime() {
 // A year or a month: the same numbers from the period_* RPCs, for the games
 // played in it. A villain or player is listed only if they played then.
 async function _fetchPeriod() {
+  const lbFilter = size.value();
   const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
   const [stats, summary, xp] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
@@ -194,6 +192,17 @@ async function _fetchPeriod() {
   return {
     rows:    _addXp((stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })), xp),
     summary: (summary.data || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
+  };
+}
+
+// Solo: the same numbers from the solo games of the period (solo.js), no XP.
+async function _fetchSolo() {
+  const solo = await loadSoloGames();
+  if (!solo) return null;
+  const { games, players } = soloInPeriod(solo, period.range());
+  return {
+    rows:    soloRankRows(players, lbTab === 'characters' ? 'character' : 'nickname'),
+    summary: soloSummary(games),
   };
 }
 
@@ -258,7 +267,7 @@ async function _fetchXp() {
   for (const [nick, entries] of Object.entries(ledger)) {
     out[nick] = { xp: 0, ach: 0 };
     for (const e of entries) {
-      if (lbFilter !== 'all' && e.size !== lbFilter) continue;
+      if (size.value() !== 'all' && e.size !== size.value()) continue;
       if (from && !(e.at && new Date(e.at) >= from && new Date(e.at) < to)) continue;
       out[nick].xp  += e.xp;
       out[nick].ach += e.ach;
@@ -283,21 +292,26 @@ function render({ rows, summary }) {
     { val: avgTurns != null ? avgTurns      : '-', lbl: t('Avg rounds') },
   ]);
 
+  // Solo: what it is, above its own ranking (which has no XP: % Wins instead).
+  const solo     = size.isSolo();
+  const soloHint = solo ? soloHintHTML() : '';
+  const mode     = solo && lbMode === 'xp' ? 'pct' : lbMode;
+
   if (!rows.length) {
     // Players: there can be games with nobody signed in on them (imported ones).
     const msg = games && lbTab === 'players'
       ? t('No player has claimed a villain in these games.')
       : t('No games match this filter.');
-    document.getElementById('lb').innerHTML = `<div class="empty-state">${msg}</div>`;
+    document.getElementById('lb').innerHTML = `${soloHint}<div class="empty-state">${msg}</div>`;
     return;
   }
 
   // % Wins only: a 1-2 game sample can sit at 100% (or 0%) purely by noise, so
   // those rows follow the ranking under a divider, unranked. # Wins / # Games
   // rank everyone, a low count there isn't misleading the same way.
-  const minGames = lbMode === 'pct' ? MIN_GAMES_FOR_PCT : 0;
+  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : 0;
   // Registered players who never played have no % at all: only in the counts.
-  if (lbMode === 'pct') rows = rows.filter(r => r.games > 0);
+  if (mode === 'pct') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
   const hasUnranked = rows.some(r => r.games < minGames);
 
@@ -307,11 +321,12 @@ function render({ rows, summary }) {
   const hasMore = rows.length > lbDisplayLimit;
 
   document.getElementById('lb').innerHTML = `
-    ${statModeSegHTML(lbMode, 'setMode', { xp: !isChar })}
+    ${soloHint}
+    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo })}
     ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${lbMode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each other player who claimed theirs, doubled if you won. Plus 1 for each achievement.')}</p>` : ''}
+    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each other player who claimed theirs, doubled if you won. Plus 1 for each achievement.')}</p>` : ''}
     ${renderStatTableHTML(rows, {
-      mode:        lbMode,
+      mode,
       headLabel:   isChar ? t('Villain') : t('Player'),
       getName:     key => isChar ? villainName(key) : key,
       getNameHTML: isChar ? villainNameInline : undefined,

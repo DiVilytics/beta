@@ -20,6 +20,11 @@ function _boxLabelHTML(box) {
 let csAvgDur    = null;      // avg game duration (minutes) across this character's games
 let csAvgTurns  = null;      // avg rounds across this character's games
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
+// All / Solo (dashed) above the stats: Solo shows this villain's solo games
+// (solo.js) instead, never mixed with the others. csSoloStats: undefined until
+// loaded, null if they couldn't load, else { games, players, avatars }.
+let csSolo      = false;
+let csSoloStats;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -34,9 +39,13 @@ async function init() {
   // A language switch brings back the grouping and the switches (lang.js).
   const saved = takeViewState();
   if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; }
-  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode }));
+  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, solo: csSolo }));
 
-  if (charName) { await renderDetailPage(charName); return; }
+  if (charName) {
+    await renderDetailPage(charName);
+    if (saved?.solo && csChar) csSetSolo(true);
+    return;
+  }
 
   // ?pace= opens the roster straight into pace view, scrolled to that band
   // (mirrors how ?box= scrolls to a box group).
@@ -179,9 +188,10 @@ async function renderDetailPage(charName) {
     return;
   }
 
+  // No games: render() says so, under All / Solo (there may be solo games).
   if (!buckets || !buckets.length) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })}</p></div>`);
+    render();
     renderExtras();
     return;
   }
@@ -257,6 +267,29 @@ function csSetRivalMode(m) {
   render();
 }
 
+// All / Solo. Solo loads the solo games once, with the avatars of the players
+// who played this villain solo.
+async function csSetSolo(on) {
+  if (on === csSolo) return;
+  csSolo = on;
+  render();
+  if (!on || csSoloStats) return;
+  const solo = await loadSoloGames();
+  if (!solo) { csSoloStats = null; render(); return; }
+  const players = solo.players.filter(p => p.character === csChar.name);
+  const ids     = new Set(players.map(p => p.game_id));
+  const nicks   = [...new Set(players.map(p => p.nickname).filter(Boolean))];
+  const { data } = nicks.length
+    ? await db.from('profiles').select('nickname, avatar_url, default_avatar').in('nickname', nicks)
+    : { data: [] };
+  csSoloStats = {
+    games:   solo.games.filter(g => ids.has(g.id)),
+    players,
+    avatars: Object.fromEntries((data || []).map(p => [p.nickname, resolveAvatar(p)])),
+  };
+  render();
+}
+
 // ── SEARCH / AUTOCOMPLETE ─────────────────────────────────────────────────────
 
 function _attachCharSearch() {
@@ -280,9 +313,23 @@ function _attachCharSearch() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
+function _csVariantPillsHTML() {
+  return `
+    <div class="pill-group cs-variant-pills">
+      <button class="pill${csSolo ? '' : ' on'}" type="button" onclick="csSetSolo(false)">${t('All')}</button>
+      <button class="pill pill-solo${csSolo ? ' on' : ''}" type="button" onclick="csSetSolo(true)">${t('Solo')}</button>
+    </div>`;
+}
+
 function render() {
   const root = document.getElementById('csRoot');
   root.className = '';
+
+  if (csSolo) { root.innerHTML = _csVariantPillsHTML() + _soloStatsHTML(); return; }
+  if (!csLoading && !csBuckets.all.games) {
+    root.innerHTML = `${_csVariantPillsHTML()}<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })}</p></div>`;
+    return;
+  }
 
   const rows = [
     { label: t('Overall'), key: 'all' },
@@ -300,6 +347,7 @@ function render() {
 
   const v = val => csLoading ? '-' : val;
   root.innerHTML = `
+    ${_csVariantPillsHTML()}
     <div class="summary">
       ${statBoxesHTML([
         { val: v(overall.games), lbl: t('Games') },
@@ -333,6 +381,44 @@ function render() {
       }).join('')}
     </div>
     ${_adversariesSectionHTML()}`;
+}
+
+// Solo: this villain's solo games, summed up, and the players who played it
+// solo, ranked (no table sizes, no rivalries: one villain per game).
+function _soloStatsHTML() {
+  const hint = soloHintHTML();
+  if (csSoloStats === null) return `${hint}<div class="empty"><p>${t("Couldn't load the solo games.")}</p></div>`;
+  const loading = csSoloStats === undefined;
+  const games   = loading ? [] : csSoloStats.games;
+  if (!loading && !games.length) {
+    return `${hint}<div class="empty"><div class="empty-icon">🎲</div><h3>${t('No solo games yet')}</h3><p>${t("{villain} hasn't been played solo yet.", { villain: _esc(villainName(csChar.name)) })}</p></div>`;
+  }
+  const players = loading ? [] : csSoloStats.players;
+  const wins    = players.filter(p => p.is_winner).length;
+  const sum     = soloSummary(games);
+  const v = val => loading ? '-' : val;
+  return `
+    ${hint}
+    <div class="summary">
+      ${statBoxesHTML([
+        { val: v(games.length), lbl: t('Games') },
+        { val: sum.avg_duration != null ? Math.round(sum.avg_duration) + 'm' : '-', lbl: t('Avg duration') },
+        { val: sum.avg_turns    != null ? Math.round(sum.avg_turns)          : '-', lbl: t('Avg rounds') },
+        { val: v((players.length ? Math.round((wins / players.length) * 100) : 0) + '%'), lbl: t('Win rate') },
+        { val: v(wins), lbl: t('Wins') },
+      ])}
+    </div>
+    ${loading ? '' : `
+      ${statModeSegHTML(csMode, 'csSetMode')}
+      ${renderStatTableHTML(soloRankRows(players, 'nickname'), {
+        mode:        csMode,
+        headLabel:   t('Player'),
+        getKey:      r   => r.nickname,
+        getHref:     key => `players.html?nick=${encodeURIComponent(key)}`,
+        getIdentity: key => playerAvatarHTML(csSoloStats.avatars[key]),
+        selfKey:     getCurrentProfile()?.nickname || null,
+        wrapClass:   'mb-1-25',
+      })}`}`;
 }
 
 // "Rivalries": the opponents this character has beaten most / lost to most,

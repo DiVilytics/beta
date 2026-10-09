@@ -1,8 +1,9 @@
 // ── STATE ─────────────────────────────────────────────────────────────────────
 
 let pfNick      = '';
-let pfGames     = [];   // games this nickname appeared in
+let pfGames     = [];   // official games this nickname appeared in
 let pfPlayers   = [];   // all players for those games
+let pfSolo      = { games: [], players: [] };   // their solo games (solo.js), a world of their own
 let pfCharBoxMap  = {};
 let pfAllChars  = [];
 let pfAch       = new Map();
@@ -12,13 +13,15 @@ let pfFriends   = [];   // top co-players by shared games (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
 let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
-let pfFilter         = 'all';   // 'all' | 2..6
 let pfWinsOnly       = false;
 let pfLocationFilter = null;
 
-// The period, All time / Year / Month (period-filter.js), its menus starting
-// from this player's first dated game. It filters the stats, the villain table
-// and the games; achievements and Most played with stay all-time.
+// The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
+// time / Year / Month (period-filter.js), its menus starting from this player's
+// first dated game. They filter the stats, the villain table and the games;
+// achievements and Most played with stay all-time. Solo shows the solo games
+// only, without achievements or Most played with (solo games have neither).
+const size   = createSizeFilter('pfSize', { onChange: () => render() });
 const period = createPeriodFilter('pfPeriod', { onChange: () => render() });
 
 let pfDisplayLimit   = PAGE_SIZE;
@@ -75,12 +78,12 @@ async function init() {
   // A language switch brings back the filters and the games loaded (lang.js).
   const saved = takeViewState();
   if (saved) {
-    pfFilter = saved.filter; pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location;
-    updateFilterPills('#pfFilterPills .pill', pfFilter);
+    pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location;
+    size.set(saved.filter);
     period.set(saved.period);
   }
   keepViewState(() => ({
-    filter: pfFilter, mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter,
+    filter: size.value(), mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter,
     period: period.get(), limit: pfDisplayLimit,
   }));
 
@@ -135,15 +138,17 @@ async function load() {
 
   const gameIds = [...new Set(myRows.map(r => r.game_id).concat((created?.rows || []).map(r => r.id)))];
 
-  const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true });
+  const all = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
+  const { games, players } = gamesOfVariant(all);
   pfGames   = games;
   pfPlayers = players;
+  pfSolo    = gamesOfVariant(all, 'solo');
   pfAch     = computeCharacterAchievements(players.filter(p => p.nickname === pfNick));
   pfGlobal  = computeGlobalAchievements(games, players, p => p.nickname === pfNick, pfAllChars);
   pfFriends = await _loadFriends();
   pfLoaded  = true;
   // Oldest first: the games come newest first, undated ones last.
-  period.setFirst(games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
+  period.setFirst(all.games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
 
   document.getElementById('pfRoot').className = '';
 
@@ -204,12 +209,6 @@ function pfSetMode(m) {
   render();
 }
 
-function pfSetFilter(f) {
-  pfFilter = f;
-  updateFilterPills('#pfFilterPills .pill', f);
-  render();
-}
-
 function pfToggleWinsOnly() {
   pfWinsOnly = !pfWinsOnly;
   const btn = document.getElementById('pfWinsOnlyBtn');
@@ -248,12 +247,16 @@ function _attachPlayerSearch() {
   });
 }
 
+// The games the page is showing: the official ones, or on Solo the solo ones.
+const _pfData = () => size.isSolo() ? pfSolo : { games: pfGames, players: pfPlayers };
+
 function pfFilteredGameIds() {
-  let games = pfGames;
-  if (pfFilter !== 'all') {
+  let { games, players } = _pfData();
+  const n = size.value();
+  if (typeof n === 'number') {
     const countMap = {};
-    for (const p of pfPlayers) countMap[p.game_id] = (countMap[p.game_id] || 0) + 1;
-    games = games.filter(g => countMap[g.id] === pfFilter);
+    for (const p of players) countMap[p.game_id] = (countMap[p.game_id] || 0) + 1;
+    games = games.filter(g => countMap[g.id] === n);
   }
   if (pfLocationFilter) games = games.filter(g => g.location === pfLocationFilter);
   if (!period.isAll()) {
@@ -281,9 +284,11 @@ function render() {
   pfDisplayLimit = PAGE_SIZE;
   const root = document.getElementById('pfRoot');
 
+  const solo    = size.isSolo();
+  const data    = _pfData();
   const keepIds = pfFilteredGameIds();
-  const games   = pfGames.filter(g => keepIds.has(g.id));
-  const mine    = pfPlayers.filter(p => keepIds.has(p.game_id) && p.nickname === pfNick);
+  const games   = data.games.filter(g => keepIds.has(g.id));
+  const mine    = data.players.filter(p => keepIds.has(p.game_id) && p.nickname === pfNick);
 
   const wins   = mine.filter(p => p.is_winner).length;
   const nGames = mine.length;
@@ -291,7 +296,7 @@ function render() {
 
   // Longest run of consecutive wins, chronological, within the current filter.
   const atById = {};
-  for (const g of pfGames) atById[g.id] = g.played_at;
+  for (const g of data.games) atById[g.id] = g.played_at;
   let bestStreak = 0, streakRun = 0;
   for (const p of [...mine].sort((a, b) => new Date(atById[a.game_id]) - new Date(atById[b.game_id]))) {
     if (p.is_winner) { streakRun++; if (streakRun > bestStreak) bestStreak = streakRun; }
@@ -311,8 +316,8 @@ function render() {
     ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
     title: pfNick ? `${t('Achievements')} | ${pfNick}` : t('Achievements'),
   });
-  // All-time sections, shown whatever the filters.
-  const achHTML = achievementsSectionHTML({
+  // All-time sections, shown whatever the filters (not on Solo).
+  const achHTML = solo ? '' : achievementsSectionHTML({
     ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
     // The profile shows only earned achievements (mirroring the characters grid).
     onlyEarned: true,
@@ -322,12 +327,17 @@ function render() {
       </div>`,
   });
 
+  const soloHint = solo ? soloHintHTML() : '';
+  const friends  = solo ? '' : _friendsSectionHTML();
+
   // No games: the sentence takes the place of the stats, the filters stay. A
   // player who never played has no achievements to show either.
   if (!nGames) {
-    root.innerHTML = pfGames.length
-      ? `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
-        ${_friendsSectionHTML()}
+    root.innerHTML = solo && !pfSolo.games.length
+      ? `${soloHint}<div class="empty"><div class="empty-icon">🎲</div><h3>${t('No solo games yet')}</h3><p>${t("{nick} hasn't recorded any solo games.", { nick: _esc(pfNick) })}</p></div>`
+      : data.games.length
+      ? `${soloHint}<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
+        ${friends}
         ${achHTML}`
       : `<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
     return;
@@ -343,6 +353,7 @@ function render() {
   const charRows = Object.values(charMap);
 
   root.innerHTML = `
+    ${soloHint}
     <div class="summary">
       ${statBoxesHTML([
         { val: nGames,       lbl: t('Games') },
@@ -369,7 +380,7 @@ function render() {
       wrapClass:   'mb-1-25',
     })}
 
-    ${_friendsSectionHTML()}
+    ${friends}
 
     ${achHTML}
 
@@ -387,11 +398,12 @@ function render() {
 let _pfScrollToId = null;
 
 function _renderGamesList(keepIds = pfFilteredGameIds()) {
-  let games = pfGames.filter(g => keepIds.has(g.id));
+  const data = _pfData();
+  let games = data.games.filter(g => keepIds.has(g.id));
 
   if (pfWinsOnly) {
     const winGameIds = new Set(
-      pfPlayers.filter(p => keepIds.has(p.game_id) && p.nickname === pfNick && p.is_winner).map(p => p.game_id)
+      data.players.filter(p => keepIds.has(p.game_id) && p.nickname === pfNick && p.is_winner).map(p => p.game_id)
     );
     games = games.filter(g => winGameIds.has(g.id));
   }
@@ -411,7 +423,7 @@ function _renderGamesList(keepIds = pfFilteredGameIds()) {
   list.innerHTML = '';
   // Pre-group players by game_id so each card is an O(1) lookup, not an O(n) scan.
   const byGame = {};
-  for (const p of pfPlayers) (byGame[p.game_id] ||= []).push(p);
+  for (const p of data.players) (byGame[p.game_id] ||= []).push(p);
   for (const g of visible) {
     const gp = sortGamePlayers(byGame[g.id] || []);
     list.appendChild(buildProfileCard(g, gp));

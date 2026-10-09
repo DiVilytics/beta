@@ -45,7 +45,7 @@
 
 <main>
   <div class="page-header">
-    <h2><span class="page-ico" aria-hidden="true">⚔️</span><span data-i18n>Claim your villain</span></h2>
+    <h2><span class="page-ico" aria-hidden="true">⚔️</span><span id="claimTitle" data-i18n>Claim your villain</span></h2>
   </div>
   <a class="back-link" href="players.html" onclick="claimGoBack(); return false;" data-i18n>← Back</a>
   <div id="claimRoot" class="spinner" data-i18n>Loading…</div>
@@ -119,7 +119,7 @@
       <button class="sheet-close" onclick="closeLineup()">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint" data-i18n>You can change the villains and the winner until another player claims a villain.</p>
+      <p class="modal-hint" id="lineupHint" data-i18n>You can change the villains and the winner until another player claims a villain.</p>
       <div class="err" id="lineupErr"></div>
       <div id="lineupSlots"></div>
     </div>
@@ -142,6 +142,7 @@
   <script src="search.js"></script>
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
+<script src="solo.js"></script>
 <script src="claim.js"></script>
 </body>
 </html>

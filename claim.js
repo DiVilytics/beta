@@ -23,11 +23,16 @@ const CLAIM_ERRORS = {
   not_creator:     'Only the player who recorded the game can change it.',
   lineup_locked:   'Another player has claimed a villain: the lineup can no longer be changed.',
   invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
+  solo_seat:       'A solo game is always its creator\'s.',
 };
 const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
 
 // The creator can change the villains and the winner while no other player has
-// claimed a villain (their own seat, marked 👤 in New Game, doesn't count).
+// claimed a villain (their own seat, marked 👤 in New Game, doesn't count). A
+// solo game (solo.js) has one seat, its creator's: always editable by them, won
+// (👑) or lost, never shared or released.
+const claimIsSolo = () => claimGame?.variant === 'solo';
+
 function lineupEditable(user) {
   return !!user && !!claimGame && claimGame.created_by === user.id
     && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
@@ -68,9 +73,11 @@ async function init() {
 
   claimGame    = game;
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
+  // Nothing to claim in a solo game: the page is just the game's.
+  if (claimIsSolo()) document.getElementById('claimTitle').textContent = t('Solo game');
 
   render();
-  if (claimOpenQR) { claimOpenQR = false; shareGame(); }
+  if (claimOpenQR) { claimOpenQR = false; if (!claimIsSolo()) shareGame(); }
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -108,11 +115,13 @@ function render() {
 
   const myClaim = claimPlayers.find(p => p.user_id === user.id);
   const role    = gameUserRole(claimGame, claimPlayers, user);
+  const solo    = claimIsSolo();
 
   const meta = [
     fmtDuration(claimGame.duration_minutes),
     claimGame.num_turns ? tn(claimGame.num_turns, '{n} round', '{n} rounds') : null,
     claimGame.location  ? claimGame.location             : null,
+    solo ? t('Solo') : null,
   ].filter(Boolean).join(' | ');
 
   // Like the game cards: the player's nickname sits under the villain's name;
@@ -122,7 +131,9 @@ function render() {
     let nickHTML = '', actionHTML = '';
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
     else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
-    if (isMine) {
+    if (solo) {
+      // One seat, always its creator's: nothing to claim or release.
+    } else if (isMine) {
       // Your own claim: let you release it (e.g. if you picked the wrong one).
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">${t('Release')}</button>`;
     } else if (!p.nickname && !myClaim) {
@@ -131,7 +142,7 @@ function render() {
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
-          <span class="chip-seat">${i + 1}</span>
+          <span class="chip-seat">${solo ? '' : i + 1}</span>
           ${charImgHTML(p.character)}
           <div class="claim-who"><div class="claim-name">${villainNameHTML(p.character)}</div>${nickHTML}</div>
           ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
@@ -148,12 +159,22 @@ function render() {
     <div class="claim-share-row">
       ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
       ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit lineup')}</button>` : ''}
-      <button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>
+      ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
-    <div class="section-label">${t('Players')}</div>
-    <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">${t('You played as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}
+    <div class="section-label">${solo ? t('Player') : t('Players')}</div>
+    <div class="claim-rows${solo ? ' solo' : ''}">${rowsHTML}</div>
+    ${myClaim ? `<p class="claim-success">${_playedAsHTML(myClaim, solo)}</p>` : ''}
+    ${solo ? soloHintHTML() : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
+}
+
+// "You played as …": in a solo game, whether you won or lost with it.
+function _playedAsHTML(seat, solo) {
+  const villain = `<strong>${charImgHTML(seat.character)} ${villainNameInline(seat.character)}</strong>`;
+  if (!solo) return t('You played as {villain} in this game.', { villain });
+  return seat.is_winner
+    ? t('You won this solo game with {villain}.', { villain })
+    : t('You lost this solo game with {villain}.', { villain });
 }
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
@@ -179,6 +200,7 @@ function editGameDetails() {
   document.getElementById('editLocation').value = claimGame.location || '';
   document.getElementById('editDur').value      = claimGame.duration_minutes || '';
   document.getElementById('editTurns').value    = claimGame.num_turns || '';
+  document.getElementById('editTurns').max      = claimIsSolo() ? SOLO_MAX_TURNS : 999;
   clearError('editDetailsErr');
   const btn = document.getElementById('editDetailsSaveBtn');
   btn.disabled    = false;
@@ -210,6 +232,10 @@ async function saveGameDetails() {
 
   const btn   = document.getElementById('editDetailsSaveBtn');
   const errEl = document.getElementById('editDetailsErr');
+  if (claimIsSolo() && turns > SOLO_MAX_TURNS) {
+    showError(errEl, t('A solo game ends by round {n}.', { n: SOLO_MAX_TURNS }));
+    return;
+  }
   btn.disabled    = true;
   btn.textContent = t('Saving…');
 
@@ -305,6 +331,9 @@ async function editLineup() {
   if (!lineupEditable(getCurrentUser())) return;
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
+  document.getElementById('lineupHint').textContent = claimIsSolo()
+    ? t('Change your villain, and whether you won (👑) or lost.')
+    : t('You can change the villains and the winner until another player claims a villain.');
   clearError('lineupErr');
   const btn = document.getElementById('lineupSaveBtn');
   btn.disabled    = false;
@@ -323,7 +352,7 @@ function _renderLineup() {
     const available = lineupChars.filter(c => !taken.has(c.name));
     return `
       <div class="order-slot">
-        <span class="row-num">${i + 1}.</span>
+        <span class="row-num">${claimIsSolo() ? '' : `${i + 1}.`}</span>
         <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
         <div class="order-slot-info">
           <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Select villain')}">
@@ -333,7 +362,7 @@ function _renderLineup() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn win${s.is_winner ? ' on' : ''}" type="button" onclick="setLineupWinner(${i})" title="${t('Winner')}">👑</button>
+          <button class="pf-btn win${s.is_winner ? ' on' : ''}" type="button" onclick="setLineupWinner(${i})" title="${claimIsSolo() ? t('Won') : t('Winner')}">👑</button>
         </div>
       </div>`;
   }).join('');
@@ -345,8 +374,9 @@ function setLineupVillain(i, name) {
   _renderLineup();
 }
 
+// The crown moves to this seat; in a solo game it turns on and off (won, lost).
 function setLineupWinner(i) {
-  lineupDraft.forEach((s, j) => { s.is_winner = j === i; });
+  lineupDraft.forEach((s, j) => { s.is_winner = j === i && !(claimIsSolo() && s.is_winner); });
   _renderLineup();
 }
 

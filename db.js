@@ -97,18 +97,23 @@ async function fetchGamesByIds(ids, { orderByPlayedAtDesc = false } = {}) {
 
 // Convenience: returns { games, players } for a set of ids in one trip. Only
 // the official games among them and their players: solo games (variant
-// 'solo', the unofficial solo variant) have statistics of their own; pass
-// { variant: 'solo' } for those instead.
+// 'solo', the unofficial solo variant, solo.js) have statistics of their own.
+// { variant: 'solo' } returns those instead, { variant: 'any' } both.
 async function fetchGamesWithPlayers(ids, opts = {}) {
   if (!ids.length) return { games: [], players: [] };
-  const variant = opts.variant ?? null;
-  const [allGames, allPlayers] = await Promise.all([
+  const [games, players] = await Promise.all([
     fetchGamesByIds(ids, opts),
     fetchPlayersForGames(ids),
   ]);
-  const games = allGames.filter(g => (g.variant ?? null) === variant);
-  const kept  = new Set(games.map(g => g.id));
-  return { games, players: allPlayers.filter(p => kept.has(p.game_id)) };
+  return opts.variant === 'any' ? { games, players } : gamesOfVariant({ games, players }, opts.variant ?? null);
+}
+
+// The games of one variant (null: official, 'solo') out of { games, players },
+// with their players.
+function gamesOfVariant({ games, players }, variant = null) {
+  const kept = games.filter(g => (g.variant ?? null) === variant);
+  const ids  = new Set(kept.map(g => g.id));
+  return { games: kept, players: players.filter(p => ids.has(p.game_id)) };
 }
 
 // ── STATIC DATA LOADERS ──────────────────────────────────────────────────────

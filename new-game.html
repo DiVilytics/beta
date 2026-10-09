@@ -59,9 +59,10 @@
     <div class="live-turns">
       <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
       <div class="live-turn-count"><span id="liveTurnCount">1</span><span class="live-turn-lbl" data-i18n>round</span></div>
-      <button class="live-btn" type="button" onclick="bumpTurn(1)">+</button>
+      <button class="live-btn" id="livePlusBtn" type="button" onclick="bumpTurn(1)">+</button>
     </div>
-    <p class="live-hint" data-i18n>The counter shows the current round. A round ends when every player has had their turn: tap + when the first player is up again. When you're done, tap Pause game: the duration and the number of rounds are filled in automatically.</p>
+    <p class="live-hint" id="liveHint" data-i18n>The counter shows the current round. A round ends when every player has had their turn: tap + when the first player is up again. When you're done, tap Pause game: the duration and the number of rounds are filled in automatically.</p>
+    <p class="live-hint hidden" id="liveHintSolo" data-i18n>The counter shows the current round: alone, every turn is a round, and you have 20 to reach your Objective. When you're done, tap Pause game: the duration and the number of rounds are filled in automatically.</p>
   </div>
 
   <!-- FORM CONTENT, hidden while a live game is running -->
@@ -106,6 +107,7 @@
           <option value="4">4p</option>
           <option value="5">5p</option>
           <option value="6">6p</option>
+          <option value="solo" data-i18n>Solo</option>
         </select>
         <span class="chevron" aria-hidden="true">▼</span>
       </span>
@@ -141,6 +143,15 @@
     </div>
     <div id="orderSlots"></div>
     <button class="add-row-btn" id="orderAddBtn" onclick="addOrderSlot()" data-i18n>+ Add player</button>
+    <!-- Solo (solo.js): won or lost against the game, and what the variant is. -->
+    <div class="solo-result hidden" id="soloResult">
+      <span class="solo-result-lbl" data-i18n>Result</span>
+      <div class="seg">
+        <button class="seg-btn" type="button" data-result="won" onclick="setSoloResult('won')" data-i18n>Won 👑</button>
+        <button class="seg-btn" type="button" data-result="lost" onclick="setSoloResult('lost')" data-i18n>Lost</button>
+      </div>
+    </div>
+    <div class="hidden" id="soloHintNg"></div>
 
   </div>
 
@@ -179,6 +190,7 @@
 <script src="game-card.js"></script>
 <script src="shared.js"></script>
 <script src="pace-filter.js"></script>
+<script src="solo.js"></script>
 <script src="new-game.js"></script>
 <script src="new-game-audio.js"></script>
 </body>

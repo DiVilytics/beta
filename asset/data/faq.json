@@ -122,6 +122,55 @@
       ]
     }
   },
+  "solo": {
+    "title": "Solo variant (unofficial)",
+    "desc": "One villain against the game",
+    "intro": "A way to play alone, made by a player and not by the game's designers: the \"Quarantine\" solo variant by Matt Lowder (2020), summarized in our own words. Anything not listed here works as in the official rules.",
+    "author": "Matt Lowder",
+    "url": "https://boardgamegeek.com/thread/2399439/villainous-quarantine-solo-variant",
+    "groups": [
+      {
+        "title": "The variant",
+        "items": [
+          { "term": "How it works", "text": "You play one villain against the game. With no opponents, a die roll at the end of each turn decides when your Fate deck strikes. A game takes about 20 minutes." },
+          { "term": "Winning and losing", "text": "You have 20 turns. Reach your Objective by the end of turn 20 and you win; otherwise you lose. Alone, every turn is a round, so a solo game lasts at most 20 rounds." },
+          { "term": "What you need", "text": "Your villain as in a normal game, a 10-sided die (or two 6-sided dice) and a way to count the turns, such as a 20-sided die or a counter." }
+        ]
+      },
+      {
+        "title": "Setup and turns",
+        "items": [
+          { "term": "Setup", "text": "Set up your villain as usual, but start with 1 Power. Draw your four cards and take your first turn." },
+          { "term": "End of turn", "text": "Draw up to four cards, roll for Fate (below), then count one turn down and start the next." }
+        ]
+      },
+      {
+        "title": "Fate",
+        "items": [
+          { "term": "The Fate roll", "text": "At the end of every turn, roll the 10-sided die: on 1 to 4 you are Fated (a 40% chance)." },
+          { "term": "Fate locations", "text": "With no opponent to target, the Fate symbol works differently: if your Villain Mover is at a location with the Fate symbol, you are Fated only on 1 or 2 (20%)." },
+          { "term": "Being Fated", "text": "Reveal the top two cards of your Fate deck, play the one that hurts you most, and discard the other." },
+          { "term": "Two 6-sided dice", "text": "Add the dice: you are Fated on 7, 8 or 9 (about 41%), or only on 9 or 10 (about 19%) at a location with the Fate symbol. A 10-sided die matches the intended odds better." },
+          { "term": "Close to winning", "text": "If at the end of a turn you can see you will surely win on the next one, you are Fated automatically, but you reveal and play only one Fate card." }
+        ]
+      },
+      {
+        "title": "Conditions",
+        "items": [
+          { "term": "Original rule", "text": "With no opponents to trigger them, you trigger your own Conditions: when you meet a Condition's requirement during your turn, discard it and do what it says. At the end of that turn, draw up to three cards instead of four (two if you triggered two Conditions), as if you had played a card off-turn." },
+          { "term": "Alternative rule", "text": "A simpler option, suggested later and preferred by the author: you can play one Condition from your hand when your end-of-turn roll is 7 to 10." },
+          { "term": "Newer villains", "text": "The variant was built around the first villains: for Conditions released later, agree on a house rule that feels right." }
+        ]
+      },
+      {
+        "title": "On DiVilytics",
+        "items": [
+          { "term": "Recording a solo game", "text": "In New Game, pick Solo in the players menu, choose your villain, then Won or Lost. The rounds are the turns you played (20 if you lost)." },
+          { "term": "Separate statistics", "text": "Solo games are unofficial, so they never count with the others: not in the rankings, the villains' statistics, XP or achievements. They have their own, under the dashed Solo pill of the Leaderboard, the Game Log and every villain and player page." }
+        ]
+      }
+    ]
+  },
   "general": [
     {
       "title": "More on the core rules",
