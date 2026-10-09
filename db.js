@@ -116,9 +116,12 @@ async function fetchGamesWithPlayers(ids, opts = {}) {
 // returns the parsed object on first call and serves the same instance on
 // subsequent calls.
 
+// A data file's address for this release (ASSET_VERSION, config.js).
+const _versioned = url => `${url}?v=${ASSET_VERSION}`;
+
 async function _fetchJson(url) {
   try {
-    const r = await fetch(url);
+    const r = await fetch(_versioned(url));
     if (!r.ok) { console.warn(`fetchJson ${url}: ${r.status}`); return {}; }
     return await r.json();
   } catch (e) {
@@ -147,7 +150,7 @@ async function _fetchJsonLocalized(url, depth = 1) {
   const base = await _fetchJson(url);
   if (LANG === 'en') return base;
   try {
-    const r = await fetch(url.replace(/\.json$/, `.${LANG}.json`));
+    const r = await fetch(_versioned(url.replace(/\.json$/, `.${LANG}.json`)));
     return r.ok ? _mergeLocalized(base, await r.json(), depth) : base;
   } catch (_) { return base; }
 }

@@ -6,6 +6,12 @@
 const SUPABASE_URL      = 'https://qmeqdrzgsyiacwxjpdjk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtZXFkcnpnc3lpYWN3eGpwZGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NzY3MDIsImV4cCI6MjA5MjQ1MjcwMn0.600_RzDrvlimAXLxNZrnzR1ieymPPwxavdkdM4h3wpU';
 
+// ── VERSION ──────────────────────────────────────────────────────────────────
+// The deploy's version, stamped by the Pages workflow (.github/stamp.py) on the
+// published copy, as it stamps every page's scripts and stylesheet: the data
+// files carry it too (db.js), so a browser never mixes two releases.
+const ASSET_VERSION = 'dev';
+
 // ── PAGINATION ───────────────────────────────────────────────────────────────
 // game-log and player profile both list game cards in batches of this size.
 const PAGE_SIZE = 20;
