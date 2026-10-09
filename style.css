@@ -358,8 +358,8 @@ a.chip {
   font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; white-space: nowrap;
 }
 
-/* The XP table (leaderboard.js): one game's XP by table size and claims, lost
-   in purple, won in gold. */
+/* The XP table (leaderboard.js): one game's XP by claims, lost in purple, won
+   in gold. */
 .xp-table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
 .xp-table th, .xp-table td { padding: 8px 2px; text-align: center; border-bottom: 1px solid var(--border); font-size: calc(13px * var(--ts)); white-space: nowrap; }
 .xp-table thead th { color: var(--dim); font-size: calc(11px * var(--ts)); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -367,8 +367,7 @@ a.chip {
 .xp-table tbody th { text-align: left; color: var(--muted); font-weight: 600; }
 .xp-lost { color: var(--accent); font-weight: 700; }
 .xp-won  { color: var(--gold); font-weight: 700; }
-.xp-none { color: var(--dim); }
-.xp-table td .xp-won { margin-left: 0.4em; }   /* lost and won apart: "6 11", not "611" */
+
 
 /* Villain Guide sheet: a heading per section, card names in their type color. */
 .guide-title { margin: 16px 0 6px; font-size: calc(12px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }

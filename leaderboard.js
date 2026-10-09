@@ -282,22 +282,23 @@ const _addXp = (rows, xp) => lbTab === 'players'
   : rows;
 
 // The XP table (XP table ›, under the explanation): what one game gives, C +
-// (C - 1) * W, by table size (rows) and players who claimed their villain, you
-// included (columns), lost in purple and won in gold; a size can't have more
-// claims than players.
+// (C - 1) * W, by the players who claimed their villain, you included (the table
+// size doesn't count), lost in purple and won in gold.
 function openXpTable() {
   const claims = [1, 2, 3, 4, 5, 6];
-  const cell = (size, c) => c > size
-    ? '<td class="xp-none">-</td>'
-    : `<td><span class="xp-lost">${c}</span> <span class="xp-won">${2 * c - 1}</span></td>`;
+  const row = (label, cls, xp) =>
+    `<tr><th>${label}</th>${claims.map(c => `<td class="${cls}">${xp(c)}</td>`).join('')}</tr>`;
   document.getElementById('xpBody').innerHTML = `
-    <p class="modal-hint">${t('The XP of one game, by table size and players who claimed their villain: <span class="xp-lost">lost</span> and <span class="xp-won">won</span>.')}</p>
+    <p class="modal-hint">${t('The XP of one game, by how many players claimed their villain, you included.')}</p>
     <table class="xp-table">
       <thead>
         <tr><th></th><th colspan="${claims.length}">${t('Players who claimed, you included')}</th></tr>
         <tr><th></th>${claims.map(c => `<th>${c}</th>`).join('')}</tr>
       </thead>
-      <tbody>${TABLE_SIZES.map(size => `<tr><th>${size}p</th>${claims.map(c => cell(size, c)).join('')}</tr>`).join('')}</tbody>
+      <tbody>
+        ${row(t('Lost'), 'xp-lost', c => c)}
+        ${row(t('Won'),  'xp-won',  c => 2 * c - 1)}
+      </tbody>
     </table>
     <p class="modal-hint">${t('Plus 1 XP for each achievement.')}</p>`;
   openOverlay('xpOverlay');

@@ -2,7 +2,7 @@
   "2026-10-10": {
     "title": "La tabella degli XP",
     "improved": [
-      "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: per numero di giocatori e giocatori che hanno rivendicato il proprio cattivo, persa o vinta."
+      "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: secondo quanti giocatori hanno rivendicato il proprio cattivo, persa o vinta."
     ],
     "fixed": [
       "Una partita cronometrata in Nuova partita senza usare il contatore dei round non viene più registrata con 1 round."
