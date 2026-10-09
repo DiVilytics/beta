@@ -316,7 +316,10 @@ function render() {
   const solo  = csSoloStats || { games: 0, wins: 0 };
   const stats = key => key === 'solo' ? solo : csBuckets[key];
   const keys  = [...rows.map(r => r.key), 'solo'];
-  const maxVal = Math.max(...keys.map(k => statValue(stats(k), csMode))) || 1;
+  // The bars: a win rate on its own scale, 0 to 100%, so no row stretches the
+  // others (Solo included); a count against the official rows' largest
+  // (Overall), Solo on that same scale (a full bar at most).
+  const maxVal = csMode === 'pct' ? 1 : Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
 
