@@ -11,10 +11,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const PAGE_SIZE = 20;
 
 // ── BETA ─────────────────────────────────────────────────────────────────────
-// The beta (divilytics.github.io/beta/, the next version tried out before it
-// replaces this one) shares the browser's storage with the site: its game in
-// progress and its New Game draft are kept under keys of their own.
-const IS_BETA       = location.pathname.startsWith('/beta/');
+// The beta (IS_BETA, lang.js) shares the browser's storage with the site: its
+// game in progress and its New Game draft are kept under keys of their own.
 const STORAGE_SCOPE = IS_BETA ? '_beta' : '';
 
 // ── LIVE GAME PERSISTENCE ────────────────────────────────────────────────────

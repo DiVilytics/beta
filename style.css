@@ -182,11 +182,12 @@ nav {
   align-items: center;
 }
 .nav-brand img { height: 28px; width: auto; display: block; }
-/* The beta's tag next to the logo (shared.js), dashed like everything not yet official. */
-.beta-badge {
-  margin-left: 8px; padding: 1px 7px; border: 1px dashed var(--s4); border-radius: 999px;
-  font-size: calc(10px * var(--ts)); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
-}
+/* The beta (lang.js IS_BETA): a purple menu bar, in both themes, with the
+   logo on a clear background (theme.js). */
+:root[data-beta] { --nav-bg: #5a49d6; }
+:root[data-beta] nav { border-bottom-color: transparent; }
+:root[data-beta] .nav-links a.active { background: rgba(255, 255, 255, 0.22); }
+:root[data-beta] .nav-auth { border-left-color: rgba(255, 255, 255, 0.35); }
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
 .nav-auth  { display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }

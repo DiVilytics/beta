@@ -54,7 +54,7 @@ if ((localStorage.getItem('theme') || 'auto') === 'auto') {
 
 function _updateThemeIcons() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  const asset = isLight ? 'asset/logos/logo-w.svg' : 'asset/logos/logo-b.svg';
+  const asset = IS_BETA ? 'asset/logos/logo-beta.svg' : isLight ? 'asset/logos/logo-w.svg' : 'asset/logos/logo-b.svg';
   const navImg = document.querySelector('.nav-brand img');
   if (navImg) navImg.src = asset;
   _updateFavicon();
@@ -65,7 +65,7 @@ function _updateThemeIcons() {
 // background), so the chrome isn't stuck on the default/dark value.
 function _updateThemeColor() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  const color = isLight ? '#ffffff' : '#000000';
+  const color = IS_BETA ? '#5a49d6' : isLight ? '#ffffff' : '#000000';   // the beta's bar is purple
   let meta = document.querySelector('meta[name="theme-color"]');
   if (!meta) {
     meta = document.createElement('meta');

@@ -515,11 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// The beta (config.js) says so next to the logo, on every page.
-if (IS_BETA) document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('.nav-brand')?.insertAdjacentHTML('beforeend', '<span class="beta-badge">Beta</span>');
-});
-
 // ── NICKNAME MODAL ────────────────────────────────────────────────────────────
 
 let _nickMode      = 'create';  // 'create' | 'update'

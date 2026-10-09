@@ -28,6 +28,12 @@ document.documentElement.lang = LANG;
 // setTextSize() lives in shared.js.
 try { if (localStorage.getItem('textSize') === 'large') document.documentElement.dataset.text = 'large'; } catch (_) {}
 
+// The beta (divilytics.github.io/beta/, the next version tried out before it
+// replaces this one): its menu bar is purple (style.css, theme.js), set here so
+// it never paints otherwise. Its storage keys are its own (config.js).
+const IS_BETA = location.pathname.startsWith('/beta/');
+if (IS_BETA) document.documentElement.dataset.beta = '';
+
 // Pick a language (home page switch): remember it and redraw every page in it.
 // The page reloads; nothing else should change (see THE PAGE ACROSS A SWITCH).
 function setLang(lang) {
