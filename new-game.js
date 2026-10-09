@@ -4,9 +4,8 @@ let chars            = [];
 let boxInfo          = {};          // loadBoxInfo(), used to order box groups by release date
 let orderSlots       = [];          // each: { id, char, isMe, isWinner }
 // Solo (solo.js), the last choice of the players menu: one villain, yours, won
-// or lost against the game (soloResult: 'won' | 'lost', null until picked).
+// against the game (👑, the row's isWinner) or lost.
 let soloMode         = false;
-let soloResult       = null;
 let orderNextId      = 0;
 let slotTimers       = {};          // slotId → setInterval id (active spin animation)
 let _shuffleTimer    = null;        // setInterval id for the shuffle-order animation
@@ -22,7 +21,8 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
-const LEGEND_ITEMS = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
+const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
+const SOLO_LEGEND_ITEMS = [t('👑 = winner')];   // Solo: the row's only button
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -129,7 +129,6 @@ function _saveDraft() {
       saved:     Date.now(),
       slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
       solo:      soloMode,
-      soloResult,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
@@ -165,7 +164,6 @@ function _restoreDraftForm() {
   if (d.slots && (d.slots.length >= 2 || (d.solo && d.slots.length === 1))) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
-    soloResult = d.soloResult || null;
     if (d.fDate) document.getElementById('fDate').value = d.fDate;
     document.getElementById('fLocation').value = d.fLocation || '';
     document.getElementById('fDur').value      = d.fDur      || '';
@@ -237,7 +235,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (host) layoutSeparatedRows(host, LEGEND_ITEMS);   // hidden (live game, Solo): keeps the current markup
+  if (host) layoutSeparatedRows(host, soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS);   // hidden (live game): keeps the current markup
 }
 
 // Lays out the legend now, again once the web font is in (a first pass may
@@ -289,8 +287,7 @@ function setPlayerCount(n) {
 // Into Solo: the lineup becomes one row, the first villain already picked (or
 // the first row). Out of it: back to two rows at least, nobody marked.
 function _setSolo(on) {
-  soloMode   = on;
-  soloResult = null;
+  soloMode = on;
   if (on) {
     const keep = orderSlots.find(s => s.char) || orderSlots[0];
     for (const s of orderSlots) {
@@ -304,28 +301,19 @@ function _setSolo(on) {
   _saveLiveState();
 }
 
-function setSoloResult(r) {
-  soloResult = r;
-  renderOrderSlots();
-  _saveLiveState();
-}
-
-// What only Solo shows (the result, what the variant is, its live hint and the
-// 20 rounds) and what it hides: Random order, + Add player, and the row's
-// buttons with their legend (one villain: Draw villain does what its 🎲 would,
-// the villain is yours, the result goes below).
+// What only Solo shows (what the variant is, its live hint and the 20 rounds)
+// and what it hides: Random order, + Add player, and every row button but 👑
+// (one villain: Draw villain does what its 🎲 would, and the villain is yours).
 function _syncSoloUI() {
-  setVisible('soloResult', soloMode);
-  document.querySelectorAll('#soloResult .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.result === soloResult));
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
-  setVisible('playersLegend', !soloMode);
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
   const turns = document.getElementById('fTurns');
   if (turns) turns.max = soloMode ? SOLO_MAX_TURNS : 999;
+  _layoutLegend();
 }
 
 function removeOrderSlot(id) {
@@ -567,8 +555,8 @@ function renderOrderSlots() {
           ${soloMode ? '' : `
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
-          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>
-          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>`}
+          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
+          <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
       </div>`;
   }).join('');
@@ -686,8 +674,9 @@ function _updateActionBtns() {
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
   // still validated in the handlers.
   const lineupErr = _validateLineup();                     // null = ready to start
-  const hasWinner = soloMode ? !!soloResult : orderSlots.some(s => s.isWinner);
-  const saveErr   = lineupErr || (hasWinner ? null : soloMode ? t('Pick the result: Won or Lost.') : t('Mark the winner with 👑.'));
+  // Solo: no 👑 is a lost game.
+  const hasWinner = soloMode || orderSlots.some(s => s.isWinner);
+  const saveErr   = lineupErr || (hasWinner ? null : t('Mark the winner with 👑.'));
   if (startBtn)  { startBtn.disabled  = animating || !!lineupErr; startBtn.title  = animating ? '' : (lineupErr || ''); }
   if (submitBtn) { submitBtn.disabled = animating || !!saveErr;   submitBtn.title = animating ? '' : (saveErr   || ''); }
 }
@@ -893,7 +882,6 @@ function _saveLiveState() {
   liveGame.persist({
     slots:     orderSlots,
     solo:      soloMode,
-    soloResult,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
@@ -969,7 +957,6 @@ function _doDiscard() {
   slotTimers = {};
   orderSlots = [];
   soloMode   = false;
-  soloResult = null;
   addOrderSlot();
   addOrderSlot();
 
@@ -1010,7 +997,6 @@ function _checkResume() {
     isWinner: !!s.isWinner,
   }));
   soloMode   = !!state.solo;
-  soloResult = state.soloResult || null;
   renderOrderSlots();
 
   if (state.liveStart) {
@@ -1052,13 +1038,12 @@ async function submitForm() {
   const lineupErr = _validateLineup();
   if (lineupErr) return showErr(lineupErr);
   if (soloMode) {
-    if (!soloResult) return showErr(t('Pick the result: Won or Lost.'));
     if (turns > SOLO_MAX_TURNS) return showErr(t('A solo game ends by round {n}.', { n: SOLO_MAX_TURNS }));
   } else if (!orderSlots.some(s => s.isWinner)) return showErr(t('Mark the winner with 👑.'));
 
-  // Solo: the one seat is yours, won or lost against the game.
+  // Solo: the one seat is yours, won (👑) or lost against the game.
   const ps = soloMode
-    ? [{ position: 0, character: orderSlots[0].char, is_winner: soloResult === 'won', user_id: user.id, nickname: profile.nickname }]
+    ? [{ position: 0, character: orderSlots[0].char, is_winner: orderSlots[0].isWinner, user_id: user.id, nickname: profile.nickname }]
     : orderSlots.map((s, i) => ({
         position:  i,
         character: s.char,

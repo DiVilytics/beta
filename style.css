@@ -641,6 +641,9 @@ main {
    its hint right below. "With these" picks villains that must all be at the
    table, so the pace and My-boxes tools (which shape a pool) step aside. */
 .filter-char-panel.with-mode .gl-only { display: none; }
+/* Solo (game-log.js): just the villains, picked by tapping; no mode, no hint. */
+.filter-char-panel.solo-mode #glCharMode,
+.filter-char-panel.solo-mode #glFilterHint { display: none; }
 .txt-btn {
   font-family: inherit;
   font-size: calc(12px * var(--ts));
@@ -2323,10 +2326,8 @@ select:disabled {
 .pill-solo, .pill-solo.on { border-style: dashed; }
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
-/* New Game: Solo picked in the players menu, and its result (Won / Lost). */
+/* New Game: Solo picked in the players menu. */
 .players-count-select.solo { border-style: dashed; border-color: var(--s4); }
-.solo-result { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
-.solo-result-lbl { font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--muted); }
 #soloHintNg .solo-hint { margin: 10px 0 0; }
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }

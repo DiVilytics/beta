@@ -332,7 +332,7 @@ async function editLineup() {
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
   document.getElementById('lineupHint').textContent = claimIsSolo()
-    ? t('Change your villain, and whether you won or lost.')
+    ? t('Change your villain, and whether you won (👑) or lost.')
     : t('You can change the villains and the winner until another player claims a villain.');
   clearError('lineupErr');
   const btn = document.getElementById('lineupSaveBtn');
@@ -346,7 +346,7 @@ function closeLineup() {
   closeOverlay('lineupOverlay');
 }
 
-// A solo game: its one villain, then Won / Lost as in New Game.
+// A solo game: its one villain, 👑 on if won (as in New Game).
 function _renderLineup() {
   const solo = claimIsSolo();
   document.getElementById('lineupSlots').innerHTML = lineupDraft.map((s, i) => {
@@ -363,19 +363,11 @@ function _renderLineup() {
           <div class="order-slot-name">${villainNameHTML(s.character)}</div>
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
-        ${solo ? '' : `
         <div class="order-slot-actions">
           <button class="pf-btn win${s.is_winner ? ' on' : ''}" type="button" onclick="setLineupWinner(${i})" title="${t('Winner')}">👑</button>
-        </div>`}
+        </div>
       </div>`;
-  }).join('') + (solo ? `
-    <div class="solo-result">
-      <span class="solo-result-lbl">${t('Result')}</span>
-      <div class="seg">
-        <button class="seg-btn${lineupDraft[0].is_winner ? ' on' : ''}" type="button" onclick="setLineupResult(true)">${t('Won 👑')}</button>
-        <button class="seg-btn${lineupDraft[0].is_winner ? '' : ' on'}" type="button" onclick="setLineupResult(false)">${t('Lost')}</button>
-      </div>
-    </div>` : '');
+  }).join('');
 }
 
 // Every seat keeps a villain: the menu's empty first entry changes nothing.
@@ -384,15 +376,11 @@ function setLineupVillain(i, name) {
   _renderLineup();
 }
 
-// The crown moves to this seat (one winner).
+// The crown moves to this seat (one winner); in a solo game it turns on and
+// off (won, lost).
 function setLineupWinner(i) {
-  lineupDraft.forEach((s, j) => { s.is_winner = j === i; });
-  _renderLineup();
-}
-
-// A solo game: won or lost.
-function setLineupResult(won) {
-  lineupDraft[0].is_winner = won;
+  const solo = claimIsSolo();
+  lineupDraft.forEach((s, j) => { s.is_winner = j === i && !(solo && s.is_winner); });
   _renderLineup();
 }
 

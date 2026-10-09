@@ -165,7 +165,7 @@
       {
         "title": "On DiVilytics",
         "items": [
-          { "term": "Recording a solo game", "text": "In New Game, pick Solo in the players menu, choose your villain, then Won or Lost. The rounds are the turns you played (20 if you lost)." },
+          { "term": "Recording a solo game", "text": "In New Game, pick Solo in the players menu, choose your villain and mark it with 👑 if you won. The rounds are the turns you played (20 if you lost)." },
           { "term": "Separate statistics", "text": "Solo games are unofficial, so they never count with the others: not in the rankings, the villains' statistics, XP or achievements. They have their own, under the dashed Solo pill of the Leaderboard, the Game Log and every villain and player page." }
         ]
       }

@@ -321,7 +321,7 @@
       {
         "title": "Su DiVilytics",
         "items": [
-          { "term": "Registrare una partita in solitario", "text": "In Nuova partita scegli Solitario nel menu dei giocatori, scegli il tuo Cattivo e poi Vinta o Persa. I round sono i turni che hai giocato (20 se hai perso)." },
+          { "term": "Registrare una partita in solitario", "text": "In Nuova partita scegli Solitario nel menu dei giocatori, scegli il tuo Cattivo e segnalo con 👑 se hai vinto. I round sono i turni che hai giocato (20 se hai perso)." },
           { "term": "Statistiche separate", "text": "Le partite in solitario non sono ufficiali, quindi non contano mai con le altre: né nelle classifiche, né nelle statistiche dei Cattivi, negli XP o nei traguardi. Hanno le loro, sotto il filtro tratteggiato Solitario della Classifica, del Registro e di ogni pagina di Cattivo e giocatore." }
         ]
       }
