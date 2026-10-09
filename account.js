@@ -30,9 +30,9 @@ async function init() {
   _acctChars      = chars;
   _acctBoxInfo    = boxInfo;
   _acctOwnedBoxes = new Set((ownedRes.data || []).map(r => r.box));
-  const myGp      = gpRes.rows;
-  _acctAch        = computeCharacterAchievements(myGp);
-  const { games, players } = await fetchGamesWithPlayers([...new Set(myGp.map(r => r.game_id))]);
+  const { games, players } = await fetchGamesWithPlayers([...new Set(gpRes.rows.map(r => r.game_id))]);
+  const official  = new Set(games.map(g => g.id));   // solo games give no achievements
+  _acctAch        = computeCharacterAchievements(gpRes.rows.filter(r => official.has(r.game_id)));
   _acctGlobal     = computeGlobalAchievements(games, players, p => p.user_id === user.id, _acctChars);
   await _loadIdentities();
   _renderPage();

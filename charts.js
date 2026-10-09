@@ -26,10 +26,10 @@ async function _characterStats() {
   return _data.charStats;
 }
 
-// All games' played_at / duration / rounds / source (small rows, paged past the cap).
+// All official games' played_at / duration / rounds / source (small rows, paged past the cap).
 async function _gamesLite() {
   if (_data.games) return _data.games;
-  const { rows } = await _fetchAllRows(() => db.from('games').select('played_at, duration_minutes, num_turns, source'));
+  const { rows } = await _fetchAllRows(() => db.from('games').select('played_at, duration_minutes, num_turns, source').is('variant', null));
   _data.games = rows;
   return _data.games;
 }

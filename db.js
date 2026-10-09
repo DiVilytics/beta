@@ -95,14 +95,20 @@ async function fetchGamesByIds(ids, { orderByPlayedAtDesc = false } = {}) {
   return games;
 }
 
-// Convenience: returns { games, players } for a set of ids in one trip.
+// Convenience: returns { games, players } for a set of ids in one trip. Only
+// the official games among them and their players: solo games (variant
+// 'solo', the unofficial solo variant) have statistics of their own; pass
+// { variant: 'solo' } for those instead.
 async function fetchGamesWithPlayers(ids, opts = {}) {
   if (!ids.length) return { games: [], players: [] };
-  const [games, players] = await Promise.all([
+  const variant = opts.variant ?? null;
+  const [allGames, allPlayers] = await Promise.all([
     fetchGamesByIds(ids, opts),
     fetchPlayersForGames(ids),
   ]);
-  return { games, players };
+  const games = allGames.filter(g => (g.variant ?? null) === variant);
+  const kept  = new Set(games.map(g => g.id));
+  return { games, players: allPlayers.filter(p => kept.has(p.game_id)) };
 }
 
 // ── STATIC DATA LOADERS ──────────────────────────────────────────────────────

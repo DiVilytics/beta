@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /beta/
 
 Sitemap: https://divilytics.github.io/sitemap.xml

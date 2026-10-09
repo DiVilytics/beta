@@ -195,8 +195,9 @@ async function renderDetailPage(charName) {
   const [{ rows: dgames }, { data: adv }] = await Promise.all([
     _fetchAllRows(() => db
       .from('game_players')
-      .select('games(duration_minutes, num_turns)')
-      .eq('character', charName)),
+      .select('games!inner(duration_minutes, num_turns)')
+      .eq('character', charName)
+      .is('games.variant', null)),   // official games only
     db.rpc('character_adversary_stats', { char_name: charName }),
   ]);
   csAvgDur     = avg(dgames.map(r => r.games?.duration_minutes));
