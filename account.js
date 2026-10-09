@@ -108,6 +108,8 @@ function _renderPage() {
       <div class="box-picker" id="boxPicker"></div>
     </div>
 
+    <div class="acct-section" id="betaSection">${_betaSectionHTML()}</div>
+
     <div class="acct-section">
       <div class="section-label">${t('Account')}</div>
       <div class="err" id="identitiesErr"></div>
@@ -452,6 +454,27 @@ async function confirmDeleteAccount() {
 
   await db.auth.signOut();
   location.href = 'index.html';
+}
+
+// ── BETA ──────────────────────────────────────────────────────────────────────
+// Join the beta (lang.js): this browser then opens the beta instead of the
+// release. Joining from the release goes to the beta's account page, leaving
+// from the beta back to the release's.
+
+function _betaSectionHTML() {
+  const joined = betaJoined();
+  return `
+    <div class="section-label">${t('Beta')}</div>
+    <p class="acct-note">${joined && IS_BETA
+      ? t("You're on the beta: on this browser, DiVilytics always opens here.")
+      : t('Try new features before everyone else, on a version still being finished. Your account and your games are the same on both.')}</p>
+    <button class="btn btn-ghost" onclick="setBeta(${!joined})">${joined ? t('Leave the beta') : t('Join the beta')}</button>`;
+}
+
+function setBeta(join) {
+  try { if (join) localStorage.setItem(BETA_KEY, '1'); else localStorage.removeItem(BETA_KEY); } catch (_) {}
+  if (join === IS_BETA) { document.getElementById('betaSection').innerHTML = _betaSectionHTML(); return; }
+  location.href = join ? `/beta${location.pathname}` : (location.pathname.replace(/^\/beta/, '') || '/');
 }
 
 // ── LINKED IDENTITIES ─────────────────────────────────────────────────────────

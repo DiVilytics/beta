@@ -2762,6 +2762,8 @@ select:disabled {
   margin-bottom: 10px;
 }
 
+.acct-note { color: var(--muted); font-size: calc(13px * var(--ts)); line-height: 1.45; margin: 0 0 10px; }
+
 .acct-actions {
   display: flex;
   flex-wrap: wrap;
