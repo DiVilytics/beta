@@ -71,7 +71,7 @@ async function init() {
     glChars,
     pace.excluded,
     (name, excluded) => {   // a single villain tapped in or out
-      if (!excluded) _capWithPicks();   // a box name can pick past the limit: not the extra ones
+      if (!excluded) _capWithPicks();   // never past the limit
       updateFilterUI();
       _syncResetBtn();
     },
@@ -214,6 +214,7 @@ function updateFilterUI() {
   // With these at its limit: the villains not picked gray out.
   _syncWithOrder();
   document.getElementById('charFilterPanel').classList.toggle('with-capped', glCharMode === 'with' && _withOrder.length >= _withLimit());
+  _syncBoxNames();
   // The toggle sums the filter up: "Villains | among 12" or "Villains | with
   // Ursula, Jafar" (names up to two, then a count); nothing after it when off.
   const picked = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
@@ -249,6 +250,19 @@ function _syncWithOrder() {
   const picked = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
   _withOrder = _withOrder.filter(n => picked.has(n));
   for (const n of picked) if (!_withOrder.includes(n)) _withOrder.push(n);
+}
+
+// With these: a box name picks its whole box or clears it, never part of it.
+// It clears the box when any of its villains is picked; it picks them all only
+// if they all fit under the limit, otherwise it grays out.
+function _syncBoxNames() {
+  const free = _withLimit() - _withOrder.length;
+  for (const group of document.querySelectorAll('#charGrid .box-group')) {
+    const names = new Set([...group.querySelectorAll('.char-pill')].map(p => p.dataset.name));
+    const none  = [...names].every(n => pace.excluded.has(n));   // none of the box picked
+    const btn = group.querySelector('.box-name');
+    if (btn) btn.disabled = glCharMode === 'with' && none && names.size > free;
+  }
 }
 
 // With these: down to the limit, keeping the villains picked first.

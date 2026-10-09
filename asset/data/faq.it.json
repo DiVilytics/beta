@@ -317,13 +317,6 @@
           { "term": "Regola alternativa", "text": "Un'opzione più semplice, proposta in seguito e preferita dall'autore: puoi giocare una Condizione dalla mano quando il tiro di fine turno è da 7 a 10." },
           { "term": "Cattivi più recenti", "text": "La variante è nata con i primi Cattivi: per le Condizioni uscite dopo, accordatevi su una regola della casa che vi sembri giusta." }
         ]
-      },
-      {
-        "title": "Su DiVilytics",
-        "items": [
-          { "term": "Registrare una partita in solitario", "text": "In Nuova partita scegli Solitario nel menu dei giocatori, scegli il tuo Cattivo e segnalo con 👑 se hai vinto. I round sono i turni che hai giocato (20 se hai perso)." },
-          { "term": "Statistiche separate", "text": "Le partite in solitario non sono ufficiali, quindi non contano mai con le altre: né nelle classifiche, né nelle statistiche dei Cattivi, negli XP o nei traguardi. Hanno le loro, sotto il filtro tratteggiato Solitario della Classifica, del Registro e di ogni pagina di Cattivo e giocatore." }
-        ]
       }
     ]
   },

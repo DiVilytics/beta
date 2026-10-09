@@ -10,6 +10,10 @@
 const FAQ_GENERAL = 'general';
 const FAQ_SOLO    = 'solo';
 
+// Each rulebook's book in the topic menu: the official rules green, Introduction
+// to Evil blue; the unofficial solo variant has the open book.
+const RULEBOOK_ICONS = { rules: '📗', 'rules-i2e': '📘' };
+
 let faqData  = null;
 let faqTopic = null;   // null = menu | rulebook id | FAQ_GENERAL | FAQ_SOLO | villain name | undefined = unknown
 
@@ -92,7 +96,7 @@ function _menuHTML() {
   return `
     ${Object.entries(_rulebooks()).map(([id, rb]) => `
       <a class="home-section-link faq-rulebook-link" href="${_faqHref(id)}">
-        <span class="home-section-icon">📖</span>
+        <span class="home-section-icon">${RULEBOOK_ICONS[id] || '📗'}</span>
         <div class="home-section-text">
           <span class="home-section-name">${_esc(rb.title)}</span>
           <span class="home-section-desc">${_esc(rb.desc)} (${tn(_countItems(rb.groups), '{n} entry', '{n} entries')})</span>
@@ -100,7 +104,7 @@ function _menuHTML() {
       </a>`).join('')}
     ${faqData.solo ? `
     <a class="home-section-link faq-rulebook-link faq-solo-link" href="${_faqHref(FAQ_SOLO)}">
-      <span class="home-section-icon">🎲</span>
+      <span class="home-section-icon">📖</span>
       <div class="home-section-text">
         <span class="home-section-name">${_esc(faqData.solo.title)}</span>
         <span class="home-section-desc">${_esc(faqData.solo.desc)} (${tn(_countItems(faqData.solo.groups), '{n} entry', '{n} entries')})</span>

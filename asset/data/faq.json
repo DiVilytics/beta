@@ -161,13 +161,6 @@
           { "term": "Alternative rule", "text": "A simpler option, suggested later and preferred by the author: you can play one Condition from your hand when your end-of-turn roll is 7 to 10." },
           { "term": "Newer villains", "text": "The variant was built around the first villains: for Conditions released later, agree on a house rule that feels right." }
         ]
-      },
-      {
-        "title": "On DiVilytics",
-        "items": [
-          { "term": "Recording a solo game", "text": "In New Game, pick Solo in the players menu, choose your villain and mark it with 👑 if you won. The rounds are the turns you played (20 if you lost)." },
-          { "term": "Separate statistics", "text": "Solo games are unofficial, so they never count with the others: not in the rankings, the villains' statistics, XP or achievements. They have their own, under the dashed Solo pill of the Leaderboard, the Game Log and every villain and player page." }
-        ]
       }
     ]
   },
