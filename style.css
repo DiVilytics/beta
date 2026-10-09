@@ -360,7 +360,9 @@ a.chip {
 
 /* The XP table (leaderboard.js): one game's XP by claims, lost in purple, won
    in gold. */
-.xp-table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+/* Fixed layout: the labels' column set, the six claims' columns all equal. */
+.xp-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+.xp-table .xp-label-col { width: 64px; }
 .xp-table th, .xp-table td { padding: 8px 2px; text-align: center; border-bottom: 1px solid var(--border); font-size: calc(13px * var(--ts)); white-space: nowrap; }
 .xp-table thead th { color: var(--dim); font-size: calc(11px * var(--ts)); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 .xp-table thead tr:first-child th { white-space: normal; }   /* the columns' heading may wrap */

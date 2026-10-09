@@ -291,6 +291,7 @@ function openXpTable() {
   document.getElementById('xpBody').innerHTML = `
     <p class="modal-hint">${t('The XP of one game, by how many players claimed their villain, you included.')}</p>
     <table class="xp-table">
+      <colgroup><col class="xp-label-col"><col span="${claims.length}"></colgroup>
       <thead>
         <tr><th></th><th colspan="${claims.length}">${t('Players who claimed, you included')}</th></tr>
         <tr><th></th>${claims.map(c => `<th>${c}</th>`).join('')}</tr>
