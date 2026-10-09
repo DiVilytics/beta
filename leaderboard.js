@@ -20,7 +20,9 @@ const period = createPeriodFilter('lbPeriod', {
   onChange: () => { lbDisplayLimit = LB_PAGE_SIZE; loadAndRender(); },
 });
 
-const LB_PAGE_SIZE = 35;
+// The Players tab shows 30 at a time, Load more for the next 30, your own row
+// pinned under them when it ranks lower; the Villains tab shows every villain.
+const LB_PAGE_SIZE = 30;
 let lbDisplayLimit = LB_PAGE_SIZE;
 
 // Cache: key `${lbTab}:${size}:${period.id()}` → { rows, summary }. Avoids
@@ -318,7 +320,8 @@ function render({ rows, summary }) {
   const isChar  = lbTab === 'characters';
   // Only the Players tab has a "you" to highlight.
   const selfKey = isChar ? null : (getCurrentProfile()?.nickname || null);
-  const hasMore = rows.length > lbDisplayLimit;
+  const limit   = isChar ? Infinity : lbDisplayLimit;
+  const hasMore = rows.length > limit;
 
   document.getElementById('lb').innerHTML = `
     ${soloHint}
@@ -330,7 +333,7 @@ function render({ rows, summary }) {
       headLabel:   isChar ? t('Villain') : t('Player'),
       getName:     key => isChar ? villainName(key) : key,
       getNameHTML: isChar ? villainNameInline : undefined,
-      limit:       lbDisplayLimit,
+      limit,
       selfKey,
       minGames,
       getKey:      r   => isChar ? r.character : r.nickname,
