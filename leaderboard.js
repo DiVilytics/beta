@@ -126,6 +126,11 @@ async function loadAndRender() {
       lb.innerHTML = `<div class="empty-state">${t("Couldn't load the leaderboard.")}</div>`;
       return;
     }
+    // The Villains tab lists every villain, also those without games here.
+    if (lbTab === 'characters') {
+      const present = new Set(data.rows.map(r => r.character));
+      data.rows = data.rows.concat(lbChars.filter(c => !present.has(c.name)).map(c => ({ character: c.name, games: 0, wins: 0 })));
+    }
     _lbCache[key] = data;
   }
 
@@ -305,7 +310,8 @@ function render({ rows, summary }) {
   // rank everyone, a low count there isn't misleading the same way.
   const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : 0;   // stats-table.js
   // Registered players who never played have no % at all: only in the counts.
-  if (mode === 'pct') rows = rows.filter(r => r.games > 0);
+  // Villains are all listed, those without games under the divider ("-").
+  if (mode === 'pct' && lbTab === 'players') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
   const hasUnranked = rows.some(r => r.games < minGames);
 

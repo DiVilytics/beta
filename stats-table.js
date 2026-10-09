@@ -58,6 +58,7 @@ function statValueLabel(mode) {
 // The number in parentheses: the games, or for XP the XP from achievements.
 const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
 function statCellHTML(r, mode) {
+  if (mode === 'pct' && !r.games) return '-';   // no games, no win rate
   const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
   return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${_statSub(r, mode)})</span>`}</span>`;
 }
