@@ -1,14 +1,19 @@
 {
   "2026-10-09": {
-    "title": "XP, and fixing a recorded game",
+    "title": "Solo, XP, and fixing a recorded game",
     "new": [
-      "The players' Leaderboard opens on XP: for every game where you claimed your villain, 1 for each other player who claimed theirs, doubled if you won; plus 1 for each achievement.",
+      "Solo, an unofficial variant for one player: your villain against the game, with 20 turns to reach the Objective. Record it from New Game; solo games have their own rankings and stats, under the dashed Solo pill, and never count with the others. The FAQ summarizes its rules.",
+      "The players' Leaderboard opens on XP: for every game where you claimed your villain, 1 for each player who claimed theirs, you included, and if you won, 1 more for each of the others; plus 1 for each achievement.",
       "Whoever recorded a game can change its villains and its winner until another player claims a villain, and can delete the game from its page.",
+      "Villain Movers: next to each villain's name, in a row while a game is in progress, and as a collection on every player page.",
       "Seven new avatar images.",
       "Join the beta from your account page to try new features before everyone else."
     ],
     "improved": [
-      "After saving a game, its page opens with the QR code on top: close it to check the villains, the winner and the details."
+      "After saving a game, its page opens with the QR code on top: close it to check the villains, the winner and the details.",
+      "On a villain's page, tap a table size, or Solo, to see its numbers in the boxes on top.",
+      "Achievements are now only on player pages: the ones earned, and with Show all also those still to earn.",
+      "The villains' Leaderboard always lists every villain, even those without games in the chosen filters."
     ]
   },
   "2026-10-07": {
