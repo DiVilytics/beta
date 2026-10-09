@@ -14,6 +14,7 @@ let pfLoaded    = false;  // the filters show before the games: render() waits f
 
 let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
 let pfWinsOnly       = false;
+let pfAchAll         = false;   // achievements: the earned ones, or (Show all) every one
 let pfLocationFilter = null;
 
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
@@ -78,12 +79,12 @@ async function init() {
   // A language switch brings back the filters and the games loaded (lang.js).
   const saved = takeViewState();
   if (saved) {
-    pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location;
+    pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location; pfAchAll = !!saved.achAll;
     size.set(saved.filter);
     period.set(saved.period);
   }
   keepViewState(() => ({
-    filter: size.value(), mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter,
+    filter: size.value(), mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter, achAll: pfAchAll,
     period: period.get(), limit: pfDisplayLimit,
   }));
 
@@ -214,6 +215,26 @@ function _moversSectionHTML() {
     <div class="pf-movers">${pfAllChars.map(c => moverImgHTML(c.name, played.has(c.name) ? '' : 'off')).join('')}</div>`;
 }
 
+// The achievements: the earned ones, or every one with Show all (the pill in
+// their header, like Wins only on the games).
+function _achievementsHTML() {
+  return achievementsSectionHTML({
+    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
+    onlyEarned: !pfAchAll,
+    header: (earned, total) => `
+      <div class="pf-games-header">
+        <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
+        <button class="pill${pfAchAll ? ' on' : ''}" onclick="pfToggleAchAll()" type="button">${t('Show all')}</button>
+      </div>`,
+  });
+}
+
+function pfToggleAchAll() {
+  pfAchAll = !pfAchAll;
+  const box = document.getElementById('pfAch');
+  if (box) box.innerHTML = _achievementsHTML();
+}
+
 // ── CONTROLS ──────────────────────────────────────────────────────────────────
 
 function pfSetMode(m) {
@@ -329,15 +350,7 @@ function render() {
     title: pfNick ? `${t('Achievements')} | ${pfNick}` : t('Achievements'),
   });
   // All-time sections, shown whatever the filters (not on Solo).
-  const achHTML = solo ? '' : achievementsSectionHTML({
-    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
-    // The profile shows only earned achievements (mirroring the characters grid).
-    onlyEarned: true,
-    header: (earned, total) => `
-      <div class="pf-games-header">
-        <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
-      </div>`,
-  });
+  const achHTML = solo ? '' : `<div id="pfAch">${_achievementsHTML()}</div>`;
 
   const soloHint = solo ? soloHintHTML() : '';
   const friends  = solo ? '' : _friendsSectionHTML();
