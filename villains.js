@@ -22,7 +22,7 @@ let csAvgTurns  = null;      // avg rounds across this character's games
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
 // All / Solo (dashed) above the stats: Solo shows this villain's solo games
 // (solo.js) instead, never mixed with the others. csSoloStats: undefined until
-// loaded, null if they couldn't load, else { games, players, avatars }.
+// loaded, null if they couldn't load, else { games, players }.
 let csSolo      = false;
 let csSoloStats;
 
@@ -267,8 +267,7 @@ function csSetRivalMode(m) {
   render();
 }
 
-// All / Solo. Solo loads the solo games once, with the avatars of the players
-// who played this villain solo.
+// All / Solo. Solo loads the solo games once.
 async function csSetSolo(on) {
   if (on === csSolo) return;
   csSolo = on;
@@ -278,15 +277,7 @@ async function csSetSolo(on) {
   if (!solo) { csSoloStats = null; render(); return; }
   const players = solo.players.filter(p => p.character === csChar.name);
   const ids     = new Set(players.map(p => p.game_id));
-  const nicks   = [...new Set(players.map(p => p.nickname).filter(Boolean))];
-  const { data } = nicks.length
-    ? await db.from('profiles').select('nickname, avatar_url, default_avatar').in('nickname', nicks)
-    : { data: [] };
-  csSoloStats = {
-    games:   solo.games.filter(g => ids.has(g.id)),
-    players,
-    avatars: Object.fromEntries((data || []).map(p => [p.nickname, resolveAvatar(p)])),
-  };
+  csSoloStats = { games: solo.games.filter(g => ids.has(g.id)), players };
   render();
 }
 
@@ -383,8 +374,8 @@ function render() {
     ${_adversariesSectionHTML()}`;
 }
 
-// Solo: this villain's solo games, summed up, and the players who played it
-// solo, ranked (no table sizes, no rivalries: one villain per game).
+// Solo: this villain's solo games, summed up (no table sizes, no rivalries:
+// one villain per game).
 function _soloStatsHTML() {
   const hint = soloHintHTML();
   if (csSoloStats === null) return `${hint}<div class="empty"><p>${t("Couldn't load the solo games.")}</p></div>`;
@@ -407,18 +398,7 @@ function _soloStatsHTML() {
         { val: v((players.length ? Math.round((wins / players.length) * 100) : 0) + '%'), lbl: t('Win rate') },
         { val: v(wins), lbl: t('Wins') },
       ])}
-    </div>
-    ${loading ? '' : `
-      ${statModeSegHTML(csMode, 'csSetMode')}
-      ${renderStatTableHTML(soloRankRows(players, 'nickname'), {
-        mode:        csMode,
-        headLabel:   t('Player'),
-        getKey:      r   => r.nickname,
-        getHref:     key => `players.html?nick=${encodeURIComponent(key)}`,
-        getIdentity: key => playerAvatarHTML(csSoloStats.avatars[key]),
-        selfKey:     getCurrentProfile()?.nickname || null,
-        wrapClass:   'mb-1-25',
-      })}`}`;
+    </div>`;
 }
 
 // "Rivalries": the opponents this character has beaten most / lost to most,

@@ -22,8 +22,7 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
-const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
-const SOLO_LEGEND_ITEMS = [t('🎲 = draw')];   // the villain is yours, the result goes below
+const LEGEND_ITEMS = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -238,7 +237,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (host) layoutSeparatedRows(host, soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS);   // hidden (live game): keeps the current markup
+  if (host) layoutSeparatedRows(host, LEGEND_ITEMS);   // hidden (live game, Solo): keeps the current markup
 }
 
 // Lays out the legend now, again once the web font is in (a first pass may
@@ -312,19 +311,21 @@ function setSoloResult(r) {
 }
 
 // What only Solo shows (the result, what the variant is, its live hint and the
-// 20 rounds) and what it hides (Random order, + Add player).
+// 20 rounds) and what it hides: Random order, + Add player, and the row's
+// buttons with their legend (one villain: Draw villain does what its 🎲 would,
+// the villain is yours, the result goes below).
 function _syncSoloUI() {
   setVisible('soloResult', soloMode);
   document.querySelectorAll('#soloResult .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.result === soloResult));
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
+  setVisible('playersLegend', !soloMode);
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
   const turns = document.getElementById('fTurns');
   if (turns) turns.max = soloMode ? SOLO_MAX_TURNS : 999;
-  _layoutLegend();
 }
 
 function removeOrderSlot(id) {
@@ -563,8 +564,8 @@ function renderOrderSlots() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           ${soloMode ? '' : `
+          <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>`}
