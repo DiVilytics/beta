@@ -11,6 +11,17 @@ function charImgHTML(name) {
   return `<img class="char-portrait" src="${charImgSrc(name)}" onerror="this.src='asset/players/default.svg'" alt="">`;
 }
 
+// A villain's Villain Mover (asset/movers), cut out of one photo of them all, so
+// their sizes compare: the game in progress shows them at a common scale, as
+// they stand on the table. A villain without one shows nothing.
+function moverImgSrc(name) {
+  return `asset/movers/${name.replace(/ /g, '_')}.png`;
+}
+
+function moverImgHTML(name, cls = '') {
+  return `<img class="mover${cls ? ` ${cls}` : ''}" src="${moverImgSrc(name)}" alt="${_esc(villainName(name))}" title="${_esc(villainName(name))}" onerror="this.remove()">`;
+}
+
 // Avatar helpers (resolveAvatar, the builder recipe model, avatarHTML,
 // playerAvatarHTML and the lightbox) live in avatar.js.
 

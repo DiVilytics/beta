@@ -237,7 +237,7 @@ async function _renderCharIdentity() {
     ? `<a class="pace-dot ${csChar.pace}" href="villains.html?pace=${csChar.pace}" title="${_esc(t('View {pace} pace villains', { pace: t(csChar.pace[0].toUpperCase() + csChar.pace.slice(1)) }))}"></a>`
     : `<a class="pace-dot gray" href="villains.html?pace=gray" title="${t('Pace not yet set')}"></a>`;
   document.getElementById('csIdentity').innerHTML =
-    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${villainNameInline(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span></div><p class="char-meta">${t('Pace')}: ${paceDot}${guideLink}</p>`;
+    `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${villainNameInline(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span>${moverImgHTML(csChar.name, 'cs-mover')}</div><p class="char-meta">${t('Pace')}: ${paceDot}${guideLink}</p>`;
 }
 
 function _foldBuckets(buckets) {

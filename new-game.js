@@ -762,9 +762,12 @@ function _initDrag() {
 
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
 
-// The line under "Game in progress": player count and, when set, the location.
-// Drawn on start and on resume (the form fields are hidden while live).
+// The line under "Game in progress": player count and, when set, the location;
+// then the villains' movers in play order. Drawn on start and on resume (the
+// form fields are hidden while live).
 function _renderLiveInfo() {
+  const movers = document.getElementById('liveMovers');
+  if (movers) movers.innerHTML = orderSlots.filter(s => s.char).map(s => moverImgHTML(s.char)).join('');
   const infoEl   = document.getElementById('liveInfo');
   const location = document.getElementById('fLocation').value.trim();
   if (infoEl) infoEl.textContent = [soloMode ? t('Solo') : tn(orderSlots.length, '{n} player', '{n} players'), location ? t('Playing at {location}', { location }) : null].filter(Boolean).join(' | ');

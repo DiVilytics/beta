@@ -223,6 +223,7 @@ window.I18N.it = {
     "Open a profile by tapping a nickname on the leaderboard or a game card.": "Apri un profilo toccando un nickname in classifica o in una partita.",
     "Share": "Condividi",
     "Most played with": "Con chi gioca di più",
+    "Movers": "Pedine",
     "{nick} hasn't played any recorded games.": "{nick} non ha ancora partite registrate.",
     "No games for this filter": "Nessuna partita con questo filtro",
     "Win rate": "% Vittorie",

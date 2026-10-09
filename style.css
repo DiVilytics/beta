@@ -392,6 +392,19 @@ a.pace-dot:hover { transform: scale(1.3); }
 .pace-dot.red    { background: var(--pace-red); }
 .pace-dot.gray   { background: var(--pace-gray); }
 
+/* Villain Movers (ui.js moverImgHTML): the villain page's, beside the portrait
+   and the name (not zoomable); the game in progress's row, at one common scale
+   so they compare as on the table; a player's compact collection, the villains
+   not played yet faded. */
+.mover { display: block; flex: none; }
+.cs-mover { height: 40px; width: auto; }
+.live-movers { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 8px; margin-top: 14px; }
+/* One scale for all: six of the widest still fit a phone's line. */
+.live-movers .mover { zoom: 0.32; }
+.pf-movers { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3px; margin-bottom: 1.25rem; }
+.pf-movers .mover { height: 18px; width: auto; }
+.pf-movers .mover.off { opacity: 0.25; filter: grayscale(1); }
+
 /* ── LIVE GAME PANEL ──────────────────────────────────────────────── */
 .live-status {
   text-align: center;
