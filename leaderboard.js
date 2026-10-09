@@ -208,9 +208,10 @@ async function _fetchSolo() {
 }
 
 // ── XP ────────────────────────────────────────────────────────────────────────
-// Every game a player claimed a villain in earns them XP: 1 for each other
-// player who claimed one in that game, 2 if they won (so a loss is worth
-// claiming when the others claim too, and a game claimed alone gives none);
+// Every official game a player claimed a villain in earns them C + (C - 1) * W
+// XP, C the players who claimed one in it (them included), W 1 if they won: a
+// loss is worth claiming when the others claim too, a win more so, a game
+// claimed alone gives 1 either way (Solo has no XP);
 // plus the XP of the achievements that game unlocked (achievementXp, achievements.js:
 // their achievements after it minus before it, in play order). So a table size
 // or a period counts the XP of its own games, achievements included.
@@ -248,8 +249,8 @@ function _loadXpLedger() {
         const achAfter = achievementXp(computeCharacterAchievements(sofar), lbChars, boxInfo, global);
         const ach = achAfter - achBefore;
         achBefore = achAfter;
-        const others = claims(p.game_id) - 1;
-        return { at: gameById[p.game_id]?.played_at || null, size: seats[p.game_id].length, xp: others * (p.is_winner ? 2 : 1) + ach, ach };
+        const c = claims(p.game_id);
+        return { at: gameById[p.game_id]?.played_at || null, size: seats[p.game_id].length, xp: c + (c - 1) * (p.is_winner ? 1 : 0) + ach, ach };
       });
     }
     return ledger;
@@ -327,7 +328,7 @@ function render({ rows, summary }) {
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo })}
     ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each other player who claimed theirs, doubled if you won. Plus 1 for each achievement.')}</p>` : ''}
+    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')}</p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
       headLabel:   isChar ? t('Villain') : t('Player'),
