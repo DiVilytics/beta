@@ -319,6 +319,10 @@ function render() {
   // The bars scale to the largest official row, as everywhere; Solo has no bar
   // (it's not measured against the official games).
   const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
+  // Gold, as in the rankings, for the best table size (ties share it): not
+  // Overall, their total, which would always lead the counts.
+  const sizeVals = rows.filter(r => r.key !== 'all' && stats(r.key).games).map(r => statValue(stats(r.key), csMode));
+  const best     = sizeVals.length ? Math.max(...sizeVals) : 0;
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
 
@@ -330,9 +334,10 @@ function render() {
     const b       = stats(key);
     const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
     const dispVal = b.games ? statCellHTML(b, csMode) : '-';
+    const gold    = typeof key === 'number' && b.games && best > 0 && statValue(b, csMode) === best;
     const bar     = key === 'solo' ? '' : `
           <div class="bar-bg">
-            <div class="bar-fill" style="width:${barW}%"></div>
+            <div class="bar-fill${gold ? ' gold' : ''}" style="width:${barW}%"></div>
           </div>`;
     const arg     = typeof key === 'number' ? key : `'${key}'`;
     return `
