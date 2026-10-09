@@ -17,14 +17,13 @@ function _boxLabelHTML(box) {
   const year = csBoxInfo[box]?.year;
   return `${_esc(box)}${year ? ` <span class="cs-box-year">(${year})</span>` : ''}`;
 }
-let csAvgDur    = null;      // avg game duration (minutes) across this character's games
-let csAvgTurns  = null;      // avg rounds across this character's games
+let csAvg       = {};        // avg duration / rounds per table size: { all: { dur, turns }, 2: …, … }
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
-// All / Solo (dashed) above the stats: Solo shows this villain's solo games
-// (solo.js) instead, never mixed with the others. csSoloStats: undefined until
-// loaded, null if they couldn't load, else { games, players }.
-let csSolo      = false;
-let csSoloStats;
+// The table's rows: Overall, 2p…6p and, dashed under them, Solo (solo.js: this
+// villain's solo games, never counted in Overall). Tapping a row shows its
+// numbers in the boxes on top; Overall at first.
+let csRow       = 'all';     // 'all' | 2…6 | 'solo'
+let csSoloStats = null;      // { games, wins, dur, turns }; null until loaded or if they couldn't load
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -38,14 +37,10 @@ async function init() {
 
   // A language switch brings back the grouping and the switches (lang.js).
   const saved = takeViewState();
-  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; }
-  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, solo: csSolo }));
+  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; csRow = saved.row ?? 'all'; }
+  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, row: csRow }));
 
-  if (charName) {
-    await renderDetailPage(charName);
-    if (saved?.solo && csChar) csSetSolo(true);
-    return;
-  }
+  if (charName) { await renderDetailPage(charName); return; }
 
   // ?pace= opens the roster straight into pace view, scrolled to that band
   // (mirrors how ?box= scrolls to a box group).
@@ -173,7 +168,7 @@ async function renderDetailPage(charName) {
   // seg and table rows) so nothing shifts when the numbers arrive. Rivalries,
   // decks and the FAQ link only go in afterwards, below, so they never get
   // pushed down by content loading above them.
-  csBuckets = _foldBuckets([]); csAdversaries = []; csAvgDur = csAvgTurns = null;
+  csBuckets = _foldBuckets([]); csAdversaries = []; csAvg = {}; csSoloStats = null;
   csLoading = true;
   render();
   const renderExtras = () => { renderDeck(charName); renderFaqLink(charName); };
@@ -188,33 +183,43 @@ async function renderDetailPage(charName) {
     return;
   }
 
-  // No games: render() says so, under All / Solo (there may be solo games).
-  if (!buckets || !buckets.length) {
-    csLoading = false;
-    render();
-    renderExtras();
-    return;
-  }
+  csBuckets = _foldBuckets(buckets || []);
 
-  csBuckets = _foldBuckets(buckets);
-
-  // Avg duration / rounds across every game this character was played in (one
-  // row per game), plus its head-to-head record vs every other character (one
-  // RPC). Fetched together. _fetchAllRows pages past the ~1000-row cap so a
-  // heavily-played character's averages aren't computed from a truncated sample.
-  const [{ rows: dgames }, { data: adv }] = await Promise.all([
+  // Avg duration / rounds of every official game this character was played in
+  // (one row per game, with its number of seats, so each table size gets its
+  // own), its head-to-head record vs every other character (one RPC) and its
+  // solo games. Fetched together. _fetchAllRows pages past the ~1000-row cap so
+  // a heavily-played character's averages aren't computed from a truncated sample.
+  const [{ rows: dgames }, { data: adv }, solo] = await Promise.all([
     _fetchAllRows(() => db
       .from('game_players')
-      .select('games!inner(duration_minutes, num_turns)')
+      .select('games!inner(duration_minutes, num_turns, game_players(count))')
       .eq('character', charName)
       .is('games.variant', null)),   // official games only
     db.rpc('character_adversary_stats', { char_name: charName }),
+    loadSoloGames(),
   ]);
-  csAvgDur     = avg(dgames.map(r => r.games?.duration_minutes));
-  csAvgTurns   = avg(dgames.map(r => r.games?.num_turns));
+  const bySize = {};   // 'all' | size → { dur: [], turns: [] }
+  for (const { games: g } of dgames) {
+    for (const k of ['all', g?.game_players?.[0]?.count]) {
+      const b = bySize[k] ||= { dur: [], turns: [] };
+      b.dur.push(g?.duration_minutes);
+      b.turns.push(g?.num_turns);
+    }
+  }
+  csAvg = Object.fromEntries(Object.entries(bySize).map(([k, b]) => [k, { dur: avg(b.dur), turns: avg(b.turns) }]));
   csAdversaries = (adv || []).map(a => ({
     opponent: a.opponent, wins: Number(a.wins), losses: Number(a.losses), games: Number(a.games),
   }));
+  if (solo) {
+    const seats = solo.players.filter(p => p.character === charName);
+    const ids   = new Set(seats.map(p => p.game_id));
+    const games = solo.games.filter(g => ids.has(g.id));
+    csSoloStats = {
+      games: seats.length, wins: seats.filter(p => p.is_winner).length,
+      dur: avg(games.map(g => g.duration_minutes)), turns: avg(games.map(g => g.num_turns)),
+    };
+  }
 
   csLoading = false;
   render();
@@ -267,17 +272,9 @@ function csSetRivalMode(m) {
   render();
 }
 
-// All / Solo. Solo loads the solo games once.
-async function csSetSolo(on) {
-  if (on === csSolo) return;
-  csSolo = on;
-  render();
-  if (!on || csSoloStats) return;
-  const solo = await loadSoloGames();
-  if (!solo) { csSoloStats = null; render(); return; }
-  const players = solo.players.filter(p => p.character === csChar.name);
-  const ids     = new Set(players.map(p => p.game_id));
-  csSoloStats = { games: solo.games.filter(g => ids.has(g.id)), players };
+// A row of the table: its numbers go in the boxes on top.
+function csSelectRow(key) {
+  csRow = key;
   render();
 }
 
@@ -304,23 +301,9 @@ function _attachCharSearch() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
-function _csVariantPillsHTML() {
-  return `
-    <div class="pill-group cs-variant-pills">
-      <button class="pill${csSolo ? '' : ' on'}" type="button" onclick="csSetSolo(false)">${t('All')}</button>
-      <button class="pill pill-solo${csSolo ? ' on' : ''}" type="button" onclick="csSetSolo(true)">${t('Solo')}</button>
-    </div>`;
-}
-
 function render() {
   const root = document.getElementById('csRoot');
   root.className = '';
-
-  if (csSolo) { root.innerHTML = _csVariantPillsHTML() + _soloStatsHTML(); return; }
-  if (!csLoading && !csBuckets.all.games) {
-    root.innerHTML = `${_csVariantPillsHTML()}<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })}</p></div>`;
-    return;
-  }
 
   const rows = [
     { label: t('Overall'), key: 'all' },
@@ -330,75 +313,59 @@ function render() {
     { label: '5p', key: 5 },
     { label: '6p', key: 6 },
   ];
+  const solo  = csSoloStats || { games: 0, wins: 0 };
+  const stats = key => key === 'solo' ? solo : csBuckets[key];
+  const keys  = [...rows.map(r => r.key), 'solo'];
+  const maxVal = Math.max(...keys.map(k => statValue(stats(k), csMode))) || 1;
+  // Both tables size their games column alike, so their columns line up.
+  const widths = statGamesWidth(keys.map(stats));
 
-  const maxVal = Math.max(...rows.map(r => statValue(csBuckets[r.key], csMode))) || 1;
-
-  const overall  = csBuckets.all;
-  const csWinPct = overall.games ? Math.round((overall.wins / overall.games) * 100) : 0;
-
+  // The boxes on top: the selected row's numbers.
+  const sel  = stats(csRow);
+  const avgs = csRow === 'solo' ? solo : (csAvg[csRow] || {});
   const v = val => csLoading ? '-' : val;
+  const rowHTML = (label, key) => {
+    const b       = stats(key);
+    const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
+    const dispVal = b.games ? statCellHTML(b, csMode) : '-';
+    const arg     = typeof key === 'number' ? key : `'${key}'`;
+    return `
+      <div class="lb-row cs-row${csRow === key ? ' on' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
+           onclick="csSelectRow(${arg})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();csSelectRow(${arg})}">
+        <div class="row-label">${label}</div>
+        <div class="bar-cell">
+          <div class="bar-bg">
+            <div class="bar-fill" style="width:${barW}%"></div>
+          </div>
+        </div>
+        <div class="row-val">${csLoading ? '-' : dispVal}</div>
+      </div>`;
+  };
+
   root.innerHTML = `
-    ${_csVariantPillsHTML()}
     <div class="summary">
       ${statBoxesHTML([
-        { val: v(overall.games), lbl: t('Games') },
-        { val: csAvgDur   != null ? Math.round(csAvgDur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: csAvgTurns != null ? Math.round(csAvgTurns)     : '-', lbl: t('Avg rounds') },
-        { val: v(csWinPct + '%'), lbl: t('Win rate') },
-        { val: v(overall.wins),   lbl: t('Wins') },
+        { val: v(sel.games), lbl: t('Games') },
+        { val: avgs.dur   != null ? Math.round(avgs.dur) + 'm' : '-', lbl: t('Avg duration') },
+        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: t('Avg rounds') },
+        { val: v(sel.games ? Math.round((sel.wins / sel.games) * 100) + '%' : '-'), lbl: t('Win rate') },
+        { val: v(sel.wins), lbl: t('Wins') },
       ])}
     </div>
     ${statModeSegHTML(csMode, 'csSetMode')}
-    <div class="lb-table cs-table mb-1-25" style="${statGamesWidth(rows.map(r => csBuckets[r.key]))}">
+    <div class="lb-table cs-table" style="${widths}">
       <div class="lb-head">
         <span>${t('Players')}</span>
         <span></span>
         <span class="text-right">${statValueLabel(csMode)}</span>
       </div>
-      ${rows.map(r => {
-        const b         = csBuckets[r.key];
-        const barW      = b.games ? statBarWidth(b, csMode, maxVal) : 0;
-        const dispVal   = b.games ? statCellHTML(b, csMode) : '-';
-        return `
-          <div class="lb-row">
-            <div class="row-label">${r.label}</div>
-            <div class="bar-cell">
-              <div class="bar-bg">
-                <div class="bar-fill" style="width:${barW}%"></div>
-              </div>
-            </div>
-            <div class="row-val">${csLoading ? '-' : dispVal}</div>
-          </div>`;
-      }).join('')}
+      ${rows.map(r => rowHTML(r.label, r.key)).join('')}
     </div>
+    <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
+      ${rowHTML(t('Solo'), 'solo')}
+    </div>
+    ${csRow === 'solo' ? soloHintHTML() : ''}
     ${_adversariesSectionHTML()}`;
-}
-
-// Solo: this villain's solo games, summed up (no table sizes, no rivalries:
-// one villain per game).
-function _soloStatsHTML() {
-  const hint = soloHintHTML();
-  if (csSoloStats === null) return `${hint}<div class="empty"><p>${t("Couldn't load the solo games.")}</p></div>`;
-  const loading = csSoloStats === undefined;
-  const games   = loading ? [] : csSoloStats.games;
-  if (!loading && !games.length) {
-    return `${hint}<div class="empty"><div class="empty-icon">🎲</div><h3>${t('No solo games yet')}</h3><p>${t("{villain} hasn't been played solo yet.", { villain: _esc(villainName(csChar.name)) })}</p></div>`;
-  }
-  const players = loading ? [] : csSoloStats.players;
-  const wins    = players.filter(p => p.is_winner).length;
-  const sum     = soloSummary(games);
-  const v = val => loading ? '-' : val;
-  return `
-    ${hint}
-    <div class="summary">
-      ${statBoxesHTML([
-        { val: v(games.length), lbl: t('Games') },
-        { val: sum.avg_duration != null ? Math.round(sum.avg_duration) + 'm' : '-', lbl: t('Avg duration') },
-        { val: sum.avg_turns    != null ? Math.round(sum.avg_turns)          : '-', lbl: t('Avg rounds') },
-        { val: v((players.length ? Math.round((wins / players.length) * 100) : 0) + '%'), lbl: t('Win rate') },
-        { val: v(wins), lbl: t('Wins') },
-      ])}
-    </div>`;
 }
 
 // "Rivalries": the opponents this character has beaten most / lost to most,

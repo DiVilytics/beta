@@ -2335,7 +2335,11 @@ select:disabled {
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }
 .solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
-.cs-variant-pills { margin-bottom: 12px; }
+/* The villain page's table (villains.js): a row shows its numbers in the boxes
+   on top when tapped; the selected one is marked. Solo sits under it, dashed. */
+.cs-row { cursor: pointer; }
+.cs-table .lb-row.on { background: var(--s3); box-shadow: inset 3px 0 0 var(--muted); }
+.cs-solo-table { margin-top: 6px; border-style: dashed; }
 
 /* Small square ‹ › buttons (the avatar builder's part rows). */
 .cs-month-nav {
