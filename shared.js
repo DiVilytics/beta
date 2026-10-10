@@ -471,11 +471,15 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
         <div class="kbd-help-ico">⌨️</div>
         <div class="kbd-help-title">${_esc(t('Keyboard shortcuts'))}</div>
         <div class="kbd-help-groups">
+          <div class="kbd-help-col">
           ${group(t('Pages'), _KBD_PAGES.filter(p => !p[3]?.inSettings).map(([k, , label, o]) => [k.toUpperCase(), t(label), o?.gapAfter]))}
-          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label)]), ..._KBD_SETTINGS.map(([k, label]) => [k, t(label)])])}
-          ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
           ${group(t('During a game'), [['⏯︎', t('Pause or resume the timer')], ['⏮︎', t('Previous round')], ['⏭︎', t('Next round')]],
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
+          </div>
+          <div class="kbd-help-col">
+          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label)]), ..._KBD_SETTINGS.map(([k, label]) => [k, t(label)])])}
+          ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
+          </div>
         </div>
         <p class="kbd-help-text">${_esc(t('Click anywhere or press Esc to close.'))}</p>
       </div>`;
