@@ -974,7 +974,8 @@ async function tnWithdraw(playerId, withdrawn) {
 }
 
 // The organizer fixes a saved table: New Game's rows, dragged by ⠿ into place
-// order (1st on top), each with 🏳️ for a drop. Drops always sit at the bottom:
+// order (1st on top), each with 🏳️ for a drop; and, under them, the play
+// order (the villains stay the drawn ones). Drops always sit at the bottom:
 // marking one moves it just above the earlier drops (the latest drop), taking
 // one back moves it just below the others; dragging keeps that order.
 let tnEdit = null;   // { tableId, rows: [{ position, dropped }] } in place order
@@ -982,7 +983,11 @@ let tnEdit = null;   // { tableId, rows: [{ position, dropped }] } in place orde
 function tnEditTable(tableId) {
   const tb = tnTables.find(x => x.id === tableId);
   if (!tb) return;
-  tnEdit = { tableId, rows: tb.seats.slice().sort((a, b) => a.place - b.place).map(s => ({ position: s.position, dropped: !!s.dropped })) };
+  tnEdit = {
+    tableId,
+    rows:  tb.seats.slice().sort((a, b) => a.place - b.place).map(s => ({ position: s.position, dropped: !!s.dropped })),
+    order: tb.seats.map(s => s.position).sort((a, b) => a - b),   // the seats in play order
+  };
   const first = tb.seats.find(s => s.place === 1);   // the standard game's duration and rounds are 1st place's
   openConfirmSheet({
     id:           'tnEditSheet',
@@ -995,11 +1000,16 @@ function tnEditTable(tableId) {
                      <span class="players-legend"><span class="sep-item">${t('⠿ = drag')}</span> | <span class="sep-item">${t('🏳️ = dropped')}</span></span></div>
                    <div class="err" id="tnEditErr"></div>
                    <div class="tn-edit-rows" id="tnEditRows"></div>
-                   <p class="modal-hint">${t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with this duration and these rounds).')}</p>`,
+                   <p class="modal-hint">${t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with this duration and these rounds).')}</p>
+                   <div class="section-label">${t('Play order')}</div>
+                   <div class="tn-edit-rows" id="tnEditOrder"></div>
+                   <p class="modal-hint">${t('If the table played in another order than the drawn one, drag the villains into it. Their villains stay the drawn ones.')}</p>`,
     confirmLabel: t('Save Changes'),
     busyLabel:    t('Saving…'),
     onConfirm:    async () => {
       const results = tnEdit.rows.map((r, i) => ({ position: r.position, place: i + 1, dropped: r.dropped }));
+      // A new play order: each seat's new position (sent only when it changed).
+      if (tnEdit.order.some((pos, i) => pos !== i)) for (const r of results) r.order = tnEdit.order.indexOf(r.position);
       // The game's duration and rounds go to whoever is 1st now (empty: as they were).
       const dur = parseInt(document.getElementById('tnEditDur').value), turns = parseInt(document.getElementById('tnEditTurns').value);
       if (dur > 0)   results[0].minutes = dur;
@@ -1009,13 +1019,14 @@ function tnEditTable(tableId) {
       await tnLoad(tnTour.id);
     },
   });
-  const box = document.getElementById('tnEditRows');
-  if (!box.dataset.drag) {
+  for (const [id, list] of [['tnEditRows', 'rows'], ['tnEditOrder', 'order']]) {
+    const box = document.getElementById(id);
+    if (box.dataset.drag) continue;
     box.dataset.drag = '1';
     attachRowDrag(box, {
       rowSelector: '.order-slot',
       onDrop: (from, to) => {
-        if (to !== from) tnEdit.rows.splice(to, 0, tnEdit.rows.splice(from, 1)[0]);
+        if (to !== from) tnEdit[list].splice(to, 0, tnEdit[list].splice(from, 1)[0]);
         _tnRenderEditRows();
       },
     });
@@ -1023,28 +1034,36 @@ function tnEditTable(tableId) {
   _tnRenderEditRows();
 }
 
+// A villain's row in the sheet: ⠿, the place or seat number, portrait, names.
+function _tnEditRowHTML(s, num, cls = '', actions = '') {
+  const name = tnPlayers.find(p => p.id === s.player_id)?.name || '';
+  return `
+    <div class="order-slot tn-edit-row${cls}">
+      <div class="drag-handle">
+        <span class="drag-dots">⠿</span><span class="row-num tn-edit-place">${num}</span>
+        <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
+      </div>
+      <div class="claim-who"><div class="claim-name">${villainNameHTML(s.character)}</div><div class="claim-nick">${_esc(name)}</div></div>
+      ${actions}
+    </div>`;
+}
+
 function _tnRenderEditRows() {
   // Drops at the bottom, each group keeping its order.
   tnEdit.rows = [...tnEdit.rows.filter(r => !r.dropped), ...tnEdit.rows.filter(r => r.dropped)];
   const tb = tnTables.find(x => x.id === tnEdit.tableId);
-  const byId = new Map(tnPlayers.map(p => [p.id, p]));
   const playing = tnEdit.rows.filter(r => !r.dropped).length;
   document.getElementById('tnEditRows').innerHTML = tnEdit.rows.map((r, i) => {
     const s = tb.seats.find(x => x.position === r.position);
     const last = !r.dropped && playing === 1;   // someone finishes 1st
-    return `
-      <div class="order-slot tn-edit-row${i === 0 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}">
-        <div class="drag-handle">
-          <span class="drag-dots">⠿</span><span class="row-num tn-edit-place">${fmtPlace(i + 1)}</span>
-          <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
-        </div>
-        <div class="claim-who"><div class="claim-name">${villainNameHTML(s.character)}</div><div class="claim-nick">${_esc(byId.get(s.player_id)?.name || '')}</div></div>
-        <div class="order-slot-actions">
-          <button class="pf-btn drop${r.dropped ? ' on' : ''}" type="button" onclick="tnToggleDrop(${r.position})"
-                  ${last ? `disabled title="${t('Someone has to finish 1st')}"` : `title="${t('Dropped')}"`}>🏳️</button>
-        </div>
-      </div>`;
+    return _tnEditRowHTML(s, fmtPlace(i + 1), `${i === 0 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}`, `
+      <div class="order-slot-actions">
+        <button class="pf-btn drop${r.dropped ? ' on' : ''}" type="button" onclick="tnToggleDrop(${r.position})"
+                ${last ? `disabled title="${t('Someone has to finish 1st')}"` : `title="${t('Dropped')}"`}>🏳️</button>
+      </div>`);
   }).join('');
+  document.getElementById('tnEditOrder').innerHTML = tnEdit.order
+    .map((pos, i) => _tnEditRowHTML(tb.seats.find(x => x.position === pos), `${i + 1}.`)).join('');
 }
 
 function tnToggleDrop(position) {

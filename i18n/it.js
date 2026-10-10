@@ -785,6 +785,8 @@ window.I18N.it = {
     "{n} player still in the game": "{n} giocatore ancora in partita",
     "{n} players still in the game": "{n} giocatori ancora in partita",
     "Organizer": "Organizzatore",
+    "Play order": "Ordine di gioco",
+    "If the table played in another order than the drawn one, drag the villains into it. Their villains stay the drawn ones.": "Se il tavolo ha giocato in un ordine diverso da quello sorteggiato, trascina i cattivi in quell'ordine. I cattivi restano quelli sorteggiati.",
   },
 
   // From the Villainous Italia F.A.Q. (the last three confirmed separately).
