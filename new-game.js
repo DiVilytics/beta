@@ -868,7 +868,7 @@ function _renderSoloDie(rolling = false) {
     <div class="die-face${rolling ? ' rolling' : ''}" aria-hidden="true">${roll ?? '?'}</div>
     <div class="die-text">
       <strong>${roll == null ? t("The Phantom's die") : rolling ? t('Rolling…') : fated ? t('Fated') : t('Safe')}</strong>
-      <span>${t('Fated on 1-{n}', { n: fate })}</span>
+      <span>${_esc(soloFatedOn(soloLevel))}</span>
       ${liveGame.turns >= turns ? `<span class="die-last">${t('Last round: + ends the game, lost.')}</span>` : ''}
     </div>`;
 }

@@ -24,17 +24,19 @@ const CLAIM_ERRORS = {
   lineup_locked:   'Another player has claimed a villain: the villains and the winner can no longer be changed.',
   invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
   solo_seat:       'A solo game is always its creator\'s.',
+  solo_locked:     "A solo game's difficulty, villain and result can't be changed.",
 };
 const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
 
 // The creator can change the villains and the winner while no other player has
 // claimed a villain (their own seat, marked 👤 in New Game, doesn't count). A
-// solo game (solo.js) has one seat, its creator's: always editable by them, won
-// (👑) or lost, never shared or released.
+// solo game (solo.js) has one seat, its creator's, never shared or released;
+// its difficulty, villain and result stay as recorded (its other details can
+// still be fixed).
 const claimIsSolo = () => claimGame?.variant === 'solo';
 
 function lineupEditable(user) {
-  return !!user && !!claimGame && claimGame.created_by === user.id
+  return !!user && !!claimGame && !claimIsSolo() && claimGame.created_by === user.id
     && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
 }
 
@@ -160,7 +162,7 @@ function render() {
     </div>
     <div class="claim-share-row">
       ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
-      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${_lineupLabel()}</button>` : ''}
+      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit villains and winner')}</button>` : ''}
       ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
     <div class="section-label">${solo ? t('Player') : t('Players')}</div>
@@ -178,10 +180,6 @@ function _playedAsHTML(seat, solo) {
     ? t('You won this solo game with {villain}.', { villain })
     : t('You lost this solo game with {villain}.', { villain });
 }
-
-// The button and its sheet say what they change: the villains and the winner
-// (in a solo game, its one villain and whether it won).
-const _lineupLabel = () => claimIsSolo() ? t('Edit villain and winner') : t('Edit villains and winner');
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
@@ -201,30 +199,15 @@ function shareGame() {
 
 // ── EDIT GAME DETAILS ─────────────────────────────────────────────────────────
 
-// A solo game's details include its level (solo.js), picked in the sheet.
-let _editLevel = null;
-
-function setEditLevel(id) {
-  _editLevel = id;
-  _renderEditLevel();
-}
-
-function _renderEditLevel() {
-  const solo = claimIsSolo();
-  setVisible('editLevelField', solo);
-  if (!solo) return;
-  document.getElementById('editLevel').innerHTML = soloLevelSegHTML(_editLevel, 'setEditLevel');
-  document.getElementById('editTurns').max = SOLO_LEVELS[_editLevel].turns;
-}
+// A solo game's rounds go up to its level's (solo.js).
+const _maxTurns = () => claimIsSolo() ? SOLO_LEVELS[soloLevelOf(claimGame)].turns : 999;
 
 function editGameDetails() {
   if (!claimGame) return;
-  _editLevel = claimIsSolo() ? soloLevelOf(claimGame) : null;
-  _renderEditLevel();
   document.getElementById('editLocation').value = claimGame.location || '';
   document.getElementById('editDur').value      = claimGame.duration_minutes || '';
   document.getElementById('editTurns').value    = claimGame.num_turns || '';
-  if (!claimIsSolo()) document.getElementById('editTurns').max = 999;
+  document.getElementById('editTurns').max      = _maxTurns();
   clearError('editDetailsErr');
   const btn = document.getElementById('editDetailsSaveBtn');
   btn.disabled    = false;
@@ -245,21 +228,19 @@ async function saveGameDetails() {
 
   // Always write the current values (a cleared field is saved as null).
   const patch = { duration_minutes: dur, num_turns: turns, location: location };
-  if (claimIsSolo()) patch.solo_level = _editLevel;
 
   // No-op if nothing actually changed.
   if (dur === (claimGame.duration_minutes || null) &&
       turns === (claimGame.num_turns || null) &&
-      location === (claimGame.location || null) &&
-      (!claimIsSolo() || _editLevel === claimGame.solo_level)) {
+      location === (claimGame.location || null)) {
     closeEditDetails();
     return;
   }
 
   const btn   = document.getElementById('editDetailsSaveBtn');
   const errEl = document.getElementById('editDetailsErr');
-  if (claimIsSolo() && turns > SOLO_LEVELS[_editLevel].turns) {
-    showError(errEl, t('A solo game on {level} ends by round {n}.', { level: soloLevelName(_editLevel), n: SOLO_LEVELS[_editLevel].turns }));
+  if (claimIsSolo() && turns > _maxTurns()) {
+    showError(errEl, t('A solo game on {level} ends by round {n}.', { level: soloLevelName(soloLevelOf(claimGame)), n: _maxTurns() }));
     return;
   }
   btn.disabled    = true;
@@ -357,10 +338,8 @@ async function editLineup() {
   if (!lineupEditable(getCurrentUser())) return;
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
-  document.getElementById('lineupTitle').textContent = _lineupLabel();
-  document.getElementById('lineupHint').textContent = claimIsSolo()
-    ? t('Change your villain, and whether you won (👑) or lost.')
-    : t('You can change the villains and the winner until another player claims a villain.');
+  document.getElementById('lineupTitle').textContent = t('Edit villains and winner');
+  document.getElementById('lineupHint').textContent  = t('You can change the villains and the winner until another player claims a villain.');
   clearError('lineupErr');
   const btn = document.getElementById('lineupSaveBtn');
   btn.disabled    = false;
@@ -373,15 +352,13 @@ function closeLineup() {
   closeOverlay('lineupOverlay');
 }
 
-// A solo game: its one villain, 👑 on if won (as in New Game).
 function _renderLineup() {
-  const solo = claimIsSolo();
   document.getElementById('lineupSlots').innerHTML = lineupDraft.map((s, i) => {
     const taken     = new Set(lineupDraft.filter(o => o.id !== s.id).map(o => o.character));
     const available = lineupChars.filter(c => !taken.has(c.name));
     return `
       <div class="order-slot">
-        <span class="row-num">${solo ? '' : `${i + 1}.`}</span>
+        <span class="row-num">${i + 1}.</span>
         <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
         <div class="order-slot-info">
           <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Select villain')}">
@@ -403,11 +380,9 @@ function setLineupVillain(i, name) {
   _renderLineup();
 }
 
-// The crown moves to this seat (one winner); in a solo game it turns on and
-// off (won, lost).
+// The crown moves to this seat (one winner).
 function setLineupWinner(i) {
-  const solo = claimIsSolo();
-  lineupDraft.forEach((s, j) => { s.is_winner = j === i && !(solo && s.is_winner); });
+  lineupDraft.forEach((s, j) => { s.is_winner = j === i; });
   _renderLineup();
 }
 

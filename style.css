@@ -96,8 +96,8 @@
   --muted: #555;
   --dim: #bbb;
   --gold: #e6a200;
-  --lvl-easy:   #16a34a;
-  --lvl-medium: #ca8a04;
+  --lvl-easy:   #15803d;
+  --lvl-medium: #a16207;
   --lvl-hard:   #dc2626;
 }
 
@@ -2391,25 +2391,19 @@ select:disabled {
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }
 .solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
-/* Solo's difficulty levels (solo.js): a colored dot before the name, in the
-   level filter under Solo (dashed, the selected one bordered in its color), the
-   pickers (New Game, a game's details) and on solo games. */
+/* Solo's difficulty levels (solo.js): the names in green, yellow and red, in
+   the level filter under Solo (dashed), New Game's picker (the draw pool's
+   switch, under it, with the level's rounds and Fate beside it) and on solo
+   games. */
 .lvl-easy   { --lvl: var(--lvl-easy); }
 .lvl-medium { --lvl: var(--lvl-medium); }
 .lvl-hard   { --lvl: var(--lvl-hard); }
-.lvl-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lvl); flex: none; }
-.solo-level { display: inline-flex; align-items: center; gap: 5px; }
+.solo-level, .pill.pill-solo[class*="lvl-"], .solo-level-seg .seg-btn { color: var(--lvl); }
 /* A little tighter than the other pills: the four fit one phone line in Italian too. */
-.pill[data-level] { display: inline-flex; align-items: center; gap: 5px; padding: 0 10px; }
-.pill.pill-solo.on[data-level]:not([data-level="all"]) { border-color: var(--lvl); }
+.pill[data-level] { padding: 0 10px; }
 .cs-solo-levels { margin: -6px 0 12px; }
-.solo-level-pick { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-#soloLevelNg { margin-top: 12px; }
-.field .solo-level-pick { align-items: flex-start; }
-.solo-level-seg { border-style: dashed; border-color: var(--s4); }
-.solo-level-seg .seg-btn { display: inline-flex; align-items: center; gap: 6px; }
-.solo-level-seg .seg-btn.on { box-shadow: inset 0 0 0 1px var(--lvl); }
-.solo-level-rule { font-size: calc(12px * var(--ts)); color: var(--muted); }
+#soloLevelNg { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; }
+.solo-level-rule { font-size: calc(11px * var(--ts)); line-height: 1.35; color: var(--muted); }
 /* New Game, after + on the last round: the game stopped, lost. */
 .solo-end-note {
   border: 1px dashed var(--s4); border-radius: var(--r);

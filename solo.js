@@ -36,32 +36,34 @@ function soloLevelName(id) {
   return { easy: t('Easy'), medium: t('Medium'), hard: t('Hard') }[id] || '';
 }
 
-// "20 rounds | Fated on 1-4": what a level means.
-function soloLevelRule(id) {
+// What a level means, on two lines: "20 rounds" and "Fated on 1-4/10".
+function soloLevelRuleHTML(id) {
   const l = SOLO_LEVELS[id];
-  return `${tn(l.turns, '{n} round', '{n} rounds')} | ${t('Fated on 1-{n}', { n: l.fate })}`;
+  return `${_esc(tn(l.turns, '{n} round', '{n} rounds'))}<br>${_esc(soloFatedOn(id))}`;
 }
 
-// The level's name after its colored dot.
+// "Fated on 1-4/10": the die results that Fate you, out of the die's.
+const soloFatedOn = id => t('Fated on 1-{n}/{die}', { n: SOLO_LEVELS[id].fate, die: SOLO_DIE });
+
+// The level's name, in its color (green, yellow, red).
 function soloLevelTagHTML(id) {
-  return `<span class="solo-level lvl-${id}"><span class="lvl-dot" aria-hidden="true"></span>${_esc(soloLevelName(id))}</span>`;
+  return `<span class="solo-level lvl-${id}">${_esc(soloLevelName(id))}</span>`;
 }
 
 // The level row under Solo (size-filter.js, the villain page): All, then the
-// three levels, dashed like Solo. `onPick` is the name of the function that
-// takes the picked id ('all' or a level).
+// three levels in their colors, dashed like Solo. `onPick` is the name of the
+// function that takes the picked id ('all' or a level).
 function soloLevelPillsHTML(current, onPick) {
-  const pill = (id, label) => `<button class="pill pill-solo${id === 'all' ? '' : ` lvl-${id}`}${current === id ? ' on' : ''}" type="button" data-level="${id}"${onPick ? ` onclick="${onPick}('${id}')"` : ''}>${id === 'all' ? '' : '<span class="lvl-dot" aria-hidden="true"></span>'}${_esc(label)}</button>`;
+  const pill = (id, label) => `<button class="pill pill-solo${id === 'all' ? '' : ` lvl-${id}`}${current === id ? ' on' : ''}" type="button" data-level="${id}"${onPick ? ` onclick="${onPick}('${id}')"` : ''}>${_esc(label)}</button>`;
   return pill('all', t('All')) + SOLO_LEVEL_IDS.map(id => pill(id, soloLevelName(id))).join('');
 }
 
-// The level picker (New Game, a game's details): a segment per level, the
-// rule of the one picked under it. `onPick` is the name of the function that
-// takes the level's id.
+// New Game's level picker: the switch of the draw pool (Pace | Pace+), one
+// segment per level, with what the picked one means beside it.
 function soloLevelSegHTML(current, onPick) {
-  const btn = id => `<button class="seg-btn lvl-${id}${id === current ? ' on' : ''}" type="button" aria-pressed="${id === current}" onclick="${onPick}('${id}')"><span class="lvl-dot" aria-hidden="true"></span>${_esc(soloLevelName(id))}</button>`;
-  return `<div class="seg solo-level-seg" role="group" aria-label="${_esc(t('Difficulty'))}">${SOLO_LEVEL_IDS.map(btn).join('')}</div>
-    <p class="solo-level-rule">${_esc(soloLevelRule(current))}</p>`;
+  const btn = id => `<button class="seg-btn lvl-${id}${id === current ? ' on' : ''}" type="button" aria-pressed="${id === current}" onclick="${onPick}('${id}')">${_esc(soloLevelName(id))}</button>`;
+  return `<div class="seg seg-sm solo-level-seg" role="group" aria-label="${_esc(t('Difficulty'))}">${SOLO_LEVEL_IDS.map(btn).join('')}</div>
+    <span class="solo-level-rule">${soloLevelRuleHTML(current)}</span>`;
 }
 
 // A fair roll of the Phantom's 10-sided die: 1…SOLO_DIE.
