@@ -394,6 +394,7 @@ _updateAuthUI();
 
 const _KBD_PAGES = [
   ['n', 'new-game.html',    'New Game'],
+  ['o', 'tournaments.html', 'Tournaments'],
   ['g', 'game-log.html',    'Game Log'],
   ['l', 'leaderboard.html', 'Leaderboard'],
   ['v', 'villains.html',    'Villains'],

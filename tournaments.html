@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title data-i18n>DiVilytics | Tournaments</title>
+  <meta name="robots" content="noindex">
+  <script src="lang.js"></script>
+  <script src="i18n/it.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="/asset/favicon/favicon-96x96.png?v=20260603b" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/asset/favicon/favicon.svg?v=20260603b" />
+  <link rel="shortcut icon" href="/asset/favicon/favicon.ico?v=20260603b" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/asset/favicon/apple-touch-icon.png?v=20260603b" />
+  <meta name="apple-mobile-web-app-title" content="DiVilytics" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="/asset/favicon/site.webmanifest?v=20260603b" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MTR91YL11"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6MTR91YL11');
+  </script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html"><img src="asset/logos/logo-b.svg" alt="DiVilytics | Disney Villainous Analytics"></a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
+      <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
+      <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
+      <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
+      <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
+      <a href="charts.html" title="Charts" data-i18n-attr="title">📊</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h2><span class="page-ico" aria-hidden="true">🏟️</span><span data-i18n>Tournaments</span></h2>
+  </div>
+  <p class="page-intro" data-i18n>Organize a tournament: the players, the tables and the villains of every stage, and the points.</p>
+
+  <a class="back-link hidden" id="tnBack" href="tournaments.html" onclick="goBack('tournaments.html'); return false;" data-i18n>← Back</a>
+  <div id="tnRoot" class="spinner" data-i18n>Loading…</div>
+
+  <!-- New tournament, and the lobby's Edit settings (tournaments.js). -->
+  <div id="tnForm" class="hidden">
+    <div class="err" id="tnFormErr"></div>
+    <div class="field">
+      <label for="tnName" data-i18n>Name</label>
+      <input type="text" id="tnName" maxlength="60" placeholder="e.g. Lucca 2026" autocomplete="off" data-i18n-attr="placeholder">
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="tnSize" data-i18n>Players per table</label>
+        <select id="tnSize">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="tnStages" data-i18n>Stages</label>
+        <input type="number" id="tnStages" min="1" max="20" value="3">
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n>Pairing</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnPairing"></div>
+      <p class="modal-hint tn-rule-hint" id="tnPairingHint"></p>
+    </div>
+    <div class="field">
+      <label data-i18n>Scoring</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>
+      <p class="modal-hint tn-rule-hint" id="tnScoringHint"></p>
+    </div>
+    <div class="field">
+      <label data-i18n>Villains</label>
+      <button class="exclude-toggle" type="button" onclick="tnTogglePool()">
+        <span class="exclude-toggle-label" data-i18n>Draw pool</span>
+        <div class="toggle-right">
+          <span class="badge" id="tnPoolBadge"></span>
+          <span class="chevron" id="tnPoolChevron">▼</span>
+        </div>
+      </button>
+      <div class="exclude-body" id="tnPoolBody">
+        <div class="filter-actions">
+          <button class="btn btn-ghost btn-sm" type="button" onclick="tnPool.excludeAll()" data-i18n>Exclude all</button>
+          <button class="btn btn-ghost btn-sm owned-toggle" id="tnMineBtn" type="button" onclick="tnPool.toggleMine()" data-i18n>My boxes</button>
+          <button class="btn btn-ghost btn-sm" id="tnPoolReset" type="button" onclick="tnPool.resetToStart()" disabled data-i18n>Reset</button>
+          <button class="btn btn-primary btn-sm filter-apply-btn" type="button" onclick="tnTogglePool(false)" data-i18n>Done</button>
+        </div>
+        <div class="filter-bulk-row">
+          <div class="seg seg-sm pace-mode" id="tnPaceMode">
+            <button class="seg-btn on" type="button" onclick="tnPool.setPaceMode(false)" title="Draw only the selected color" data-i18n data-i18n-attr="title">Pace</button>
+            <button class="seg-btn"    type="button" onclick="tnPool.setPaceMode(true)"  title="Also include the neighboring colors" data-i18n data-i18n-attr="title">Pace+</button>
+          </div>
+          <div class="pace-colors" id="tnPaceColors">
+            <button class="pace-color green"  data-pace="green"  onclick="tnPool.selectPace('green')"  type="button" title="Draw only green villains" data-i18n-attr="title"></button>
+            <button class="pace-color yellow" data-pace="yellow" onclick="tnPool.selectPace('yellow')" type="button" title="Draw only yellow villains" data-i18n-attr="title"></button>
+            <button class="pace-color orange" data-pace="orange" onclick="tnPool.selectPace('orange')" type="button" title="Draw only orange villains" data-i18n-attr="title"></button>
+            <button class="pace-color red"    data-pace="red"    onclick="tnPool.selectPace('red')"    type="button" title="Draw only red villains" data-i18n-attr="title"></button>
+          </div>
+        </div>
+        <div id="tnPoolGrid"></div>
+      </div>
+      <p class="modal-hint tn-rule-hint" data-i18n>Every stage, each player gets a different villain from the pool, and nobody plays the same villain twice while the pool allows it.</p>
+    </div>
+    <div class="tn-form-actions">
+      <button class="btn btn-ghost" type="button" onclick="tnCloseForm()" data-i18n>Cancel</button>
+      <button class="btn btn-primary" type="button" id="tnFormSave" onclick="tnSaveForm()"></button>
+    </div>
+  </div>
+</main>
+
+<!-- QR share sheet -->
+<div class="overlay" id="qrOverlay" onclick="if(event.target===this) closeOverlay('qrOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>Share with players</h3>
+      <button class="sheet-close" onclick="closeOverlay('qrOverlay')">×</button>
+    </div>
+    <div class="sheet-body">
+      <p class="modal-hint" data-i18n>Players scan this to follow the tournament and claim their name.</p>
+      <div class="qr-wrap">
+        <div id="qrCode"></div>
+      </div>
+      <div class="qr-url-row">
+        <div class="qr-url" id="qrUrlText"></div>
+        <button class="pf-btn" onclick="copyQrUrl()" title="Copy link" data-i18n-attr="title">⎘</button>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-primary" onclick="closeOverlay('qrOverlay')" data-i18n>Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation sheets (Start, Delete, Remove) are injected on demand by openConfirmSheet (ui.js). -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script src="db.js"></script>
+  <script src="theme.js"></script>
+  <script src="ui.js"></script>
+  <script src="avatar.js"></script>
+  <script src="achievements.js"></script>
+  <script src="stats-table.js"></script>
+  <script src="search.js"></script>
+  <script src="game-card.js"></script>
+  <script src="shared.js"></script>
+<script src="pace-filter.js"></script>
+<script src="tournament-rules.js"></script>
+<script src="tournaments.js"></script>
+</body>
+</html>

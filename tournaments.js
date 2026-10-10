@@ -1,0 +1,572 @@
+// ── TOURNAMENTS (beta) ────────────────────────────────────────────────────────
+// tournaments.html. Without a parameter: the tournaments and + New tournament.
+// ?new: the New tournament form. ?t=<id>: one tournament, with its settings,
+// its players by name and, once started, the current stage's tables.
+//
+// The organizer adds the players by name. A signed-in player claims their name
+// with That's me (and with it every seat of theirs in the tournament's games),
+// or joins by themselves. Start closes sign-ups and draws every stage's
+// villains and stage 1's tables. The rules (pairing, scoring, villain draw)
+// live in tournament-rules.js; the database (DiVilytics-Sync, the tournaments
+// migration) keeps the facts, checks every write and answers with the codes in
+// TN_ERRORS. While a tournament is open and not finished, the page reloads it
+// every few seconds, so names, claims and tables show up as they change.
+
+let tnChars    = [];
+let tnBoxInfo  = {};
+let tnList     = null;        // the list view's tournaments
+let tnTour     = null;        // the open tournament (a tournaments row)
+let tnPlayers  = [];          // its players (tournament_players rows)
+let tnTables   = [];          // its tables, each with .seats in play order
+let tnProfiles = new Map();   // user id → profile (organizers, claimed names, recorders)
+let tnPool     = null;        // the form's draw pool (pace-filter.js)
+let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
+const tnRule   = { pairing: 'random', scoring: 'borda' };
+
+const TN_POLL_MS  = 8000;
+let   tnPollTimer = null;
+let   tnSnapshot  = '';       // the data last drawn: a reload redraws only on a change
+
+// The database's answers (tournaments migration).
+const TN_ERRORS = {
+  not_organizer:         'Only the organizer can do this.',
+  already_started:       'The tournament has already started.',
+  too_few_players:       'A tournament needs at least 2 players.',
+  invalid_pool:          'The draw pool needs at least as many villains as there are players.',
+  invalid_villains:      "The villains couldn't be drawn. Try again.",
+  invalid_tables:        "The tables couldn't be drawn. Try again.",
+  name_claimed:          'Someone else just claimed this name.',
+  already_in_tournament: 'You already have a name in this tournament.',
+  no_profile:            'You need a nickname first.',
+  not_your_name:         "This name isn't yours to release.",
+  not_running:           "The tournament isn't running.",
+  stage_not_done:        'Every table of this stage has to be saved first.',
+};
+function _tnErrorMsg(error) {
+  if (error?.code === '23505') return t('There is already a player with this name.');
+  return TN_ERRORS[error?.message] ? t(TN_ERRORS[error.message]) : (error?.message || '');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+async function init() {
+  setActiveNav('tournaments.html');
+  const params = new URLSearchParams(location.search);
+  await initAuth(() => _tnAuthChanged());
+  [tnChars, tnBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  if (params.has('new')) return tnOpenForm(null);
+  const id = params.get('t');
+  if (id) {
+    setVisible('tnBack', true);
+    return tnLoad(id);
+  }
+  tnLoadList();
+}
+
+function _tnAuthChanged() {
+  if (!_tnFormOpen() && tnTour) tnRenderTournament();
+  else if (!_tnFormOpen() && tnList) tnRenderList();
+  if (_tnFormOpen() && tnPool) tnPool.loadOwnedBoxes().then(() => tnPool.updatePaceUI());
+}
+
+// ── SHARED BITS ───────────────────────────────────────────────────────────────
+
+async function _tnLoadProfiles(ids) {
+  const want = [...new Set(ids.filter(id => id && !tnProfiles.has(id)))];
+  if (!want.length) return;
+  const { data } = await db.from('profiles').select('id, nickname, avatar_url, default_avatar').in('id', want);
+  for (const p of data || []) tnProfiles.set(p.id, p);
+}
+
+function _tnStatus(tour) {
+  if (tour.finished_at)   return t('Finished');
+  if (!tour.current_stage) return t('Sign-ups open');
+  return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
+}
+
+// 1st, 2nd, 3rd… (1º, 2º… in Italian).
+function fmtPlace(n) {
+  if (LANG === 'it') return `${n}º`;
+  const tail = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return `${n}${tail}`;
+}
+
+// A failed action: a banner on top of the page, as on the game page.
+function _tnShowError(msg) {
+  const root = document.getElementById('tnRoot');
+  root.querySelector(':scope > .err')?.remove();
+  const el = document.createElement('div');
+  el.className = 'err show';
+  el.textContent = msg;
+  root.prepend(el);
+  el.scrollIntoView({ block: 'nearest' });
+}
+
+// ── THE LIST ──────────────────────────────────────────────────────────────────
+
+async function tnLoadList() {
+  const root = document.getElementById('tnRoot');
+  const { data, error } = await db.from('tournaments')
+    .select('id, name, organizer, created_at, stages, current_stage, finished_at, tournament_players(count)')
+    .order('created_at', { ascending: false });
+  root.className = '';
+  if (error) { root.innerHTML = loadErrorHTML(t("Couldn't load the tournaments"), error); return; }
+  tnList = data || [];
+  await _tnLoadProfiles(tnList.map(x => x.organizer));
+  tnRenderList();
+}
+
+function tnRenderList() {
+  const root = document.getElementById('tnRoot');
+  const newBtn = `<button class="btn btn-primary btn-sm" type="button" onclick="tnNew()">${t('+ New tournament')}</button>`;
+  if (!tnList.length) {
+    root.innerHTML = emptyStateHTML('🏟️', t('No tournaments yet'), t('Add the players, and DiVilytics draws the tables and the villains of every stage.'), newBtn);
+    return;
+  }
+  root.innerHTML = `
+    <div class="list-header">
+      <div class="results-hint">${tn(tnList.length, '{n} tournament', '{n} tournaments')}</div>
+      ${newBtn}
+    </div>
+    <div class="tn-list">${tnList.map(_tnCardHTML).join('')}</div>`;
+}
+
+function _tnCardHTML(tour) {
+  const n   = tour.tournament_players?.[0]?.count ?? 0;
+  const org = tnProfiles.get(tour.organizer)?.nickname;
+  const meta = [org ? _esc(org) : null, tn(n, '{n} player', '{n} players'), fmtDateShort(tour.created_at)].filter(Boolean).join(' | ');
+  return `
+    <a class="game-card tn-card" href="tournaments.html?t=${tour.id}">
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-date">${_esc(tour.name)}</div>
+          <div class="card-meta">${_tnStatus(tour)}</div>
+        </div>
+        <div class="tn-card-meta">${meta}</div>
+      </div>
+    </a>`;
+}
+
+function tnNew() {
+  if (!getCurrentUser()) return goToSignIn();
+  location.href = 'tournaments.html?new';
+}
+
+// ── ONE TOURNAMENT ────────────────────────────────────────────────────────────
+
+// Loads the tournament and draws it; quiet (the reloads): no spinner, and a
+// redraw only when something changed.
+async function tnLoad(id, { quiet = false } = {}) {
+  const root = document.getElementById('tnRoot');
+  const [tourRes, playersRes, tablesRes] = await Promise.all([
+    db.from('tournaments').select('*').eq('id', id).maybeSingle(),
+    db.from('tournament_players').select('*').eq('tournament_id', id).order('joined_at'),
+    db.from('tournament_tables').select('*, tournament_seats(*)').eq('tournament_id', id).order('stage').order('table_no'),
+  ]);
+  const error = tourRes.error || playersRes.error || tablesRes.error;
+  if (quiet && (error || !tourRes.data)) { _tnSchedulePoll(); return; }
+  root.className = '';
+  // A malformed id (22P02: not a uuid) is a wrong link, like a missing tournament.
+  if (error && error.code !== '22P02') { root.innerHTML = loadErrorHTML(t("Couldn't load the tournament"), error); return; }
+  if (!tourRes.data) {
+    root.innerHTML = emptyStateHTML('⚠️', t('Tournament not found'), t('This tournament may have been deleted, or the link is wrong.'),
+      `<a class="btn btn-ghost btn-sm" href="tournaments.html">${t('All tournaments')}</a>`);
+    return;
+  }
+  tnTour    = tourRes.data;
+  tnPlayers = playersRes.data || [];
+  tnTables  = (tablesRes.data || []).map(tb => ({ ...tb, seats: (tb.tournament_seats || []).sort((a, b) => a.position - b.position) }));
+  await _tnLoadProfiles([tnTour.organizer, ...tnPlayers.map(p => p.user_id), ...tnTables.map(tb => tb.recorder)]);
+  _tnSchedulePoll();
+  const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);
+  if (quiet && snap === tnSnapshot) return;
+  tnSnapshot = snap;
+  if (!_tnFormOpen()) tnRenderTournament();
+}
+
+// The reloads: every few seconds while the page is visible and the tournament
+// isn't finished, skipped while you type a name, a sheet is open or the
+// settings are being edited; and at once when the page comes back into view.
+function _tnSchedulePoll() {
+  clearTimeout(tnPollTimer);
+  if (!tnTour || tnTour.finished_at) return;
+  tnPollTimer = setTimeout(() => {
+    if (document.visibilityState === 'visible' && !_tnBusy()) tnLoad(tnTour.id, { quiet: true });
+    else _tnSchedulePoll();
+  }, TN_POLL_MS);
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && tnTour && !tnTour.finished_at && !_tnBusy()) tnLoad(tnTour.id, { quiet: true });
+});
+
+function _tnBusy() {
+  const input = document.getElementById('tnAddName');
+  return _tnFormOpen() || !!document.querySelector('.overlay.open')
+    || (!!input && (input.value.trim() !== '' || document.activeElement === input));
+}
+
+function tnRenderTournament() {
+  const root = document.getElementById('tnRoot');
+  root.className = '';
+  const user  = getCurrentUser();
+  const isOrg = !!user && user.id === tnTour.organizer;
+  const lobby = tnTour.current_stage === 0;
+  const mine  = user ? tnPlayers.find(p => p.user_id === user.id) : null;
+
+  const pairing = TOURNAMENT_PAIRINGS[tnTour.pairing];
+  const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
+  const settings = [
+    t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') }),
+    t('{n} per table', { n: tnTour.table_size }),
+    tn(tnTour.stages, '{n} stage', '{n} stages'),
+    pairing ? t(pairing.name) : _esc(tnTour.pairing),
+    scoring ? t(scoring.name) : _esc(tnTour.scoring),
+  ].join(' | ');
+  const status = [_tnStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
+
+  const actions = [
+    `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
+    isOrg && lobby ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
+    isOrg && lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start')}</button>` : '',
+  ].join('');
+
+  const ctx  = { user, isOrg, lobby, mine };
+  const rows = tnPlayers.map(p => _tnPlayerRowHTML(p, ctx)).join('');
+
+  root.innerHTML = `
+    <div class="claim-game-info">
+      <div class="claim-date">${_esc(tnTour.name)}</div>
+      <div class="claim-meta">${settings}</div>
+      <div class="claim-meta">${status}</div>
+    </div>
+    <div class="claim-share-row">${actions}</div>
+    ${lobby ? '' : _tnStageHTML(mine)}
+    <div class="section-label">${t('Players')}</div>
+    ${tnPlayers.length ? `<div class="claim-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
+    ${_tnJoinHTML(ctx)}
+    ${isOrg ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button></div>` : ''}`;
+}
+
+// A player: their name, the avatar and nickname of whoever claimed it (the
+// nickname only when it differs from the name), and what you can do with it.
+function _tnPlayerRowHTML(p, { user, isOrg, lobby, mine }) {
+  const prof   = p.user_id ? tnProfiles.get(p.user_id) : null;
+  const isMine = !!user && p.user_id === user.id;
+  const avatar = prof
+    ? avatarHTML(resolveAvatar(prof), { cls: 'tn-avatar' })
+    : '<img class="tn-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
+  const canClaim = !p.user_id && !!user && !mine;
+  let sub = '';
+  if (p.withdrawn_after != null)        sub = `<div class="claim-nick">${t('Withdrawn after stage {n}', { n: p.withdrawn_after })}</div>`;
+  else if (prof && prof.nickname !== p.name) sub = `<div class="claim-nick">${_esc(prof.nickname)}</div>`;
+  else if (!p.user_id && !canClaim)      sub = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
+  const actions = [
+    canClaim ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnClaim('${p.id}')">${t("That's me")}</button>` : '',
+    isMine   ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnRelease('${p.id}')">${t('Release')}</button>` : '',
+    isOrg && lobby ? `<button class="pf-btn del" type="button" onclick="tnRemove('${p.id}')" title="${t('Remove')}">❌</button>` : '',
+  ].join('');
+  return `
+    <div class="claim-row${isMine ? ' mine' : ''}">
+      <div class="claim-char">${avatar}<div class="claim-who"><div class="claim-name">${_esc(p.name)}</div>${sub}</div></div>
+      ${actions ? `<div class="tn-row-actions">${actions}</div>` : ''}
+    </div>`;
+}
+
+// Under the players: the organizer's Add a player (lobby), Join as a player
+// for whoever signed in has no name yet (lobby), and Sign in for guests.
+function _tnJoinHTML({ user, isOrg, lobby, mine }) {
+  if (!user) {
+    return `<p class="tn-hint">${lobby ? t('Sign in to join, or to claim your name.') : t('Sign in to claim your name.')}
+      <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`;
+  }
+  if (!lobby) return '';
+  return `
+    ${isOrg ? `
+      <div class="tn-add-row">
+        <input type="text" id="tnAddName" maxlength="30" placeholder="${t('Player name')}" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') tnAddPlayer()">
+        <button class="btn btn-ghost" type="button" onclick="tnAddPlayer()">${t('Add')}</button>
+      </div>` : ''}
+    ${mine ? '' : `<div class="claim-share-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnJoin()">${t('Join as a player')}</button></div>`}`;
+}
+
+// The current stage: its tables, yours first.
+function _tnStageHTML(mine) {
+  const stage  = tnTour.current_stage;
+  const myId   = mine?.id;
+  const atMine = tb => tb.seats.some(s => s.player_id === myId);
+  const tables = tnTables.filter(tb => tb.stage === stage)
+    .sort((a, b) => (atMine(b) - atMine(a)) || a.table_no - b.table_no);
+  const saved  = tables.filter(tb => tb.saved_at).length;
+  return `
+    <div class="section-label">${t('Stage {n} of {m}', { n: stage, m: tnTour.stages })} | ${t('{n} of {m} tables saved', { n: saved, m: tables.length })}</div>
+    <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>`;
+}
+
+// A table, drawn like a game card: its players in play order with their
+// villains (a saved table: in place order, with their places).
+function _tnTableHTML(tb, myId) {
+  const bye = tb.seats.length === 1;
+  const recorder = tb.recorder ? tnProfiles.get(tb.recorder)?.nickname : null;
+  const status = bye ? t('Bye')
+    : tb.saved_at ? t('Saved')
+    : recorder    ? t("In progress on {name}'s phone", { name: _esc(recorder) })
+    : t('Waiting');
+  const byName = new Map(tnPlayers.map(p => [p.id, p]));
+  const seats  = tb.saved_at && !bye ? tb.seats.slice().sort((a, b) => a.place - b.place) : tb.seats;
+  const chips = seats.map(s => {
+    const won  = tb.saved_at && !bye && s.place === 1;
+    const self = s.player_id === myId;
+    const name = byName.get(s.player_id)?.name || '';
+    return `
+      <div class="chip${won ? ' winner' : ''}${self ? ' self' : ''}">
+        <span class="chip-seat">${bye ? '' : tb.saved_at ? fmtPlace(s.place) : s.position + 1}</span>
+        <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(s.character)}">${charImgHTML(s.character)}</a>
+        <div class="chip-body">
+          <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(s.character)}">${villainNameHTML(s.character)}</a></div>
+          <div class="chip-nick">${_esc(name)}${s.dropped ? ` | ${t('Dropped')}` : ''}</div>
+        </div>
+        ${won ? '<span class="win-star">👑</span>' : ''}
+      </div>`;
+  }).join('');
+  return `
+    <div class="game-card tn-table">
+      <div class="card-body">
+        <div class="card-top card-top-wrap">
+          <div class="card-date">${t('Table {n}', { n: tb.table_no })}</div>
+          <div class="card-meta">${status}</div>
+        </div>
+        <div class="card-players rows tn-seats">${chips}</div>
+      </div>
+    </div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+
+function tnShare() {
+  showQRModal(new URL(`tournaments.html?t=${tnTour.id}`, location.href).href, 'qrCode', 'qrOverlay');
+}
+
+// After an action: the tournament as it is now, and the error if it failed.
+async function _tnAfter(error) {
+  await tnLoad(tnTour.id);
+  if (error) _tnShowError(_tnErrorMsg(error));
+}
+
+async function tnAddPlayer() {
+  const input = document.getElementById('tnAddName');
+  const name  = input?.value.trim();
+  if (!name) return;
+  const { error } = await db.from('tournament_players').insert({ tournament_id: tnTour.id, name });
+  if (!error) input.value = '';
+  await _tnAfter(error);
+  document.getElementById('tnAddName')?.focus();   // the next name
+}
+
+async function tnJoin() {
+  const user = getCurrentUser();
+  if (!user) return goToSignIn();
+  const profile = getCurrentProfile();
+  if (!profile) return _openNicknameModal();
+  const { error } = await db.from('tournament_players').insert({ tournament_id: tnTour.id, name: profile.nickname, user_id: user.id });
+  await tnLoad(tnTour.id);
+  if (error?.code === '23505') _tnShowError(t("There is already a player named {name}: if it's you, tap That's me.", { name: profile.nickname }));
+  else if (error) _tnShowError(_tnErrorMsg(error));
+}
+
+async function tnClaim(playerId) {
+  if (!getCurrentProfile()) return _openNicknameModal();
+  const { error } = await db.rpc('claim_tournament_player', { target_player: playerId });
+  await _tnAfter(error);
+}
+
+function tnRelease(playerId) {
+  const p = tnPlayers.find(x => x.id === playerId);
+  if (!p) return;
+  openConfirmSheet({
+    id:           'tnReleaseSheet',
+    title:        t('Release this name?'),
+    bodyHTML:     `<p class="confirm-text">${t('{name} and its villains in the tournament\'s games go back to unclaimed, for you or someone else to claim.', { name: `<strong class="text-emph">${_esc(p.name)}</strong>` })}</p>`,
+    confirmLabel: t('Release'),
+    busyLabel:    t('Releasing…'),
+    danger:       true,
+    onConfirm:    async () => {
+      const { error } = await db.rpc('release_tournament_player', { target_player: playerId });
+      await _tnAfter(error);
+    },
+  });
+}
+
+async function tnRemove(playerId) {
+  const { error } = await db.from('tournament_players').delete().eq('id', playerId);
+  await _tnAfter(error);
+}
+
+// Start: sign-ups close; every player's villains for every stage and stage 1's
+// tables are drawn here (tournament-rules.js) and checked by the database.
+function tnStart() {
+  const n = tnPlayers.length;
+  if (n < 2) return _tnShowError(t('A tournament needs at least 2 players.'));
+  if (tnTour.villain_pool.length < n) {
+    return _tnShowError(t('The draw pool has {v} villains for {n} players: every player needs a different one. Add villains in Edit settings.', { v: tnTour.villain_pool.length, n }));
+  }
+  const sizes = tournamentSplit(n, tnTour.table_size);
+  openConfirmSheet({
+    id:           'tnStartSheet',
+    title:        t('Start the tournament?'),
+    bodyHTML:     `<p class="confirm-text">${t('Sign-ups close, and stage 1 is drawn: {tables} and a villain for every player.', { tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
+    confirmLabel: t('Start'),
+    busyLabel:    t('Drawing…'),
+    onConfirm:    async () => {
+      const villains = tournamentVillainSchedule(tnTour, tnPlayers.map(p => p.id));
+      const tables   = tournamentDrawStage(tnTour, tnPlayers, []);
+      const { error } = await db.rpc('start_tournament', { target: tnTour.id, villains, tables });
+      await _tnAfter(error);
+    },
+  });
+}
+
+function tnDelete() {
+  const games = tnTables.filter(tb => tb.game_id).length;
+  openConfirmSheet({
+    id:           'tnDeleteSheet',
+    title:        t('Delete tournament?'),
+    bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the tournament, its players and tables. This action cannot be undone.')}</p>`
+                + (games ? `<p class="confirm-text">${tn(games, 'Its {n} game is deleted too, from the Game Log and from every profile.', 'Its {n} games are deleted too, from the Game Log and from every profile.')}</p>` : ''),
+    confirmLabel: t('Delete tournament'),
+    busyLabel:    t('Deleting…'),
+    danger:       true,
+    onConfirm:    async () => {
+      const { error } = await db.rpc('delete_tournament', { target: tnTour.id });
+      if (error) { await _tnAfter(error); return; }
+      location.replace('tournaments.html');
+    },
+  });
+}
+
+// ── THE FORM ──────────────────────────────────────────────────────────────────
+// New tournament, or the lobby's settings: the name, the players per table
+// (the largest table), the stages, the pairing and scoring rules (one button
+// per rule in tournament-rules.js) and the draw pool (New Game's draw pool).
+
+const _tnFormOpen = () => !document.getElementById('tnForm').classList.contains('hidden');
+
+async function tnOpenForm(tour) {
+  tnFormFor = tour;
+  if (!getCurrentUser() && !tour) return goToSignIn();
+  clearTimeout(tnPollTimer);
+  setVisible('tnRoot', false);
+  setVisible('tnBack', true);
+  setVisible('tnForm', true);
+  document.getElementById('tnFormSave').textContent = tour ? t('Save Changes') : t('Create tournament');
+  clearError('tnFormErr');
+
+  document.getElementById('tnName').value   = tour?.name || '';
+  document.getElementById('tnSize').value   = String(tour?.table_size || 4);
+  document.getElementById('tnStages').value = String(tour?.stages || 3);
+  tnRule.pairing = tour?.pairing || 'random';
+  tnRule.scoring = tour?.scoring || 'borda';
+  _tnRenderRules();
+
+  if (!tnPool) {
+    tnPool = createPaceFilter({
+      getChars:     () => tnChars,
+      gridId:       'tnPoolGrid',
+      paceColorsId: 'tnPaceColors',
+      paceModeId:   'tnPaceMode',
+      mineBtnId:    'tnMineBtn',
+      mineTitles: {
+        signIn:  t('Sign in to filter by owned boxes'),
+        noBoxes: t('Mark which boxes you own on the account page first'),
+        on:      t('Pool limited to your boxes'),
+        off:     t('Limit the pool to your boxes'),
+      },
+      onChange:      _tnPoolChanged,
+      onError:       msg => showError('tnFormErr', msg),
+      mineByDefault: true,
+    });
+    buildExcludeGrid(document.getElementById('tnPoolGrid'), tnChars, tnPool.excluded, _tnPoolChanged, tnBoxInfo);
+    await tnPool.loadOwnedBoxes();
+  }
+  if (tour) {
+    const inPool = new Set(tour.villain_pool);
+    tnPool.restoreState({ excluded: tnChars.map(c => c.name).filter(n => !inPool.has(n)) });
+  } else {
+    tnPool.reset();
+    tnPool.defaultToMine();   // your boxes, when you've marked some
+  }
+  tnPool.updatePaceUI();
+  _tnPoolChanged();
+  if (!tour) document.getElementById('tnName').focus();
+}
+
+function tnCloseForm() {
+  if (!tnFormFor) return goBack('tournaments.html');
+  setVisible('tnForm', false);
+  setVisible('tnRoot', true);
+  tnRenderTournament();
+  _tnSchedulePoll();
+}
+
+// One button per rule, the picked one on, its explanation under it.
+function _tnRenderRules() {
+  for (const [kind, rules, segId, hintId] of [
+    ['pairing', TOURNAMENT_PAIRINGS, 'tnPairing', 'tnPairingHint'],
+    ['scoring', TOURNAMENT_SCORINGS, 'tnScoring', 'tnScoringHint'],
+  ]) {
+    document.getElementById(segId).innerHTML = Object.entries(rules).map(([id, r]) =>
+      `<button class="seg-btn${id === tnRule[kind] ? ' on' : ''}" type="button" onclick="tnPickRule('${kind}', '${id}')">${t(r.name)}</button>`).join('');
+    document.getElementById(hintId).textContent = t(rules[tnRule[kind]]?.hint || '');
+  }
+}
+
+function tnPickRule(kind, id) {
+  tnRule[kind] = id;
+  _tnRenderRules();
+}
+
+function tnTogglePool(open) {
+  const body = document.getElementById('tnPoolBody');
+  const isOpen = body.classList.toggle('open', open);
+  document.getElementById('tnPoolChevron').classList.toggle('open', isOpen);
+}
+
+function _tnPoolChanged() {
+  const badge = document.getElementById('tnPoolBadge');
+  badge.textContent = tnChars.length - tnPool.excluded.size;
+  badge.classList.add('visible');
+  badge.classList.toggle('full', !tnPool.excluded.size);
+  document.getElementById('tnPoolReset').disabled = tnPool.isDefault();
+}
+
+async function tnSaveForm() {
+  const user = getCurrentUser();
+  if (!user) return goToSignIn();
+  const name   = document.getElementById('tnName').value.trim();
+  const stages = Number(document.getElementById('tnStages').value);
+  const pool   = tnChars.map(c => c.name).filter(n => !tnPool.excluded.has(n));
+  if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
+  if (!Number.isInteger(stages) || stages < 1 || stages > 20) return showError('tnFormErr', t('Stages: from 1 to 20.'));
+  if (pool.length < 2) return showError('tnFormErr', t('The draw pool needs at least 2 villains.'));
+  const row = {
+    name, stages,
+    table_size:   Number(document.getElementById('tnSize').value),
+    pairing:      tnRule.pairing,
+    scoring:      tnRule.scoring,
+    villain_pool: pool,
+  };
+  const btn = document.getElementById('tnFormSave');
+  btn.disabled = true;
+  const res = tnFormFor
+    ? await db.from('tournaments').update(row).eq('id', tnFormFor.id).select('id')
+    : await db.from('tournaments').insert({ ...row, organizer: user.id }).select('id');
+  btn.disabled = false;
+  if (res.error || !res.data?.length) return showError('tnFormErr', _tnErrorMsg(res.error) || t('The tournament has already started.'));
+  if (!tnFormFor) { location.replace(`tournaments.html?t=${res.data[0].id}`); return; }
+  setVisible('tnForm', false);
+  setVisible('tnRoot', true);
+  await tnLoad(tnFormFor.id);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+init();
