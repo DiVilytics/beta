@@ -2385,6 +2385,8 @@ select:disabled {
 .size-row > [data-size="solo"] { margin-left: auto; }
 .size-row > .period-pill-wrap:last-child { flex: 0 1 auto; min-width: 0; }
 .size-row > .period-pill-wrap:last-child .period-pill { width: 100%; min-width: 0; text-overflow: ellipsis; }
+.size-row [data-menu="level"].on { color: var(--lvl); }
+.size-row [data-menu="level"] option { color: var(--text); }
 /* No field-style focus ring after a pick with the mouse; keyboard focus keeps it. */
 .period-pill:focus { box-shadow: none; border-color: var(--border); }
 .period-pill.on:focus { border-color: var(--s4); }
@@ -2404,10 +2406,11 @@ select:disabled {
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }
 .solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
-/* Solo's difficulty levels (solo.js): the names in green, yellow and red, in
-   New Game's picker (the draw pool's switch, the picked one in its color,
-   with the level's rounds and Fate beside it, in the lineup row) and on solo
-   games. The level filter under Solo stays plain, dashed. */
+/* Solo's difficulty levels (solo.js): a level shows its color (green, yellow,
+   red) only where it's the one in effect: picked (New Game's switch, the
+   filters' Difficulty menu, the villain page's Solo table) or a game's own
+   (solo game cards, the game page, the game in progress and its die). Levels
+   not picked stay gray, and texts naming all three stay plain. */
 .lvl-easy   { --lvl: var(--lvl-easy); }
 .lvl-medium { --lvl: var(--lvl-medium); }
 .lvl-hard   { --lvl: var(--lvl-hard); }

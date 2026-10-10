@@ -51,6 +51,8 @@ function createSizeFilter(rootId, { onChange }) {
     soloBtn.classList.toggle('on', value === 'solo' && !leveled);
     sel.classList.toggle('on', sized);
     lvlSel.classList.toggle('on', leveled);
+    // The picked level in its color, as wherever a level is the one in effect.
+    for (const id of SOLO_LEVEL_IDS) lvlSel.classList.toggle(`lvl-${id}`, leveled && id === level);
     sel.innerHTML =
       `<option value="" hidden${sized ? '' : ' selected'}>${_esc(t('Players'))}</option>` +
       TABLE_SIZES.map(n => `<option value="${n}"${n === value ? ' selected' : ''}>${n}p</option>`).join('');
