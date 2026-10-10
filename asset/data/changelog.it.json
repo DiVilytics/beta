@@ -6,7 +6,8 @@
     ],
     "improved": [
       "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: secondo quanti giocatori hanno rivendicato il proprio cattivo, persa o vinta.",
-      "Il solitario ha nuove regole nelle F.A.Q.: giochi contro un giocatore fantasma, e otto cattivi hanno una correzione tutta loro."
+      "Il solitario ha nuove regole nelle F.A.Q.: giochi contro un giocatore fantasma, e otto cattivi hanno una correzione tutta loro.",
+      "Il tuo avatar, in alto a destra, ora apre anche le impostazioni (tema, dimensione del testo, lingua), con il tuo account in cima."
     ],
     "fixed": [
       "Una partita cronometrata in Nuova partita senza usare il contatore dei round non viene più registrata con 1 round."

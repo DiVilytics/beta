@@ -267,8 +267,9 @@ nav {
 .nav-avatar-guest {
   opacity: 0.4;
 }
-/* Settings panel (⚙️ in the nav): theme and language switches, under the nav's
-   right edge. The nav is sticky, so the panel is positioned against it. */
+/* Settings panel (the nav's avatar opens it): the account, then the theme,
+   text size and language switches, under the nav's right edge. The nav is
+   sticky, so the panel is positioned against it. */
 .settings-panel {
   position: absolute; top: calc(100% + 6px); right: 1rem; z-index: 45;
   display: none; flex-direction: column; gap: 10px;
@@ -285,28 +286,24 @@ nav {
   display: inline-flex; align-items: center; justify-content: center;
 }
 .settings-ico { margin-right: 6px; }
+/* The account: your avatar and nickname, to the account page (Sign in for a
+   guest), framed like the switches under it. */
+.settings-account {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  height: 30px; padding: 0 10px 0 3px;
+  background: var(--s2); border: 1px solid var(--border); border-radius: var(--rs);
+  font-family: inherit; font-size: calc(12px * var(--ts)); font-weight: 600;
+  color: var(--text); text-decoration: none; cursor: pointer;
+}
+.settings-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.settings-nick { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.settings-go { color: var(--muted); }
 /* Text size: each option is shown at its own size (12px, or 12px × 1.125). */
 .settings-panel [data-text-opt="small"] { font-size: 12px; }
 .settings-panel [data-text-opt="large"] { font-size: 13.5px; }
 .ts-a { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; }
 [data-text-opt="small"] .ts-a { font-size: 11px; }
 [data-text-opt="large"] .ts-a { font-size: 16px; }
-
-.nav-icon-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 30px;
-  padding: 0 6px;
-  border-radius: var(--rs);
-  cursor: pointer;
-  color: var(--muted);
-  transition: color 0.15s, background 0.15s;
-}
 
 /* Clickable chip (profile link from game card / leaderboard) */
 a.chip {
@@ -2963,7 +2960,7 @@ select:disabled {
   .nav-brand:hover                          { opacity: 0.65; }
   .nav-avatar:hover                         { opacity: 0.75; }
   .nav-avatar-btn:hover .nav-avatar-guest   { opacity: 0.7; }
-  .nav-icon-btn:hover                       { color: var(--text); background: var(--s2); }
+  .settings-account:hover                   { border-color: var(--muted); }
   a.chip:hover                              { border-color: var(--s4); }
   a.chip.winner:hover                       { border-color: rgba(240, 165, 0, 0.5); }
   .chip-char a.char-link:hover              { text-decoration: underline; text-underline-offset: 2px; }

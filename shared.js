@@ -249,9 +249,11 @@ function _updateAuthUI() {
   const el = document.getElementById('navAuth');
   if (!el) return;
 
-  const themeBtn = `<button class="nav-icon-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${t('Settings')}" aria-haspopup="true" aria-expanded="false">⚙️</button>`;
+  // The avatar opens the settings panel, the account on top (SETTINGS PANEL).
+  const menuBtn = (cls, title, inner) =>
+    `<button class="${cls}" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${title}" aria-haspopup="true" aria-expanded="false">${inner}</button>`;
   const avatarLink = src =>
-    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${_withShortcut(t('Account'), 'a')}" aria-keyshortcuts="A">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
+    menuBtn('nav-avatar-btn nav-avatar-link active', t('Account and settings'), avatarHTML(src, { cls: 'nav-avatar' }));
 
   // Before the session check resolves, fall back to the cached avatar (if any) so
   // a returning user sees their icon immediately rather than a guest flash.
@@ -265,17 +267,35 @@ function _updateAuthUI() {
     el.innerHTML = avatarLink(cached);
   } else {
     if (_authResolved) _setCachedNavAvatar(null);   // confirmed signed out, drop the cache
-    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="${_withShortcut(t('Sign in'), 'a')}" aria-keyshortcuts="A"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
+    el.innerHTML = menuBtn('nav-avatar-btn', t('Sign in and settings'), '<img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">');
   }
+  _renderSettingsAccount();
   _updateThemeBtn();
   _updateThemeIcons();
 }
 
 // ── SETTINGS PANEL ───────────────────────────────────────────────────────────
-// The ⚙️ in the nav opens a small panel with the theme (Auto / Light / Dark,
-// theme.js) and the language (EN / IT, lang.js; switching reloads the page).
-// It lives in the nav itself (not in #navAuth, which is repainted on sign-in),
-// and closes after a choice, on a tap outside it, or on Escape (KEYBOARD).
+// The avatar in the nav opens a small panel: the account on top (your avatar
+// and nickname, to the account page; Sign in for a guest), then the theme
+// (Auto / Light / Dark, theme.js), the text size and the language (EN / IT,
+// lang.js; switching reloads the page). It lives in the nav itself (not in
+// #navAuth, which is repainted on sign-in), and closes after a choice, on a tap
+// outside it, or on Escape (KEYBOARD).
+function _settingsAccountHTML() {
+  const cached = (!_currentUser && !_authResolved) ? _cachedNavAvatar() : null;
+  if (!_currentUser && !cached) {
+    return `<button class="settings-account" type="button" onclick="goToSignIn()"><img class="settings-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""><span class="settings-nick">${t('Sign in')}</span><span class="settings-go">›</span></button>`;
+  }
+  const src  = _currentUser ? resolveAvatar(_currentProfile) : cached;
+  const nick = _currentProfile?.nickname;
+  return `<a class="settings-account" href="account.html">${avatarHTML(src, { cls: 'settings-avatar' })}<span class="settings-nick">${nick ? _esc(nick) : t('Account')}</span><span class="settings-go">›</span></a>`;
+}
+
+function _renderSettingsAccount() {
+  const row = document.getElementById('settingsAccount');
+  if (row) row.innerHTML = _settingsAccountHTML();
+}
+
 function _settingsPanel() {
   let panel = document.getElementById('settingsPanel');
   if (panel) return panel;
@@ -289,6 +309,10 @@ function _settingsPanel() {
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', t('Settings'));
   panel.innerHTML = `
+    <div class="settings-row">
+      <span class="settings-lbl">${t('Account')}</span>
+      <div id="settingsAccount">${_settingsAccountHTML()}</div>
+    </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Theme')}</span>
       <div class="seg">${btn('data-theme-opt', 'auto', `<span class="settings-ico">🌗</span>${t('Auto')}`)}${btn('data-theme-opt', 'light', `<span class="settings-ico">☀️</span>${t('Light')}`)}${btn('data-theme-opt', 'dark', `<span class="settings-ico">🌙</span>${t('Dark')}`)}</div>

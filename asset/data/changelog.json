@@ -6,7 +6,8 @@
     ],
     "improved": [
       "Under the players' Leaderboard, XP table shows what a game is worth: by how many players claimed their villain, lost or won.",
-      "Solo has new rules in the FAQ: you play against a Phantom player, and eight villains get a fix of their own."
+      "Solo has new rules in the FAQ: you play against a Phantom player, and eight villains get a fix of their own.",
+      "Your avatar, top right, now opens the settings too (theme, text size, language), with your account on top."
     ],
     "fixed": [
       "A game timed in New Game without the round counter is no longer recorded with 1 round."
