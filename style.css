@@ -2163,6 +2163,7 @@ select:disabled {
 .kbd-help-group   { break-inside: avoid; padding-bottom: 20px; }
 .kbd-help-lbl     { margin-bottom: 8px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .kbd-help-row     { display: flex; align-items: center; gap: 10px; padding: 2px 0; font-size: calc(14px * var(--ts)); color: var(--text); }
+.kbd-help-row.gap-after { margin-bottom: 10px; }
 .kbd-help kbd {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
   min-width: 25px; height: 25px; padding: 0 6px;

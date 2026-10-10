@@ -392,7 +392,13 @@ _updateAuthUI();
 // new-game-audio.js) aren't characters, so they never match. The match is on
 // the character typed, so it follows the keyboard layout.
 
+// In the help list: Home, Tutorial and F.A.Q. on top, then (after a gap) the
+// pages in the nav's order; Account is listed with the settings, as in the
+// avatar menu.
 const _KBD_PAGES = [
+  ['h', 'index.html',       'Home'],
+  ['!', 'tutorial.html',    'Tutorial'],
+  ['f', 'faq.html',         'F.A.Q.', { gapAfter: true }],
   ['n', 'new-game.html',    'New Game'],
   ['g', 'game-log.html',    'Game Log'],
   ['t', 'tournaments.html', 'Tournaments'],
@@ -400,10 +406,7 @@ const _KBD_PAGES = [
   ['v', 'villains.html',    'Villains'],
   ['p', 'players.html',     'Players'],
   ['c', 'charts.html',      'Charts'],
-  ['a', 'account.html',     'Account'],
-  ['h', 'index.html',       'Home'],
-  ['u', 'tutorial.html',    'Tutorial'],
-  ['f', 'faq.html',         'F.A.Q.'],
+  ['a', 'account.html',     'Account', { inSettings: true }],
 ];
 // In the order of the settings panel: theme, text size, language.
 const _KBD_SETTINGS = [
@@ -454,7 +457,7 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
   let el = document.getElementById('kbdHelp');
   if (!open) { el?.classList.remove('open'); return; }
   if (!el) {
-    const row = (key, label) => `<div class="kbd-help-row"><kbd>${_esc(key)}</kbd><span>${_esc(label)}</span></div>`;
+    const row = (key, label, gap) => `<div class="kbd-help-row${gap ? ' gap-after' : ''}"><kbd>${_esc(key)}</kbd><span>${_esc(label)}</span></div>`;
     const group = (title, rows, note = '') =>
       `<section class="kbd-help-group"><div class="kbd-help-lbl">${_esc(title)}</div>${rows.map(r => row(...r)).join('')}${note ? `<p class="kbd-help-note">${_esc(note)}</p>` : ''}</section>`;
     el = document.createElement('div');
@@ -468,8 +471,8 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
         <div class="kbd-help-ico">⌨️</div>
         <div class="kbd-help-title">${_esc(t('Keyboard shortcuts'))}</div>
         <div class="kbd-help-groups">
-          ${group(t('Pages'), _KBD_PAGES.map(([k, , label]) => [k.toUpperCase(), t(label)]))}
-          ${group(t('Settings'), _KBD_SETTINGS.map(([k, label]) => [k, t(label)]))}
+          ${group(t('Pages'), _KBD_PAGES.filter(p => !p[3]?.inSettings).map(([k, , label, o]) => [k.toUpperCase(), t(label), o?.gapAfter]))}
+          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label)]), ..._KBD_SETTINGS.map(([k, label]) => [k, t(label)])])}
           ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
           ${group(t('During a game'), [['⏯︎', t('Pause or resume the timer')], ['⏮︎', t('Previous round')], ['⏭︎', t('Next round')]],
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
