@@ -283,6 +283,14 @@ function render({ rows, summary }) {
     { val: avgTurns != null ? avgTurns      : '-', lbl: t('Avg rounds') },
   ]);
 
+  // No games at all (every table size, all time): the card, as in the Game
+  // log, not a ranking of empty rows, on both tabs.
+  if (!games && lbFilter === 'all' && period.isAll()) {
+    document.getElementById('lb').innerHTML = emptyStateHTML('⚔️', t('No games yet'), t('Record your first game to get started.'),
+      `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
+    return;
+  }
+
   if (!rows.length) {
     // Players: there can be games with nobody signed in on them (imported ones).
     document.getElementById('lb').innerHTML = games && lbTab === 'players'
