@@ -803,6 +803,7 @@ function _tnPlace(position, dropped) {
   if (_tnPlaces().done && liveGame.isRunning) { stopLive(); tnGame.autoStopped = true; }
   _tnPersist();
   _tnRenderLive();
+  _updateMediaMetadata();   // the lock screen's count (new-game-audio.js)
 }
 
 // Undoing the placement that ended the game: the timer goes on from where it
@@ -812,6 +813,7 @@ function tnUndoLast() {
   if (tnGame.autoStopped) { tnGame.autoStopped = false; startLive(); }
   _tnPersist();
   _tnRenderLive();
+  _updateMediaMetadata();
 }
 
 // New Game's names, for the lock-screen controls (new-game-audio.js).
@@ -842,8 +844,10 @@ function bumpTurn(delta) {
   _tnRenderLive();
 }
 
+// The lock screen: the round, and how many villains are still in the game.
 function liveMediaLines() {
-  return { title: t('Round {n}', { n: liveGame.turns }), artist: t('Update Timer and Rounds') };
+  const left = tnGame ? _tnPlaces().left.length : 0;
+  return { title: t('Round {n}', { n: liveGame.turns }), artist: tn(left, '{n} player still in the game', '{n} players still in the game') };
 }
 
 function tnTogglePause() { tnGame.autoStopped = false; liveGame.isRunning ? stopLive() : startLive(); }

@@ -782,6 +782,8 @@ window.I18N.it = {
     "🏳️ = dropped": "🏳️ = abbandonato",
     "Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it).": "Trascina i cattivi nei loro posti. Chi abbandona resta in fondo; la partita standard si aggiorna (l'ha vinta il 1º).",
     "Someone has to finish 1st": "Qualcuno deve arrivare 1º",
+    "{n} player still in the game": "{n} giocatore ancora in partita",
+    "{n} players still in the game": "{n} giocatori ancora in partita",
   },
 
   // From the Villainous Italia F.A.Q. (the last three confirmed separately).
