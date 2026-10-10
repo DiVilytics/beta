@@ -409,6 +409,8 @@ const _KBD_PAGES = [
   ['a', 'account.html',     'Account', { inSettings: true }],
 ];
 // In the order of the settings panel: theme, text size, language.
+// The help list leaves a gap between theme, text size and language.
+const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : ";'".includes(k) ? 'text' : 'lang';
 const _KBD_SETTINGS = [
   ['[',  'Light theme', () => setTheme('light')],
   [']',  'Dark theme',  () => setTheme('dark')],
@@ -477,7 +479,7 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
           </div>
           <div class="kbd-help-col">
-          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label)]), ..._KBD_SETTINGS.map(([k, label]) => [k, t(label)])])}
+          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label), true]), ..._KBD_SETTINGS.map(([k, label], i, all) => [k, t(label), i + 1 < all.length && _kbdSettingGroup(k) !== _kbdSettingGroup(all[i + 1][0])])])}
           ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
           </div>
         </div>
