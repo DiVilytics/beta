@@ -12,7 +12,7 @@
    10. RESULTS HINT   tiny "n of m" caption
    11. RESUME BANNER  new-game resume-after-reload chip
    12. GAME CARDS     .game-card and friends (used by game-log + player)
-   13. EMPTY/LOADING  empty-state, spinner
+   13. EMPTY/LOADING  empty, spinner
    14. BOTTOM SHEET   overlay, sheet, sheet-{header,body,footer}
    15. FORM           inputs, labels, .form-row, section-label
    16. LEADERBOARD    .lb-table, summary stat boxes, ranks/bars
@@ -1523,7 +1523,6 @@ select:disabled {
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
 
-.empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: calc(13px * var(--ts)); }
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */
 .char-portrait {

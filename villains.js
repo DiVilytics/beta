@@ -157,7 +157,7 @@ async function renderDetailPage(charName) {
   csChar     = csAllChars.find(c => c.name === charName);
 
   if (!csChar) {
-    _showCsEmpty(`<div class="empty"><h3>${t('Villain not found')}</h3><p>${_esc(charName)}</p></div>`);
+    _showCsEmpty(emptyStateHTML('⚠️', t('Villain not found'), t('“{name}” isn\'t a villain on DiVilytics.', { name: _esc(charName) })));
     return;
   }
 
@@ -179,7 +179,7 @@ async function renderDetailPage(charName) {
 
   if (error) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`);
+    _showCsEmpty(loadErrorHTML(t("Couldn't load the stats"), error));
     renderExtras();
     return;
   }

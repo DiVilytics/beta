@@ -126,7 +126,7 @@ async function loadAndRender() {
       summary.className = 'summary';
       summary.innerHTML = '';
       lb.className = '';
-      lb.innerHTML = `<div class="empty-state">${t("Couldn't load the leaderboard.")}</div>`;
+      lb.innerHTML = loadErrorHTML(t("Couldn't load the leaderboard"));
       return;
     }
     // The Villains tab lists every villain, also those without games here.
@@ -325,12 +325,18 @@ function render({ rows, summary }) {
   const soloHint = solo ? soloHintHTML() : '';
   const mode     = solo && lbMode === 'xp' ? 'pct' : lbMode;
 
+  // No solo games at all: the card, not a ranking of empty rows.
+  if (solo && !games && size.level() === 'all' && period.isAll()) {
+    document.getElementById('lb').innerHTML = soloHint + emptyStateHTML('⚔️', t('No solo games yet'), t('To record one, pick Solo in New Game, where you choose the number of players.'),
+      `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
+    return;
+  }
+
   if (!rows.length) {
     // Players: there can be games with nobody signed in on them (imported ones).
-    const msg = games && lbTab === 'players'
-      ? t('No player has claimed a villain in these games.')
-      : t('No games match this filter.');
-    document.getElementById('lb').innerHTML = `${soloHint}<div class="empty-state">${msg}</div>`;
+    document.getElementById('lb').innerHTML = soloHint + (games && lbTab === 'players'
+      ? emptyStateHTML('👤', t('No players to rank'), t('No player has claimed a villain in these games.'))
+      : emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.')));
     return;
   }
 

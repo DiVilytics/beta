@@ -27,7 +27,7 @@ async function init() {
   const root = document.getElementById('clRoot');
   root.className = '';
   if (!days.length) {
-    root.innerHTML = `<div class="empty-state">${t("Couldn't load the release notes.")}</div>`;
+    root.innerHTML = loadErrorHTML(t("Couldn't load the release notes"));
     return;
   }
   const seen = changelogSeen();

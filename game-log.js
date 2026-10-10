@@ -139,8 +139,7 @@ async function load(reset = true) {
   if (token !== _loadToken) return;
 
   if (error) {
-    document.getElementById('root').innerHTML =
-      `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
+    document.getElementById('root').innerHTML = loadErrorHTML(t("Couldn't load the games"), error);
     return;
   }
 
@@ -179,7 +178,7 @@ async function _loadSolo(reset, token) {
   const solo = await loadSoloGames();
   if (token !== _loadToken) return;
   if (!solo) {
-    document.getElementById('root').innerHTML = `<div class="empty"><p>${t("Couldn't load the solo games.")}</p></div>`;
+    document.getElementById('root').innerHTML = loadErrorHTML(t("Couldn't load the solo games"));
     return;
   }
   const included  = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
@@ -401,25 +400,15 @@ function render() {
     hint.textContent = '';
     root.className = '';
     if (solo && !filterActive) {
-      root.innerHTML = `${soloHint}
-        <div class="empty">
-          <div class="empty-icon">⚔️</div>
-          <h3>${t('No solo games yet')}</h3>
-          <p>${t('To record one, pick Solo in New Game, where you choose the number of players.')}</p>
-          <a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>
-        </div>`;
+      root.innerHTML = soloHint + emptyStateHTML('⚔️', t('No solo games yet'), t('To record one, pick Solo in New Game, where you choose the number of players.'),
+        `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
     } else if (!filterActive) {
-      root.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🕒</div>
-          <h3>${t('No games yet')}</h3>
-          <p>${t('Record your first game to get started.')}</p>
-          <a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>
-        </div>`;
+      root.innerHTML = emptyStateHTML('⚔️', t('No games yet'), t('Record your first game to get started.'),
+        `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
     } else if (solo) {
-      root.innerHTML = `${soloHint}<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No matches')}</h3><p>${t('Try adjusting the filters.')}</p></div>`;
+      root.innerHTML = soloHint + emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     } else {
-      root.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No matches')}</h3><p>${t('Try adjusting the filters.')}</p></div>`;
+      root.innerHTML = emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     }
     return;
   }
