@@ -949,6 +949,9 @@ main {
 }
 
 .card-date { font-size: calc(13px * var(--ts)); font-weight: 600; }
+/* A tournament game: 🏟️ before its date, to the tournament (game-card.js). */
+.tn-mark { margin-right: 6px; text-decoration: none; }
+.tn-game-link { color: var(--accent); font-weight: 600; text-decoration: none; }
 
 .card-meta {
   font-size: calc(11px * var(--ts));

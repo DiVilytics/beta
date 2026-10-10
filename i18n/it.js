@@ -780,7 +780,7 @@ window.I18N.it = {
     "Ties: most 1st places, then the points of the opponents faced.": "Pareggi: più primi posti, poi i punti degli avversari affrontati.",
     "⠿ = drag": "⠿ = trascina",
     "🏳️ = dropped": "🏳️ = abbandonato",
-    "Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it).": "Trascina i cattivi nei loro posti. Chi abbandona resta in fondo; la partita standard si aggiorna (l'ha vinta il 1º).",
+    "Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with this duration and these rounds).": "Trascina i cattivi nei loro posti. Chi abbandona resta in fondo; la partita standard si aggiorna (l'ha vinta il 1º, con questa durata e questi round).",
     "Someone has to finish 1st": "Qualcuno deve arrivare 1º",
     "{n} player still in the game": "{n} giocatore ancora in partita",
     "{n} players still in the game": "{n} giocatori ancora in partita",

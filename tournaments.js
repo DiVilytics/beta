@@ -1003,18 +1003,27 @@ function tnEditTable(tableId) {
   const tb = tnTables.find(x => x.id === tableId);
   if (!tb) return;
   tnEdit = { tableId, rows: tb.seats.slice().sort((a, b) => a.place - b.place).map(s => ({ position: s.position, dropped: !!s.dropped })) };
+  const first = tb.seats.find(s => s.place === 1);   // the standard game's duration and rounds are 1st place's
   openConfirmSheet({
     id:           'tnEditSheet',
     title:        t('Table {n}', { n: tb.table_no }),
-    bodyHTML:     `<div class="section-label lineup-label"><span>${t('Ranking')}</span>
+    bodyHTML:     `<div class="form-row">
+                     <div class="field"><label>${t('Duration <span class="optional">(min)</span>')}</label><input type="number" id="tnEditDur" min="1" max="999" value="${first?.minutes || ''}"></div>
+                     <div class="field"><label>${t('Rounds <span class="optional"></span>')}</label><input type="number" id="tnEditTurns" min="1" max="999" value="${first?.round || ''}"></div>
+                   </div>
+                   <div class="section-label lineup-label"><span>${t('Ranking')}</span>
                      <span class="players-legend"><span class="sep-item">${t('⠿ = drag')}</span> | <span class="sep-item">${t('🏳️ = dropped')}</span></span></div>
                    <div class="err" id="tnEditErr"></div>
                    <div class="tn-edit-rows" id="tnEditRows"></div>
-                   <p class="modal-hint">${t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it).')}</p>`,
+                   <p class="modal-hint">${t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with this duration and these rounds).')}</p>`,
     confirmLabel: t('Save Changes'),
     busyLabel:    t('Saving…'),
     onConfirm:    async () => {
       const results = tnEdit.rows.map((r, i) => ({ position: r.position, place: i + 1, dropped: r.dropped }));
+      // The game's duration and rounds go to whoever is 1st now (empty: as they were).
+      const dur = parseInt(document.getElementById('tnEditDur').value), turns = parseInt(document.getElementById('tnEditTurns').value);
+      if (dur > 0)   results[0].minutes = dur;
+      if (turns > 0) results[0].round   = turns;
       const { error } = await db.rpc('edit_tournament_table', { target_table: tableId, results });
       if (error) { showError('tnEditErr', _tnErrorMsg(error)); throw error; }
       await tnLoad(tnTour.id);

@@ -6,9 +6,11 @@
 // Centralizes "what's this user's relationship to this game?" so callers
 // don't re-derive the same booleans inline. Pass the current user object
 // (typically `getCurrentUser()`); a missing user yields all-false.
+// A tournament game (g.tournament, attachTournaments in db.js) is changed only
+// from its tournament: being its creator (the organizer) gives nothing here.
 function gameUserRole(g, gp, user) {
   if (!user) return { isCreator: false, isClaimant: false, isParticipant: false };
-  const isCreator  = g.created_by === user.id;
+  const isCreator  = g.created_by === user.id && !g.tournament;
   const isClaimant = gp.some(p => p.user_id === user.id);
   return { isCreator, isClaimant, isParticipant: isCreator || isClaimant };
 }
@@ -62,12 +64,18 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
   return `
     <div class="card-body">
       <div class="card-top${rows ? ' card-top-wrap' : ''}">
-        <div class="card-date">${fmtGameDate(g)}</div>
+        <div class="card-date">${g.tournament ? _tournamentMarkHTML(g.tournament) : ''}${fmtGameDate(g)}</div>
         <div class="card-meta">${metaHTML}</div>
       </div>
       <div class="card-players${rows ? ' rows' : ''}">${chipsHTML}</div>
     </div>
     ${actions}`;
+}
+
+// 🏟️ before a tournament game's date, to its tournament.
+function _tournamentMarkHTML(tour) {
+  const title = [tour.name, t('Stage {n}', { n: tour.stage }), t('Table {n}', { n: tour.tableNo })].join(' | ');
+  return `<a class="tn-mark" href="tournaments.html?t=${tour.id}" title="${_esc(title)}">🏟️</a>`;
 }
 
 // Wrap the HTML in a <div class="game-card"> and attach the optional

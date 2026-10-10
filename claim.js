@@ -36,7 +36,7 @@ const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[err
 const claimIsSolo = () => claimGame?.variant === 'solo';
 
 function lineupEditable(user) {
-  return !!user && !!claimGame && !claimIsSolo() && claimGame.created_by === user.id
+  return !!user && !!claimGame && !claimIsSolo() && !claimGame.tournament && claimGame.created_by === user.id
     && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
 }
 
@@ -71,6 +71,7 @@ async function init() {
 
   if (playersErr) return showClaimError(t("Couldn't load the game"), t('Try reloading the page.'), playersErr);
 
+  await attachTournaments([game]);   // a tournament's game: changed only from its tournament
   claimGame    = game;
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
   // Nothing to claim in a solo game: the page is just the game's.
@@ -147,9 +148,10 @@ function render() {
     <div class="claim-game-info">
       <div class="claim-date">${fmtGameDate(claimGame)}</div>
       ${meta ? `<div class="claim-meta">${meta}</div>` : ''}
+      ${claimGame.tournament ? `<div class="claim-meta"><a class="tn-game-link" href="tournaments.html?t=${claimGame.tournament.id}">🏟️ ${[_esc(claimGame.tournament.name), t('Stage {n}', { n: claimGame.tournament.stage }), t('Table {n}', { n: claimGame.tournament.tableNo })].join(' | ')}</a></div>` : ''}
     </div>
     <div class="claim-share-row">
-      ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
+      ${role.isParticipant && !claimGame.tournament ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
       ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit villains and winner')}</button>` : ''}
       ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
