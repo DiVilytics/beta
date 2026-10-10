@@ -2367,12 +2367,15 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-view-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
 .tn-hint-center { justify-content: center; text-align: center; }
 .tn-standings { margin-bottom: 10px; }
-/* The organizer's Edit result: a row per seat, its place and Dropped. */
-.tn-edit-rows { display: flex; flex-direction: column; gap: 8px; }
-.tn-edit-row { display: grid; grid-template-columns: 32px 1fr auto auto; align-items: center; gap: 10px; }
-.tn-edit-row .char-portrait { width: 32px; height: 32px; }
-.tn-edit-place { width: auto; }
-.tn-edit-drop { display: flex; align-items: center; gap: 4px; font-size: calc(12px * var(--ts)); color: var(--muted); white-space: nowrap; }
+/* The organizer's Edit result: New Game's rows (.order-slot, dragged by ⠿),
+   the place where New Game has the seat number, 🏳️ for a drop. */
+.tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.tn-edit-row .claim-who { flex: 1; }
+.tn-edit-row .tn-edit-place { width: 28px; }
+.tn-edit-row.winner { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
+.tn-edit-row.winner .claim-name, .tn-edit-row.winner .tn-edit-place { color: var(--gold); }
+.tn-edit-row.dropped .claim-name { color: var(--muted); }
+.pf-btn.drop.on { background: var(--accent-d); border-color: rgba(124, 106, 247, 0.35); }
 /* The table's game in progress: New Game's live panel, then the villains
    still playing (their movers, at the live row's scale) and the ranking. */
 .live-status.paused::before { animation: none; background: var(--gold); }

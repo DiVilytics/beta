@@ -451,6 +451,77 @@ function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'
   openOverlay(id);
 }
 
+// ── DRAG TO REORDER ───────────────────────────────────────────────────────────
+// Rows reordered by their ⠿ handle (.drag-handle): the grabbed row follows the
+// finger, the rows it passes slide out of its way, and on release it settles
+// into its slot before onDrop(from, to) reorders the caller's data and redraws
+// (same feel as dragging a sheet to close). New Game's play order, a
+// tournament table's ranking. canStart(): true to drag, false to ignore the
+// touch, 'block' to swallow it (rows busy).
+function attachRowDrag(container, { rowSelector, canStart = () => true, onDrop }) {
+  let src = null, rows = [], rects = [], si = 0, target = 0, startY = 0, gap = 4, dragH = 0;
+
+  const offsetTo = idx => {
+    let off = 0;
+    if (idx > si) for (let i = si + 1; i <= idx; i++) off += rects[i].height + gap;
+    if (idx < si) for (let i = idx; i < si; i++) off -= rects[i].height + gap;
+    return off;
+  };
+
+  container.addEventListener('pointerdown', e => {
+    const handle = e.target.closest('.drag-handle');
+    if (!handle || src) return;
+    const ok = canStart(e);
+    if (ok === false) return;
+    e.preventDefault();
+    if (ok === 'block') return;
+    src    = handle.closest(rowSelector);
+    rows   = [...container.querySelectorAll(rowSelector)];
+    rects  = rows.map(r => r.getBoundingClientRect());
+    si     = target = rows.indexOf(src);
+    gap    = rows.length > 1 ? rects[1].top - rects[0].bottom : 4;
+    dragH  = rects[si].height + gap;
+    startY = e.clientY;
+    rows.forEach(r => { r.style.transition = r === src ? 'none' : 'transform 0.18s ease'; });
+    src.classList.add('dragging');
+    document.body.style.touchAction = 'none';
+    try { container.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  container.addEventListener('pointermove', e => {
+    if (!src) return;
+    const minDy = rects[0].top - rects[si].top;
+    const maxDy = rects[rects.length - 1].bottom - rects[si].bottom;
+    const dy = Math.max(minDy, Math.min(maxDy, e.clientY - startY));
+    src.style.transform = `translateY(${dy}px)`;
+    const center = rects[si].top + rects[si].height / 2 + dy;
+    target = si;
+    for (let i = si + 1; i < rows.length; i++) if (center >= rects[i].top + rects[i].height / 2) target = i;
+    for (let i = si - 1; i >= 0; i--)          if (center <= rects[i].top + rects[i].height / 2) target = i;
+    rows.forEach((r, i) => {
+      if (r === src) return;
+      const shift = (i > si && i <= target) ? -dragH : (i < si && i >= target) ? dragH : 0;
+      r.style.transform = shift ? `translateY(${shift}px)` : '';
+    });
+  });
+
+  function end() {
+    if (!src) return;
+    const moved = src;
+    src = null;
+    document.body.style.touchAction = '';
+    moved.style.transition = 'transform 0.15s ease';
+    moved.style.transform  = `translateY(${offsetTo(target)}px)`;
+    setTimeout(() => {
+      rows.forEach(r => { r.style.transition = ''; r.style.transform = ''; });
+      moved.classList.remove('dragging');
+      onDrop(si, target);
+    }, 160);
+  }
+  container.addEventListener('pointerup',     end);
+  container.addEventListener('pointercancel', end);
+}
+
 // ── FILTER HELPERS ────────────────────────────────────────────────────────────
 
 function updateFilterPills(selector, value) {

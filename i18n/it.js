@@ -778,9 +778,10 @@ window.I18N.it = {
     "Opponents' points: {n}": "Punti degli avversari: {n}",
     "Points": "Punti",
     "Ties: most 1st places, then the points of the opponents faced.": "Pareggi: più primi posti, poi i punti degli avversari affrontati.",
-    "Fix the places and the drops. Drops take the bottom places; the standard game follows (1st place won it).": "Correggi i posti e gli abbandoni. Chi abbandona prende gli ultimi posti; la partita standard si aggiorna (l'ha vinta il 1º).",
-    "Each villain needs a different place.": "Ogni cattivo deve avere un posto diverso.",
-    "Drops take the bottom places, and someone finishes 1st.": "Chi abbandona prende gli ultimi posti, e qualcuno arriva 1º.",
+    "⠿ = drag": "⠿ = trascina",
+    "🏳️ = dropped": "🏳️ = abbandonato",
+    "Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it).": "Trascina i cattivi nei loro posti. Chi abbandona resta in fondo; la partita standard si aggiorna (l'ha vinta il 1º).",
+    "Someone has to finish 1st": "Qualcuno deve arrivare 1º",
   },
 
   // From the Villainous Italia F.A.Q. (the last three confirmed separately).

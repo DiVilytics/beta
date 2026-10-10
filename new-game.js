@@ -708,80 +708,19 @@ function _updateActionBtns() {
 
 // ── DRAG TO REORDER ───────────────────────────────────────────────────────────
 
-let _dragSrc = null;
-
-// Reorder rows by their ⠿ handle: the grabbed row follows the finger, the rows
-// it passes slide out of its way, and on release it settles into its slot
-// before the new order is saved (same feel as dragging a sheet to close).
+// Reorder rows by their ⠿ handle (attachRowDrag, ui.js). Solo has one row, and
+// a draw or a shuffle in progress writes into the rows itself and sets the
+// order when it settles, which would undo the drag.
 function _initDrag() {
-  const container = document.getElementById('orderSlots');
-  let rows = [], rects = [], si = 0, target = 0, startY = 0, gap = 4, dragH = 0;
-
-  const offsetTo = idx => {
-    let off = 0;
-    if (idx > si) for (let i = si + 1; i <= idx; i++) off += rects[i].height + gap;
-    if (idx < si) for (let i = idx; i < si; i++) off -= rects[i].height + gap;
-    return off;
-  };
-
-  container.addEventListener('pointerdown', e => {
-    const handle = e.target.closest('.drag-handle');
-    if (!handle || _dragSrc || soloMode) return;   // Solo: one row, nothing to reorder
-    // Not mid-draw or mid-shuffle: those animations write into the rows and set
-    // the order themselves when they settle, which would undo the drag.
-    if (_shuffleTimer || Object.keys(slotTimers).length) { e.preventDefault(); return; }
-    e.preventDefault();
-    _dragSrc = handle.closest('.order-slot');
-    rows   = [...container.querySelectorAll('.order-slot')];
-    rects  = rows.map(r => r.getBoundingClientRect());
-    si     = target = rows.indexOf(_dragSrc);
-    gap    = rows.length > 1 ? rects[1].top - rects[0].bottom : 4;
-    dragH  = rects[si].height + gap;
-    startY = e.clientY;
-    rows.forEach(r => { r.style.transition = r === _dragSrc ? 'none' : 'transform 0.18s ease'; });
-    _dragSrc.classList.add('dragging');
-    document.body.style.touchAction = 'none';
-    try { container.setPointerCapture(e.pointerId); } catch (_) {}
-  });
-
-  container.addEventListener('pointermove', e => {
-    if (!_dragSrc) return;
-    const minDy = rects[0].top - rects[si].top;
-    const maxDy = rects[rects.length - 1].bottom - rects[si].bottom;
-    const dy = Math.max(minDy, Math.min(maxDy, e.clientY - startY));
-    _dragSrc.style.transform = `translateY(${dy}px)`;
-    const center = rects[si].top + rects[si].height / 2 + dy;
-    target = si;
-    for (let i = si + 1; i < rows.length; i++) if (center >= rects[i].top + rects[i].height / 2) target = i;
-    for (let i = si - 1; i >= 0; i--)          if (center <= rects[i].top + rects[i].height / 2) target = i;
-    rows.forEach((r, i) => {
-      if (r === _dragSrc) return;
-      const shift = (i > si && i <= target) ? -dragH : (i < si && i >= target) ? dragH : 0;
-      r.style.transform = shift ? `translateY(${shift}px)` : '';
-    });
-  });
-
-  function _endDrag() {
-    if (!_dragSrc) return;
-    const src = _dragSrc;
-    _dragSrc = null;
-    document.body.style.touchAction = '';
-    src.style.transition = 'transform 0.15s ease';
-    src.style.transform  = `translateY(${offsetTo(target)}px)`;
-    setTimeout(() => {
-      rows.forEach(r => { r.style.transition = ''; r.style.transform = ''; });
-      src.classList.remove('dragging');
-      if (target !== si) {
-        const moved = orderSlots.splice(si, 1)[0];
-        orderSlots.splice(target, 0, moved);
-      }
+  attachRowDrag(document.getElementById('orderSlots'), {
+    rowSelector: '.order-slot',
+    canStart: () => soloMode ? false : (_shuffleTimer || Object.keys(slotTimers).length) ? 'block' : true,
+    onDrop: (from, to) => {
+      if (to !== from) orderSlots.splice(to, 0, orderSlots.splice(from, 1)[0]);
       renderOrderSlots();
       _saveLiveState();
-    }, 160);
-  }
-
-  container.addEventListener('pointerup',     _endDrag);
-  container.addEventListener('pointercancel', _endDrag);
+    },
+  });
 }
 
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
