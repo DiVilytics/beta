@@ -1,8 +1,9 @@
 {
   "2026-10-10": {
-    "title": "La tabella degli XP",
+    "title": "La tabella degli XP e nuove regole del solitario",
     "improved": [
-      "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: secondo quanti giocatori hanno rivendicato il proprio cattivo, persa o vinta."
+      "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: secondo quanti giocatori hanno rivendicato il proprio cattivo, persa o vinta.",
+      "Il solitario ha nuove regole nelle F.A.Q.: giochi contro un giocatore fantasma, e otto cattivi hanno una correzione tutta loro."
     ],
     "fixed": [
       "Una partita cronometrata in Nuova partita senza usare il contatore dei round non viene più registrata con 1 round."

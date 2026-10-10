@@ -154,10 +154,10 @@ function _rulebookHTML(id) {
     ${_groupsHTML(rb.groups)}`;
 }
 
-// The solo variant: its entries dashed, then who made it, linked.
+// The solo variant: its entries dashed, then who made it and for which site, linked.
 function _soloCreditHTML() {
   const sv = faqData.solo;
-  return `<p class="faq-credit">${t('A variant by {author}, from {link}.', { author: _esc(sv.author), link: `<a href="${_esc(sv.url)}" target="_blank" rel="noopener">BoardGameGeek</a>` })}</p>`;
+  return `<p class="faq-credit">${t('A variant by {author}, from {link}.', { author: _esc(sv.author), link: `<a href="${_esc(sv.url)}" target="_blank" rel="noopener">${_esc(sv.site)}</a>` })}</p>`;
 }
 
 function _soloHTML() {

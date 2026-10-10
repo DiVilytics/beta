@@ -1,6 +1,7 @@
 // ── SOLO ──────────────────────────────────────────────────────────────────────
-// The solo variant, unofficial: "Quarantine" by Matt Lowder (BoardGameGeek),
-// summarized in the FAQ (faq.html?topic=solo). One villain against the game:
+// The solo variant, unofficial: "Unofficial Instructions for Solo Play" by
+// Robert Nava (v2.5.3), summarized in the FAQ (faq.html?topic=solo), its
+// villain fixes included. One villain against a Phantom player (the game):
 // reach the Objective within 20 turns to win. A solo game (games.variant
 // 'solo') has one seat, its creator's, won (is_winner) or lost.
 //
