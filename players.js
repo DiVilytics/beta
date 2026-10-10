@@ -10,7 +10,7 @@ let pfAch       = new Map();
 let pfBoxInfo   = {};
 let pfGlobal    = null;
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
-let pfTournaments = [];   // the tournaments they organized or played in (filter-independent)
+let pfTournaments = { list: [] };   // the tournaments they organized or played in, their medals (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
 let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
@@ -190,18 +190,22 @@ async function _loadFriends() {
 }
 
 // The tournaments this player organized or played in (a name they claimed),
-// newest first; [] when there are none or they can't load.
+// newest first, with their final place in the finished ones they played (by
+// the tournament's own rules, tournament-rules.js): { list, medals: [gold,
+// silver, bronze], played }. Nothing when there are none or they can't load.
 async function _loadTournaments() {
+  const none = { list: [], medals: [0, 0, 0], played: 0 };
   try {
     const prof = await fetchProfile({ nickname: pfNick }, 'id');
-    if (!prof) return [];
-    const sel = 'id, name, organizer, created_at, stages, current_stage, finished_at, tournament_players(count)';
+    if (!prof) return none;
+    const sel = 'id, name, organizer, created_at, stages, current_stage, finished_at, table_size, scoring, tournament_players(count)';
     const [org, played] = await Promise.all([
       db.from('tournaments').select(sel).eq('organizer', prof.id),
-      db.from('tournament_players').select('tournament_id').eq('user_id', prof.id),
+      db.from('tournament_players').select('id, tournament_id').eq('user_id', prof.id),
     ]);
+    const myPlayer  = new Map((played.data || []).map(r => [r.tournament_id, r.id]));
     const organized = org.data || [];
-    const otherIds  = (played.data || []).map(r => r.tournament_id).filter(id => !organized.some(x => x.id === id));
+    const otherIds  = [...myPlayer.keys()].filter(id => !organized.some(x => x.id === id));
     const others    = otherIds.length ? (await db.from('tournaments').select(sel).in('id', otherIds)).data || [] : [];
     const orgIds    = [...new Set(others.map(x => x.organizer))];
     const nicks     = new Map();
@@ -209,21 +213,46 @@ async function _loadTournaments() {
       const { data } = await db.from('profiles').select('id, nickname').in('id', orgIds);
       for (const p of data || []) nicks.set(p.id, p.nickname);
     }
-    return [
+
+    // Final places: the finished tournaments they played, ranked from their tables.
+    const ranks    = new Map();
+    const finished = [...organized, ...others].filter(x => x.finished_at && myPlayer.has(x.id));
+    if (finished.length) {
+      const rows = await _fetchInChunks(finished.map(x => x.id), chunk => db.from('tournament_tables')
+        .select('tournament_id, stage, saved_at, tournament_seats(player_id, position, place, dropped)').in('tournament_id', chunk));
+      for (const tour of finished) {
+        const tables = rows.filter(r => r.tournament_id === tour.id).map(r => ({ ...r, seats: r.tournament_seats || [] }));
+        const me = tournamentStandings(tour, tables).find(r => r.player_id === myPlayer.get(tour.id));
+        if (me) ranks.set(tour.id, me.rank);
+      }
+    }
+    const medals = [1, 2, 3].map(n => [...ranks.values()].filter(r => r === n).length);
+
+    const list = [
       ...organized.map(x => ({ tour: x, isOrganizer: true })),
       ...others.map(x => ({ tour: x, organizer: nicks.get(x.organizer) })),
-    ].sort((a, b) => b.tour.created_at.localeCompare(a.tour.created_at));
+    ].map(x => ({ ...x, rank: ranks.get(x.tour.id) || null }))
+     .sort((a, b) => b.tour.created_at.localeCompare(a.tour.created_at));
+    return { list, medals, played: myPlayer.size };
   } catch (_) {
-    return [];
+    return none;
   }
 }
 
-// The "Tournaments" section: the cards of the tournaments page (game-card.js).
+// The "Tournaments" section: the medals and tournaments played, as stat boxes,
+// then the cards of the tournaments page (game-card.js).
 function _tournamentsSectionHTML() {
-  if (!pfTournaments.length) return '';
+  if (!pfTournaments.list?.length) return '';
+  const [gold, silver, bronze] = pfTournaments.medals;
   return `
     <div class="pf-games-header"><span class="pf-games-title">${t('Tournaments')}</span></div>
-    <div class="tn-list">${pfTournaments.map(x => tournamentCardHTML(x.tour, x)).join('')}</div>`;
+    ${pfTournaments.played ? `<div class="summary tn-summary">${statBoxesHTML([
+      { val: gold,   lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[0]}</span>` },
+      { val: silver, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[1]}</span>` },
+      { val: bronze, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[2]}</span>` },
+      { val: pfTournaments.played, lbl: t('Tournaments played') },
+    ])}</div>` : ''}
+    <div class="tn-list">${pfTournaments.list.map(x => tournamentCardHTML(x.tour, x)).join('')}</div>`;
 }
 
 // The "Played with" section: a ranked list of the top co-players. Empty string

@@ -81,7 +81,15 @@ function _tournamentMarkHTML(tour) {
 // ── TOURNAMENT CARD ───────────────────────────────────────────────────────────
 // A tournament in a list (tournaments.html, a player page): its name and
 // status, then who organized it (or "Organizer" on the organizer's own page),
-// its players and its date. tour: a tournaments row with tournament_players(count).
+// its players, its date and, on a player page, their final place. tour: a tournaments row with tournament_players(count).
+
+// 1st, 2nd, 3rd… (1º, 2º… in Italian), and the top three's medals.
+function fmtPlace(n) {
+  if (LANG === 'it') return `${n}º`;
+  const tail = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return `${n}${tail}`;
+}
+const TOURNAMENT_MEDALS = ['🥇', '🥈', '🥉'];
 
 function tournamentStatus(tour) {
   if (tour.finished_at)    return t('Finished');
@@ -89,12 +97,14 @@ function tournamentStatus(tour) {
   return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
 }
 
-function tournamentCardHTML(tour, { organizer = null, isOrganizer = false } = {}) {
+// rank: a player page's final place in it (a medal for the top three).
+function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank = null } = {}) {
   const n = tour.tournament_players?.[0]?.count ?? 0;
   const meta = [
     isOrganizer ? t('Organizer') : organizer ? _esc(organizer) : null,
     tn(n, '{n} player', '{n} players'),
     fmtDateShort(tour.created_at),
+    rank ? (rank <= 3 ? TOURNAMENT_MEDALS[rank - 1] : fmtPlace(rank)) : null,
   ].filter(Boolean).join(' | ');
   return `
     <a class="game-card tn-card" href="tournaments.html?t=${tour.id}">

@@ -79,12 +79,6 @@ async function _tnLoadProfiles(ids) {
 }
 
 
-// 1st, 2nd, 3rd… (1º, 2º… in Italian).
-function fmtPlace(n) {
-  if (LANG === 'it') return `${n}º`;
-  const tail = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
-  return `${n}${tail}`;
-}
 
 // A failed action: a banner on top of the page, as on the game page.
 function _tnShowError(msg) {
@@ -923,7 +917,7 @@ function _tnStandingsHTML(mine) {
     ].filter(Boolean).join(' | ');
     return `
       <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
-        <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${['🥇', '🥈', '🥉'][r.rank - 1]}</span>` : r.rank}</div>
+        <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[r.rank - 1]}</span>` : r.rank}</div>
         <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(p?.name || '')}</span><div class="row-sub">${sub}</div></div></div>
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
