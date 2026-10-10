@@ -10,6 +10,7 @@ let pfAch       = new Map();
 let pfBoxInfo   = {};
 let pfGlobal    = null;
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
+let pfTournaments = [];   // the tournaments they organized or played in (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
 let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
@@ -147,7 +148,7 @@ async function load() {
   pfSolo    = gamesOfVariant(all, 'solo');
   pfAch     = computeCharacterAchievements(players.filter(p => p.nickname === pfNick));
   pfGlobal  = computeGlobalAchievements(games, players, p => p.nickname === pfNick, pfAllChars);
-  pfFriends = await _loadFriends();
+  [pfFriends, pfTournaments] = await Promise.all([_loadFriends(), _loadTournaments()]);
   pfLoaded  = true;
   // Oldest first: the games come newest first, undated ones last.
   period.setFirst(all.games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
@@ -186,6 +187,43 @@ async function _loadFriends() {
     .in('nickname', top.map(f => f.nick));
   const avatarByNick = Object.fromEntries((data || []).map(p => [p.nickname, resolveAvatar(p)]));
   return top.map(f => ({ ...f, avatar: avatarByNick[f.nick] || 'asset/players/default.svg' }));
+}
+
+// The tournaments this player organized or played in (a name they claimed),
+// newest first; [] when there are none or they can't load.
+async function _loadTournaments() {
+  try {
+    const prof = await fetchProfile({ nickname: pfNick }, 'id');
+    if (!prof) return [];
+    const sel = 'id, name, organizer, created_at, stages, current_stage, finished_at, tournament_players(count)';
+    const [org, played] = await Promise.all([
+      db.from('tournaments').select(sel).eq('organizer', prof.id),
+      db.from('tournament_players').select('tournament_id').eq('user_id', prof.id),
+    ]);
+    const organized = org.data || [];
+    const otherIds  = (played.data || []).map(r => r.tournament_id).filter(id => !organized.some(x => x.id === id));
+    const others    = otherIds.length ? (await db.from('tournaments').select(sel).in('id', otherIds)).data || [] : [];
+    const orgIds    = [...new Set(others.map(x => x.organizer))];
+    const nicks     = new Map();
+    if (orgIds.length) {
+      const { data } = await db.from('profiles').select('id, nickname').in('id', orgIds);
+      for (const p of data || []) nicks.set(p.id, p.nickname);
+    }
+    return [
+      ...organized.map(x => ({ tour: x, isOrganizer: true })),
+      ...others.map(x => ({ tour: x, organizer: nicks.get(x.organizer) })),
+    ].sort((a, b) => b.tour.created_at.localeCompare(a.tour.created_at));
+  } catch (_) {
+    return [];
+  }
+}
+
+// The "Tournaments" section: the cards of the tournaments page (game-card.js).
+function _tournamentsSectionHTML() {
+  if (!pfTournaments.length) return '';
+  return `
+    <div class="pf-games-header"><span class="pf-games-title">${t('Tournaments')}</span></div>
+    <div class="tn-list">${pfTournaments.map(x => tournamentCardHTML(x.tour, x)).join('')}</div>`;
 }
 
 // The "Played with" section: a ranked list of the top co-players. Empty string
@@ -346,6 +384,7 @@ function render() {
 
   const soloHint = solo ? soloHintHTML() : '';
   const friends  = solo ? '' : _friendsSectionHTML();
+  const tours    = solo ? '' : _tournamentsSectionHTML();
 
   // No games: the sentence takes the place of the stats, the filters stay. A
   // player who never played has no achievements to show either.
@@ -355,8 +394,9 @@ function render() {
       : data.games.length || solo
       ? `${soloHint}${emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'))}
         ${friends}
-        ${achHTML}`
-      : emptyStateHTML('⚔️', t('No games yet'), t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) }));
+        ${achHTML}
+        ${tours}`
+      : emptyStateHTML('⚔️', t('No games yet'), t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })) + tours;
     return;
   }
 
@@ -400,6 +440,8 @@ function render() {
     ${friends}
 
     ${achHTML}
+
+    ${tours}
 
     <div class="pf-games-header">
       <span class="pf-games-title">${t('Games')}</span>

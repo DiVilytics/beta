@@ -78,6 +78,36 @@ function _tournamentMarkHTML(tour) {
   return `<a class="tn-mark" href="tournaments.html?t=${tour.id}" title="${_esc(title)}">🏟️</a>`;
 }
 
+// ── TOURNAMENT CARD ───────────────────────────────────────────────────────────
+// A tournament in a list (tournaments.html, a player page): its name and
+// status, then who organized it (or "Organizer" on the organizer's own page),
+// its players and its date. tour: a tournaments row with tournament_players(count).
+
+function tournamentStatus(tour) {
+  if (tour.finished_at)    return t('Finished');
+  if (!tour.current_stage) return t('Sign-ups open');
+  return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
+}
+
+function tournamentCardHTML(tour, { organizer = null, isOrganizer = false } = {}) {
+  const n = tour.tournament_players?.[0]?.count ?? 0;
+  const meta = [
+    isOrganizer ? t('Organizer') : organizer ? _esc(organizer) : null,
+    tn(n, '{n} player', '{n} players'),
+    fmtDateShort(tour.created_at),
+  ].filter(Boolean).join(' | ');
+  return `
+    <a class="game-card tn-card" href="tournaments.html?t=${tour.id}">
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-date">${_esc(tour.name)}</div>
+          <div class="card-meta">${tournamentStatus(tour)}</div>
+        </div>
+        <div class="tn-card-meta">${meta}</div>
+      </div>
+    </a>`;
+}
+
 // Wrap the HTML in a <div class="game-card"> and attach the optional
 // location-click handler. Callers that just need HTML should call
 // buildGameCardHTML directly.

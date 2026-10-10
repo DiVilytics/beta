@@ -784,6 +784,7 @@ window.I18N.it = {
     "Someone has to finish 1st": "Qualcuno deve arrivare 1º",
     "{n} player still in the game": "{n} giocatore ancora in partita",
     "{n} players still in the game": "{n} giocatori ancora in partita",
+    "Organizer": "Organizzatore",
   },
 
   // From the Villainous Italia F.A.Q. (the last three confirmed separately).

@@ -78,11 +78,6 @@ async function _tnLoadProfiles(ids) {
   for (const p of data || []) tnProfiles.set(p.id, p);
 }
 
-function _tnStatus(tour) {
-  if (tour.finished_at)   return t('Finished');
-  if (!tour.current_stage) return t('Sign-ups open');
-  return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
-}
 
 // 1st, 2nd, 3rd… (1º, 2º… in Italian).
 function fmtPlace(n) {
@@ -128,24 +123,9 @@ function tnRenderList() {
       <div class="results-hint">${tn(tnList.length, '{n} tournament', '{n} tournaments')}</div>
       ${newBtn}
     </div>
-    <div class="tn-list">${tnList.map(_tnCardHTML).join('')}</div>`;
+    <div class="tn-list">${tnList.map(tour => tournamentCardHTML(tour, { organizer: tnProfiles.get(tour.organizer)?.nickname })).join('')}</div>`;
 }
 
-function _tnCardHTML(tour) {
-  const n   = tour.tournament_players?.[0]?.count ?? 0;
-  const org = tnProfiles.get(tour.organizer)?.nickname;
-  const meta = [org ? _esc(org) : null, tn(n, '{n} player', '{n} players'), fmtDateShort(tour.created_at)].filter(Boolean).join(' | ');
-  return `
-    <a class="game-card tn-card" href="tournaments.html?t=${tour.id}">
-      <div class="card-body">
-        <div class="card-top">
-          <div class="card-date">${_esc(tour.name)}</div>
-          <div class="card-meta">${_tnStatus(tour)}</div>
-        </div>
-        <div class="tn-card-meta">${meta}</div>
-      </div>
-    </a>`;
-}
 
 function tnNew() {
   if (!getCurrentUser()) return goToSignIn();
@@ -225,7 +205,7 @@ function tnRenderTournament() {
     pairing ? t(pairing.name) : _esc(tnTour.pairing),
     scoring ? t(scoring.name) : _esc(tnTour.scoring),
   ].join(' | ');
-  const status = [_tnStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
+  const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
