@@ -344,7 +344,7 @@ function _tnTableHTML(tb, myId) {
         <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(s.character)}">${charImgHTML(s.character)}</a>
         <div class="chip-body">
           <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(s.character)}">${villainNameHTML(s.character)}</a></div>
-          <div class="chip-nick">${[_esc(name), s.dropped ? t('Dropped') : null, tb.saved_at ? _tnPointsLabel(_tnSeatPoints(tb, s)) : null].filter(Boolean).join(' | ')}</div>
+          <div class="chip-nick">${[_esc(name), s.dropped ? `🏳️ ${t('Dropped')}` : null, tb.saved_at ? _tnPointsLabel(_tnSeatPoints(tb, s)) : null].filter(Boolean).join(' | ')}</div>
         </div>
         ${won ? '<span class="win-star">👑</span>' : ''}
       </div>`;
@@ -599,7 +599,8 @@ async function tnSaveForm() {
 //
 // Tapping a villain still playing places it: won (the next place from the
 // top) or dropped (the next place from the bottom), with the time and round
-// it happened at. The last one placed can be undone. With one villain left it
+// it happened at (the round only once the counter was used, as in New Game:
+// otherwise the rounds are saved empty). The last one placed can be undone. With one villain left it
 // takes the free place, the game stops and Save sends it all at once
 // (save_tournament_table: the standard game is 1st place's).
 
@@ -765,12 +766,12 @@ function _tnRenderLive() {
     if (!r) return `<div class="tn-slot empty"><span class="tn-slot-place">${fmtPlace(place)}</span></div>`;
     const s = seat(r.position);
     const undo = !r.auto && r === lastAction;
-    const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
+    const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null && tnGame.roundsCounted ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
     return `
       <${undo ? 'button type="button" onclick="tnUndoLast()" title="' + t('Undo') + '"' : 'div'} class="tn-slot${place === 1 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}${undo ? ' undo' : ''}">
         <span class="tn-slot-place">${fmtPlace(place)}${place === 1 ? ' 👑' : ''}</span>
         ${moverImgHTML(s.character)}${who(s)}
-        <span class="tn-slot-when">${r.dropped ? t('Dropped') : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
+        <span class="tn-slot-when">${r.dropped ? `🏳️ ${t('Dropped')}` : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
       </${undo ? 'button' : 'div'}>`;
   }).join('');
 
@@ -787,7 +788,7 @@ function tnTapPlaying(position) {
   const won = document.getElementById('tnPlaceWon');
   const dropped = document.getElementById('tnPlaceDropped');
   won.textContent = `👑 ${t('Won: {place}', { place: fmtPlace(top) })}`;
-  dropped.textContent = t('Dropped: {place}', { place: fmtPlace(bottom) });
+  dropped.textContent = `🏳️ ${t('Dropped: {place}', { place: fmtPlace(bottom) })}`;
   won.onclick = () => _tnPlace(position, false);
   dropped.onclick = () => _tnPlace(position, true);
   openOverlay('tnPlaceSheet');
@@ -835,6 +836,7 @@ function stopLive() {
 
 function bumpTurn(delta) {
   if (!tnGame || (delta < 0 && liveGame.turns <= 1)) return;
+  tnGame.roundsCounted = true;   // as in New Game: rounds only when the counter was used
   liveGame.bumpTurns(delta);
   _tnPersist();
   _tnRenderLive();
@@ -855,7 +857,7 @@ async function tnSaveGame() {
   const { error } = await db.rpc('save_tournament_table', {
     target_table: tnGame.tableId,
     played_at:    new Date(tnGame.startedAt).toISOString(),
-    results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round, dropped })),
+    results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round: tnGame.roundsCounted ? round : null, dropped })),
   });
   btn.textContent = t('Save game');
   if (error) { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error), { scroll: true }); }
