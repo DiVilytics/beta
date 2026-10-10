@@ -354,7 +354,7 @@ function render() {
           </div>`;
     const arg     = typeof key === 'number' ? key : `'${key}'`;
     return `
-      <div class="lb-row cs-row${csRow === key ? ' on' : ''}${!csLoading && few(b) ? ' lb-row-unranked' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
+      <div class="lb-row cs-row${isSolo(key) ? ` lvl-${key}` : ''}${csRow === key ? ' on' : ''}${!csLoading && few(b) ? ' lb-row-unranked' : ''}" role="button" tabindex="0" aria-pressed="${csRow === key}"
            onclick="csSelectRow(${arg})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();csSelectRow(${arg})}">
         <div class="row-label">${label}</div>
         <div class="bar-cell">${bar}</div>

@@ -2372,6 +2372,15 @@ select:disabled {
 .period-pill:disabled + .chevron { opacity: 0.45; }
 .period-pill.on { background: var(--s2); color: var(--text); border-color: var(--s4); }
 .period-pill:disabled { background: transparent; opacity: 0.45; }
+/* The filter rows' pills (table size, period) are a little tighter than the
+   others, so the size row fits a phone line in Italian with large text. */
+.period-row .pill { padding: 0 10px; }
+.period-row .period-pill { padding: 0 22px 0 10px; }
+/* The size row (size-filter.js) never wraps: where even so it doesn't fit, the
+   Difficulty menu, last, gives way and cuts its label short. */
+.size-row { flex-wrap: nowrap; }
+.size-row > .period-pill-wrap:last-child { flex: 0 1 auto; min-width: 0; }
+.size-row > .period-pill-wrap:last-child .period-pill { width: 100%; min-width: 0; text-overflow: ellipsis; }
 /* No field-style focus ring after a pick with the mouse; keyboard focus keeps it. */
 .period-pill:focus { box-shadow: none; border-color: var(--border); }
 .period-pill.on:focus { border-color: var(--s4); }
@@ -2416,6 +2425,8 @@ select:disabled {
 .cs-row { cursor: pointer; }
 .cs-table .lb-row.on { background: var(--s3); box-shadow: inset 3px 0 0 var(--muted); }
 .cs-solo-table { margin-top: 12px; border-style: dashed; }
+/* The selected level's name in its color (solo.js). */
+.cs-solo-table .cs-row.on .row-label { color: var(--lvl); }
 
 /* Small square ‹ › buttons (the avatar builder's part rows). */
 .cs-month-nav {

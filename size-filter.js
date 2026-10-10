@@ -7,7 +7,8 @@
 // world of its own rather than a size. Solo is every solo game; the Difficulty
 // menu works like Players: it reads "Difficulty" until a level is picked (Easy,
 // Medium or Hard), then the level, and only that level's solo games count.
-// Depends on t (lang.js), _esc (db.js), SOLO_LEVELS, SOLO_LEVEL_IDS and
+// The row never wraps: on a screen too narrow for it, the Difficulty menu
+// gives way, its label cut short (style.css .size-row). Depends on t (lang.js), _esc (db.js), SOLO_LEVELS, SOLO_LEVEL_IDS and
 // soloLevelName (solo.js).
 //
 // createSizeFilter(rootId, { onChange }) builds the controls into #rootId,
@@ -25,7 +26,7 @@ function createSizeFilter(rootId, { onChange }) {
   let level = 'all';
 
   const root = document.getElementById(rootId);
-  root.classList.add('pill-group', 'period-row');
+  root.classList.add('pill-group', 'period-row', 'size-row');
   root.innerHTML = `
     <button class="pill" type="button" data-size="all">${t('All')}</button>
     <span class="period-pill-wrap">
