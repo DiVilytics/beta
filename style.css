@@ -1491,6 +1491,8 @@ select:disabled {
 .rank-num.gold   { color: var(--gold); }
 .rank-num.silver { color: #aaa; }
 .rank-num.bronze { color: #a0856a; }
+/* Light theme: positions without a medal darker than silver (--dim is lighter there). */
+[data-theme="light"] .rank-num:not(.gold):not(.silver):not(.bronze) { color: var(--muted); }
 
 .row-name { display: block; font-size: calc(14px * var(--ts)); font-weight: 600; color: inherit; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row-name .char-portrait { margin-right: 6px; }
