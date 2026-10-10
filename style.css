@@ -802,6 +802,8 @@ main {
   padding: 8px 10px;
   font-size: calc(10px * var(--ts)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   color: var(--muted);
+  /* One line, cut short with … where a column is too narrow (Più affrontati). */
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .cs-adv-row {
   display: flex; align-items: center; gap: 6px;
