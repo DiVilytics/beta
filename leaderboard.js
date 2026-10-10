@@ -325,10 +325,14 @@ function render({ rows, summary }) {
   const soloHint = solo ? soloHintHTML() : '';
   const mode     = solo && lbMode === 'xp' ? 'pct' : lbMode;
 
-  // No solo games at all: the card, not a ranking of empty rows.
-  if (solo && !games && size.level() === 'all' && period.isAll()) {
-    document.getElementById('lb').innerHTML = soloHint + emptyStateHTML('⚔️', t('No solo games yet'), t('To record one, pick Solo in New Game, where you choose the number of players.'),
-      `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
+  // No games at all (every table size, or on Solo every level, all time): the
+  // card, as in the Game log, not a ranking of empty rows, on both tabs.
+  if (!games && (size.value() === 'all' || (solo && size.level() === 'all')) && period.isAll()) {
+    document.getElementById('lb').innerHTML = soloHint + (solo
+      ? emptyStateHTML('⚔️', t('No solo games yet'), t('To record one, pick Solo in New Game, where you choose the number of players.'),
+          `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`)
+      : emptyStateHTML('⚔️', t('No games yet'), t('Record your first game to get started.'),
+          `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`));
     return;
   }
 
