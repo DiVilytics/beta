@@ -380,7 +380,7 @@ function _adversariesSectionHTML() {
   };
   const col = (title, list, fmt) => `
     <div class="cs-adv-col">
-      <div class="cs-adv-title">${title}</div>
+      <div class="cs-adv-title" title="${title}">${title}</div>
       ${list.length ? list.map(a => row(a, fmt)).join('') : '<div class="cs-adv-empty">-</div>'}
     </div>`;
 
