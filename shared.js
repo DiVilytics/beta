@@ -94,17 +94,18 @@ function setActiveNav(filename) {
   updateLiveGameNavBadge();
 }
 
-// Reads the saved live game from localStorage and tags the New Game nav link
+// Reads the saved live game from localStorage and tags its nav link (New Game's)
 // with `.has-live-game` (red, pulsing) or `.has-paused-game` (gold) so users
 // see at a glance that a game is open. Safe to call repeatedly.
+// A tournament table's game (tournaments.js) puts the dot on 🏟️ instead.
 function updateLiveGameNavBadge() {
-  const link = document.querySelector('.nav-links a[href="new-game.html"]');
-  if (!link) return;
-  link.classList.remove('has-live-game', 'has-paused-game');
+  const links = document.querySelectorAll('.nav-links a[href$="new-game.html"], .nav-links a[href$="tournaments.html"]');
+  links.forEach(a => a.classList.remove('has-live-game', 'has-paused-game'));
 
   const state = liveGame.loadSaved();
   if (!state) return;
-  link.classList.add(state.liveStart ? 'has-live-game' : 'has-paused-game');
+  const page = state.tournament ? 'tournaments.html' : 'new-game.html';
+  document.querySelector(`.nav-links a[href$="${page}"]`)?.classList.add(state.liveStart ? 'has-live-game' : 'has-paused-game');
 }
 
 // Cross-tab sync: another tab may have started/stopped a game.

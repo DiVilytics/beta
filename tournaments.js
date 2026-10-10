@@ -181,7 +181,10 @@ async function tnLoad(id, { quiet = false } = {}) {
   const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);
   if (quiet && snap === tnSnapshot) return;
   tnSnapshot = snap;
-  if (!_tnFormOpen()) tnRenderTournament();
+  if (!_tnFormOpen() && !_tnLiveOpen()) tnRenderTournament();
+  // A reload on the table's game: back into it.
+  const table = new URLSearchParams(location.search).get('table');
+  if (!quiet && table && _tnSavedGame()?.tournament?.tableId === table) tnResumeTable();
 }
 
 // The reloads: every few seconds while the page is visible and the tournament
@@ -201,7 +204,7 @@ document.addEventListener('visibilitychange', () => {
 
 function _tnBusy() {
   const input = document.getElementById('tnAddName');
-  return _tnFormOpen() || !!document.querySelector('.overlay.open')
+  return _tnFormOpen() || _tnLiveOpen() || !!document.querySelector('.overlay.open')
     || (!!input && (input.value.trim() !== '' || document.activeElement === input));
 }
 
@@ -338,6 +341,7 @@ function _tnTableHTML(tb, myId) {
         </div>
         <div class="card-players rows tn-seats">${chips}</div>
       </div>
+      ${(action => action ? `<div class="card-actions">${action}</div>` : '')(_tnTableActionHTML(tb))}
     </div>`;
 }
 
@@ -566,6 +570,294 @@ async function tnSaveForm() {
   setVisible('tnForm', false);
   setVisible('tnRoot', true);
   await tnLoad(tnFormFor.id);
+}
+
+// ── A TABLE'S GAME IN PROGRESS ────────────────────────────────────────────────
+// The phone that records a table (take_tournament_table: the organizer, or a
+// player at it who claimed their name; one at a time) runs its game here, on
+// New Game's engine: the timer and rounds of liveGame (shared.js), the same
+// live panel and the lock-screen controls (new-game-audio.js, which calls the
+// startLive / stopLive / bumpTurn / liveMediaLines below). One game in
+// progress per phone, New Game's or a table's.
+//
+// Tapping a villain still playing places it: won (the next place from the
+// top) or dropped (the next place from the bottom), with the time and round
+// it happened at. The last one placed can be undone. With one villain left it
+// takes the free place, the game stops and Save sends it all at once
+// (save_tournament_table: the standard game is 1st place's).
+
+let tnGame      = null;   // { tourId, tableId, stage, tableNo, tourName, startedAt, seats, actions }
+let liveTimerId = null;
+let tnSaveTimer = null;
+
+Object.assign(TN_ERRORS, {
+  not_at_table:    'Only the players at this table who claimed their name, or the organizer, can record it.',
+  table_taken:     'Another phone is already recording this table.',
+  not_recorder:    'Another phone records this table now (the organizer took it over).',
+  table_saved:     'This table has already been saved.',
+  invalid_results: 'Every villain needs a place before saving.',
+});
+
+const _tnSavedGame = () => liveGame.loadSaved();
+const _tnLiveOpen  = () => !document.getElementById('tnLive').classList.contains('hidden');
+
+// Who can record a table: the organizer, or a player at it who claimed their name.
+function _tnCanRecord(tb) {
+  const user = getCurrentUser();
+  if (!user || tb.saved_at || tb.seats.length < 2) return false;
+  if (user.id === tnTour.organizer) return true;
+  const mine = tnPlayers.find(p => p.user_id === user.id);
+  return !!mine && tb.seats.some(s => s.player_id === mine.id);
+}
+
+// The table card's button: Resume on the phone that runs it; Start game when
+// nobody records it (or you do, from another session); Take over for the organizer.
+function _tnTableActionHTML(tb) {
+  const saved = _tnSavedGame();
+  if (saved?.tournament?.tableId === tb.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnResumeTable()">${t('Resume game')}</button>`;
+  if (!_tnCanRecord(tb)) return '';
+  const user = getCurrentUser();
+  if (!tb.recorder || tb.recorder === user.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Start game')}</button>`;
+  if (user.id === tnTour.organizer) return `<button class="btn btn-ghost btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Take over')}</button>`;
+  return '';
+}
+
+async function tnStartTable(tableId) {
+  const tb = tnTables.find(x => x.id === tableId);
+  if (!tb) return;
+  const saved = _tnSavedGame();
+  if (saved && saved.tournament?.tableId !== tableId) {
+    return _tnShowError(t('Another game is in progress on this phone: save it or discard it first.'));
+  }
+  const { error } = await db.rpc('take_tournament_table', { target_table: tableId });
+  if (error) return _tnAfter(error);
+  const byId = new Map(tnPlayers.map(p => [p.id, p]));
+  tnGame = {
+    tourId: tnTour.id, tableId, stage: tb.stage, tableNo: tb.table_no, tourName: tnTour.name,
+    startedAt: Date.now(),
+    seats: tb.seats.map(s => ({ position: s.position, player_id: s.player_id, character: s.character, name: byId.get(s.player_id)?.name || '' })),
+    actions: [],
+  };
+  liveGame.clear();
+  liveGame.markStarted(Date.now());
+  liveGame.setTurns(1);
+  _tnPersist();
+  _tnOpenLive();
+  liveGame.emit('start');
+}
+
+function tnResumeTable() {
+  const saved = _tnSavedGame();
+  if (!saved?.tournament) return;
+  tnGame = saved.tournament;
+  liveGame.restoreFrom(saved);
+  if (liveGame.turns < 1) liveGame.setTurns(1);
+  _tnOpenLive();
+  if (liveGame.isRunning) liveGame.emit('start');
+}
+
+function _tnPersist() {
+  if (!tnGame) return;
+  liveGame.persist({ slots: tnGame.seats, tournament: tnGame });
+  updateLiveGameNavBadge();
+}
+
+function _tnOpenLive() {
+  clearTimeout(tnPollTimer);
+  const url = new URL(location.href);
+  url.searchParams.set('table', tnGame.tableId);
+  history.replaceState(null, '', url);
+  setVisible('tnRoot', false);
+  setVisible('tnBack', false);
+  setVisible('tnLive', true);
+  clearError('tnLiveErr');
+  document.getElementById('fLocation').value = tnGame.tourName;
+  clearInterval(liveTimerId);
+  if (liveGame.isRunning) liveTimerId = setInterval(tickLive, 1000);
+  clearInterval(tnSaveTimer);
+  tnSaveTimer = setInterval(_tnPersist, 30000);
+  _tnRenderLive();
+  window.scrollTo(0, 0);
+}
+
+function _tnCloseLive() {
+  clearInterval(liveTimerId); liveTimerId = null;
+  clearInterval(tnSaveTimer); tnSaveTimer = null;
+  tnGame = null;
+  const url = new URL(location.href);
+  url.searchParams.delete('table');
+  history.replaceState(null, '', url);
+  setVisible('tnLive', false);
+  setVisible('tnRoot', true);
+  setVisible('tnBack', true);
+}
+
+// The places: winners from the top, drops from the bottom; with one villain
+// left, it takes the free place (not stored until Save).
+function _tnPlaces() {
+  const n = tnGame.seats.length;
+  const placed = new Set(tnGame.actions.map(a => a.position));
+  const left = tnGame.seats.filter(s => !placed.has(s.position));
+  const top = tnGame.actions.filter(a => !a.dropped).length + 1;
+  const bottom = n - tnGame.actions.filter(a => a.dropped).length;
+  const last = tnGame.actions[tnGame.actions.length - 1];
+  const results = tnGame.actions.slice();
+  if (left.length === 1) results.push({ position: left[0].position, place: top, minutes: last?.minutes ?? null, round: last?.round ?? null, dropped: false, auto: true });
+  return { n, left, top, bottom, results, done: left.length <= 1 };
+}
+
+function fmtElapsed(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const pad = x => String(x).padStart(2, '0');
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+}
+
+function tickLive() {
+  document.getElementById('liveTime').textContent = fmtElapsed(liveGame.isRunning ? liveGame.elapsedMs : (liveGame.exactDurMs || 0));
+}
+
+function _tnRenderLive() {
+  const { left, top, bottom, results, done } = _tnPlaces();
+  document.getElementById('liveInfo').innerHTML = [
+    _esc(tnGame.tourName), t('Stage {n}', { n: tnGame.stage }), t('Table {n}', { n: tnGame.tableNo }),
+  ].join(' | ');
+  document.getElementById('tnLiveStatus').textContent = done ? t('Game over') : liveGame.isRunning ? t('Game in progress') : t('Game paused');
+  document.getElementById('tnLiveStatus').classList.toggle('paused', !liveGame.isRunning);
+  document.getElementById('liveTurnCount').textContent = liveGame.turns;
+  document.getElementById('liveMinusBtn').disabled = liveGame.turns <= 1;
+  tickLive();
+
+  const seat = pos => tnGame.seats.find(s => s.position === pos);
+  const who  = s => `<span class="tn-mover-villain">${villainNameHTML(s.character)}</span><span class="tn-mover-name">${_esc(s.name)}</span>`;
+  document.getElementById('tnPlaying').innerHTML = left.length > 1
+    ? left.map(s => `<button class="tn-mover" type="button" onclick="tnTapPlaying(${s.position})">${moverImgHTML(s.character)}${who(s)}</button>`).join('')
+    : `<p class="tn-hint">${t('Everyone is placed.')}</p>`;
+
+  const byPlace = new Map(results.map(r => [r.place, r]));
+  const lastAction = tnGame.actions[tnGame.actions.length - 1];
+  document.getElementById('tnRanking').innerHTML = tnGame.seats.map((_, i) => {
+    const place = i + 1, r = byPlace.get(place);
+    if (!r) return `<div class="tn-slot empty"><span class="tn-slot-place">${fmtPlace(place)}</span></div>`;
+    const s = seat(r.position);
+    const undo = !r.auto && r === lastAction;
+    const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
+    return `
+      <${undo ? 'button type="button" onclick="tnUndoLast()" title="' + t('Undo') + '"' : 'div'} class="tn-slot${place === 1 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}${undo ? ' undo' : ''}">
+        <span class="tn-slot-place">${fmtPlace(place)}${place === 1 ? ' 👑' : ''}</span>
+        ${moverImgHTML(s.character)}${who(s)}
+        <span class="tn-slot-when">${r.dropped ? t('Dropped') : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
+      </${undo ? 'button' : 'div'}>`;
+  }).join('');
+
+  document.getElementById('tnPauseBtn').textContent = liveGame.isRunning ? t('Pause game') : t('Resume game');
+  document.getElementById('tnPauseBtn').disabled = done;
+  document.getElementById('tnSaveBtn').disabled = !done;
+  setVisible('tnLiveHint', !done);
+}
+
+function tnTapPlaying(position) {
+  const { top, bottom } = _tnPlaces();
+  const s = tnGame.seats.find(x => x.position === position);
+  document.getElementById('tnPlaceTitle').innerHTML = `${villainNameInline(s.character)} | ${_esc(s.name)}`;
+  const won = document.getElementById('tnPlaceWon');
+  const dropped = document.getElementById('tnPlaceDropped');
+  won.textContent = `👑 ${t('Won: {place}', { place: fmtPlace(top) })}`;
+  dropped.textContent = t('Dropped: {place}', { place: fmtPlace(bottom) });
+  won.onclick = () => _tnPlace(position, false);
+  dropped.onclick = () => _tnPlace(position, true);
+  openOverlay('tnPlaceSheet');
+}
+
+function _tnPlace(position, dropped) {
+  closeOverlay('tnPlaceSheet');
+  const { top, bottom } = _tnPlaces();
+  const ms = liveGame.isRunning ? liveGame.elapsedMs : (liveGame.exactDurMs || 0);
+  tnGame.actions.push({ position, place: dropped ? bottom : top, minutes: Math.round(ms / 60000), round: liveGame.turns, dropped });
+  if (_tnPlaces().done) stopLive();   // one left: the game is over
+  _tnPersist();
+  _tnRenderLive();
+}
+
+function tnUndoLast() {
+  tnGame.actions.pop();
+  _tnPersist();
+  _tnRenderLive();
+}
+
+// New Game's names, for the lock-screen controls (new-game-audio.js).
+function startLive() {
+  if (!tnGame || liveGame.isRunning || _tnPlaces().done) return;
+  liveGame.markStarted(Date.now() - (liveGame.exactDurMs || 0));
+  clearInterval(liveTimerId);
+  liveTimerId = setInterval(tickLive, 1000);
+  liveGame.emit('start');
+  _tnPersist();
+  _tnRenderLive();
+}
+
+function stopLive() {
+  if (!tnGame || !liveGame.isRunning) return;
+  liveGame.markStopped(liveGame.elapsedMs);
+  clearInterval(liveTimerId); liveTimerId = null;
+  liveGame.emit('stop');
+  _tnPersist();
+  _tnRenderLive();
+}
+
+function bumpTurn(delta) {
+  if (!tnGame || (delta < 0 && liveGame.turns <= 1)) return;
+  liveGame.bumpTurns(delta);
+  _tnPersist();
+  _tnRenderLive();
+}
+
+function liveMediaLines() {
+  return { title: t('Round {n}', { n: liveGame.turns }), artist: t('Update Timer and Rounds') };
+}
+
+function tnTogglePause() { liveGame.isRunning ? stopLive() : startLive(); }
+
+async function tnSaveGame() {
+  const { results, done } = _tnPlaces();
+  if (!done) return;
+  const btn = document.getElementById('tnSaveBtn');
+  btn.disabled = true;
+  btn.textContent = t('Saving…');
+  const { error } = await db.rpc('save_tournament_table', {
+    target_table: tnGame.tableId,
+    played_at:    new Date(tnGame.startedAt).toISOString(),
+    results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round, dropped })),
+  });
+  btn.textContent = t('Save game');
+  if (error) { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error), { scroll: true }); }
+  const tourId = tnGame.tourId;
+  liveGame.clear();
+  liveGame.emit('close');
+  updateLiveGameNavBadge();
+  _tnCloseLive();
+  await tnLoad(tourId);
+}
+
+function tnDiscardGame() {
+  openConfirmSheet({
+    id:           'tnDiscardSheet',
+    title:        t('Discard this game?'),
+    bodyHTML:     `<p class="confirm-text">${t('The timer, the rounds and the places so far are lost, and the table is free again for another phone.')}</p>`,
+    confirmLabel: t('Discard game'),
+    busyLabel:    t('Discarding…'),
+    danger:       true,
+    onConfirm:    async () => {
+      // Taken over meanwhile: the table isn't ours to give back, just let go of it.
+      await db.rpc('release_tournament_table', { target_table: tnGame.tableId });
+      const tourId = tnGame.tourId;
+      liveGame.clear();
+      liveGame.emit('close');
+      updateLiveGameNavBadge();
+      _tnCloseLive();
+      await tnLoad(tourId);
+    },
+  });
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

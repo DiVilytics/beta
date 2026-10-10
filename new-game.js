@@ -1096,6 +1096,19 @@ function _checkResume() {
     if (localStorage.getItem(liveGame.KEY)) liveGame.clear();
     return;
   }
+  // A tournament table's game (tournaments.js): it lives on its tournament's
+  // page; New Game only points there, its own form left alone.
+  if (state.tournament) {
+    const g = state.tournament;
+    const card = document.createElement('div');
+    card.innerHTML = emptyStateHTML('🏟️', t('A tournament game is in progress'),
+      t('{name}, table {n}: save it or discard it on its tournament page before starting another game.', { name: _esc(g.tourName), n: g.tableNo }),
+      `<a class="btn btn-primary btn-sm" href="tournaments.html?t=${g.tourId}&table=${g.tableId}">${t('Open it')}</a>`);
+    document.getElementById('formContent').before(card);
+    setVisible('formContent', false);
+    setVisible('footerDefault', false);
+    return;
+  }
   liveGame.restoreFrom(state);
   document.getElementById('startBtn').textContent = t('Resume game');   // stays purple (btn-primary)
   clearError('err');

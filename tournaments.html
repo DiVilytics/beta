@@ -123,7 +123,56 @@
       <button class="btn btn-primary" type="button" id="tnFormSave" onclick="tnSaveForm()"></button>
     </div>
   </div>
+  <!-- A table's game in progress (tournaments.js): New Game's live panel, then
+       the villains still playing and the ranking as it fills. -->
+  <div id="tnLive" class="hidden">
+    <div class="err" id="tnLiveErr"></div>
+    <div class="live-status" id="tnLiveStatus" data-i18n>Game in progress</div>
+    <div class="live-info" id="liveInfo"></div>
+    <div class="live-time" id="liveTime">00:00</div>
+    <div class="live-turns">
+      <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
+      <div class="live-turn-count"><span class="live-turn-num"><span id="liveTurnCount">1</span></span><span class="live-turn-lbl" data-i18n>round</span></div>
+      <button class="live-btn" id="livePlusBtn" type="button" onclick="bumpTurn(1)">+</button>
+    </div>
+    <div class="section-label" data-i18n>Playing</div>
+    <div class="tn-playing" id="tnPlaying"></div>
+    <div class="section-label" data-i18n>Ranking</div>
+    <div class="tn-ranking" id="tnRanking"></div>
+    <p class="live-hint" id="tnLiveHint" data-i18n>Tap a villain when they win (the next place from the top) or drop out (the next place from the bottom). Tap the last one placed to undo it. With one villain left, the game ends.</p>
+    <!-- The lock screen's album line (new-game-audio.js reads it). -->
+    <input type="hidden" id="fLocation">
+    <div class="new-game-footer">
+      <button class="btn btn-danger" type="button" onclick="tnDiscardGame()" data-i18n>Discard game</button>
+      <button class="btn btn-primary" type="button" id="tnPauseBtn" onclick="tnTogglePause()" data-i18n>Pause game</button>
+      <button class="btn btn-save" type="button" id="tnSaveBtn" onclick="tnSaveGame()" disabled data-i18n>Save game</button>
+    </div>
+  </div>
 </main>
+
+<!-- Tapping a villain still playing: won (the next place from the top) or dropped (from the bottom). -->
+<div class="overlay" id="tnPlaceSheet" onclick="if(event.target===this) closeOverlay('tnPlaceSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="tnPlaceTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('tnPlaceSheet')">×</button>
+    </div>
+    <div class="sheet-body tn-place-choices">
+      <button class="btn btn-save" type="button" id="tnPlaceWon"></button>
+      <button class="btn btn-ghost" type="button" id="tnPlaceDropped"></button>
+    </div>
+  </div>
+</div>
+
+<audio id="bgAudio" src="asset/audio/empty.mp3" preload="metadata" loop></audio>
+<div class="tap-resume hidden" id="tapResume" role="button" tabindex="0" onclick="resumeLockScreen()" onkeydown="if(event.key==='Enter'||event.key===' ')resumeLockScreen()">
+  <div class="tap-resume-card">
+    <div class="tap-resume-ico">🔒</div>
+    <div class="tap-resume-title" data-i18n>Tap to continue</div>
+    <p class="tap-resume-text" data-i18n>The game is still running. Tap anywhere to turn the lock-screen controls (timer and rounds) back on.</p>
+  </div>
+</div>
 
 <!-- QR share sheet -->
 <div class="overlay" id="qrOverlay" onclick="if(event.target===this) closeOverlay('qrOverlay')">
@@ -166,5 +215,6 @@
 <script src="pace-filter.js"></script>
 <script src="tournament-rules.js"></script>
 <script src="tournaments.js"></script>
+<script src="new-game-audio.js"></script>
 </body>
 </html>
