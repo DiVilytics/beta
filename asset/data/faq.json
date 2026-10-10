@@ -134,7 +134,7 @@
         "title": "The variant",
         "items": [
           { "term": "How it works", "text": "You play one villain against a Phantom player, an imaginary opponent whose choices you make. After each of your turns, a die roll decides whether it Fates you." },
-          { "term": "Winning and losing", "text": "You have 20 turns. Reach your Objective by the end of turn 20 and you win; otherwise you lose. Alone, every turn is a round, so a solo game lasts at most 20 rounds." },
+          { "term": "Winning and losing", "text": "You have 20 turns, or 25 on Easy and 15 on Hard (see Difficulty). Reach your Objective by the end of your last turn and you win; otherwise you lose. Alone, every turn is a round." },
           { "term": "What you need", "text": "Your villain as in a normal game, a 10-sided die (a dice app works too) and a way to count the turns, such as a 20-sided die or Power tokens." }
         ]
       },
@@ -142,13 +142,13 @@
         "title": "Setup and turns",
         "items": [
           { "term": "Setup", "text": "Set up as usual, or as your Villain Guide says. You are the first player, so you start with no Power." },
-          { "term": "End of turn", "text": "End your turn as usual, drawing up to your hand limit, then move the turn counter on by one. After your 20th turn the game is over." }
+          { "term": "End of turn", "text": "End your turn as usual, drawing up to your hand limit, then move the turn counter on by one. After your last turn the game is over." }
         ]
       },
       {
         "title": "The Phantom player",
         "items": [
-          { "term": "Its turn", "text": "The Phantom's turn starts when you end yours. Roll the 10-sided die: on 1 to 4 (a 40% chance), it Fates you. Then your next turn begins." },
+          { "term": "Its turn", "text": "The Phantom's turn starts when you end yours. Roll the 10-sided die: on 1 to 4 (a 40% chance; see Difficulty), it Fates you. Then your next turn begins." },
           { "term": "Choosing for it", "text": "Whenever a card of any kind asks the Phantom to choose, you choose for it: always the option that hurts you most at that moment." },
           { "term": "What it knows", "text": "To judge what hurts you most, consider only the face-up cards in play, discard piles included. Leave out your hand, any card you saw in secret and your plans: an opponent wouldn't know them. When in doubt, use random choices (Optional rules)." }
         ]
@@ -172,7 +172,7 @@
       {
         "title": "Optional rules",
         "items": [
-          { "term": "Easier or harder", "text": "More turns make the game easier, fewer make it harder (change them by 5 at most). More die results that trigger Fate make it harder, fewer make it easier (change them by 2 at most). Starting with some Power, such as 5, makes the start easier." },
+          { "term": "Difficulty", "text": "Three levels change both the turns you have and the die results that Fate you. Easy: 25 turns, Fated on 1-2 (20%). Medium, the rules as written: 20 turns, Fated on 1-4 (40%). Hard: 15 turns, Fated on 1-6 (60%). Starting with some Power, such as 5, also makes the start easier." },
           { "term": "Random choices", "text": "For a more honest game, don't choose for the Phantom: number its possible choices (or use even and odd, heads and tails), then roll a die or flip a coin. Do the same to pick which Fate card to play and, numbering the possible locations, where it goes." }
         ]
       },
@@ -187,7 +187,7 @@
           { "term": "Infiltrate", "villain": "Syndrome", "text": "With no other real players, Infiltrate does no harm: take it out of the Fate deck, or leave it in as a card that does nothing." },
           { "term": "Fate actions", "villain": "Yzma", "text": "When the Phantom Fates you, number your Fate decks and roll a die to pick one. Play a random card from it; if it can't be played, try another random card, until one is played. Shuffle the unused cards back into that deck: Yzma may have learned something about it. If no card can be played, shuffle them all back: Yzma has escaped Fate, and seen what that deck holds." },
           { "term": "Trick or Treat", "villain": "Oogie Boogie", "text": "Take the Power from the Cauldron, as there's no other player to take it from." },
-          { "term": "Turns", "villain": "King Candy", "text": "King Candy races Vanellope von Schweetz and the turn limit at once. For your first games, try 25 turns, then go back to 20 once you know his strategy." }
+          { "term": "Turns", "villain": "King Candy", "text": "King Candy races Vanellope von Schweetz and the turn limit at once. For your first games, try Easy, with 25 turns, then go back to Medium once you know his strategy." }
         ]
       }
     ]

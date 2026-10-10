@@ -60,15 +60,19 @@
     <div class="live-time" id="liveTime">00:00</div>
     <div class="live-turns">
       <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
-      <div class="live-turn-count"><span id="liveTurnCount">1</span><span class="live-turn-lbl" data-i18n>round</span></div>
+      <div class="live-turn-count"><span class="live-turn-num"><span id="liveTurnCount">1</span><span class="live-turn-max" id="liveTurnMax"></span></span><span class="live-turn-lbl" data-i18n>round</span></div>
       <button class="live-btn" id="livePlusBtn" type="button" onclick="bumpTurn(1)">+</button>
     </div>
+    <!-- Solo: the Phantom's die, rolled by + (new-game.js). -->
+    <div class="live-die hidden" id="liveDie" aria-live="polite"></div>
     <p class="live-hint" id="liveHint" data-i18n>The counter shows the current round. A round ends when every player has had their turn: tap + when the first player is up again. When you're done, tap Pause game: the duration is filled in automatically, and the rounds too if you used the counter.</p>
-    <p class="live-hint hidden" id="liveHintSolo" data-i18n>The counter shows the current round: alone, every turn is a round, and you have 20 to reach your Objective. When you're done, tap Pause game: the duration is filled in automatically, and the rounds too if you used the counter.</p>
+    <p class="live-hint hidden" id="liveHintSolo" data-i18n>The counter shows the current round: alone, every turn is a round. At the end of each of your turns tap +, and the die rolls for the Phantom: Fated or Safe. + after your last round ends the game, lost. Reached your Objective? Tap Pause game, mark 👑 and save.</p>
   </div>
 
   <!-- FORM CONTENT, hidden while a live game is running -->
   <div id="formContent">
+    <!-- Solo: + after the last round ended the game (new-game.js). -->
+    <p class="solo-end-note hidden" id="soloEndNote" role="status"></p>
     <div class="form-row">
       <div class="field">
         <label data-i18n>Date &amp; Time</label>
@@ -145,7 +149,8 @@
     </div>
     <div id="orderSlots"></div>
     <button class="add-row-btn" id="orderAddBtn" onclick="addOrderSlot()" data-i18n>+ Add player</button>
-    <!-- Solo (solo.js): what the variant is. -->
+    <!-- Solo (solo.js): the difficulty level, then what the variant is. -->
+    <div class="solo-level-pick hidden" id="soloLevelNg"></div>
     <div class="hidden" id="soloHintNg"></div>
 
   </div>

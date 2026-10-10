@@ -4,8 +4,13 @@ let chars            = [];
 let boxInfo          = {};          // loadBoxInfo(), used to order box groups by release date
 let orderSlots       = [];          // each: { id, char, isMe, isWinner }
 // Solo (solo.js), the last choice of the players menu: one villain, yours, won
-// against the game (👑, the row's isWinner) or lost.
+// against the game (👑, the row's isWinner) or lost, at a difficulty level.
 let soloMode         = false;
+let soloLevel        = SOLO_DEFAULT_LEVEL;
+// Solo, live: the Phantom's rolls, { round: result }, each kept on the round
+// its + led to (− takes it back). Kept with the game in progress.
+let _soloRolls       = {};
+let _dieTimer        = null;        // setInterval id of the rolling die
 let orderNextId      = 0;
 let slotTimers       = {};          // slotId → setInterval id (active spin animation)
 let _shuffleTimer    = null;        // setInterval id for the shuffle-order animation
@@ -133,6 +138,7 @@ function _saveDraft() {
       saved:     Date.now(),
       slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
       solo:      soloMode,
+      soloLevel,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
@@ -168,6 +174,7 @@ function _restoreDraftForm() {
   if (d.slots && (d.slots.length >= 2 || (d.solo && d.slots.length === 1))) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
+    soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
     if (d.fDate) document.getElementById('fDate').value = d.fDate;
     document.getElementById('fLocation').value = d.fLocation || '';
     document.getElementById('fDur').value      = d.fDur      || '';
@@ -305,12 +312,14 @@ function _setSolo(on) {
   _saveLiveState();
 }
 
-// What only Solo shows (what the variant is, its live hint and the 20 rounds)
-// and what it hides: Random order and Draw villains (one villain: its 🎲 does
-// it), + Add player, and the row's ❌ and 👤 (the villain is yours). The one
-// row can't be dragged: its ⠿ grays out.
+// What only Solo shows (the level picker, what the variant is, its live hint
+// and the level's rounds) and what it hides: Random order and Draw villains
+// (one villain: its 🎲 does it), + Add player, and the row's ❌ and 👤 (the
+// villain is yours). The one row can't be dragged: its ⠿ grays out.
 function _syncSoloUI() {
   document.getElementById('orderSlots')?.classList.toggle('solo', soloMode);
+  const levelEl = document.getElementById('soloLevelNg');
+  if (levelEl) { levelEl.innerHTML = soloMode ? soloLevelSegHTML(soloLevel, 'setSoloLevel') : ''; setVisible('soloLevelNg', soloMode); }
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
@@ -319,8 +328,18 @@ function _syncSoloUI() {
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
   const turns = document.getElementById('fTurns');
-  if (turns) turns.max = soloMode ? SOLO_MAX_TURNS : 999;
+  if (turns) turns.max = soloMode ? _soloTurns() : 999;
   _layoutLegend();
+}
+
+// Solo: the level's rounds.
+const _soloTurns = () => SOLO_LEVELS[soloLevel].turns;
+
+function setSoloLevel(id) {
+  if (!SOLO_LEVELS[id] || id === soloLevel) return;
+  soloLevel = id;
+  _syncSoloUI();
+  _saveLiveState();
 }
 
 function removeOrderSlot(id) {
@@ -774,7 +793,10 @@ function _renderLiveInfo() {
   if (movers) movers.innerHTML = orderSlots.filter(s => s.char).map(s => moverImgHTML(s.char)).join('');
   const infoEl   = document.getElementById('liveInfo');
   const location = document.getElementById('fLocation').value.trim();
-  if (infoEl) infoEl.textContent = [soloMode ? t('Solo') : tn(orderSlots.length, '{n} player', '{n} players'), location ? t('Playing at {location}', { location }) : null].filter(Boolean).join(' | ');
+  if (infoEl) infoEl.innerHTML = [
+    soloMode ? `${t('Solo')} | ${soloLevelTagHTML(soloLevel)}` : tn(orderSlots.length, '{n} player', '{n} players'),
+    location ? _esc(t('Playing at {location}', { location })) : null,
+  ].filter(Boolean).join(' | ');
 }
 
 function setLiveUI(on) {
@@ -799,25 +821,97 @@ function tickLive() {
 }
 
 // The live round and its − button, disabled at round 1 (the lowest round); in
-// Solo + stops at round 20, the last one.
+// Solo the round out of the level's, and the Phantom's die.
 function _renderTurnCount() {
   document.getElementById('liveTurnCount').textContent = liveGame.turns;
+  document.getElementById('liveTurnMax').textContent   = soloMode ? `/${_soloTurns()}` : '';
   document.getElementById('liveMinusBtn').disabled = liveGame.turns <= 1;
-  document.getElementById('livePlusBtn').disabled  = soloMode && liveGame.turns >= SOLO_MAX_TURNS;
+  _renderSoloDie();
 }
 
+// Solo: + ends your turn, and the Phantom's 10-sided die rolls at once (Fated
+// on 1 to the level's number); − takes the round and its roll back. + after
+// the last round ends the game: lost.
 function bumpTurn(delta) {
   if (delta < 0 && liveGame.turns <= 1) return;   // round 1 is the lowest (also from the lock screen)
-  if (delta > 0 && soloMode && liveGame.turns >= SOLO_MAX_TURNS) return;
+  if (delta > 0 && soloMode && liveGame.turns >= _soloTurns()) { _endSoloLost(); return; }
   _turnBumped    = true;
   _roundsCounted = true;
-  liveGame.bumpTurns(delta);
+  if (soloMode) {
+    if (delta > 0) _soloRolls[liveGame.turns + 1] = soloRollDie();
+    else delete _soloRolls[liveGame.turns];
+  }
+  liveGame.bumpTurns(delta);   // the lock screen reads the roll (liveMediaLines)
   _renderTurnCount();
+  if (soloMode && delta > 0) _animateDie();
   if (!liveTimerId) {
     const fTurns = document.getElementById('fTurns');
     if (fTurns) fTurns.value = liveGame.turns || '';
   }
   _saveLiveState();
+}
+
+// Solo: the Phantom's die under the counter, in the level's color: the roll
+// that led to this round, Fated (the die filled) or Safe; before the first +,
+// only the rule. On the last round it says what + does then.
+function _renderSoloDie(rolling = false) {
+  const el = document.getElementById('liveDie');
+  if (!el) return;
+  setVisible('liveDie', soloMode);
+  if (!rolling) { clearInterval(_dieTimer); _dieTimer = null; }
+  if (!soloMode) return;
+  const { turns, fate } = SOLO_LEVELS[soloLevel];
+  const roll  = _soloRolls[liveGame.turns];
+  const fated = roll != null && roll <= fate;
+  el.className = `live-die lvl-${soloLevel}${roll == null ? ' unrolled' : rolling ? '' : fated ? ' fated' : ' safe'}`;
+  el.innerHTML = `
+    <div class="die-face${rolling ? ' rolling' : ''}" aria-hidden="true">${roll ?? '?'}</div>
+    <div class="die-text">
+      <strong>${roll == null ? t("The Phantom's die") : rolling ? t('Rolling…') : fated ? t('Fated') : t('Safe')}</strong>
+      <span>${t('Fated on 1-{n}', { n: fate })}</span>
+      ${liveGame.turns >= turns ? `<span class="die-last">${t('Last round: + ends the game, lost.')}</span>` : ''}
+    </div>`;
+}
+
+// The roll, shown tumbling for half a second before it lands (not when the
+// page is hidden, a + from the lock screen, or with reduced motion).
+function _animateDie() {
+  if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  _renderSoloDie(true);
+  const face = document.querySelector('#liveDie .die-face');
+  let frames = 0;
+  _dieTimer = setInterval(() => {
+    if (++frames >= 10) { _renderSoloDie(); return; }
+    if (face) face.textContent = 1 + Math.floor(Math.random() * SOLO_DIE);
+  }, 50);
+}
+
+// Solo: + after the last round. The game stops as if paused, lost (no 👑), its
+// rounds the level's; the note says so, and Resume game takes it back.
+function _endSoloLost() {
+  orderSlots[0].isWinner = false;
+  _turnBumped    = true;   // the duration and the rounds go in, however short the game
+  _roundsCounted = true;
+  stopLive();
+  renderOrderSlots();
+  _saveLiveState();
+  const note = document.getElementById('soloEndNote');
+  if (note) {
+    note.textContent = t('Round {n} is over: the game is lost. Save it, or tap Resume game if + was a mistake.', { n: _soloTurns() });
+    setVisible('soloEndNote', true);
+  }
+}
+
+// The lock screen's two lines (new-game-audio.js): the round and, in Solo, the
+// Phantom's last roll.
+function liveMediaLines() {
+  const round = t('Round {n}', { n: liveGame.turns });
+  const roll  = soloMode ? _soloRolls[liveGame.turns] : null;
+  if (!soloMode) return { title: round, artist: t('Update Timer and Rounds') };
+  return {
+    title:  `${round}/${_soloTurns()}`,
+    artist: roll == null ? t('Update Timer and Rounds') : `🎲 ${roll} | ${roll <= SOLO_LEVELS[soloLevel].fate ? t('Fated') : t('Safe')}`,
+  };
 }
 
 function showErr(msg) {
@@ -844,7 +938,8 @@ function startLive() {
   const resuming  = liveGame.hasSession;   // a paused game: keep the date it started on
   liveGame.markStarted(Date.now() - durOffset);
 
-  if (!resuming) _setDateToNow();
+  if (!resuming) { _setDateToNow(); _soloRolls = {}; }
+  setVisible('soloEndNote', false);
 
   // The counter shows the current round: a new game starts at 1, a resumed one
   // carries on from its rounds (and rounds set before the start count).
@@ -894,6 +989,8 @@ function _saveLiveState() {
   liveGame.persist({
     slots:     orderSlots,
     solo:      soloMode,
+    soloLevel,
+    soloRolls: _soloRolls,
     roundsCounted: _roundsCounted,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
@@ -970,7 +1067,10 @@ function _doDiscard() {
   slotTimers = {};
   orderSlots = [];
   soloMode   = false;
+  soloLevel  = SOLO_DEFAULT_LEVEL;
+  _soloRolls = {};
   _roundsCounted = false;
+  setVisible('soloEndNote', false);
   addOrderSlot();
   addOrderSlot();
 
@@ -1011,6 +1111,8 @@ function _checkResume() {
     isWinner: !!s.isWinner,
   }));
   soloMode   = !!state.solo;
+  soloLevel  = SOLO_LEVELS[state.soloLevel] ? state.soloLevel : SOLO_DEFAULT_LEVEL;
+  _soloRolls = state.soloRolls || {};
   // Games saved before the flag: the counter was used if it moved past 1.
   _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
   renderOrderSlots();
@@ -1054,7 +1156,7 @@ async function submitForm() {
   const lineupErr = _validateLineup();
   if (lineupErr) return showErr(lineupErr);
   if (soloMode) {
-    if (turns > SOLO_MAX_TURNS) return showErr(t('A solo game ends by round {n}.', { n: SOLO_MAX_TURNS }));
+    if (turns > _soloTurns()) return showErr(t('A solo game on {level} ends by round {n}.', { level: soloLevelName(soloLevel), n: _soloTurns() }));
   } else if (!orderSlots.some(s => s.isWinner)) return showErr(t('Mark the winner with 👑.'));
 
   // Solo: the one seat is yours, won (👑) or lost against the game.
@@ -1078,7 +1180,7 @@ async function submitForm() {
     location:         place,
     created_by:       user.id,
     source:           'divilytics',   // recorded in this app (other sources: the imports)
-    ...(soloMode ? { variant: 'solo' } : {}),
+    ...(soloMode ? { variant: 'solo', solo_level: soloLevel } : {}),
   };
 
   const { data: g, error } = await db.from('games').insert(gameData).select().single();

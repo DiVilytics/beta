@@ -1,6 +1,9 @@
 {
   "2026-10-10": {
-    "title": "La tabella degli XP e nuove regole del solitario",
+    "title": "Difficoltà del solitario, nuove regole e tabella degli XP",
+    "new": [
+      "Il solitario ha tre livelli di difficoltà: Facile, Media e Difficile, con 25, 20 o 15 round, e il Fato con 1-2, 1-4 o 1-6. In una partita in corso, + tira il dado del fantasma e mostra se subisci il Fato, e + dopo il tuo ultimo round chiude la partita, persa. Sotto Solitario puoi filtrare per difficoltà."
+    ],
     "improved": [
       "Sotto la Classifica dei giocatori, la Tabella degli XP mostra quanto vale una partita: secondo quanti giocatori hanno rivendicato il proprio cattivo, persa o vinta.",
       "Il solitario ha nuove regole nelle F.A.Q.: giochi contro un giocatore fantasma, e otto cattivi hanno una correzione tutta loro."

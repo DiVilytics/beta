@@ -239,7 +239,7 @@ async function exportMyData() {
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo'];
+    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Difficulty'];
     const rows = [header];
     for (const g of games) {
       const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
@@ -255,6 +255,7 @@ async function exportMyData() {
           p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
           g.variant === 'solo' ? 'yes' : 'no',
+          { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[g.solo_level] || '',   // a solo game's level (solo.js)
         ]);
       }
     }

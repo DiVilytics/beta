@@ -12,7 +12,7 @@ const _lbModeByTab = { characters: 'pct', players: 'xp' };
 
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
 // time / Year / Month (period-filter.js): any change reloads. Solo ranks the
-// solo games only (solo.js), never with the others.
+// solo games only (solo.js), of the level picked, never with the others.
 const size = createSizeFilter('lbSize', {
   onChange: () => { lbDisplayLimit = LB_PAGE_SIZE; loadAndRender(); },
 });
@@ -25,11 +25,11 @@ const period = createPeriodFilter('lbPeriod', {
 const LB_PAGE_SIZE = 30;
 let lbDisplayLimit = LB_PAGE_SIZE;
 
-// Cache: key `${lbTab}:${size}:${period.id()}` → { rows, summary }. Avoids
-// re-fetching when only the sort lbMode changes, or when going back to a
+// Cache: key `${lbTab}:${size}:${level}:${period.id()}` → { rows, summary }.
+// Avoids re-fetching when only the sort lbMode changes, or when going back to a
 // period already seen.
 const _lbCache = {};
-const _lbKey = () => `${lbTab}:${size.value()}:${period.id()}`;
+const _lbKey = () => `${lbTab}:${size.value()}:${size.level()}:${period.id()}`;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -60,12 +60,13 @@ async function init() {
   if ((saved?.tab || new URLSearchParams(location.search).get('tab')) === 'players') _applyTab('players');
   if (saved) {
     size.set(saved.filter);
+    size.setLevel(saved.level);
     period.set(saved.period);
     lbDisplayLimit = saved.limit || LB_PAGE_SIZE;
   }
   keepViewState(() => ({
     tab: lbTab, modes: { ..._lbModeByTab, [lbTab]: lbMode },
-    filter: size.value(), period: period.get(), limit: lbDisplayLimit,
+    filter: size.value(), level: size.level(), period: period.get(), limit: lbDisplayLimit,
   }));
   await loadAndRender();
   _loadXpLedger();   // in the background, so the Players tab opens at once
@@ -196,14 +197,15 @@ async function _fetchPeriod() {
   };
 }
 
-// Solo: the same numbers from the solo games of the period (solo.js), no XP.
+// Solo: the same numbers from the solo games of the period and level
+// (solo.js), no XP; the average rounds are those to win.
 async function _fetchSolo() {
   const solo = await loadSoloGames();
   if (!solo) return null;
-  const { games, players } = soloInPeriod(solo, period.range());
+  const { games, players } = soloOfLevel(soloInPeriod(solo, period.range()), size.level());
   return {
     rows:    soloRankRows(players, lbTab === 'characters' ? 'character' : 'nickname'),
-    summary: soloSummary(games),
+    summary: soloSummary(games, soloWonIds(players)),
   };
 }
 
@@ -315,7 +317,7 @@ function render({ rows, summary }) {
   document.getElementById('summary').innerHTML = statBoxesHTML([
     { val: games,                                  lbl: t('Games') },
     { val: avgDur   != null ? avgDur + 'm' : '-',  lbl: t('Avg duration') },
-    { val: avgTurns != null ? avgTurns      : '-', lbl: t('Avg rounds') },
+    { val: avgTurns != null ? avgTurns      : '-', lbl: size.isSolo() ? t('Avg rounds to win') : t('Avg rounds') },
   ]);
 
   // Solo: what it is, above its own ranking (which has no XP: % Wins instead).

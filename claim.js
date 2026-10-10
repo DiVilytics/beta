@@ -117,11 +117,13 @@ function render() {
   const role    = gameUserRole(claimGame, claimPlayers, user);
   const solo    = claimIsSolo();
 
+  const level = solo ? soloLevelOf(claimGame) : null;
   const meta = [
     fmtDuration(claimGame.duration_minutes),
-    claimGame.num_turns ? tn(claimGame.num_turns, '{n} round', '{n} rounds') : null,
-    claimGame.location  ? claimGame.location             : null,
+    claimGame.num_turns ? (level ? t('{n}/{max} rounds', { n: claimGame.num_turns, max: SOLO_LEVELS[level].turns }) : tn(claimGame.num_turns, '{n} round', '{n} rounds')) : null,
+    claimGame.location  ? _esc(claimGame.location)       : null,
     solo ? t('Solo') : null,
+    level ? soloLevelTagHTML(level) : null,
   ].filter(Boolean).join(' | ');
 
   // Like the game cards: the player's nickname sits under the villain's name;
@@ -199,12 +201,30 @@ function shareGame() {
 
 // ── EDIT GAME DETAILS ─────────────────────────────────────────────────────────
 
+// A solo game's details include its level (solo.js), picked in the sheet.
+let _editLevel = null;
+
+function setEditLevel(id) {
+  _editLevel = id;
+  _renderEditLevel();
+}
+
+function _renderEditLevel() {
+  const solo = claimIsSolo();
+  setVisible('editLevelField', solo);
+  if (!solo) return;
+  document.getElementById('editLevel').innerHTML = soloLevelSegHTML(_editLevel, 'setEditLevel');
+  document.getElementById('editTurns').max = SOLO_LEVELS[_editLevel].turns;
+}
+
 function editGameDetails() {
   if (!claimGame) return;
+  _editLevel = claimIsSolo() ? soloLevelOf(claimGame) : null;
+  _renderEditLevel();
   document.getElementById('editLocation').value = claimGame.location || '';
   document.getElementById('editDur').value      = claimGame.duration_minutes || '';
   document.getElementById('editTurns').value    = claimGame.num_turns || '';
-  document.getElementById('editTurns').max      = claimIsSolo() ? SOLO_MAX_TURNS : 999;
+  if (!claimIsSolo()) document.getElementById('editTurns').max = 999;
   clearError('editDetailsErr');
   const btn = document.getElementById('editDetailsSaveBtn');
   btn.disabled    = false;
@@ -225,19 +245,21 @@ async function saveGameDetails() {
 
   // Always write the current values (a cleared field is saved as null).
   const patch = { duration_minutes: dur, num_turns: turns, location: location };
+  if (claimIsSolo()) patch.solo_level = _editLevel;
 
   // No-op if nothing actually changed.
   if (dur === (claimGame.duration_minutes || null) &&
       turns === (claimGame.num_turns || null) &&
-      location === (claimGame.location || null)) {
+      location === (claimGame.location || null) &&
+      (!claimIsSolo() || _editLevel === claimGame.solo_level)) {
     closeEditDetails();
     return;
   }
 
   const btn   = document.getElementById('editDetailsSaveBtn');
   const errEl = document.getElementById('editDetailsErr');
-  if (claimIsSolo() && turns > SOLO_MAX_TURNS) {
-    showError(errEl, t('A solo game ends by round {n}.', { n: SOLO_MAX_TURNS }));
+  if (claimIsSolo() && turns > SOLO_LEVELS[_editLevel].turns) {
+    showError(errEl, t('A solo game on {level} ends by round {n}.', { level: soloLevelName(_editLevel), n: SOLO_LEVELS[_editLevel].turns }));
     return;
   }
   btn.disabled    = true;

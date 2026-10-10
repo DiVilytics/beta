@@ -21,9 +21,11 @@ let csAvg       = {};        // avg duration / rounds per table size: { all: { d
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
 // The table's rows: Overall, 2p…6p and, dashed under them, Solo (solo.js: this
 // villain's solo games, never counted in Overall). Tapping a row shows its
-// numbers in the boxes on top; Overall at first.
+// numbers in the boxes on top; Overall at first. Selected, Solo shows the level
+// pills under it (solo.js): its row and the boxes then count that level only.
 let csRow       = 'all';     // 'all' | 2…6 | 'solo'
-let csSoloStats = null;      // { games, wins, dur, turns }; null until loaded or if they couldn't load
+let csSolo      = null;      // this villain's solo games, { games, players }; null until loaded or if they couldn't load
+let csSoloLevel = 'all';     // 'all' | 'easy' | 'medium' | 'hard'
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -37,8 +39,8 @@ async function init() {
 
   // A language switch brings back the grouping and the switches (lang.js).
   const saved = takeViewState();
-  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; csRow = saved.row ?? 'all'; }
-  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, row: csRow }));
+  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; csRow = saved.row ?? 'all'; csSoloLevel = saved.soloLevel ?? 'all'; }
+  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, row: csRow, soloLevel: csSoloLevel }));
 
   if (charName) { await renderDetailPage(charName); return; }
 
@@ -168,7 +170,7 @@ async function renderDetailPage(charName) {
   // seg and table rows) so nothing shifts when the numbers arrive. Rivalries,
   // decks and the FAQ link only go in afterwards, below, so they never get
   // pushed down by content loading above them.
-  csBuckets = _foldBuckets([]); csAdversaries = []; csAvg = {}; csSoloStats = null;
+  csBuckets = _foldBuckets([]); csAdversaries = []; csAvg = {}; csSolo = null;
   csLoading = true;
   render();
   const renderExtras = () => { renderDeck(charName); renderFaqLink(charName); };
@@ -214,11 +216,7 @@ async function renderDetailPage(charName) {
   if (solo) {
     const seats = solo.players.filter(p => p.character === charName);
     const ids   = new Set(seats.map(p => p.game_id));
-    const games = solo.games.filter(g => ids.has(g.id));
-    csSoloStats = {
-      games: seats.length, wins: seats.filter(p => p.is_winner).length,
-      dur: avg(games.map(g => g.duration_minutes)), turns: avg(games.map(g => g.num_turns)),
-    };
+    csSolo = { games: solo.games.filter(g => ids.has(g.id)), players: seats };
   }
 
   csLoading = false;
@@ -278,6 +276,24 @@ function csSelectRow(key) {
   render();
 }
 
+// Solo's level pills.
+function csSetSoloLevel(level) {
+  csSoloLevel = level;
+  render();
+}
+
+// The Solo row's numbers, for the level picked: { games, wins, dur, turns },
+// the rounds those of the games won (a lost one runs to its last round).
+function _soloStats() {
+  if (!csSolo) return { games: 0, wins: 0 };
+  const { games, players } = soloOfLevel(csSolo, csSoloLevel);
+  const won = soloWonIds(players);
+  return {
+    games: players.length, wins: won.size,
+    dur: avg(games.map(g => g.duration_minutes)), turns: avg(games.filter(g => won.has(g.id)).map(g => g.num_turns)),
+  };
+}
+
 // ── SEARCH / AUTOCOMPLETE ─────────────────────────────────────────────────────
 
 function _attachCharSearch() {
@@ -313,7 +329,7 @@ function render() {
     { label: '5p', key: 5 },
     { label: '6p', key: 6 },
   ];
-  const solo  = csSoloStats || { games: 0, wins: 0 };
+  const solo  = _soloStats();
   const stats = key => key === 'solo' ? solo : csBuckets[key];
   const keys  = [...rows.map(r => r.key), 'solo'];
   // The bars scale to the largest official row, as everywhere; Solo has no bar
@@ -357,7 +373,7 @@ function render() {
       ${statBoxesHTML([
         { val: v(sel.games), lbl: t('Games') },
         { val: avgs.dur   != null ? Math.round(avgs.dur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: t('Avg rounds') },
+        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: csRow === 'solo' ? t('Avg rounds to win') : t('Avg rounds') },
         { val: v(sel.games ? Math.round((sel.wins / sel.games) * 100) + '%' : '-'), lbl: t('Win rate') },
         { val: v(sel.wins), lbl: t('Wins') },
       ])}
@@ -375,7 +391,7 @@ function render() {
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
       ${rowHTML(t('Solo'), 'solo')}
     </div>
-    ${csRow === 'solo' ? soloHintHTML() : ''}
+    ${csRow === 'solo' ? `<div class="pill-group solo-levels cs-solo-levels">${soloLevelPillsHTML(csSoloLevel, 'csSetSoloLevel')}</div>${soloHintHTML()}` : ''}
     ${_adversariesSectionHTML()}`;
 }
 

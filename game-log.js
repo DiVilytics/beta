@@ -81,6 +81,7 @@ async function init() {
   const saved = takeViewState();
   if (saved) {
     size.set(saved.count);
+    size.setLevel(saved.level);
     glFilterLocation = saved.location;
     if (glFilterLocation) document.getElementById('locationSearchInput').value = glFilterLocation;
     period.set(saved.period);
@@ -90,7 +91,7 @@ async function init() {
     _syncCharModeUI();
   }
   keepViewState(() => ({
-    count: size.value(), location: glFilterLocation, period: period.get(),
+    count: size.value(), level: size.level(), location: glFilterLocation, period: period.get(),
     charMode: glCharMode, onlySnapshot: _onlySnapshot,
     pace: _paceState(),
     loaded: glGames.length,
@@ -171,8 +172,9 @@ async function load(reset = true) {
 }
 
 // Solo (solo.js): every solo game is loaded at once (they're few), then
-// filtered and paged here. Among these keeps the games of an included villain,
-// With these the picked villain's (one at most; none picked: every game).
+// filtered and paged here: the level, then Among these keeps the games of an
+// included villain, With these the picked villain's (one at most; none picked:
+// every game).
 async function _loadSolo(reset, token) {
   const solo = await loadSoloGames();
   if (token !== _loadToken) return;
@@ -183,7 +185,7 @@ async function _loadSolo(reset, token) {
   const included  = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
   const villainOk = v => glCharMode === 'with' ? !included.size || included.has(v) : included.has(v);
   const villainOf = Object.fromEntries(solo.players.map(p => [p.game_id, p.character]));
-  const games = soloInPeriod(solo, period.isAll() ? {} : period.range()).games.filter(g =>
+  const games = soloOfLevel(soloInPeriod(solo, period.isAll() ? {} : period.range()), size.level()).games.filter(g =>
     (!glFilterLocation || g.location === glFilterLocation) && villainOk(villainOf[g.id]));
 
   glGames   = games.slice(0, reset ? PAGE_SIZE : glGames.length + PAGE_SIZE);
@@ -384,7 +386,7 @@ function render() {
 
   const hint         = document.getElementById('resultsHint');
   const solo         = size.isSolo();
-  const filterActive = (size.value() !== 'all' && !solo) || _charFilterActive() || glFilterLocation !== null || !period.isAll();
+  const filterActive = (size.value() !== 'all' && !solo) || size.level() !== 'all' || _charFilterActive() || glFilterLocation !== null || !period.isAll();
   const root         = document.getElementById('root');
 
   const pillArea = document.getElementById('locationPillArea');

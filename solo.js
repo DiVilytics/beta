@@ -2,8 +2,10 @@
 // The solo variant, unofficial: "Unofficial Instructions for Solo Play" by
 // Robert Nava (v2.5.3), summarized in the FAQ (faq.html?topic=solo), its
 // villain fixes included. One villain against a Phantom player (the game):
-// reach the Objective within 20 turns to win. A solo game (games.variant
-// 'solo') has one seat, its creator's, won (is_winner) or lost.
+// reach the Objective within the level's turns to win. A solo game
+// (games.variant 'solo') has one seat, its creator's, won (is_winner) or lost,
+// a difficulty level (games.solo_level) and the rounds it took (num_turns: the
+// one it was won on, or the level's last when lost).
 //
 // Solo games never count with the official ones: the database's statistics
 // skip them, and so does fetchGamesWithPlayers (db.js). The pages show them
@@ -11,8 +13,71 @@
 // with statistics computed here from all of them. Depends on db, _fetchAllRows
 // (db.js), t (lang.js).
 
-const SOLO_MAX_TURNS = 20;
 const SOLO_FAQ_HREF  = 'faq.html?topic=solo';
+
+// The difficulty levels (games.solo_level), the solo rules' optional
+// difficulty: the turns you have, and the results of the Phantom's 10-sided
+// die that Fate you (1 to `fate`). Green, yellow and red wherever they show.
+// Never redefine one: a recorded game keeps its meaning (a new level gets a
+// new id).
+const SOLO_LEVELS = {
+  easy:   { turns: 25, fate: 2 },
+  medium: { turns: 20, fate: 4 },   // the rules as written
+  hard:   { turns: 15, fate: 6 },
+};
+const SOLO_LEVEL_IDS     = Object.keys(SOLO_LEVELS);
+const SOLO_DEFAULT_LEVEL = 'medium';
+const SOLO_DIE           = 10;
+
+// A game's level (one recorded before the levels was medium).
+const soloLevelOf = g => SOLO_LEVELS[g?.solo_level] ? g.solo_level : SOLO_DEFAULT_LEVEL;
+
+function soloLevelName(id) {
+  return { easy: t('Easy'), medium: t('Medium'), hard: t('Hard') }[id] || '';
+}
+
+// "20 rounds | Fated on 1-4": what a level means.
+function soloLevelRule(id) {
+  const l = SOLO_LEVELS[id];
+  return `${tn(l.turns, '{n} round', '{n} rounds')} | ${t('Fated on 1-{n}', { n: l.fate })}`;
+}
+
+// The level's name after its colored dot.
+function soloLevelTagHTML(id) {
+  return `<span class="solo-level lvl-${id}"><span class="lvl-dot" aria-hidden="true"></span>${_esc(soloLevelName(id))}</span>`;
+}
+
+// The level row under Solo (size-filter.js, the villain page): All, then the
+// three levels, dashed like Solo. `onPick` is the name of the function that
+// takes the picked id ('all' or a level).
+function soloLevelPillsHTML(current, onPick) {
+  const pill = (id, label) => `<button class="pill pill-solo${id === 'all' ? '' : ` lvl-${id}`}${current === id ? ' on' : ''}" type="button" data-level="${id}"${onPick ? ` onclick="${onPick}('${id}')"` : ''}>${id === 'all' ? '' : '<span class="lvl-dot" aria-hidden="true"></span>'}${_esc(label)}</button>`;
+  return pill('all', t('All')) + SOLO_LEVEL_IDS.map(id => pill(id, soloLevelName(id))).join('');
+}
+
+// The level picker (New Game, a game's details): a segment per level, the
+// rule of the one picked under it. `onPick` is the name of the function that
+// takes the level's id.
+function soloLevelSegHTML(current, onPick) {
+  const btn = id => `<button class="seg-btn lvl-${id}${id === current ? ' on' : ''}" type="button" aria-pressed="${id === current}" onclick="${onPick}('${id}')"><span class="lvl-dot" aria-hidden="true"></span>${_esc(soloLevelName(id))}</button>`;
+  return `<div class="seg solo-level-seg" role="group" aria-label="${_esc(t('Difficulty'))}">${SOLO_LEVEL_IDS.map(btn).join('')}</div>
+    <p class="solo-level-rule">${_esc(soloLevelRule(current))}</p>`;
+}
+
+// A fair roll of the Phantom's 10-sided die: 1…SOLO_DIE.
+function soloRollDie() {
+  const a = new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return 1 + (a[0] % SOLO_DIE);
+}
+
+// The games of one level ('all': every one).
+function soloOfLevel({ games, players }, level) {
+  if (!SOLO_LEVELS[level]) return { games, players };
+  const kept = games.filter(g => soloLevelOf(g) === level);
+  const ids  = new Set(kept.map(g => g.id));
+  return { games: kept, players: players.filter(p => ids.has(p.game_id)) };
+}
 
 let _soloGames = null;
 
@@ -57,16 +122,22 @@ function soloRankRows(players, key) {
   return Object.values(by);
 }
 
-// The summary boxes' numbers: { games, avg_duration, avg_turns }.
-function soloSummary(games) {
+// The summary boxes' numbers: { games, avg_duration, avg_turns }. The rounds
+// are those of the games won (a lost game always runs to its last round):
+// how quickly the Objective is reached. `wonIds` holds their ids.
+function soloSummary(games, wonIds) {
   return {
     games:        games.length,
     avg_duration: avg(games.map(g => g.duration_minutes)),
-    avg_turns:    avg(games.map(g => g.num_turns)),
+    avg_turns:    avg(games.filter(g => wonIds.has(g.id)).map(g => g.num_turns)),
   };
 }
 
+// The ids of the games won, from their seats.
+const soloWonIds = players => new Set(players.filter(p => p.is_winner).map(p => p.game_id));
+
 // What Solo is, wherever it's picked (the filters, New Game).
 function soloHintHTML() {
-  return `<p class="results-hint solo-hint">${t('Solo variant, unofficial: one villain against the game, {n} turns to reach the Objective. Counted only under Solo, never with the other games.', { n: SOLO_MAX_TURNS })} <a href="${SOLO_FAQ_HREF}">${t('Solo rules')} ›</a></p>`;
+  const [e, m, h] = SOLO_LEVEL_IDS.map(id => SOLO_LEVELS[id].turns);
+  return `<p class="results-hint solo-hint">${t('Solo variant, unofficial: one villain against the game, {easy}, {medium} or {hard} turns to reach the Objective (Easy, Medium, Hard). Counted only under Solo, never with the other games.', { easy: e, medium: m, hard: h })} <a href="${SOLO_FAQ_HREF}">${t('Solo rules')} ›</a></p>`;
 }

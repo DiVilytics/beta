@@ -77,6 +77,11 @@
   --pace-orange: #fb923c;
   --pace-red:    #e05454;
   --pace-gray:   #9ca3af;
+
+  /* Solo difficulty levels (solo.js): green, yellow, red. */
+  --lvl-easy:   #4ade80;
+  --lvl-medium: #facc15;
+  --lvl-hard:   #e05454;
 }
 
 [data-theme="light"] {
@@ -91,6 +96,9 @@
   --muted: #555;
   --dim: #bbb;
   --gold: #e6a200;
+  --lvl-easy:   #16a34a;
+  --lvl-medium: #ca8a04;
+  --lvl-hard:   #dc2626;
 }
 
 /* ── RESET ────────────────────────────────────────────────────────── */
@@ -495,6 +503,29 @@ a.pace-dot:hover { transform: scale(1.3); }
   letter-spacing: 0.06em;
   margin-top: 2px;
 }
+/* Solo: the round out of the level's ("7/20"), and the Phantom's die under the
+   counter, in the level's color: filled when it Fates you. */
+.live-turn-max { font-size: 0.5em; color: var(--muted); font-weight: 600; }
+.live-die { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 auto 16px; }
+.die-face {
+  width: 56px; height: 56px; flex: none;
+  display: grid; place-items: center;
+  border: 2px solid var(--lvl); border-radius: 12px; background: var(--s2);
+  font-size: calc(26px * var(--ts)); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.live-die.unrolled .die-face { color: var(--dim); border-style: dashed; }
+.live-die.fated .die-face { background: var(--lvl); color: #111; }
+.die-face.rolling { animation: dieTumble 0.5s ease-in-out; }
+@keyframes dieTumble {
+  0%, 100% { transform: rotate(0); }
+  25%      { transform: rotate(-14deg) scale(1.06); }
+  50%      { transform: rotate(10deg); }
+  75%      { transform: rotate(-6deg) scale(1.03); }
+}
+.die-text { display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
+.die-text strong { font-size: calc(16px * var(--ts)); }
+.die-text span { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.die-text .die-last { color: var(--text); }
 .live-hint {
   text-align: center;
   font-size: calc(12px * var(--ts));
@@ -2360,6 +2391,31 @@ select:disabled {
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }
 .solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
+/* Solo's difficulty levels (solo.js): a colored dot before the name, in the
+   level filter under Solo (dashed, the selected one bordered in its color), the
+   pickers (New Game, a game's details) and on solo games. */
+.lvl-easy   { --lvl: var(--lvl-easy); }
+.lvl-medium { --lvl: var(--lvl-medium); }
+.lvl-hard   { --lvl: var(--lvl-hard); }
+.lvl-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lvl); flex: none; }
+.solo-level { display: inline-flex; align-items: center; gap: 5px; }
+/* A little tighter than the other pills: the four fit one phone line in Italian too. */
+.pill[data-level] { display: inline-flex; align-items: center; gap: 5px; padding: 0 10px; }
+.pill.pill-solo.on[data-level]:not([data-level="all"]) { border-color: var(--lvl); }
+.cs-solo-levels { margin: -6px 0 12px; }
+.solo-level-pick { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#soloLevelNg { margin-top: 12px; }
+.field .solo-level-pick { align-items: flex-start; }
+.solo-level-seg { border-style: dashed; border-color: var(--s4); }
+.solo-level-seg .seg-btn { display: inline-flex; align-items: center; gap: 6px; }
+.solo-level-seg .seg-btn.on { box-shadow: inset 0 0 0 1px var(--lvl); }
+.solo-level-rule { font-size: calc(12px * var(--ts)); color: var(--muted); }
+/* New Game, after + on the last round: the game stopped, lost. */
+.solo-end-note {
+  border: 1px dashed var(--s4); border-radius: var(--r);
+  padding: 10px 14px; margin-bottom: 16px;
+  text-align: center; font-size: calc(13px * var(--ts)); color: var(--text);
+}
 /* The villain page's table (villains.js): a row shows its numbers in the boxes
    on top when tapped; the selected one is marked. Solo sits under it, dashed. */
 .cs-row { cursor: pointer; }

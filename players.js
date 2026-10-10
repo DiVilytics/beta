@@ -81,10 +81,11 @@ async function init() {
   if (saved) {
     pfMode = saved.mode; pfWinsOnly = saved.winsOnly; pfLocationFilter = saved.location; pfAchAll = !!saved.achAll;
     size.set(saved.filter);
+    size.setLevel(saved.level);
     period.set(saved.period);
   }
   keepViewState(() => ({
-    filter: size.value(), mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter, achAll: pfAchAll,
+    filter: size.value(), level: size.level(), mode: pfMode, winsOnly: pfWinsOnly, location: pfLocationFilter, achAll: pfAchAll,
     period: period.get(), limit: pfDisplayLimit,
   }));
 
@@ -268,8 +269,9 @@ function _attachPlayerSearch() {
   });
 }
 
-// The games the page is showing: the official ones, or on Solo the solo ones.
-const _pfData = () => size.isSolo() ? pfSolo : { games: pfGames, players: pfPlayers };
+// The games the page is showing: the official ones, or on Solo the solo ones
+// of the level picked.
+const _pfData = () => size.isSolo() ? soloOfLevel(pfSolo, size.level()) : { games: pfGames, players: pfPlayers };
 
 function pfFilteredGameIds() {
   let { games, players } = _pfData();
@@ -331,7 +333,9 @@ function render() {
   const onBestStreak = reachesToday && bestStreak > 0 && streakRun === bestStreak;
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
-  const avgTurns = avg(games.map(g => g.num_turns));
+  // Solo: the rounds of the games won (a lost one runs to its last round).
+  const wonIds   = solo && soloWonIds(mine);
+  const avgTurns = avg((solo ? games.filter(g => wonIds.has(g.id)) : games).map(g => g.num_turns));
 
   setAchievementsContext({
     ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
@@ -348,7 +352,7 @@ function render() {
   if (!nGames) {
     root.innerHTML = solo && !pfSolo.games.length
       ? `${soloHint}<div class="empty"><div class="empty-icon">🎲</div><h3>${t('No solo games yet')}</h3><p>${t("{nick} hasn't recorded any solo games.", { nick: _esc(pfNick) })}</p></div>`
-      : data.games.length
+      : data.games.length || solo
       ? `${soloHint}<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
         ${friends}
         ${achHTML}`
@@ -371,7 +375,7 @@ function render() {
       ${statBoxesHTML([
         { val: nGames,       lbl: t('Games') },
         { val: avgDur   != null ? Math.round(avgDur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: t('Avg rounds') },
+        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
         { val: winPct + '%', lbl: t('Win rate') },
         { val: wins,         lbl: t('Wins') },
         { val: bestStreak,   lbl: t('Max streak'), hot: onBestStreak, title: onBestStreak ? t('Currently on this streak') : '' },
