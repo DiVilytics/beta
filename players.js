@@ -203,6 +203,26 @@ function _friendsSectionHTML() {
     <div class="pf-friends">${rows}</div>`;
 }
 
+// The achievements: the earned ones, or every one with Show all (the pill in
+// their header, like Wins only on the games).
+function _achievementsHTML() {
+  return achievementsSectionHTML({
+    ach: pfAch, chars: pfAllChars, boxInfo: pfBoxInfo, global: pfGlobal,
+    onlyEarned: !pfAchAll,
+    header: (earned, total) => `
+      <div class="pf-games-header">
+        <span class="pf-games-title">${t('Achievements')} | ${earned} / ${total}</span>
+        <button class="pill${pfAchAll ? ' on' : ''}" onclick="pfToggleAchAll()" type="button">${t('Show all')}</button>
+      </div>`,
+  });
+}
+
+function pfToggleAchAll() {
+  pfAchAll = !pfAchAll;
+  const box = document.getElementById('pfAch');
+  if (box) box.innerHTML = _achievementsHTML();
+}
+
 // ── CONTROLS ──────────────────────────────────────────────────────────────────
 
 function pfSetMode(m) {
