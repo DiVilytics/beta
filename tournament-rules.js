@@ -9,7 +9,7 @@
 //
 //   TOURNAMENT_PAIRINGS[id]       { name, hint, tables(players, ctx) }: the
 //                                 stage's tables, [[playerId, ...], ...]
-//   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size) }
+//   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat) }
 //   TOURNAMENT_VILLAIN_DRAWS[id]  { schedule(playerIds, pool, stages) }: every
 //                                 player's villain in every stage
 //   TOURNAMENT_TIEBREAKS          [{ id, name, value(row) }], in order
@@ -23,7 +23,7 @@
 //
 // A tour is a tournaments row ({ table_size, stages, pairing, scoring,
 // villain_pool }); a table is { stage, saved_at, seats: [{ player_id,
-// position, character, place, minutes, round }] }; a player is a
+// position, character, place, minutes, round, dropped }] }; a player is a
 // tournament_players row ({ id, name, user_id, withdrawn_after }): players are
 // their ids here, claimed or not.
 
@@ -152,13 +152,14 @@ const TOURNAMENT_PAIRINGS = {
 };
 
 // ── Scoring ──────────────────────────────────────────────────────────────────
-// points(place, n, size): what place (1 = first) at a table of n players
-// scores, size being the tournament's largest table; n = 1 is a bye.
+// points(place, n, size, seat): what place (1 = first) at a table of n
+// players scores, size being the tournament's largest table; n = 1 is a bye.
+// seat.dropped: the place was a drop (the last free one when they left).
 
 const TOURNAMENT_SCORINGS = {
   borda: {
     name: 'Borda count',
-    hint: 'At a table of n players, 1st scores n - 1, 2nd n - 2, down to 0 for last; a smaller table scales to the largest, so its 1st scores the same. A bye counts as last: 0.',
+    hint: 'At a table of n players, 1st scores n - 1, 2nd n - 2, down to 0 for last; a smaller table scales to the largest, so its 1st scores the same. A drop scores its place; a bye counts as last: 0.',
     points(place, n, size) {
       if (n === 1) return 0;   // a bye: last
       return (n - place) / (n - 1) * (size - 1);
@@ -214,7 +215,7 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
     for (const s of tb.seats) {
       if (s.place == null) continue;
       const r = row(s.player_id);
-      r.points += scoring.points(s.place, n, tour.table_size);
+      r.points += scoring.points(s.place, n, tour.table_size, s);
       if (n === 1) { r.byes++; continue; }
       r.played++;
       if (s.place === 1) r.firsts++;
