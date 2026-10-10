@@ -2381,6 +2381,8 @@ select:disabled {
 /* The size row (size-filter.js) never wraps: where even so it doesn't fit, the
    Difficulty menu, last, gives way and cuts its label short. */
 .size-row { flex-wrap: nowrap; }
+/* All and Players on the left, Solo and Difficulty, a world apart, on the right. */
+.size-row > [data-size="solo"] { margin-left: auto; }
 .size-row > .period-pill-wrap:last-child { flex: 0 1 auto; min-width: 0; }
 .size-row > .period-pill-wrap:last-child .period-pill { width: 100%; min-width: 0; text-overflow: ellipsis; }
 /* No field-style focus ring after a pick with the mouse; keyboard focus keeps it. */
