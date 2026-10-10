@@ -243,10 +243,12 @@ function tnRenderTournament() {
       <div class="claim-meta">${status}</div>
     </div>
     <div class="claim-share-row">${actions}</div>
-    ${lobby ? '' : _tnStageHTML(mine)}
-    <div class="section-label">${t('Players')}</div>
-    ${tnPlayers.length ? `<div class="claim-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
-    ${_tnJoinHTML(ctx)}
+    ${lobby ? '' : _tnViewSegHTML()}
+    ${lobby || tnView === 'tables' ? `
+      ${lobby ? '' : _tnStageHTML(mine)}
+      <div class="section-label">${t('Players')}</div>
+      ${tnPlayers.length ? `<div class="claim-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
+      ${_tnJoinHTML(ctx)}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
     ${isOrg ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button></div>` : ''}`;
 }
 
@@ -267,6 +269,8 @@ function _tnPlayerRowHTML(p, { user, isOrg, lobby, mine }) {
     canClaim ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnClaim('${p.id}')">${t("That's me")}</button>` : '',
     isMine   ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnRelease('${p.id}')">${t('Release')}</button>` : '',
     isOrg && lobby ? `<button class="pf-btn del" type="button" onclick="tnRemove('${p.id}')" title="${t('Remove')}">❌</button>` : '',
+    isOrg && !lobby && !tnTour.finished_at
+      ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnWithdraw('${p.id}', ${p.withdrawn_after == null})">${p.withdrawn_after == null ? t('Withdraw') : t('Bring back')}</button>` : '',
   ].join('');
   return `
     <div class="claim-row${isMine ? ' mine' : ''}">
@@ -303,7 +307,20 @@ function _tnStageHTML(mine) {
   const saved  = tables.filter(tb => tb.saved_at).length;
   return `
     <div class="section-label">${t('Stage {n} of {m}', { n: stage, m: tnTour.stages })} | ${t('{n} of {m} tables saved', { n: saved, m: tables.length })}</div>
-    <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>`;
+    <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>
+    ${_tnNextStageHTML(tables)}`;
+}
+
+// The organizer's Next stage: once every table of the stage is saved.
+function _tnNextStageHTML(tables) {
+  const user = getCurrentUser();
+  if (!user || user.id !== tnTour.organizer || tnTour.finished_at || tnTour.current_stage >= tnTour.stages) return '';
+  const ready = tables.every(tb => tb.saved_at);
+  return `
+    <div class="claim-share-row">
+      <button class="btn btn-primary btn-sm" type="button" onclick="tnNextStage()"${ready ? '' : ' disabled'}>${t('Draw stage {n}', { n: tnTour.current_stage + 1 })}</button>
+    </div>
+    ${ready ? '' : `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>`}`;
 }
 
 // A table, drawn like a game card: its players in play order with their
@@ -327,7 +344,7 @@ function _tnTableHTML(tb, myId) {
         <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(s.character)}">${charImgHTML(s.character)}</a>
         <div class="chip-body">
           <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(s.character)}">${villainNameHTML(s.character)}</a></div>
-          <div class="chip-nick">${_esc(name)}${s.dropped ? ` | ${t('Dropped')}` : ''}</div>
+          <div class="chip-nick">${[_esc(name), s.dropped ? t('Dropped') : null, tb.saved_at ? _tnPointsLabel(_tnSeatPoints(tb, s)) : null].filter(Boolean).join(' | ')}</div>
         </div>
         ${won ? '<span class="win-star">👑</span>' : ''}
       </div>`;
@@ -591,6 +608,7 @@ let liveTimerId = null;
 let tnSaveTimer = null;
 
 Object.assign(TN_ERRORS, {
+  table_not_saved: 'Only a saved table can be edited.',
   not_at_table:    'Only the players at this table who claimed their name, or the organizer, can record it.',
   table_taken:     'Another phone is already recording this table.',
   not_recorder:    'Another phone records this table now (the organizer took it over).',
@@ -613,6 +631,12 @@ function _tnCanRecord(tb) {
 // The table card's button: Resume on the phone that runs it; Start game when
 // nobody records it (or you do, from another session); Take over for the organizer.
 function _tnTableActionHTML(tb) {
+  if (tb.saved_at) {
+    if (!tb.game_id) return '';
+    const isOrg = getCurrentUser()?.id === tnTour.organizer;
+    return `<a class="btn btn-ghost btn-sm" href="claim.html?game=${tb.game_id}">${t('Open game')}</a>`
+      + (isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Edit result')}</button>` : '');
+  }
   const saved = _tnSavedGame();
   if (saved?.tournament?.tableId === tb.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnResumeTable()">${t('Resume game')}</button>`;
   if (!_tnCanRecord(tb)) return '';
@@ -860,6 +884,143 @@ function tnDiscardGame() {
       updateLiveGameNavBadge();
       _tnCloseLive();
       await tnLoad(tourId);
+    },
+  });
+}
+
+// ── STANDINGS, LOG, NEXT STAGE ────────────────────────────────────────────────
+// Once started: Tables (the current stage and the players), Standings (the
+// ranking by the tournament's scoring and tiebreaks, tournament-rules.js) and
+// Log (every stage's tables, places and points). A finished tournament opens on
+// its final standings.
+
+let tnView = null;   // 'tables' | 'standings' | 'log' (null: the default for the tournament)
+
+function _tnViewSegHTML() {
+  if (!tnView) tnView = tnTour.finished_at ? 'standings' : 'tables';
+  const btn = (v, label) => `<button class="seg-btn${tnView === v ? ' on' : ''}" type="button" onclick="tnSetView('${v}')">${label}</button>`;
+  return `<div class="controls mb-1"><div class="seg tn-view-seg">${btn('tables', t('Tables'))}${btn('standings', tnTour.finished_at ? t('Final ranking') : t('Standings'))}${btn('log', t('Log'))}</div></div>`;
+}
+
+function tnSetView(v) {
+  tnView = v;
+  tnRenderTournament();
+}
+
+function _tnSeatPoints(tb, seat) {
+  const scoring = TOURNAMENT_SCORINGS[tnTour.scoring] || TOURNAMENT_SCORINGS.borda;
+  return scoring.points(seat.place, tb.seats.length, tnTour.table_size, seat);
+}
+const _tnPointsLabel = p => t(p === 1 ? '{n} pt' : '{n} pts', { n: fmtTournamentPoints(p) });
+
+// The standings, drawn like the Leaderboard's table: rank (medals for the
+// top three), player, points with their 1st places in parentheses, a bar.
+function _tnStandingsHTML(mine) {
+  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
+  if (!rows.some(r => r.played || r.byes)) return emptyStateHTML('🏟️', t('No results yet'), t('The standings fill in as the tables are saved.'));
+  const byId = new Map(tnPlayers.map(p => [p.id, p]));
+  const max = Math.max(...rows.map(r => r.points)) || 1;
+  const medal = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+  const digits = String(Math.max(0, ...rows.map(r => r.firsts))).length;
+  const body = rows.map(r => {
+    const p = byId.get(r.player_id);
+    const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
+    const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
+    const sub = [
+      p?.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after }) : null,
+      t("Opponents' points: {n}", { n: fmtTournamentPoints(r.opponents) }),
+    ].filter(Boolean).join(' | ');
+    return `
+      <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
+        <div class="rank-num ${medal(r.rank)}">${r.rank}</div>
+        <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(p?.name || '')}</span><div class="row-sub">${sub}</div></div></div>
+        <div class="row-val row-val-stack">
+          <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
+          <div class="bar-bg"><div class="bar-fill${r.rank === 1 ? ' gold' : ''}" style="width:${Math.max(0, r.points / max * 100)}%"></div></div>
+        </div>
+      </div>`;
+  }).join('');
+  const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
+  return `
+    <div class="lb-table tn-standings" style="--sv-games: calc(${digits} * 0.6em + 0.65em)">
+      <div class="lb-head"><span>#</span><span>${t('Player')}</span><span class="text-right">${t('Points')} <span class="lb-head-sub">(${t('1st places')})</span></span></div>
+      ${body}
+    </div>
+    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}</p>`;
+}
+
+// Every stage's tables, in order, with places and points.
+function _tnLogHTML(mine) {
+  const myId = mine?.id;
+  const out = [];
+  for (let st = 1; st <= tnTour.current_stage; st++) {
+    const tables = tnTables.filter(tb => tb.stage === st);
+    out.push(`<div class="section-label">${t('Stage {n} of {m}', { n: st, m: tnTour.stages })}</div>
+      <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>`);
+  }
+  return out.join('');
+}
+
+function tnNextStage() {
+  const next = tnTour.current_stage + 1;
+  const playing = tnPlayers.filter(p => p.withdrawn_after == null);
+  const sizes = tournamentSplit(playing.length, tnTour.table_size);
+  openConfirmSheet({
+    id:           'tnNextSheet',
+    title:        t('Draw stage {n}?', { n: next }),
+    bodyHTML:     `<p class="confirm-text">${t('{players} still playing: {tables}.', { players: tn(playing.length, '{n} player', '{n} players'), tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
+    confirmLabel: t('Draw stage {n}', { n: next }),
+    busyLabel:    t('Drawing…'),
+    onConfirm:    async () => {
+      const tables = tournamentDrawStage(tnTour, tnPlayers, tnTables);
+      const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables });
+      tnView = 'tables';
+      await _tnAfter(error);
+    },
+  });
+}
+
+async function tnWithdraw(playerId, withdrawn) {
+  const { error } = await db.rpc('withdraw_tournament_player', { target_player: playerId, withdrawn });
+  await _tnAfter(error);
+}
+
+// The organizer fixes a saved table: each seat's place and whether it dropped.
+function tnEditTable(tableId) {
+  const tb = tnTables.find(x => x.id === tableId);
+  if (!tb) return;
+  const byId = new Map(tnPlayers.map(p => [p.id, p]));
+  const n = tb.seats.length;
+  const rows = tb.seats.slice().sort((a, b) => a.place - b.place).map(s => `
+    <div class="tn-edit-row" data-pos="${s.position}">
+      ${charImgHTML(s.character)}
+      <div class="claim-who"><div class="claim-name">${villainNameHTML(s.character)}</div><div class="claim-nick">${_esc(byId.get(s.player_id)?.name || '')}</div></div>
+      <select class="tn-edit-place">${Array.from({ length: n }, (_, i) => `<option value="${i + 1}"${s.place === i + 1 ? ' selected' : ''}>${fmtPlace(i + 1)}</option>`).join('')}</select>
+      <label class="tn-edit-drop"><input type="checkbox"${s.dropped ? ' checked' : ''}> ${t('Dropped')}</label>
+    </div>`).join('');
+  openConfirmSheet({
+    id:           'tnEditSheet',
+    title:        t('Table {n}', { n: tb.table_no }),
+    bodyHTML:     `<p class="modal-hint">${t('Fix the places and the drops. Drops take the bottom places; the standard game follows (1st place won it).')}</p>
+                   <div class="err" id="tnEditErr"></div><div class="tn-edit-rows">${rows}</div>`,
+    confirmLabel: t('Save Changes'),
+    busyLabel:    t('Saving…'),
+    onConfirm:    async () => {
+      const results = [...document.querySelectorAll('#tnEditSheet .tn-edit-row')].map(r => ({
+        position: +r.dataset.pos,
+        place:    +r.querySelector('.tn-edit-place').value,
+        dropped:  r.querySelector('.tn-edit-drop input').checked,
+      }));
+      const places = new Set(results.map(r => r.place));
+      const maxWin = Math.max(0, ...results.filter(r => !r.dropped).map(r => r.place));
+      const minDrop = Math.min(n + 1, ...results.filter(r => r.dropped).map(r => r.place));
+      const msg = places.size !== n ? t('Each villain needs a different place.')
+        : !(maxWin < minDrop) || results.every(r => r.dropped) ? t('Drops take the bottom places, and someone finishes 1st.')
+        : null;
+      if (msg) { showError('tnEditErr', msg); throw new Error(msg); }
+      const { error } = await db.rpc('edit_tournament_table', { target_table: tableId, results });
+      if (error) { showError('tnEditErr', _tnErrorMsg(error)); throw error; }
+      await tnLoad(tnTour.id);
     },
   });
 }
