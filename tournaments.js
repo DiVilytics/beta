@@ -220,7 +220,7 @@ function tnRenderTournament() {
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
   const settings = [
     t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') }),
-    t('{n} per table', { n: tnTour.table_size }),
+    t('Up to {n} per table', { n: tnTour.table_size }),
     tn(tnTour.stages, '{n} stage', '{n} stages'),
     pairing ? t(pairing.name) : _esc(tnTour.pairing),
     scoring ? t(scoring.name) : _esc(tnTour.scoring),
@@ -774,13 +774,17 @@ function _tnPlace(position, dropped) {
   const { top, bottom } = _tnPlaces();
   const ms = liveGame.isRunning ? liveGame.elapsedMs : (liveGame.exactDurMs || 0);
   tnGame.actions.push({ position, place: dropped ? bottom : top, minutes: Math.round(ms / 60000), round: liveGame.turns, dropped });
-  if (_tnPlaces().done) stopLive();   // one left: the game is over
+  // One left: the game is over and stops by itself (an undo starts it again).
+  if (_tnPlaces().done && liveGame.isRunning) { stopLive(); tnGame.autoStopped = true; }
   _tnPersist();
   _tnRenderLive();
 }
 
+// Undoing the placement that ended the game: the timer goes on from where it
+// stopped by itself (a game paused by hand stays paused).
 function tnUndoLast() {
   tnGame.actions.pop();
+  if (tnGame.autoStopped) { tnGame.autoStopped = false; startLive(); }
   _tnPersist();
   _tnRenderLive();
 }
@@ -816,7 +820,7 @@ function liveMediaLines() {
   return { title: t('Round {n}', { n: liveGame.turns }), artist: t('Update Timer and Rounds') };
 }
 
-function tnTogglePause() { liveGame.isRunning ? stopLive() : startLive(); }
+function tnTogglePause() { tnGame.autoStopped = false; liveGame.isRunning ? stopLive() : startLive(); }
 
 async function tnSaveGame() {
   const { results, done } = _tnPlaces();
