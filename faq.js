@@ -169,7 +169,7 @@ function _resultsHTML(q) {
     if (items.length) groups.push({ title: `<a class="faq-title-link" href="${_faqHref(v)}">${_hl(villainName(v), re)}</a>`, items });
   }
   const total = groups.reduce((n, g) => n + g.items.length, 0);
-  if (!total) return `<div class="empty"><h3>${t('No results')}</h3><p>${t('Nothing in the FAQ matches “{query}”.', { query: _esc(q.trim()) })}</p></div>`;
+  if (!total) return emptyStateHTML('🔍', t('No results'), t('Nothing in the FAQ matches “{query}”.', { query: _esc(q.trim()) }));
   return `<p class="faq-count">${tn(total, '{n} result', '{n} results')}</p>` + groups.map(g => `
     <div class="faq-group">
       <h2 class="home-faq-title">${g.title}</h2>
@@ -186,7 +186,7 @@ function render() {
   else if (faqTopic === FAQ_GENERAL) root.innerHTML = _generalHTML();
   else if (_rulebooks()[faqTopic])   root.innerHTML = _rulebookHTML(faqTopic);
   else if (faqTopic)              root.innerHTML = _villainHTML(faqTopic);
-  else root.innerHTML = `${_BACK_HTML}<div class="empty"><h3>${t('Topic not found')}</h3><p>${_esc(new URLSearchParams(location.search).get('topic') || '')}</p></div>`;
+  else root.innerHTML = _BACK_HTML + emptyStateHTML('⚠️', t('Topic not found'), t('“{topic}” isn\'t a topic of the F.A.Q.', { topic: _esc(new URLSearchParams(location.search).get('topic') || '') }));
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
@@ -199,7 +199,7 @@ async function init() {
   if (!faqData.general || !faqData.villains) {
     const root = document.getElementById('faqRoot');
     root.className = '';
-    root.innerHTML = `<div class="empty"><h3>${t("Couldn't load the FAQ")}</h3><p>${t('Try reloading the page.')}</p></div>`;
+    root.innerHTML = loadErrorHTML(t("Couldn't load the FAQ"));
     return;
   }
 

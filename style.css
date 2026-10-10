@@ -1456,7 +1456,6 @@ select:disabled {
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
 
-.empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: calc(13px * var(--ts)); }
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */
 .char-portrait {

@@ -152,7 +152,7 @@ async function renderDetailPage(charName) {
   csChar     = csAllChars.find(c => c.name === charName);
 
   if (!csChar) {
-    _showCsEmpty(`<div class="empty"><h3>${t('Villain not found')}</h3><p>${_esc(charName)}</p></div>`);
+    _showCsEmpty(emptyStateHTML('⚠️', t('Villain not found'), t('“{name}” isn\'t a villain on DiVilytics.', { name: _esc(charName) })));
     return;
   }
 
@@ -174,14 +174,14 @@ async function renderDetailPage(charName) {
 
   if (error) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`);
+    _showCsEmpty(loadErrorHTML(t("Couldn't load the stats"), error));
     renderExtras();
     return;
   }
 
   if (!buckets || !buckets.length) {
     csLoading = false;
-    _showCsEmpty(`<div class="empty"><div class="empty-icon">🎭</div><h3>${t('No games yet')}</h3><p>${t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })}</p></div>`);
+    _showCsEmpty(emptyStateHTML('⚔️', t('No games yet'), t("{villain} hasn't been played in any recorded games.", { villain: _esc(villainName(csChar.name)) })));
     renderExtras();
     return;
   }

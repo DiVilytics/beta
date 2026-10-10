@@ -221,6 +221,22 @@ function clearError(target) {
   _resolveEl(target)?.classList.remove('show');
 }
 
+// An empty page, or one that went wrong: the card with an icon, a title, a line
+// of text and an optional action (a button's HTML). One icon per meaning,
+// everywhere: ⚔️ no games yet, 🔍 nothing found, 👤 players and nicknames,
+// 🔑 sign in, ⚠️ something went wrong. Title and text come translated, and
+// escaped where they hold what someone typed.
+function emptyStateHTML(icon, title, text = '', action = '') {
+  return `<div class="empty"><div class="empty-icon">${icon}</div><h3>${title}</h3>${text ? `<p>${text}</p>` : ''}${action}</div>`;
+}
+
+// What couldn't load: ⚠️, its title and to try again. The error itself goes to
+// the console (it means nothing to players).
+function loadErrorHTML(title, error) {
+  if (error) console.warn(title, error);
+  return emptyStateHTML('⚠️', title, t('Try reloading the page.'));
+}
+
 // ── OVERLAYS ──────────────────────────────────────────────────────────────────
 
 // ── SEPARATED ROWS ────────────────────────────────────────────────────────────

@@ -125,8 +125,7 @@ async function load(reset = true) {
   if (token !== _loadToken) return;
 
   if (error) {
-    document.getElementById('root').innerHTML =
-      `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
+    document.getElementById('root').innerHTML = loadErrorHTML(t("Couldn't load the games"), error);
     return;
   }
 
@@ -322,15 +321,10 @@ function render() {
     hint.textContent = '';
     root.className = '';
     if (!filterActive) {
-      root.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🕒</div>
-          <h3>${t('No games yet')}</h3>
-          <p>${t('Record your first game to get started.')}</p>
-          <a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>
-        </div>`;
+      root.innerHTML = emptyStateHTML('⚔️', t('No games yet'), t('Record your first game to get started.'),
+        `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
     } else {
-      root.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No matches')}</h3><p>${t('Try adjusting the filters.')}</p></div>`;
+      root.innerHTML = emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     }
     return;
   }

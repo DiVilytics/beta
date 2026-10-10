@@ -44,7 +44,7 @@ async function init() {
   const gameId = params.get('game');
 
   if (!gameId) {
-    return showClaimError(t('No game specified.'));
+    return showClaimError(t('Game not found'), t("This link doesn't point to a game."));
   }
 
   const { data: game, error: gameErr } = await db
@@ -53,18 +53,16 @@ async function init() {
     .eq('id', gameId)
     .maybeSingle();
 
-  if (gameErr || !game) {
-    return showClaimError(t('Game not found.'));
-  }
+  // A malformed id (22P02: not a uuid) is a wrong link, like a missing game.
+  if (gameErr && gameErr.code !== '22P02') return showClaimError(t("Couldn't load the game"), t('Try reloading the page.'), gameErr);
+  if (!game) return showClaimError(t('Game not found'), t('It may have been deleted, or the link is wrong.'));
 
   const { data: players, error: playersErr } = await db
     .from('game_players')
     .select('*')
     .eq('game_id', gameId);
 
-  if (playersErr) {
-    return showClaimError(playersErr.message);
-  }
+  if (playersErr) return showClaimError(t("Couldn't load the game"), t('Try reloading the page.'), playersErr);
 
   claimGame    = game;
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
@@ -85,24 +83,14 @@ function render() {
   if (!claimGame) return;
 
   if (!user) {
-    root.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">🔒</div>
-        <h3>${t('Sign in to claim')}</h3>
-        <p>${t('You need to be signed in to claim your villain.')}</p>
-        <button class="btn btn-primary" onclick="goToSignIn()">${t('Sign in')}</button>
-      </div>`;
+    root.innerHTML = emptyStateHTML('🔑', t('Sign in to claim'), t('You need to be signed in to claim your villain.'),
+      `<button class="btn btn-primary" onclick="goToSignIn()">${t('Sign in')}</button>`);
     return;
   }
 
   if (!profile) {
-    root.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">👤</div>
-        <h3>${t('Set a nickname first')}</h3>
-        <p>${t('You need a nickname before you can claim a villain.')}</p>
-        <button class="btn btn-primary" onclick="_openNicknameModal()">${t('Set nickname')}</button>
-      </div>`;
+    root.innerHTML = emptyStateHTML('👤', t('Set a nickname first'), t('You need a nickname before you can claim a villain.'),
+      `<button class="btn btn-primary" onclick="_openNicknameModal()">${t('Set nickname')}</button>`);
     return;
   }
 
@@ -425,16 +413,13 @@ function _showClaimRowError(msg) {
 
 // ── ERROR ─────────────────────────────────────────────────────────────────────
 
-function showClaimError(msg) {
+// The game couldn't be shown: what happened, and the way home. A load error
+// itself goes to the console.
+function showClaimError(title, text, error) {
+  if (error) console.warn(title, error);
   const root = document.getElementById('claimRoot');
   root.className = '';
-  root.innerHTML = `
-    <div class="empty">
-      <div class="empty-icon">⚠️</div>
-      <h3>${t('Oops')}</h3>
-      <p>${msg}</p>
-      <a class="btn btn-ghost btn-sm" href="index.html">${t('Back to home')}</a>
-    </div>`;
+  root.innerHTML = emptyStateHTML('⚠️', title, text, `<a class="btn btn-ghost btn-sm" href="index.html">${t('Back to home')}</a>`);
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

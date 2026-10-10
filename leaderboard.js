@@ -133,7 +133,7 @@ async function loadAndRender() {
       summary.className = 'summary';
       summary.innerHTML = '';
       lb.className = '';
-      lb.innerHTML = `<div class="empty-state">${t("Couldn't load the leaderboard.")}</div>`;
+      lb.innerHTML = loadErrorHTML(t("Couldn't load the leaderboard"));
       return;
     }
     _lbCache[key] = data;
@@ -285,10 +285,9 @@ function render({ rows, summary }) {
 
   if (!rows.length) {
     // Players: there can be games with nobody signed in on them (imported ones).
-    const msg = games && lbTab === 'players'
-      ? t('No player has claimed a villain in these games.')
-      : t('No games match this filter.');
-    document.getElementById('lb').innerHTML = `<div class="empty-state">${msg}</div>`;
+    document.getElementById('lb').innerHTML = games && lbTab === 'players'
+      ? emptyStateHTML('👤', t('No players to rank'), t('No player has claimed a villain in these games.'))
+      : emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     return;
   }
 

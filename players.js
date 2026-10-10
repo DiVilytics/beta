@@ -51,18 +51,13 @@ async function init() {
     } else if (loggedUser && !loggedProfile) {
       document.title = `DiVilytics | ${t('Player')}`;
       document.getElementById('pfRoot').className = '';
-      document.getElementById('pfRoot').innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">👤</div>
-          <h3>${t('Welcome!')}</h3>
-          <p>${t('Choose a nickname before you can record games.')}</p>
-          <button class="btn btn-primary btn-sm" onclick="_openNicknameModal(newNick => { location.href = 'players.html?nick=' + encodeURIComponent(newNick); })">${t('Set nickname')}</button>
-        </div>`;
+      document.getElementById('pfRoot').innerHTML = emptyStateHTML('👤', t('Welcome!'), t('Choose a nickname before you can record games.'),
+        `<button class="btn btn-primary btn-sm" onclick="_openNicknameModal(newNick => { location.href = 'players.html?nick=' + encodeURIComponent(newNick); })">${t('Set nickname')}</button>`);
       return;
     } else {
       document.getElementById('pfRoot').className = '';
       document.getElementById('pfRoot').innerHTML =
-        `<div class="empty"><div class="empty-icon">👤</div><h3>${t('No player selected')}</h3><p>${t('Open a profile by tapping a nickname on the leaderboard or a game card.')}</p></div>`;
+        emptyStateHTML('👤', t('No player selected'), t('Open a profile by tapping a nickname on the leaderboard or a game card.'));
       return;
     }
   }
@@ -128,8 +123,7 @@ async function load() {
   if (error) {
     setVisible('pfControls', false);
     document.getElementById('pfRoot').className = '';
-    document.getElementById('pfRoot').innerHTML =
-      `<div class="empty"><p>${t('Error: {message}', { message: _esc(error.message) })}</p></div>`;
+    document.getElementById('pfRoot').innerHTML = loadErrorHTML(t("Couldn't load the games"), error);
     return;
   }
 
@@ -326,10 +320,10 @@ function render() {
   // player who never played has no achievements to show either.
   if (!nGames) {
     root.innerHTML = pfGames.length
-      ? `<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
+      ? `${emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'))}
         ${_friendsSectionHTML()}
         ${achHTML}`
-      : `<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No games yet')}</h3><p>${t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })}</p></div>`;
+      : emptyStateHTML('⚔️', t('No games yet'), t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) }));
     return;
   }
 
