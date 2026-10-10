@@ -765,7 +765,6 @@ window.I18N.it = {
     "Bring back": "Riammetti",
     "Draw stage {n}": "Sorteggia la fase {n}",
     "Draw stage {n}?": "Sorteggiare la fase {n}?",
-    "{players} still playing: {tables}.": "{players} ancora in gioco: {tables}.",
     "Open game": "Apri partita",
     "Edit result": "Modifica risultato",
     "Tables": "Tavoli",

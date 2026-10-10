@@ -963,12 +963,9 @@ function _tnLogHTML(mine) {
 
 function tnNextStage() {
   const next = tnTour.current_stage + 1;
-  const playing = tnPlayers.filter(p => p.withdrawn_after == null);
-  const sizes = tournamentSplit(playing.length, tnTour.table_size);
   openConfirmSheet({
     id:           'tnNextSheet',
     title:        t('Draw stage {n}?', { n: next }),
-    bodyHTML:     `<p class="confirm-text">${t('{players} still playing: {tables}.', { players: tn(playing.length, '{n} player', '{n} players'), tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
     confirmLabel: t('Draw stage {n}', { n: next }),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
