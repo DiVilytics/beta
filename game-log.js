@@ -403,7 +403,7 @@ function render() {
     if (solo && !filterActive) {
       root.innerHTML = `${soloHint}
         <div class="empty">
-          <div class="empty-icon">🎲</div>
+          <div class="empty-icon">⚔️</div>
           <h3>${t('No solo games yet')}</h3>
           <p>${t('To record one, pick Solo in New Game, where you choose the number of players.')}</p>
           <a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>

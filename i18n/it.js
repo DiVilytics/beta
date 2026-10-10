@@ -618,7 +618,6 @@ window.I18N.it = {
     "No solo games yet": "Ancora nessuna partita in solitario",
     "To record one, pick Solo in New Game, where you choose the number of players.": "Per registrarne una, scegli Solitario in Nuova partita, dove scegli il numero di giocatori.",
     "{nick} hasn't recorded any solo games.": "{nick} non ha ancora partite in solitario.",
-    "{villain} hasn't been played solo yet.": "{villain} non compare ancora in nessuna partita in solitario.",
     "Choose your villain.": "Scegli il tuo cattivo.",
     "A solo game on {level} ends by round {n}.": "Una partita in solitario a difficoltà {level} finisce entro il round {n}.",
     "The counter shows the current round: alone, every turn is a round. At the end of each of your turns tap +, and the die rolls for the Phantom: Fated or Safe. + after your last round ends the game, lost. Reached your Objective? Tap Pause game, mark 👑 and save.": "Il contatore mostra il round in corso: da soli ogni turno è un round. Alla fine di ogni tuo turno tocca +, e il dado tira per il fantasma: Fato o Al sicuro. + dopo il tuo ultimo round chiude la partita, persa. Hai raggiunto l'Obiettivo? Tocca Pausa partita, segna 👑 e salva.",

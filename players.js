@@ -351,7 +351,7 @@ function render() {
   // player who never played has no achievements to show either.
   if (!nGames) {
     root.innerHTML = solo && !pfSolo.games.length
-      ? `${soloHint}<div class="empty"><div class="empty-icon">🎲</div><h3>${t('No solo games yet')}</h3><p>${t("{nick} hasn't recorded any solo games.", { nick: _esc(pfNick) })}</p></div>`
+      ? `${soloHint}<div class="empty"><div class="empty-icon">⚔️</div><h3>${t('No solo games yet')}</h3><p>${t("{nick} hasn't recorded any solo games.", { nick: _esc(pfNick) })}</p></div>`
       : data.games.length || solo
       ? `${soloHint}<div class="empty"><div class="empty-icon">🔍</div><h3>${t('No games for this filter')}</h3><p>${t('Try adjusting the filters.')}</p></div>
         ${friends}
