@@ -250,7 +250,7 @@ function _tournamentsSectionHTML() {
       { val: gold,   lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[0]}</span>` },
       { val: silver, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[1]}</span>` },
       { val: bronze, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[2]}</span>` },
-      { val: pfTournaments.played, lbl: t('Tournaments played') },
+      { val: pfTournaments.played, lbl: t('Played') },
     ])}</div>` : ''}
     <div class="tn-list">${pfTournaments.list.map(x => tournamentCardHTML(x.tour, x)).join('')}</div>`;
 }
