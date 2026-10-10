@@ -2369,6 +2369,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-view-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
 .tn-hint-center { justify-content: center; text-align: center; }
 .tn-standings { margin-bottom: 10px; }
+.tn-medal { font-size: calc(17px * var(--ts)); line-height: 1; }
 /* The organizer's Edit result: New Game's rows (.order-slot, dragged by ⠿),
    the place where New Game has the seat number, 🏳️ for a drop. */
 .tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }

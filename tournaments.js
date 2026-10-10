@@ -244,8 +244,8 @@ function tnRenderTournament() {
     </div>
     <div class="claim-share-row">${actions}</div>
     ${lobby ? '' : _tnViewSegHTML()}
-    ${lobby || tnView === 'tables' ? `
-      ${lobby ? '' : _tnStageHTML(mine)}
+    ${lobby || tnView === 'tables' || tnView === 'players' ? `
+      ${lobby || tnView === 'players' ? '' : _tnStageHTML(mine)}
       <div class="section-label">${t('Players')}</div>
       ${tnPlayers.length ? `<div class="claim-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
       ${_tnJoinHTML(ctx)}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
@@ -894,14 +894,19 @@ function tnDiscardGame() {
 // Once started: Tables (the current stage and the players), Standings (the
 // ranking by the tournament's scoring and tiebreaks, tournament-rules.js) and
 // Log (every stage's tables, places and points). A finished tournament opens on
-// its final standings.
+// its final standings, the top three with their medals (🥇 🥈 🥉; tied places share one).
 
 let tnView = null;   // 'tables' | 'standings' | 'log' (null: the default for the tournament)
 
+// A finished tournament has no current tables: it opens on its Final ranking,
+// then the Log and the Players (whose names can still be claimed).
 function _tnViewSegHTML() {
-  if (!tnView) tnView = tnTour.finished_at ? 'standings' : 'tables';
+  const done = !!tnTour.finished_at;
+  if (!tnView || (done && tnView === 'tables')) tnView = done ? 'standings' : 'tables';
   const btn = (v, label) => `<button class="seg-btn${tnView === v ? ' on' : ''}" type="button" onclick="tnSetView('${v}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg tn-view-seg">${btn('tables', t('Tables'))}${btn('standings', tnTour.finished_at ? t('Final ranking') : t('Standings'))}${btn('log', t('Log'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg tn-view-seg">${done
+    ? btn('standings', t('Final ranking')) + btn('log', t('Log')) + btn('players', t('Players'))
+    : btn('tables', t('Tables')) + btn('standings', t('Standings')) + btn('log', t('Log'))}</div></div>`;
 }
 
 function tnSetView(v) {
@@ -934,7 +939,7 @@ function _tnStandingsHTML(mine) {
     ].filter(Boolean).join(' | ');
     return `
       <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
-        <div class="rank-num ${medal(r.rank)}">${r.rank}</div>
+        <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${['🥇', '🥈', '🥉'][r.rank - 1]}</span>` : r.rank}</div>
         <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(p?.name || '')}</span><div class="row-sub">${sub}</div></div></div>
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
