@@ -47,7 +47,7 @@
   <div class="page-header">
     <h2><span class="page-ico" aria-hidden="true">🔑</span><span id="acctTitle" data-i18n>Account</span></h2>
   </div>
-  <p class="page-intro" data-i18n>Your avatar, boxes, achievements, the beta and sign-in.</p>
+  <p class="page-intro" data-i18n>Your avatar, boxes, the beta and sign-in.</p>
 
   <div id="acctRoot" class="spinner" data-i18n>Loading…</div>
 </main>
@@ -76,18 +76,6 @@
       <button class="btn btn-ghost" onclick="closeDeleteAccount()" data-i18n>Cancel</button>
       <button class="btn btn-danger" id="delAccountBtn" onclick="confirmDeleteAccount()" disabled data-i18n>Delete my profile</button>
     </div>
-  </div>
-</div>
-
-<!-- Achievement detail sheet -->
-<div class="overlay" id="achOverlay" onclick="if(event.target===this) _closeAchOverlay()">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3 id="achTitle" data-i18n>Achievement</h3>
-      <button class="sheet-close" onclick="_closeAchOverlay()">×</button>
-    </div>
-    <div class="sheet-body" id="achBody"></div>
   </div>
 </div>
 

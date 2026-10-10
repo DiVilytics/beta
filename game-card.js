@@ -18,21 +18,26 @@ function gameUserRole(g, gp, user) {
 // render the location as a button (the caller wires the click handler).
 // `layout: 'rows'` lists the players one per row in play order (seat numbers
 // when the order was recorded, crown at the row's end) instead of wrapping chips. The purple highlight
-// always marks the signed-in player (`isSelf`), on every page.
+// always marks the signed-in player (`isSelf`), on every page. A solo game
+// (solo.js) says Solo and its level where the others give the table size, and
+// its rounds out of the level's; its card is dashed.
 function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips' } = {}) {
   const rows = layout === 'rows';
   if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   // Seat numbers only when the play order was recorded: every seat has its own
-  // position. Imported games without it keep the column, empty.
-  const ordered = gp.every(p => p.position != null) && new Set(gp.map(p => p.position)).size === gp.length;
+  // position. Imported games without it keep the column, empty, and so does a
+  // solo game (one seat).
+  const ordered = g.variant !== 'solo' && gp.every(p => p.position != null) && new Set(gp.map(p => p.position)).size === gp.length;
   const locationPart = g.location
     ? (locationClickable ? `<button class="card-loc-btn">${_esc(g.location)}</button>` : _esc(g.location))
     : null;
+  const level = g.variant === 'solo' ? soloLevelOf(g) : null;
   const meta = [
     fmtDuration(g.duration_minutes),
-    g.num_turns ? tn(g.num_turns, '{n} round', '{n} rounds') : null,
+    g.num_turns ? (level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds')) : null,
     locationPart,
-    `${gp.length}p`,
+    level ? t('Solo') : `${gp.length}p`,
+    level ? soloLevelTagHTML(level) : null,
   ].filter(Boolean);
   // Rows layout: the details may wrap, so they go in as separate items that
   // layoutGameCardMeta() splits into lines without a "|" at either end.
@@ -70,7 +75,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
 // buildGameCardHTML directly.
 function buildGameCard(g, gp, { isSelf, actions, onLocationClick, layout } = {}) {
   const card = document.createElement('div');
-  card.className = 'game-card';
+  card.className = g.variant === 'solo' ? 'game-card solo' : 'game-card';
   card.innerHTML = buildGameCardHTML(g, gp, {
     isSelf,
     actions,

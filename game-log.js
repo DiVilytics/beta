@@ -5,10 +5,12 @@ let glPlayers      = [];   // game_players for loaded glGames
 let glChars        = [];   // character list from DB
 let glBoxInfo      = {};   // loadBoxInfo(), used to order box groups by release date
 
-let glFilterCount    = 'all';   // 'all' | 2 | 3 | 4 | 5 | 6
 let glFilterLocation = null;
 
-// The period, All time / Year / Month (period-filter.js): any change reloads.
+// The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
+// time / Year / Month (period-filter.js): any change reloads. Solo lists the
+// solo games only (solo.js), never with the others.
+const size   = createSizeFilter('glSize', { onChange: () => { _capWithPicks(); _syncCharModeUI(); load(true); } });
 const period = createPeriodFilter('glPeriod', { onChange: () => load(true) });
 
 // Villain filter mode. 'only': games played entirely within the included set
@@ -19,6 +21,13 @@ const period = createPeriodFilter('glPeriod', { onChange: () => load(true) });
 // read "Among these" and "With these".
 let glCharMode     = 'only';
 let _onlySnapshot  = null;
+
+// With these picks at most as many villains as the table holds: 6, the size
+// picked (2p…6p), or 1 on Solo (a solo game has one villain). At the limit the
+// other villains gray out; a smaller limit keeps the villains picked first.
+// The same filter serves the official games and Solo.
+const _withLimit = () => size.isSolo() ? 1 : typeof size.value() === 'number' ? size.value() : TABLE_SIZES[TABLE_SIZES.length - 1];
+let _withOrder = [];   // With these: the picked villains, in the order they were picked
 
 // The "included characters" filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -61,14 +70,18 @@ async function init() {
     document.getElementById('charGrid'),
     glChars,
     pace.excluded,
-    () => { updateFilterUI(); _syncResetBtn(); },   // a single villain tapped in or out
+    (name, excluded) => {   // a single villain tapped in or out
+      if (!excluded) _capWithPicks();   // never past the limit
+      updateFilterUI();
+      _syncResetBtn();
+    },
     glBoxInfo
   );
   // A language switch brings back the filters and the games loaded (lang.js).
   const saved = takeViewState();
   if (saved) {
-    glFilterCount = saved.count;
-    updateFilterPills('#countPills .pill', glFilterCount);
+    size.set(saved.count);
+    size.setLevel(saved.level);
     glFilterLocation = saved.location;
     if (glFilterLocation) document.getElementById('locationSearchInput').value = glFilterLocation;
     period.set(saved.period);
@@ -78,9 +91,9 @@ async function init() {
     _syncCharModeUI();
   }
   keepViewState(() => ({
-    count: glFilterCount, location: glFilterLocation, period: period.get(),
+    count: size.value(), level: size.level(), location: glFilterLocation, period: period.get(),
     charMode: glCharMode, onlySnapshot: _onlySnapshot,
-    pace: { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn },
+    pace: _paceState(),
     loaded: glGames.length,
   }));
   await Promise.all([loadLocationOptions(), _probeWithMode(), period.load()]);
@@ -102,6 +115,7 @@ async function load(reset = true) {
     // Don't wipe the DOM yet. keep current cards visible while fetching
   }
   const token = reset ? ++_loadToken : _loadToken;
+  if (size.isSolo()) return _loadSolo(reset, token);
 
   // 'only': char_filter is the INCLUDED set (everything not excluded). Nothing
   // excluded → null (no restriction); excluding everything → empty array → no
@@ -109,7 +123,7 @@ async function load(reset = true) {
   const included = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
   const withArr  = glCharMode === 'with' && included.length ? included : null;
   const charArr  = glCharMode === 'only' && pace.excluded.size ? included : null;
-  const countVal = glFilterCount !== 'all' ? glFilterCount : null;
+  const countVal = size.value() !== 'all' ? size.value() : null;
   const locVal   = glFilterLocation || null;
 
   // All time sends no range, the same calls as before the period existed.
@@ -156,13 +170,35 @@ async function load(reset = true) {
   render();
 }
 
-// ── FILTER ────────────────────────────────────────────────────────────────────
+// Solo (solo.js): every solo game is loaded at once (they're few), then
+// filtered and paged here: the level, then Among these keeps the games of an
+// included villain, With these the picked villain's (one at most; none picked:
+// every game).
+async function _loadSolo(reset, token) {
+  const solo = await loadSoloGames();
+  if (token !== _loadToken) return;
+  if (!solo) {
+    document.getElementById('root').innerHTML = loadErrorHTML(t("Couldn't load the solo games"));
+    return;
+  }
+  const included  = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
+  const villainOk = v => glCharMode === 'with' ? !included.size || included.has(v) : included.has(v);
+  const villainOf = Object.fromEntries(solo.players.map(p => [p.game_id, p.character]));
+  const games = soloOfLevel(soloInPeriod(solo, period.isAll() ? {} : period.range()), size.level()).games.filter(g =>
+    (!glFilterLocation || g.location === glFilterLocation) && villainOk(villainOf[g.id]));
 
-function setCountFilter(value) {
-  glFilterCount = value;
-  updateFilterPills('#countPills .pill', value);
-  load(true);
+  glGames   = games.slice(0, reset ? PAGE_SIZE : glGames.length + PAGE_SIZE);
+  const ids = new Set(glGames.map(g => g.id));
+  glPlayers = solo.players.filter(p => ids.has(p.game_id));
+  _gameOffset = glGames.length;
+  _totalGames = games.length;
+  _hasMore = glGames.length < _totalGames;
+  _loaded  = true;
+  document.getElementById('root').className = '';
+  render();
 }
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
 
 function toggleCharFilter() {
   const panel   = document.getElementById('charFilterPanel');
@@ -176,6 +212,10 @@ function toggleCharFilter() {
 // when the panel closes (Done or the toggle), so toggling characters never
 // reloads mid-edit.
 function updateFilterUI() {
+  // With these at its limit: the villains not picked gray out.
+  _syncWithOrder();
+  document.getElementById('charFilterPanel').classList.toggle('with-capped', glCharMode === 'with' && _withOrder.length >= _withLimit());
+  _syncBoxNames();
   // The toggle sums the filter up: "Villains | among 12" or "Villains | with
   // Ursula, Jafar" (names up to two, then a count); nothing after it when off.
   const picked = glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name);
@@ -202,10 +242,42 @@ async function _probeWithMode() {
   setVisible('glCharMode', !error);
 }
 
+// The filter's state, to set aside and bring back.
+const _paceState = () => ({ excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn });
+
+// Keeps _withOrder in step with the picks (a new pick goes last).
+function _syncWithOrder() {
+  if (glCharMode !== 'with') { _withOrder = []; return; }
+  const picked = new Set(glChars.filter(c => !pace.excluded.has(c.name)).map(c => c.name));
+  _withOrder = _withOrder.filter(n => picked.has(n));
+  for (const n of picked) if (!_withOrder.includes(n)) _withOrder.push(n);
+}
+
+// With these: a box name picks its whole box or clears it, never part of it.
+// It clears the box when any of its villains is picked; it picks them all only
+// if they all fit under the limit, otherwise it grays out.
+function _syncBoxNames() {
+  const free = _withLimit() - _withOrder.length;
+  for (const group of document.querySelectorAll('#charGrid .box-group')) {
+    const names = new Set([...group.querySelectorAll('.char-pill')].map(p => p.dataset.name));
+    const none  = [...names].every(n => pace.excluded.has(n));   // none of the box picked
+    const btn = group.querySelector('.box-name');
+    if (btn) btn.disabled = glCharMode === 'with' && none && names.size > free;
+  }
+}
+
+// With these: down to the limit, keeping the villains picked first.
+function _capWithPicks() {
+  _syncWithOrder();
+  if (_withOrder.length <= _withLimit()) return;
+  const keep = new Set(_withOrder.slice(0, _withLimit()));
+  pace.restoreState({ ..._paceState(), excluded: glChars.map(c => c.name).filter(n => !keep.has(n)) });
+}
+
 function glSetCharMode(mode) {
   if (mode === glCharMode) return;
   if (mode === 'with') {
-    _onlySnapshot = { excluded: [...pace.excluded], selectedPace: pace.selectedPace, pacePlus: pace.pacePlus, mineOn: pace.mineOn };
+    _onlySnapshot = _paceState();
     glCharMode = mode;
     pace.excludeAll();
   } else {
@@ -220,9 +292,12 @@ function _syncCharModeUI() {
   document.getElementById('charFilterPanel').classList.toggle('with-mode', withMode);
   document.querySelectorAll('#glCharMode .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === glCharMode));
   // What the mode does, its key words in bold (static strings, so innerHTML is safe).
+  const solo = size.isSolo();
   document.getElementById('glFilterHint').innerHTML = withMode
-    ? t('Shows games played with <strong>at least</strong> the selected villains (others can play too).')
-    : t('Shows games played <strong>only</strong> among the included villains (not necessarily all of them).');
+    ? (solo ? t('Shows the solo games of the <strong>selected</strong> villain (a solo game has only one).')
+            : t('Shows games played with <strong>at least</strong> the selected villains (others can play too).'))
+    : (solo ? t('Shows the solo games of the <strong>included</strong> villains.')
+            : t('Shows games played <strong>only</strong> among the included villains (not necessarily all of them).'));
   updateFilterUI();
   _syncResetBtn();
 }
@@ -309,7 +384,8 @@ function render() {
   if (!_loaded) return;
 
   const hint         = document.getElementById('resultsHint');
-  const filterActive = glFilterCount !== 'all' || _charFilterActive() || glFilterLocation !== null || !period.isAll();
+  const solo         = size.isSolo();
+  const filterActive = (size.value() !== 'all' && !solo) || size.level() !== 'all' || _charFilterActive() || glFilterLocation !== null || !period.isAll();
   const root         = document.getElementById('root');
 
   const pillArea = document.getElementById('locationPillArea');
@@ -317,12 +393,20 @@ function render() {
     ? locationFilterPillHTML(glFilterLocation, 'clearLocationFilter')
     : '';
 
+  // Solo: what it is, above its games.
+  const soloHint = solo ? soloHintHTML() : '';
+
   if (_totalGames === 0) {
     hint.textContent = '';
     root.className = '';
-    if (!filterActive) {
+    if (solo && !filterActive) {
+      root.innerHTML = soloHint + emptyStateHTML('⚔️', t('No solo games yet'), t('To record one, pick Solo in New Game, where you choose the number of players.'),
+        `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
+    } else if (!filterActive) {
       root.innerHTML = emptyStateHTML('⚔️', t('No games yet'), t('Record your first game to get started.'),
         `<a class="btn btn-primary btn-sm" href="new-game.html">${t('+ New Game')}</a>`);
+    } else if (solo) {
+      root.innerHTML = soloHint + emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     } else {
       root.innerHTML = emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'));
     }
@@ -341,7 +425,7 @@ function render() {
   }
 
   root.className = 'games-list';
-  root.innerHTML = '';
+  root.innerHTML = soloHint;
 
   for (const g of glGames) {
     const gp = sortGamePlayers(byGame[g.id] || []);

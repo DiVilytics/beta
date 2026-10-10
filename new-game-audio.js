@@ -58,9 +58,10 @@ function _updateMediaMetadata() {
   const icon = dark ? 'asset/logos/logo-b.png' : 'asset/logos/logo-w.png';
   // const icon = new URL(dark ? 'asset/logos/logo-b.png' : 'asset/logos/logo-w.png', location.href).href;  // not working for some reason!
   const location = document.getElementById('fLocation')?.value.trim();
+  const lines = liveMediaLines();   // the round, and a solo game's last roll (new-game.js)
   navigator.mediaSession.metadata = new MediaMetadata({
-    title:  t('Round {n}', { n: liveGame.turns }),
-    artist: t('Update Timer and Rounds'),
+    title:  lines.title,
+    artist: lines.artist,
     album:  location ? `DiVilytics | ${t('Playing at {location}', { location })}` : `DiVilytics | ${t('New Game')}`,
     artwork: [
       { src: icon, sizes: '96x96',  type: 'image/png' },

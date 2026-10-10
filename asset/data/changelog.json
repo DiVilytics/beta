@@ -1,4 +1,21 @@
 {
+  "2026-10-10": {
+    "title": "Solo, Villain Movers and the new XP",
+    "new": [
+      "Solo, an unofficial variant for one player: your villain against a Phantom player, at Easy, Medium or Hard (25, 20 or 15 rounds, Fated on 1-2, 1-4 or 1-6). Solo games have their own rankings and stats, under the dashed Solo pill and its Difficulty menu, and never count with the others. The FAQ summarizes its rules.",
+      "In a solo game in progress, + rolls the Phantom's die and shows whether you're Fated, and + after your last round ends the game, lost.",
+      "Villain Movers: next to each villain's name, and in a row while a game is in progress."
+    ],
+    "improved": [
+      "XP now counts you too: for every game where you claimed your villain, 1 for each player who claimed theirs, you included, and if you won, 1 more for each of the others. The XP table under the players' Leaderboard shows what a game is worth.",
+      "On a villain's page, tap a table size or a solo difficulty to see its numbers in the boxes on top.",
+      "Achievements are now only on player pages: the ones earned, and with Show all also those still to earn.",
+      "The villains' Leaderboard always lists every villain, even those without games in the chosen filters."
+    ],
+    "fixed": [
+      "A game timed in New Game without the round counter is no longer recorded with 1 round."
+    ]
+  },
   "2026-10-09": {
     "title": "XP, and fixing a recorded game",
     "new": [

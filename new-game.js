@@ -3,6 +3,14 @@
 let chars            = [];
 let boxInfo          = {};          // loadBoxInfo(), used to order box groups by release date
 let orderSlots       = [];          // each: { id, char, isMe, isWinner }
+// Solo (solo.js), the last choice of the players menu: one villain, yours, won
+// against the game (👑, the row's isWinner) or lost, at a difficulty level.
+let soloMode         = false;
+let soloLevel        = SOLO_DEFAULT_LEVEL;
+// Solo, live: the Phantom's rolls, { round: result }, each kept on the round
+// its + led to (− takes it back). Kept with the game in progress.
+let _soloRolls       = {};
+let _dieTimer        = null;        // setInterval id of the rolling die
 let orderNextId      = 0;
 let slotTimers       = {};          // slotId → setInterval id (active spin animation)
 let _shuffleTimer    = null;        // setInterval id for the shuffle-order animation
@@ -15,10 +23,15 @@ let _lastAuthId;                    // last auth user id the slots were rendered
 let liveTimerId     = null;        // 1s clock ticker
 let _saveIntervalId = null;        // 30s background-persist
 let _turnBumped     = false;       // + or − used since the last start (see stopLive)
+// The rounds count for this game: + or − used at some point, or rounds already
+// set before it started. Otherwise Pause leaves them empty (a game timed without
+// the counter isn't one round long). Kept with the game in progress.
+let _roundsCounted  = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
-const LEGEND_ITEMS = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
+const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
+const SOLO_LEGEND_ITEMS = [t('🎲 = draw'), t('👑 = winner')];   // Solo: the row's two buttons
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -111,7 +124,7 @@ async function init() {
 // every villain, or only your boxes when you've marked some on the Account page
 // (the one lasting way to shape it). An untouched date isn't kept: it comes back
 // as "now". A game in progress has its own snapshot (liveGame) and wins over it.
-const DRAFT_KEY    = 'divilytics_new_game_draft';
+const DRAFT_KEY    = 'divilytics_new_game_draft' + STORAGE_SCOPE;   // the beta's apart (config.js)
 const DRAFT_MAX_MS = 60 * 60 * 1000;
 let _draftReady = false;   // nothing is saved until init has restored (or not) the draft
 
@@ -124,6 +137,8 @@ function _saveDraft() {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({
       saved:     Date.now(),
       slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
+      solo:      soloMode,
+      soloLevel,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
@@ -156,8 +171,10 @@ function _restoreDraftForm() {
   if (liveGame.loadSaved()) return null;   // a game in progress shows instead
   const d = _loadDraft();
   if (!d) return null;
-  if (d.slots && d.slots.length >= 2) {
+  if (d.slots && (d.slots.length >= 2 || (d.solo && d.slots.length === 1))) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
+    soloMode   = !!d.solo;
+    soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
     if (d.fDate) document.getElementById('fDate').value = d.fDate;
     document.getElementById('fLocation').value = d.fLocation || '';
     document.getElementById('fDur').value      = d.fDur      || '';
@@ -229,7 +246,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (host) layoutSeparatedRows(host, LEGEND_ITEMS);   // hidden (live game): keeps the current markup
+  if (host) layoutSeparatedRows(host, soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS);   // hidden (live game): keeps the current markup
 }
 
 // Lays out the legend now, again once the web font is in (a first pass may
@@ -265,6 +282,8 @@ function addOrderSlot(char = '', isMe = false, isWinner = false) {
 }
 
 function setPlayerCount(n) {
+  if (n === 'solo') { _setSolo(true); return; }
+  if (soloMode) _setSolo(false);
   n = Math.max(2, Math.min(6, parseInt(n) || 2));
   while (orderSlots.length < n) orderSlots.push({ id: orderNextId++, char: '', isMe: false, isWinner: false });
   while (orderSlots.length > n) {
@@ -273,6 +292,54 @@ function setPlayerCount(n) {
     orderSlots.pop();
   }
   renderOrderSlots();
+  _saveLiveState();
+}
+
+// Into Solo: the lineup becomes one row, the first villain already picked (or
+// the first row). Out of it: back to two rows at least, nobody marked.
+function _setSolo(on) {
+  soloMode = on;
+  if (on) {
+    const keep = orderSlots.find(s => s.char) || orderSlots[0];
+    for (const s of orderSlots) {
+      if (s !== keep && slotTimers[s.id]) { clearInterval(slotTimers[s.id]); delete slotTimers[s.id]; }
+    }
+    orderSlots = [{ ...keep, isMe: false, isWinner: false }];
+  } else {
+    while (orderSlots.length < 2) orderSlots.push({ id: orderNextId++, char: '', isMe: false, isWinner: false });
+  }
+  renderOrderSlots();
+  _saveLiveState();
+}
+
+// What only Solo shows (the level picker, what the variant is, its live hint
+// and the level's rounds) and what it hides: Random order and Draw villains
+// (one villain: its 🎲 does it), + Add player, and the row's ❌ and 👤 (the
+// villain is yours). The one row can't be dragged: its ⠿ grays out.
+function _syncSoloUI() {
+  document.getElementById('orderSlots')?.classList.toggle('solo', soloMode);
+  const levelEl = document.getElementById('soloLevelNg');
+  if (levelEl) { levelEl.innerHTML = soloMode ? soloLevelSegHTML(soloLevel, 'setSoloLevel') : ''; setVisible('soloLevelNg', soloMode); }
+  const hint = document.getElementById('soloHintNg');
+  if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
+  setVisible('shuffleOrderBtn', !soloMode);
+  setVisible('drawAllBtn', !soloMode);
+  setVisible('lineupBtns', !soloMode);   // its half of the row goes to the level picker
+  setVisible('liveHint', !soloMode);
+  setVisible('liveHintSolo', soloMode);
+  document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
+  const turns = document.getElementById('fTurns');
+  if (turns) turns.max = soloMode ? _soloTurns() : 999;
+  _layoutLegend();
+}
+
+// Solo: the level's rounds.
+const _soloTurns = () => SOLO_LEVELS[soloLevel].turns;
+
+function setSoloLevel(id) {
+  if (!SOLO_LEVELS[id] || id === soloLevel) return;
+  soloLevel = id;
+  _syncSoloUI();
   _saveLiveState();
 }
 
@@ -513,16 +580,18 @@ function renderOrderSlots() {
         </div>
         <div class="order-slot-actions">
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          ${soloMode ? '' : `
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
-          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>
+          <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
       </div>`;
   }).join('');
 
-  setVisible('orderAddBtn', orderSlots.length < 6);
+  setVisible('orderAddBtn', !soloMode && orderSlots.length < 6);
   const pcSel = document.getElementById('playerCountSel');
-  if (pcSel) pcSel.value = String(orderSlots.length);
+  if (pcSel) pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
+  _syncSoloUI();
   _updateActionBtns();
   _updateDiscardBtn();
 }
@@ -630,7 +699,8 @@ function _updateActionBtns() {
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
   // still validated in the handlers.
   const lineupErr = _validateLineup();                     // null = ready to start
-  const hasWinner = orderSlots.some(s => s.isWinner);
+  // Solo: no 👑 is a lost game.
+  const hasWinner = soloMode || orderSlots.some(s => s.isWinner);
   const saveErr   = lineupErr || (hasWinner ? null : t('Mark the winner with 👑.'));
   if (startBtn)  { startBtn.disabled  = animating || !!lineupErr; startBtn.title  = animating ? '' : (lineupErr || ''); }
   if (submitBtn) { submitBtn.disabled = animating || !!saveErr;   submitBtn.title = animating ? '' : (saveErr   || ''); }
@@ -656,7 +726,7 @@ function _initDrag() {
 
   container.addEventListener('pointerdown', e => {
     const handle = e.target.closest('.drag-handle');
-    if (!handle || _dragSrc) return;
+    if (!handle || _dragSrc || soloMode) return;   // Solo: one row, nothing to reorder
     // Not mid-draw or mid-shuffle: those animations write into the rows and set
     // the order themselves when they settle, which would undo the drag.
     if (_shuffleTimer || Object.keys(slotTimers).length) { e.preventDefault(); return; }
@@ -716,12 +786,18 @@ function _initDrag() {
 
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
 
-// The line under "Game in progress": player count and, when set, the location.
-// Drawn on start and on resume (the form fields are hidden while live).
+// The line under "Game in progress": player count and, when set, the location;
+// then the villains' movers in play order. Drawn on start and on resume (the
+// form fields are hidden while live).
 function _renderLiveInfo() {
+  const movers = document.getElementById('liveMovers');
+  if (movers) movers.innerHTML = orderSlots.filter(s => s.char).map(s => moverImgHTML(s.char)).join('');
   const infoEl   = document.getElementById('liveInfo');
   const location = document.getElementById('fLocation').value.trim();
-  if (infoEl) infoEl.textContent = [tn(orderSlots.length, '{n} player', '{n} players'), location ? t('Playing at {location}', { location }) : null].filter(Boolean).join(' | ');
+  if (infoEl) infoEl.innerHTML = [
+    soloMode ? `${t('Solo')} | ${soloLevelTagHTML(soloLevel)}` : tn(orderSlots.length, '{n} player', '{n} players'),
+    location ? _esc(t('Playing at {location}', { location })) : null,
+  ].filter(Boolean).join(' | ');
 }
 
 function setLiveUI(on) {
@@ -745,17 +821,30 @@ function tickLive() {
   document.getElementById('liveTime').textContent = fmtElapsed(liveGame.elapsedMs);
 }
 
-// The live round and its − button, disabled at round 1 (the lowest round).
+// The live round and its − button, disabled at round 1 (the lowest round); in
+// Solo the round out of the level's, and the Phantom's die.
 function _renderTurnCount() {
   document.getElementById('liveTurnCount').textContent = liveGame.turns;
+  document.getElementById('liveTurnMax').textContent   = soloMode ? `/${_soloTurns()}` : '';
   document.getElementById('liveMinusBtn').disabled = liveGame.turns <= 1;
+  _renderSoloDie();
 }
 
+// Solo: + ends your turn, and the Phantom's 10-sided die rolls at once (Fated
+// on 1 to the level's number); − takes the round and its roll back. + after
+// the last round ends the game: lost.
 function bumpTurn(delta) {
   if (delta < 0 && liveGame.turns <= 1) return;   // round 1 is the lowest (also from the lock screen)
-  _turnBumped = true;
-  liveGame.bumpTurns(delta);
+  if (delta > 0 && soloMode && liveGame.turns >= _soloTurns()) { _endSoloLost(); return; }
+  _turnBumped    = true;
+  _roundsCounted = true;
+  if (soloMode) {
+    if (delta > 0) _soloRolls[liveGame.turns + 1] = soloRollDie();
+    else delete _soloRolls[liveGame.turns];
+  }
+  liveGame.bumpTurns(delta);   // the lock screen reads the roll (liveMediaLines)
   _renderTurnCount();
+  if (soloMode && delta > 0) _animateDie();
   if (!liveTimerId) {
     const fTurns = document.getElementById('fTurns');
     if (fTurns) fTurns.value = liveGame.turns || '';
@@ -763,11 +852,75 @@ function bumpTurn(delta) {
   _saveLiveState();
 }
 
+// Solo: the Phantom's die under the counter, in the level's color: the roll
+// that led to this round, Fated (the die filled) or Safe; before the first +,
+// only the rule. On the last round it says what + does then.
+function _renderSoloDie(rolling = false) {
+  const el = document.getElementById('liveDie');
+  if (!el) return;
+  setVisible('liveDie', soloMode);
+  if (!rolling) { clearInterval(_dieTimer); _dieTimer = null; }
+  if (!soloMode) return;
+  const { turns, fate } = SOLO_LEVELS[soloLevel];
+  const roll  = _soloRolls[liveGame.turns];
+  const fated = roll != null && roll <= fate;
+  el.className = `live-die lvl-${soloLevel}${roll == null ? ' unrolled' : rolling ? '' : fated ? ' fated' : ' safe'}`;
+  el.innerHTML = `
+    <div class="die-face${rolling ? ' rolling' : ''}" aria-hidden="true">${roll ?? '?'}</div>
+    <div class="die-text">
+      <strong>${roll == null ? t("The Phantom's die") : rolling ? t('Rolling…') : fated ? t('Fated') : t('Safe')}</strong>
+      <span>${_esc(soloFatedOn(soloLevel))}</span>
+      ${liveGame.turns >= turns ? `<span class="die-last">${t('Last round: + ends the game, lost.')}</span>` : ''}
+    </div>`;
+}
+
+// The roll, shown tumbling for half a second before it lands (not when the
+// page is hidden, a + from the lock screen, or with reduced motion).
+function _animateDie() {
+  if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  _renderSoloDie(true);
+  const face = document.querySelector('#liveDie .die-face');
+  let frames = 0;
+  _dieTimer = setInterval(() => {
+    if (++frames >= 10) { _renderSoloDie(); return; }
+    if (face) face.textContent = 1 + Math.floor(Math.random() * SOLO_DIE);
+  }, 50);
+}
+
+// Solo: + after the last round. The game stops as if paused, lost (no 👑), its
+// rounds the level's; the note says so, and Resume game takes it back.
+function _endSoloLost() {
+  orderSlots[0].isWinner = false;
+  _turnBumped    = true;   // the duration and the rounds go in, however short the game
+  _roundsCounted = true;
+  stopLive();
+  renderOrderSlots();
+  _saveLiveState();
+  const note = document.getElementById('soloEndNote');
+  if (note) {
+    note.textContent = t('Round {n} is over: the game is lost. Save it, or tap Resume game if + was a mistake.', { n: _soloTurns() });
+    setVisible('soloEndNote', true);
+  }
+}
+
+// The lock screen's two lines (new-game-audio.js): the round and, in Solo, the
+// Phantom's last roll.
+function liveMediaLines() {
+  const round = t('Round {n}', { n: liveGame.turns });
+  const roll  = soloMode ? _soloRolls[liveGame.turns] : null;
+  if (!soloMode) return { title: round, artist: t('Update Timer and Rounds') };
+  return {
+    title:  `${round}/${_soloTurns()}`,
+    artist: roll == null ? t('Update Timer and Rounds') : `🎲 ${roll} | ${roll <= SOLO_LEVELS[soloLevel].fate ? t('Fated') : t('Safe')}`,
+  };
+}
+
 function showErr(msg) {
   showError('err', msg, { scroll: true });
 }
 
 function _validateLineup() {
+  if (soloMode) return orderSlots[0]?.char ? null : t('Choose your villain.');
   if (orderSlots.length < 2) return t('A game must have at least 2 players.');
   if (orderSlots.some(s => !s.char)) return t('Choose a villain for each player.');
   const names = orderSlots.map(s => s.char);
@@ -786,11 +939,14 @@ function startLive() {
   const resuming  = liveGame.hasSession;   // a paused game: keep the date it started on
   liveGame.markStarted(Date.now() - durOffset);
 
-  if (!resuming) _setDateToNow();
+  if (!resuming) { _setDateToNow(); _soloRolls = {}; }
+  setVisible('soloEndNote', false);
 
   // The counter shows the current round: a new game starts at 1, a resumed one
-  // carries on from its rounds.
-  liveGame.setTurns(parseInt(document.getElementById('fTurns').value) || 1);
+  // carries on from its rounds (and rounds set before the start count).
+  const rounds = parseInt(document.getElementById('fTurns').value);
+  liveGame.setTurns(rounds || 1);
+  if (rounds) _roundsCounted = true;
   _turnBumped = false;
   _renderTurnCount();
 
@@ -812,10 +968,11 @@ function stopLive() {
   const ms = liveGame.elapsedMs;
   // Paused within the first minute without + or −: most likely an accidental
   // start, so duration and rounds stay as they were (empty) instead of "1 min"
-  // and "1 round". The exact time is kept, so Resume carries on from it.
+  // and "1 round". The exact time is kept, so Resume carries on from it. The
+  // rounds only when the counter was used (_roundsCounted).
   if (ms >= 60000 || _turnBumped) {
-    document.getElementById('fDur').value   = Math.max(1, Math.round(ms / 60000));
-    document.getElementById('fTurns').value = liveGame.turns;
+    document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
+    if (_roundsCounted) document.getElementById('fTurns').value = liveGame.turns;
   }
   liveGame.markStopped(ms);
 
@@ -832,6 +989,10 @@ function stopLive() {
 function _saveLiveState() {
   liveGame.persist({
     slots:     orderSlots,
+    solo:      soloMode,
+    soloLevel,
+    soloRolls: _soloRolls,
+    roundsCounted: _roundsCounted,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
@@ -906,6 +1067,11 @@ function _doDiscard() {
   for (const id of Object.keys(slotTimers)) { clearInterval(slotTimers[id]); }
   slotTimers = {};
   orderSlots = [];
+  soloMode   = false;
+  soloLevel  = SOLO_DEFAULT_LEVEL;
+  _soloRolls = {};
+  _roundsCounted = false;
+  setVisible('soloEndNote', false);
   addOrderSlot();
   addOrderSlot();
 
@@ -945,6 +1111,11 @@ function _checkResume() {
     isMe:     !!s.isMe,
     isWinner: !!s.isWinner,
   }));
+  soloMode   = !!state.solo;
+  soloLevel  = SOLO_LEVELS[state.soloLevel] ? state.soloLevel : SOLO_DEFAULT_LEVEL;
+  _soloRolls = state.soloRolls || {};
+  // Games saved before the flag: the counter was used if it moved past 1.
+  _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
   renderOrderSlots();
 
   if (state.liveStart) {
@@ -985,15 +1156,20 @@ async function submitForm() {
 
   const lineupErr = _validateLineup();
   if (lineupErr) return showErr(lineupErr);
-  if (!orderSlots.some(s => s.isWinner)) return showErr(t('Mark the winner with 👑.'));
+  if (soloMode) {
+    if (turns > _soloTurns()) return showErr(t('A solo game on {level} ends by round {n}.', { level: soloLevelName(soloLevel), n: _soloTurns() }));
+  } else if (!orderSlots.some(s => s.isWinner)) return showErr(t('Mark the winner with 👑.'));
 
-  const ps = orderSlots.map((s, i) => ({
-    position:  i,
-    character: s.char,
-    is_winner: s.isWinner,
-    user_id:   s.isMe ? user.id          : null,
-    nickname:  s.isMe ? profile.nickname : null,
-  }));
+  // Solo: the one seat is yours, won (👑) or lost against the game.
+  const ps = soloMode
+    ? [{ position: 0, character: orderSlots[0].char, is_winner: orderSlots[0].isWinner, user_id: user.id, nickname: profile.nickname }]
+    : orderSlots.map((s, i) => ({
+        position:  i,
+        character: s.char,
+        is_winner: s.isWinner,
+        user_id:   s.isMe ? user.id          : null,
+        nickname:  s.isMe ? profile.nickname : null,
+      }));
 
   btn.disabled    = true;
   btn.textContent = t('Saving…');
@@ -1005,6 +1181,7 @@ async function submitForm() {
     location:         place,
     created_by:       user.id,
     source:           'divilytics',   // recorded in this app (other sources: the imports)
+    ...(soloMode ? { variant: 'solo', solo_level: soloLevel } : {}),
   };
 
   const { data: g, error } = await db.from('games').insert(gameData).select().single();

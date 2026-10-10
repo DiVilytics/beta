@@ -21,15 +21,22 @@ const CLAIM_ERRORS = {
   no_profile:      'You need a nickname before you can claim a villain.',
   not_your_seat:   "This villain isn't yours to release.",
   not_creator:     'Only the player who recorded the game can change it.',
-  lineup_locked:   'Another player has claimed a villain: the lineup can no longer be changed.',
+  lineup_locked:   'Another player has claimed a villain: the villains and the winner can no longer be changed.',
   invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
+  solo_seat:       'A solo game is always its creator\'s.',
+  solo_locked:     "A solo game's difficulty, villain and result can't be changed.",
 };
 const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
 
 // The creator can change the villains and the winner while no other player has
-// claimed a villain (their own seat, marked 👤 in New Game, doesn't count).
+// claimed a villain (their own seat, marked 👤 in New Game, doesn't count). A
+// solo game (solo.js) has one seat, its creator's, never shared or released;
+// its difficulty, villain and result stay as recorded (its other details can
+// still be fixed).
+const claimIsSolo = () => claimGame?.variant === 'solo';
+
 function lineupEditable(user) {
-  return !!user && !!claimGame && claimGame.created_by === user.id
+  return !!user && !!claimGame && !claimIsSolo() && claimGame.created_by === user.id
     && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
 }
 
@@ -66,9 +73,11 @@ async function init() {
 
   claimGame    = game;
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
+  // Nothing to claim in a solo game: the page is just the game's.
+  if (claimIsSolo()) document.getElementById('claimTitle').textContent = t('Solo game');
 
   render();
-  if (claimOpenQR) { claimOpenQR = false; shareGame(); }
+  if (claimOpenQR) { claimOpenQR = false; if (!claimIsSolo()) shareGame(); }
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -96,11 +105,15 @@ function render() {
 
   const myClaim = claimPlayers.find(p => p.user_id === user.id);
   const role    = gameUserRole(claimGame, claimPlayers, user);
+  const solo    = claimIsSolo();
 
+  const level = solo ? soloLevelOf(claimGame) : null;
   const meta = [
     fmtDuration(claimGame.duration_minutes),
-    claimGame.num_turns ? tn(claimGame.num_turns, '{n} round', '{n} rounds') : null,
-    claimGame.location  ? claimGame.location             : null,
+    claimGame.num_turns ? (level ? t('{n}/{max} rounds', { n: claimGame.num_turns, max: SOLO_LEVELS[level].turns }) : tn(claimGame.num_turns, '{n} round', '{n} rounds')) : null,
+    claimGame.location  ? _esc(claimGame.location)       : null,
+    solo ? t('Solo') : null,
+    level ? soloLevelTagHTML(level) : null,
   ].filter(Boolean).join(' | ');
 
   // Like the game cards: the player's nickname sits under the villain's name;
@@ -110,7 +123,9 @@ function render() {
     let nickHTML = '', actionHTML = '';
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
     else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
-    if (isMine) {
+    if (solo) {
+      // One seat, always its creator's: nothing to claim or release.
+    } else if (isMine) {
       // Your own claim: let you release it (e.g. if you picked the wrong one).
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">${t('Release')}</button>`;
     } else if (!p.nickname && !myClaim) {
@@ -119,7 +134,7 @@ function render() {
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
-          <span class="chip-seat">${i + 1}</span>
+          <span class="chip-seat">${solo ? '' : i + 1}</span>
           ${charImgHTML(p.character)}
           <div class="claim-who"><div class="claim-name">${villainNameHTML(p.character)}</div>${nickHTML}</div>
           ${p.is_winner ? '<span class="win-star">👑</span>' : ''}
@@ -135,13 +150,23 @@ function render() {
     </div>
     <div class="claim-share-row">
       ${role.isParticipant ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
-      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit lineup')}</button>` : ''}
-      <button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>
+      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit villains and winner')}</button>` : ''}
+      ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
-    <div class="section-label">${t('Players')}</div>
-    <div class="claim-rows">${rowsHTML}</div>
-    ${myClaim ? `<p class="claim-success">${t('You played as {villain} in this game.', { villain: `<strong>${charImgHTML(myClaim.character)} ${villainNameInline(myClaim.character)}</strong>` })}</p>` : ''}
+    <div class="section-label">${solo ? t('Player') : t('Players')}</div>
+    <div class="claim-rows${solo ? ' solo' : ''}">${rowsHTML}</div>
+    ${myClaim ? `<p class="claim-success">${_playedAsHTML(myClaim, solo)}</p>` : ''}
+    ${solo ? soloHintHTML() : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
+}
+
+// "You played as …": in a solo game, whether you won or lost with it.
+function _playedAsHTML(seat, solo) {
+  const villain = `<strong>${charImgHTML(seat.character)} ${villainNameInline(seat.character)}</strong>`;
+  if (!solo) return t('You played as {villain} in this game.', { villain });
+  return seat.is_winner
+    ? t('You won this solo game with {villain}.', { villain })
+    : t('You lost this solo game with {villain}.', { villain });
 }
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
@@ -162,11 +187,15 @@ function shareGame() {
 
 // ── EDIT GAME DETAILS ─────────────────────────────────────────────────────────
 
+// A solo game's rounds go up to its level's (solo.js).
+const _maxTurns = () => claimIsSolo() ? SOLO_LEVELS[soloLevelOf(claimGame)].turns : 999;
+
 function editGameDetails() {
   if (!claimGame) return;
   document.getElementById('editLocation').value = claimGame.location || '';
   document.getElementById('editDur').value      = claimGame.duration_minutes || '';
   document.getElementById('editTurns').value    = claimGame.num_turns || '';
+  document.getElementById('editTurns').max      = _maxTurns();
   clearError('editDetailsErr');
   const btn = document.getElementById('editDetailsSaveBtn');
   btn.disabled    = false;
@@ -198,6 +227,10 @@ async function saveGameDetails() {
 
   const btn   = document.getElementById('editDetailsSaveBtn');
   const errEl = document.getElementById('editDetailsErr');
+  if (claimIsSolo() && turns > _maxTurns()) {
+    showError(errEl, t('A solo game on {level} ends by round {n}.', { level: soloLevelName(soloLevelOf(claimGame)), n: _maxTurns() }));
+    return;
+  }
   btn.disabled    = true;
   btn.textContent = t('Saving…');
 
@@ -293,6 +326,8 @@ async function editLineup() {
   if (!lineupEditable(getCurrentUser())) return;
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
+  document.getElementById('lineupTitle').textContent = t('Edit villains and winner');
+  document.getElementById('lineupHint').textContent  = t('You can change the villains and the winner until another player claims a villain.');
   clearError('lineupErr');
   const btn = document.getElementById('lineupSaveBtn');
   btn.disabled    = false;
@@ -333,6 +368,7 @@ function setLineupVillain(i, name) {
   _renderLineup();
 }
 
+// The crown moves to this seat (one winner).
 function setLineupWinner(i) {
   lineupDraft.forEach((s, j) => { s.is_winner = j === i; });
   _renderLineup();

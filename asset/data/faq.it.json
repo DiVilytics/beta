@@ -278,6 +278,76 @@
       ]
     }
   },
+  "solo": {
+    "title": "Variante in solitario (non ufficiale)",
+    "desc": "Un Cattivo contro un giocatore fantasma",
+    "intro": "Un modo di giocare da soli, ideato da un giocatore e non dagli autori del gioco: le \"Istruzioni non ufficiali per il solitario\" di Robert Nava (versione 2.5.3, 2024), riassunte con parole nostre. Tutto quello che non è indicato qui funziona come nel regolamento ufficiale e nella tua Guida al Cattivo.",
+    "author": "Robert Nava",
+    "site": "Disney Experience",
+    "url": "https://www.disneyexperience.com",
+    "groups": [
+      {
+        "title": "La variante",
+        "items": [
+          { "term": "Come funziona", "text": "Giochi un Cattivo contro un giocatore fantasma, un avversario immaginario per cui scegli tu. Dopo ogni tuo turno, un tiro di dado decide se ti fa subire il Fato." },
+          { "term": "Vincere e perdere", "text": "Hai 20 turni, oppure 25 a Facile e 15 a Difficile (vedi Difficoltà). Se raggiungi il tuo Obiettivo entro la fine del tuo ultimo turno vinci, altrimenti perdi. Da soli ogni turno è un round." },
+          { "term": "Cosa serve", "text": "Il tuo Cattivo come in una partita normale, un dado a 10 facce (va bene anche un'app) e un modo per contare i turni, per esempio un dado a 20 facce o i segnalini Potere." }
+        ]
+      },
+      {
+        "title": "Preparazione e turni",
+        "items": [
+          { "term": "Preparazione", "text": "Prepara il gioco come al solito, o come dice la tua Guida al Cattivo. Sei il primo giocatore, quindi inizi senza Potere." },
+          { "term": "Fine del turno", "text": "Termina il turno come al solito, pescando fino al limite di carte in mano, poi fai avanzare di uno il contatore dei turni. Dopo il tuo ultimo turno la partita finisce." }
+        ]
+      },
+      {
+        "title": "Il giocatore fantasma",
+        "items": [
+          { "term": "Il suo turno", "text": "Il turno del fantasma inizia quando finisce il tuo. Tira il dado a 10 facce: con 1, 2, 3 o 4 (40% di probabilità; vedi Difficoltà) ti fa subire il Fato. Poi inizia il tuo turno successivo." },
+          { "term": "Scegliere per lui", "text": "Ogni volta che una carta di qualsiasi tipo chiede al fantasma di scegliere, scegli tu per lui: sempre l'opzione che ti danneggia di più in quel momento." },
+          { "term": "Cosa sa", "text": "Per giudicare cosa ti danneggia di più, considera solo le carte scoperte in gioco, pile degli scarti comprese. Lascia fuori la tua mano, le carte che hai visto in segreto e i tuoi piani: un avversario non li conoscerebbe. Nel dubbio, usa le scelte casuali (Regole facoltative)." }
+        ]
+      },
+      {
+        "title": "Il Fato",
+        "items": [
+          { "term": "Subire il Fato", "text": "Rivela le prime due carte del tuo Mazzo Fato e gioca quella che ti danneggia di più; se ti danneggiano allo stesso modo, scegline una a caso (con una moneta o un dado). Scarta l'altra, come al solito." },
+          { "term": "Dove va", "text": "Se la carta va in un Luogo o su un Eroe, scegli quello dove ti danneggia di più." },
+          { "term": "Sfuggire al Fato", "text": "Se nessuna delle due carte si può giocare, sei sfuggito al Fato." },
+          { "term": "Il Fato su di te", "text": "Puoi compiere di proposito un'azione Fato contro te stesso, cosa che ad alcuni Cattivi conviene. Conta come del fantasma, quindi le carte ti danneggiano comunque." }
+        ]
+      },
+      {
+        "title": "Le Condizioni",
+        "items": [
+          { "term": "Quando giocarle", "text": "Gioca una Condizione quando il suo requisito si verifica, per te o per il fantasma." },
+          { "term": "Nel turno del fantasma", "text": "In qualsiasi momento del turno del fantasma, prima, durante o dopo il Fato, puoi giocare una Condizione il cui requisito si è verificato per uno di voi due." }
+        ]
+      },
+      {
+        "title": "Regole facoltative",
+        "items": [
+          { "term": "Difficoltà", "text": "Tre livelli cambiano sia i turni a disposizione sia i risultati del dado che fanno scattare il Fato. Facile: 25 turni, Fato con 1-2 (20%). Media, le regole così come sono: 20 turni, Fato con 1-4 (40%). Difficile: 15 turni, Fato con 1-6 (60%). Iniziare con un po' di Potere, per esempio 5, rende anche l'inizio più facile." },
+          { "term": "Scelte casuali", "text": "Per una partita più onesta, non scegliere per il fantasma: numera le sue scelte possibili (o usa pari e dispari, testa e croce), poi tira un dado o lancia una moneta. Fai lo stesso per decidere quale carta Fato giocare e, numerando i Luoghi possibili, dove va." }
+        ]
+      },
+      {
+        "title": "Regole speciali per i Cattivi",
+        "intro": "Le meccaniche uniche di alcuni Cattivi non funzionano bene con queste regole, quindi hanno una correzione.",
+        "items": [
+          { "term": "Corvo", "villain": "Maleficent", "text": "Facoltativa: se Corvo rende la partita troppo facile, giocalo senza l'azione nel nuovo Luogo. Può comunque volare lì per aiutare gli Alleati a cui manca 1 di Forza per sconfiggere un Eroe." },
+          { "term": "Rinchiusa", "villain": "Lady Tremaine", "text": "Rinchiusa richiede un'azione Scontro, che nel Reame della Matrigna non c'è: giocala invece ogni volta che un Eroe viene rimosso dalla Plancia. Scartare Cenerentola per giocare Cenerentola col vestito da ballo non conta." },
+          { "term": "L'invenzione di Maurice", "villain": "Gaston", "text": "Le prime copie stampano per errore una Forza su questo Oggetto, come ha confermato Ravensburger: trattalo come un normale Oggetto senza Forza." },
+          { "term": "Merlino germe", "villain": "Madam Mim", "text": "Il fantasma non può compiere azioni Scontro, quindi tratta lo scarto causato da Merlino germe come un'azione Scontro." },
+          { "term": "Infiltrarsi", "villain": "Syndrome", "text": "Senza altri giocatori veri, Infiltrarsi non fa danni: toglila dal Mazzo Fato, o lasciala dentro come una carta che non fa nulla." },
+          { "term": "Azioni Fato", "villain": "Yzma", "text": "Quando il fantasma ti fa subire il Fato, numera i tuoi Mazzi Fato e tira un dado per sceglierne uno. Gioca una carta a caso da quel mazzo; se non si può giocare, provane un'altra a caso, finché una non viene giocata. Rimescola nel mazzo le carte non usate: Yzma potrebbe averne scoperto qualcosa. Se nessuna carta si può giocare, rimescolale tutte nel mazzo: Yzma è sfuggita al Fato e ha visto cosa contiene quel mazzo." },
+          { "term": "Dolcetto o scherzetto?", "villain": "Oogie Boogie", "text": "Prendi il Potere dal Calderone, perché non ci sono altri giocatori a cui toglierlo." },
+          { "term": "Turni", "villain": "King Candy", "text": "Re Candito corre contro Vanellope von Schweetz e contro il limite di turni allo stesso tempo. Per le prime partite prova Facile, con 25 turni, poi torna a Media quando conosci la sua strategia." }
+        ]
+      }
+    ]
+  },
   "general": [
     {
       "title": "Approfondimenti sulle regole base",

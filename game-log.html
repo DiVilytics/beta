@@ -57,14 +57,8 @@
 
   <!-- Filters -->
   <div class="filter-bar">
-    <div class="pill-group" id="countPills">
-      <button class="pill on" onclick="setCountFilter('all')" data-i18n>All</button>
-      <button class="pill" onclick="setCountFilter(2)">2p</button>
-      <button class="pill" onclick="setCountFilter(3)">3p</button>
-      <button class="pill" onclick="setCountFilter(4)">4p</button>
-      <button class="pill" onclick="setCountFilter(5)">5p</button>
-      <button class="pill" onclick="setCountFilter(6)">6p</button>
-    </div>
+    <!-- Table size: All / Players menu / Solo (size-filter.js) -->
+    <div id="glSize"></div>
     <!-- Period: All time / Year / Month (period-filter.js) -->
     <div id="glPeriod"></div>
     <button class="filter-char-toggle" onclick="toggleCharFilter()" id="charFilterToggle">
@@ -126,6 +120,8 @@
 <script src="shared.js"></script>
 <script src="pace-filter.js"></script>
 <script src="period-filter.js"></script>
+<script src="size-filter.js"></script>
+<script src="solo.js"></script>
 <script src="game-log.js"></script>
 
 </body>

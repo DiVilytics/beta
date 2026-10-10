@@ -5,8 +5,6 @@ let _acctNick       = null;
 let _acctFallback   = 'asset/players/default.svg';
 let _acctBoxInfo    = {};
 let _acctOwnedBoxes = new Set();
-let _acctAch        = new Map();
-let _acctGlobal     = null;   // profile-wide achievements (table sizes / volume / locations)
 let _acctIdentities = [];   // list of { provider, identity_id, email, last_sign_in_at, ... }
 
 // Providers we support, in display order. Keep in sync with sign-in.html.
@@ -21,19 +19,15 @@ async function init() {
   await initAuth(() => _onAuthChange());
   const user = getCurrentUser();
   if (!user) { location.href = 'index.html'; return; }
-  const [chars, boxInfo, ownedRes, gpRes] = await Promise.all([
+  // Achievements live on the player page (players.html), not here.
+  const [chars, boxInfo, ownedRes] = await Promise.all([
     loadCharacters(),
     loadBoxInfo(),
     db.from('profile_boxes').select('box').eq('user_id', user.id),
-    _fetchAllRows(() => db.from('game_players').select('game_id, character, is_winner').eq('user_id', user.id)),
   ]);
   _acctChars      = chars;
   _acctBoxInfo    = boxInfo;
   _acctOwnedBoxes = new Set((ownedRes.data || []).map(r => r.box));
-  const { games, players } = await fetchGamesWithPlayers([...new Set(gpRes.rows.map(r => r.game_id))]);
-  const official  = new Set(games.map(g => g.id));   // solo games give no achievements
-  _acctAch        = computeCharacterAchievements(gpRes.rows.filter(r => official.has(r.game_id)));
-  _acctGlobal     = computeGlobalAchievements(games, players, p => p.user_id === user.id, _acctChars);
   await _loadIdentities();
   _renderPage();
 
@@ -72,11 +66,6 @@ function _renderPage() {
   _acctAvatar    = profile?.avatar_url || null;
   _pendingAvatar = _acctAvatar;
   _acctFallback  = profile?.default_avatar || 'asset/players/default.svg';
-
-  setAchievementsContext({
-    ach: _acctAch, chars: _acctChars, boxInfo: _acctBoxInfo, global: _acctGlobal,
-    title: _acctNick ? `${t('Achievements')} | ${_acctNick}` : t('Achievements'),
-  });
 
   const metaLn = profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : null;
 
@@ -117,15 +106,6 @@ function _renderPage() {
       <div class="section-label">${t('My boxes')}</div>
       <div class="err" id="boxesErr"></div>
       <div class="box-picker" id="boxPicker"></div>
-    </div>
-
-    <div class="acct-section">
-      ${achievementsSectionHTML({
-        ach: _acctAch, chars: _acctChars, boxInfo: _acctBoxInfo, global: _acctGlobal,
-        // The account page shows every achievement, earned or not.
-        onlyEarned: false,
-        header: (earned, total) => `<div class="section-label">${t('My Achievements')} | ${earned} / ${total}</div>`,
-      })}
     </div>
 
     <div class="acct-section" id="betaSection">${_betaSectionHTML()}</div>
@@ -252,13 +232,14 @@ async function exportMyData() {
 
     // One row per player per game (not one row per game with player1/2/3…
     // columns), so every game's variable player count (2-6) fits without
-    // padding, and the file filters/pivots cleanly in a spreadsheet.
+    // padding, and the file filters/pivots cleanly in a spreadsheet. Solo games
+    // too, marked in their own column.
     const gameIds = [...new Set(gpAll.rows.map(r => r.game_id))];
-    const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true });
+    const { games, players } = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner'];
+    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Difficulty'];
     const rows = [header];
     for (const g of games) {
       const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
@@ -273,6 +254,8 @@ async function exportMyData() {
           p.character,
           p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
+          g.variant === 'solo' ? 'yes' : 'no',
+          { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[g.solo_level] || '',   // a solo game's level (solo.js)
         ]);
       }
     }
@@ -473,10 +456,6 @@ async function confirmDeleteAccount() {
   await db.auth.signOut();
   location.href = 'index.html';
 }
-
-// The achievement detail overlay handlers (_showAchDetail / _showBoxDetail /
-// _showGlobalDetail / _closeAchOverlay) are shared from achievements.js and read
-// the context set via setAchievementsContext() in _renderPage().
 
 // ── BETA ──────────────────────────────────────────────────────────────────────
 // Join the beta (lang.js): this browser then opens the beta instead of the

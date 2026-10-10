@@ -1,4 +1,21 @@
 {
+  "2026-10-10": {
+    "title": "Il solitario, le pedine dei cattivi e i nuovi XP",
+    "new": [
+      "Il solitario, una variante non ufficiale per un giocatore: il tuo cattivo contro un giocatore fantasma, a difficoltà Facile, Media o Difficile (25, 20 o 15 round, il Fato con 1-2, 1-4 o 1-6). Le partite in solitario hanno classifiche e statistiche tutte loro, sotto il filtro tratteggiato Solitario e il suo menu Difficoltà, e non contano mai con le altre. Le F.A.Q. ne riassumono le regole.",
+      "In una partita in solitario in corso, + tira il dado del fantasma e mostra se subisci il Fato, e + dopo il tuo ultimo round chiude la partita, persa.",
+      "Le pedine dei cattivi: accanto al nome di ogni cattivo e in fila durante una partita in corso."
+    ],
+    "improved": [
+      "Gli XP ora contano anche te: per ogni partita in cui hai rivendicato il tuo cattivo, 1 per ogni giocatore che ha rivendicato il suo, te compreso, e se hai vinto 1 in più per ciascuno degli altri. La Tabella degli XP, sotto la Classifica dei giocatori, mostra quanto vale una partita.",
+      "Nella pagina di un cattivo, tocca un numero di giocatori o una difficoltà del solitario per vederne i numeri nei riquadri in alto.",
+      "I traguardi ora sono solo nelle pagine giocatore: quelli ottenuti e, con Mostra tutti, anche quelli da ottenere.",
+      "La Classifica dei cattivi elenca sempre tutti i cattivi, anche quelli senza partite nei filtri scelti."
+    ],
+    "fixed": [
+      "Una partita cronometrata in Nuova partita senza usare il contatore dei round non viene più registrata con 1 round."
+    ]
+  },
   "2026-10-09": {
     "title": "Gli XP, e come correggere una partita",
     "new": [

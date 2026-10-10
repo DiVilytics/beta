@@ -55,15 +55,8 @@
   <p class="page-intro" data-i18n>Villains and players ranked by their results.</p>
 
   <div class="controls period-controls">
-    <!-- Player-count filter -->
-    <div class="pill-group" id="filterPills">
-      <button class="pill on" onclick="setFilter('all')" data-i18n>All</button>
-      <button class="pill"   onclick="setFilter(2)">2p</button>
-      <button class="pill"   onclick="setFilter(3)">3p</button>
-      <button class="pill"   onclick="setFilter(4)">4p</button>
-      <button class="pill"   onclick="setFilter(5)">5p</button>
-      <button class="pill"   onclick="setFilter(6)">6p</button>
-    </div>
+    <!-- Table size: All / Players menu / Solo (size-filter.js) -->
+    <div id="lbSize"></div>
     <!-- Period: All time / Year / Month (period-filter.js) -->
     <div id="lbPeriod"></div>
   </div>
@@ -74,6 +67,18 @@
   <!-- Table -->
   <div id="lb" class="spinner" data-i18n>Loading…</div>
 </main>
+
+<!-- The XP table (leaderboard.js openXpTable) -->
+<div class="overlay" id="xpOverlay" onclick="if(event.target===this) closeOverlay('xpOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>XP per game</h3>
+      <button class="sheet-close" onclick="closeOverlay('xpOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="xpBody"></div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -87,6 +92,8 @@
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
 <script src="period-filter.js"></script>
+<script src="size-filter.js"></script>
+<script src="solo.js"></script>
 <script src="leaderboard.js"></script>
 </body>
 </html>

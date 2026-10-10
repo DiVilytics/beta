@@ -29,10 +29,13 @@ document.documentElement.lang = LANG;
 try { if (localStorage.getItem('textSize') === 'large') document.documentElement.dataset.text = 'large'; } catch (_) {}
 
 // The beta: divilytics.github.io/beta/, the next version, tried out before it
-// replaces this one. A browser that joined it (the account page, BETA_KEY)
-// opens it in place of the release: any page of the release goes to the same
-// page of the beta before anything shows.
+// replaces this one. Its menu bar is purple (style.css, theme.js), set here so
+// it never paints otherwise, and its storage keys are its own (config.js). A
+// browser that joined it (the account page, BETA_KEY) opens it in place of the
+// release: any page of the release goes to the same page of the beta before
+// anything shows.
 const IS_BETA  = location.pathname.startsWith('/beta/');
+if (IS_BETA) document.documentElement.dataset.beta = '';
 const BETA_KEY = 'betaOptIn';
 function betaJoined() {
   try { return localStorage.getItem(BETA_KEY) === '1'; } catch (_) { return false; }
