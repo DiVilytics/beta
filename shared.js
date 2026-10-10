@@ -394,15 +394,15 @@ _updateAuthUI();
 
 const _KBD_PAGES = [
   ['n', 'new-game.html',    'New Game'],
-  ['o', 'tournaments.html', 'Tournaments'],
   ['g', 'game-log.html',    'Game Log'],
+  ['t', 'tournaments.html', 'Tournaments'],
   ['l', 'leaderboard.html', 'Leaderboard'],
   ['v', 'villains.html',    'Villains'],
   ['p', 'players.html',     'Players'],
   ['c', 'charts.html',      'Charts'],
   ['a', 'account.html',     'Account'],
   ['h', 'index.html',       'Home'],
-  ['t', 'tutorial.html',    'Tutorial'],
+  ['u', 'tutorial.html',    'Tutorial'],
   ['f', 'faq.html',         'F.A.Q.'],
 ];
 // In the order of the settings panel: theme, text size, language.
