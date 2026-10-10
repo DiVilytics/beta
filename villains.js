@@ -19,13 +19,12 @@ function _boxLabelHTML(box) {
 }
 let csAvg       = {};        // avg duration / rounds per table size: { all: { dur, turns }, 2: …, … }
 let csLoading   = false;     // stats requested but not in yet: render() draws the layout with '-' values
-// The table's rows: Overall, 2p…6p and, dashed under them, Solo (solo.js: this
-// villain's solo games, never counted in Overall). Tapping a row shows its
-// numbers in the boxes on top; Overall at first. Selected, Solo shows the level
-// pills under it (solo.js): its row and the boxes then count that level only.
-let csRow       = 'all';     // 'all' | 2…6 | 'solo'
+// The tables' rows: Overall and 2p…6p and, in a dashed table under them, Solo
+// by difficulty, Easy, Medium and Hard (solo.js: this villain's solo games,
+// never counted in Overall). Tapping a row shows its numbers in the boxes on
+// top; Overall at first.
+let csRow       = 'all';     // 'all' | 2…6 | 'easy' | 'medium' | 'hard'
 let csSolo      = null;      // this villain's solo games, { games, players }; null until loaded or if they couldn't load
-let csSoloLevel = 'all';     // 'all' | 'easy' | 'medium' | 'hard'
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -39,8 +38,8 @@ async function init() {
 
   // A language switch brings back the grouping and the switches (lang.js).
   const saved = takeViewState();
-  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; csRow = saved.row ?? 'all'; csSoloLevel = saved.soloLevel ?? 'all'; }
-  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, row: csRow, soloLevel: csSoloLevel }));
+  if (saved) { csMode = saved.mode; csRivalMode = saved.rivalMode; csRow = saved.row ?? 'all'; }
+  keepViewState(() => ({ rosterView: csRosterView, mode: csMode, rivalMode: csRivalMode, row: csRow }));
 
   if (charName) { await renderDetailPage(charName); return; }
 
@@ -276,17 +275,11 @@ function csSelectRow(key) {
   render();
 }
 
-// Solo's level pills.
-function csSetSoloLevel(level) {
-  csSoloLevel = level;
-  render();
-}
-
-// The Solo row's numbers, for the level picked: { games, wins, dur, turns },
-// the rounds those of the games won (a lost one runs to its last round).
-function _soloStats() {
+// A solo level's numbers: { games, wins, dur, turns }, the rounds those of
+// the games won (a lost one runs to its last round).
+function _soloStats(level) {
   if (!csSolo) return { games: 0, wins: 0 };
-  const { games, players } = soloOfLevel(csSolo, csSoloLevel);
+  const { games, players } = soloOfLevel(csSolo, level);
   const won = soloWonIds(players);
   return {
     games: players.length, wins: won.size,
@@ -329,11 +322,12 @@ function render() {
     { label: '5p', key: 5 },
     { label: '6p', key: 6 },
   ];
-  const solo  = _soloStats();
-  const stats = key => key === 'solo' ? solo : csBuckets[key];
-  const keys  = [...rows.map(r => r.key), 'solo'];
-  // The bars scale to the largest official row, as everywhere; Solo has no bar
-  // (it's not measured against the official games).
+  const solo   = Object.fromEntries(SOLO_LEVEL_IDS.map(id => [id, _soloStats(id)]));
+  const isSolo = key => key in solo;
+  const stats  = key => isSolo(key) ? solo[key] : csBuckets[key];
+  const keys   = [...rows.map(r => r.key), ...SOLO_LEVEL_IDS];
+  // The bars scale to the largest official row, as everywhere; the solo rows
+  // have none (they're not measured against the official games).
   const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
   // In % Wins, a row with fewer than MIN_GAMES_FOR_PCT games is grayed out, as
   // on the Leaderboard (stats-table.js).
@@ -347,14 +341,14 @@ function render() {
 
   // The boxes on top: the selected row's numbers.
   const sel  = stats(csRow);
-  const avgs = csRow === 'solo' ? solo : (csAvg[csRow] || {});
+  const avgs = isSolo(csRow) ? solo[csRow] : (csAvg[csRow] || {});
   const v = val => csLoading ? '-' : val;
   const rowHTML = (label, key) => {
     const b       = stats(key);
     const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
     const dispVal = b.games ? statCellHTML(b, csMode) : '-';
     const gold    = typeof key === 'number' && b.games && !few(b) && best > 0 && statValue(b, csMode) === best;
-    const bar     = key === 'solo' ? '' : `
+    const bar     = isSolo(key) ? '' : `
           <div class="bar-bg">
             <div class="bar-fill${gold ? ' gold' : ''}" style="width:${barW}%"></div>
           </div>`;
@@ -373,7 +367,7 @@ function render() {
       ${statBoxesHTML([
         { val: v(sel.games), lbl: t('Games') },
         { val: avgs.dur   != null ? Math.round(avgs.dur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: csRow === 'solo' ? t('Avg rounds to win') : t('Avg rounds') },
+        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: isSolo(csRow) ? t('Avg rounds to win') : t('Avg rounds') },
         { val: v(sel.games ? Math.round((sel.wins / sel.games) * 100) + '%' : '-'), lbl: t('Win rate') },
         { val: v(sel.wins), lbl: t('Wins') },
       ])}
@@ -389,9 +383,14 @@ function render() {
       ${rows.map(r => rowHTML(r.label, r.key)).join('')}
     </div>
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
-      ${rowHTML(t('Solo'), 'solo')}
+      <div class="lb-head">
+        <span>${t('Solo')}</span>
+        <span></span>
+        <span class="text-right">${statValueLabel(csMode)}</span>
+      </div>
+      ${SOLO_LEVEL_IDS.map(id => rowHTML(soloLevelName(id), id)).join('')}
     </div>
-    ${csRow === 'solo' ? `<div class="pill-group solo-levels cs-solo-levels">${soloLevelPillsHTML(csSoloLevel, 'csSetSoloLevel')}</div>${soloHintHTML()}` : ''}
+    ${isSolo(csRow) ? soloHintHTML() : ''}
     ${_adversariesSectionHTML()}`;
 }
 

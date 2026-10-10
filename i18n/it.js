@@ -636,6 +636,8 @@ window.I18N.it = {
     "Hard": "Difficile",
     "Difficulty": "Difficoltà",
     "Fated on 1-{n}/{die}": "Fato con 1-{n}/{die}",
+    "Rounds: {n}": "Round: {n}",
+    "Fate: {p}%": "Fato: {p}%",
     "{n}/{max} rounds": "{n}/{max} round",
     "Avg rounds to win": "Round medi per vincere",
     "The Phantom's die": "Il dado del fantasma",

@@ -36,13 +36,15 @@ function soloLevelName(id) {
   return { easy: t('Easy'), medium: t('Medium'), hard: t('Hard') }[id] || '';
 }
 
-// What a level means, on two lines: "20 rounds" and "Fated on 1-4/10".
+// What a level means, on two lines: "Rounds: 20" and "Fate: 40%" (the chance
+// that the Phantom's die Fates you).
 function soloLevelRuleHTML(id) {
   const l = SOLO_LEVELS[id];
-  return `${_esc(tn(l.turns, '{n} round', '{n} rounds'))}<br>${_esc(soloFatedOn(id))}`;
+  return `${_esc(t('Rounds: {n}', { n: l.turns }))}<br>${_esc(t('Fate: {p}%', { p: Math.round(l.fate / SOLO_DIE * 100) }))}`;
 }
 
-// "Fated on 1-4/10": the die results that Fate you, out of the die's.
+// "Fated on 1-4/10": the die results that Fate you, out of the die's (under
+// the die, where it explains the roll).
 const soloFatedOn = id => t('Fated on 1-{n}/{die}', { n: SOLO_LEVELS[id].fate, die: SOLO_DIE });
 
 // The level's name, in its color (green, yellow, red).
@@ -50,16 +52,8 @@ function soloLevelTagHTML(id) {
   return `<span class="solo-level lvl-${id}">${_esc(soloLevelName(id))}</span>`;
 }
 
-// The level row under Solo (size-filter.js, the villain page): All, then the
-// three levels in their colors, dashed like Solo. `onPick` is the name of the
-// function that takes the picked id ('all' or a level).
-function soloLevelPillsHTML(current, onPick) {
-  const pill = (id, label) => `<button class="pill pill-solo${id === 'all' ? '' : ` lvl-${id}`}${current === id ? ' on' : ''}" type="button" data-level="${id}"${onPick ? ` onclick="${onPick}('${id}')"` : ''}>${_esc(label)}</button>`;
-  return pill('all', t('All')) + SOLO_LEVEL_IDS.map(id => pill(id, soloLevelName(id))).join('');
-}
-
 // New Game's level picker: the switch of the draw pool (Pace | Pace+), one
-// segment per level, with what the picked one means beside it.
+// segment per level, the picked one in its color, with what it means beside it.
 function soloLevelSegHTML(current, onPick) {
   const btn = id => `<button class="seg-btn lvl-${id}${id === current ? ' on' : ''}" type="button" aria-pressed="${id === current}" onclick="${onPick}('${id}')">${_esc(soloLevelName(id))}</button>`;
   return `<div class="seg seg-sm solo-level-seg" role="group" aria-label="${_esc(t('Difficulty'))}">${SOLO_LEVEL_IDS.map(btn).join('')}</div>

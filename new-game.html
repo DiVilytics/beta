@@ -139,14 +139,14 @@
       </div>
       <div id="excludeGrid"></div>
     </div>
-    <!-- Solo (solo.js): the difficulty level, under the draw pool. -->
-    <div class="hidden" id="soloLevelNg"></div>
 
     <div class="section-label lineup-label">
       <div class="header-actions" id="lineupBtns">
         <button class="btn btn-sm btn-lineup" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled title="Random order" data-i18n-attr="title" data-i18n>Random order</button>
         <button class="btn btn-sm btn-lineup" id="drawAllBtn" type="button" onclick="drawAll()" title="Draw villains" data-i18n-attr="title" data-i18n>Draw villains</button>
       </div>
+      <!-- Solo (solo.js): the difficulty level, where the two buttons above stand otherwise. -->
+      <div class="hidden" id="soloLevelNg"></div>
       <span class="players-legend" id="playersLegend"><span class="sep-item" data-i18n>🎲 = draw</span> | <span class="sep-item" data-i18n>❌ = remove</span> | <span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>👑 = winner</span></span>
     </div>
     <div id="orderSlots"></div>

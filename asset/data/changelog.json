@@ -2,7 +2,7 @@
   "2026-10-10": {
     "title": "Solo difficulty, new solo rules and the XP table",
     "new": [
-      "Solo has three difficulty levels: Easy, Medium and Hard, with 25, 20 or 15 rounds, and Fated on 1-2, 1-4 or 1-6. In a game in progress, + rolls the Phantom's die and shows whether you're Fated, and + after your last round ends the game, lost. Under Solo, filter by difficulty."
+      "Solo has three difficulty levels: Easy, Medium and Hard, with 25, 20 or 15 rounds, and Fated on 1-2, 1-4 or 1-6. In a game in progress, + rolls the Phantom's die and shows whether you're Fated, and + after your last round ends the game, lost. The Difficulty menu next to Solo filters by level, and a villain's page has a row for each."
     ],
     "improved": [
       "Under the players' Leaderboard, XP table shows what a game is worth: by how many players claimed their villain, lost or won.",

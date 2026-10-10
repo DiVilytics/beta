@@ -324,6 +324,7 @@ function _syncSoloUI() {
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
   setVisible('drawAllBtn', !soloMode);
+  setVisible('lineupBtns', !soloMode);   // its half of the row goes to the level picker
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);

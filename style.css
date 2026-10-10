@@ -2392,18 +2392,19 @@ select:disabled {
 #claimRoot .solo-hint { text-align: center; }
 .solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
 /* Solo's difficulty levels (solo.js): the names in green, yellow and red, in
-   the level filter under Solo (dashed), New Game's picker (the draw pool's
-   switch, under it, with the level's rounds and Fate beside it) and on solo
-   games. */
+   New Game's picker (the draw pool's switch, the picked one in its color,
+   with the level's rounds and Fate beside it, in the lineup row) and on solo
+   games. The level filter under Solo stays plain, dashed. */
 .lvl-easy   { --lvl: var(--lvl-easy); }
 .lvl-medium { --lvl: var(--lvl-medium); }
 .lvl-hard   { --lvl: var(--lvl-hard); }
-.solo-level, .pill.pill-solo[class*="lvl-"], .solo-level-seg .seg-btn { color: var(--lvl); }
-/* A little tighter than the other pills: the four fit one phone line in Italian too. */
-.pill[data-level] { padding: 0 10px; }
-.cs-solo-levels { margin: -6px 0 12px; }
-#soloLevelNg { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; }
-.solo-level-rule { font-size: calc(11px * var(--ts)); line-height: 1.35; color: var(--muted); }
+.solo-level, .solo-level-seg .seg-btn.on { color: var(--lvl); }
+#soloLevelNg { display: flex; align-items: center; gap: 6px; flex-shrink: 0; text-transform: none; letter-spacing: 0; font-weight: 400; }
+/* Tighter than the draw pool's switch, so the switch, its rule and the legend
+   share one phone line (in Italian too). */
+.solo-level-seg .seg-btn { padding: 0 4px; }
+#soloLevelNg:not(.hidden) + .players-legend { margin-left: 4px; }
+.solo-level-rule { font-size: calc(10px * var(--ts)); line-height: 1.35; color: var(--muted); white-space: nowrap; }
 /* New Game, after + on the last round: the game stopped, lost. */
 .solo-end-note {
   border: 1px dashed var(--s4); border-radius: var(--r);
@@ -2414,7 +2415,7 @@ select:disabled {
    on top when tapped; the selected one is marked. Solo sits under it, dashed. */
 .cs-row { cursor: pointer; }
 .cs-table .lb-row.on { background: var(--s3); box-shadow: inset 3px 0 0 var(--muted); }
-.cs-solo-table { margin-top: 6px; border-style: dashed; }
+.cs-solo-table { margin-top: 12px; border-style: dashed; }
 
 /* Small square ‹ › buttons (the avatar builder's part rows). */
 .cs-month-nav {
