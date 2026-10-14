@@ -33,7 +33,7 @@ const MIN_GAMES_FOR_PCT = 5;
 // width of the "(games)" sub-column for a table, from its largest count;
 // statValueLabel → its column header. statModeSegHTML renders the toggle
 // control (`fn` is the global handler name the buttons call, e.g. 'setMode').
-// Δ Win: how far the wins are from what equal chances would give, in
+// Δ Wins: how far the wins are from what equal chances would give, in
 // standard deviations, (W - E) / √V, with E = Σ 1/k (the wins expected by
 // chance) and V = Σ 1/k (1 - 1/k) (their variance) over the games, k the
 // players in each. 0 is exactly as expected; null without games.
@@ -67,7 +67,7 @@ function _headLabel(key) {
 function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
   if (mode === 'xp') return `${_headLabel('XP')} <span class="lb-head-sub">(${_headLabel('Achievements')})</span>`;
-  if (mode === 'chance') return `${_headLabel('Δ Win')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
+  if (mode === 'chance') return `${_headLabel('Δ Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
   return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
 }
 // The number in parentheses: the games, or for XP the XP from achievements.
@@ -83,12 +83,12 @@ function statGamesWidth(rows, mode) {
   return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
 }
 
-// `xp: true` adds XP first (the players' Leaderboard), `chance: true` Δ Win
+// `xp: true` adds XP first (the players' Leaderboard), `chance: true` Δ Wins
 // first (the villains').
 function statModeSegHTML(mode, fn, { xp = false, chance = false } = {}) {
   const btn = (m, label) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', t('XP')) : ''}${chance ? btn('chance', t('Δ Win')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', t('XP')) : ''}${chance ? btn('chance', t('Δ Wins')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {
@@ -120,7 +120,7 @@ function statBarWidth(r, mode, maxVal) {
   return Math.min(100, Math.round((statValue(r, mode) / (maxVal || 1)) * 100));
 }
 
-// Δ Win's bar starts from the middle (0, as expected by chance): to the
+// Δ Wins's bar starts from the middle (0, as expected by chance): to the
 // right above it, to the left below it, scaled to the largest distance.
 function chanceBarHTML(r, maxAbs, gold) {
   const v = chanceDelta(r) ?? 0;

@@ -1536,7 +1536,7 @@ select:disabled {
 .bar-bg { height: 4px; background: var(--s4); border-radius: 2px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
-/* Δ Win's formulas (leaderboard.js, How it's computed). */
+/* Δ Wins's formulas (leaderboard.js, How it's computed). */
 .math-block { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; margin: 10px 0; font-size: calc(15px * var(--ts)); font-style: italic; color: var(--text); }
 .math-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
 .math-frac > span:first-child { padding: 0 3px 1px; border-bottom: 1px solid currentColor; }
@@ -1544,7 +1544,7 @@ select:disabled {
 .math-sum { display: inline-flex; flex-direction: column; align-items: center; font-style: normal; line-height: 1; margin-right: 2px; }
 .math-sum > span:nth-child(2) { font-size: 1.5em; }
 .math-sum > span:first-child, .math-sum > span:last-child { font-size: 0.6em; font-style: italic; }
-/* Δ Win: from the middle, right above 0, left below it (stats-table.js). */
+/* Δ Wins: from the middle, right above 0, left below it (stats-table.js). */
 .bar-diverge { position: relative; }
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
 .bar-diverge .bar-fill { position: absolute; top: 0; }
@@ -2064,7 +2064,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .tn-player-row { min-height: 38px; padding: 3px 10px; box-sizing: border-box; }
 .tn-player-row .order-slot-portrait { width: 26px; height: 26px; }
 .tn-player-row.mine { border-color: var(--accent); }
-.tn-row-status { flex-shrink: 0; font-size: calc(12px * var(--ts)); color: var(--dim); font-style: italic; }
+.tn-row-status { flex-shrink: 0; padding-right: 2px; font-size: calc(12px * var(--ts)); color: var(--dim); font-style: italic; }
 /* As tall as + Add player under them. */
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
@@ -2377,7 +2377,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .claim-nick.unclaimed { font-style: italic; }
 .claim-share-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 4px 0 14px; }
 /* The creator's Delete game, last on the page. */
-.claim-delete-row { display: flex; justify-content: center; margin-top: 28px; }
+.claim-delete-row { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
 /* Edit lineup: New Game's rows (.order-slot), without dragging or drawing. */
 #lineupSlots { display: flex; flex-direction: column; gap: 4px; }
 #lineupSlots .row-num { margin-right: 0; }
@@ -2417,8 +2417,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
-/* How the options work: a button on top of the form, an ⓘ by each option. */
-.tn-intro-help { font-size: inherit; padding: 0; }
+/* Tournament options: an ⓘ after the page intro, and one by each option. */
 .tn-info { border: none; background: none; padding: 0 2px; font: inherit; font-size: calc(12px * var(--ts)); color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }
 .tn-help-section { margin-bottom: 16px; }
 .tn-help-section h4 { margin: 0 0 6px; font-size: calc(14px * var(--ts)); }

@@ -1,8 +1,8 @@
 {
   "2026-10-15": {
-    "title": "Δ Win on the villains' Leaderboard",
+    "title": "Δ Wins on the villains' Leaderboard",
     "new": [
-      "The villains' Leaderboard opens on Δ Win: how far each villain's wins are from what equal chances would give, in standard deviations, every game counted at its table size. 0 is exactly as expected, above 0 more wins, below 0 fewer. How it's computed explains the math."
+      "The villains' Leaderboard opens on Δ Wins: how far each villain's wins are from what equal chances would give, in standard deviations, every game counted at its table size. 0 is exactly as expected, above 0 more wins, below 0 fewer. How it's computed explains the math."
     ]
   },
   "2026-10-14": {

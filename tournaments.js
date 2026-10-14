@@ -185,7 +185,7 @@ function tnRenderTournament() {
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
   // Each option with its name, as the form calls it.
   // On top the tournament (name, date, organizer, status); under it, after a
-  // gap, its options one per row, with ⓘ for How the options work.
+  // gap, its options one per row, with ⓘ for Tournament options.
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
   const options = [
@@ -203,7 +203,6 @@ function tnRenderTournament() {
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
-    isOrg && lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start')}</button>` : '',
   ].join('');
 
   const ctx  = { user, isOrg, lobby, mine };
@@ -215,7 +214,7 @@ function tnRenderTournament() {
       <div class="claim-meta">${fmtTournamentDate(tnTour)}</div>
       <div class="claim-meta">${organizer}</div>
       <div class="claim-meta">${status}</div>
-      <div class="claim-meta tn-options-title"><strong>${t('Options')}</strong> <button class="tn-info" type="button" onclick="tnHelp()" title="${_esc(t('How the options work'))}">ⓘ</button></div>
+      <div class="claim-meta tn-options-title"><strong>${t('Options')}</strong> <button class="tn-info" type="button" onclick="tnHelp()" title="${_esc(t('Tournament options'))}">ⓘ</button></div>
       ${options}
     </div>
     <div class="claim-share-row">${actions}</div>
@@ -225,7 +224,10 @@ function tnRenderTournament() {
       <div class="section-label">${t('Players')}</div>
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
       ${user ? '' : `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
-    ${isOrg ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button></div>` : ''}`;
+    ${isOrg ? `<div class="claim-delete-row">
+      <button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button>
+      ${lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start tournament')}</button>` : ''}
+    </div>` : ''}`;
 }
 
 // A player, in New tournament's row: their number, the avatar of whoever
@@ -459,7 +461,7 @@ function tnStart() {
     id:           'tnStartSheet',
     title:        t('Start the tournament?'),
     bodyHTML:     `<p class="confirm-text">${t('Stage 1 is drawn: {tables} and a villain for every player.', { tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
-    confirmLabel: t('Start'),
+    confirmLabel: t('Start tournament'),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => _tnAfter(await _tnDrawStart()),
   });
@@ -735,7 +737,7 @@ function tnCustomFill(fill) {
   _tnRenderCustom();
 }
 
-// ── How the options work ──
+// ── Tournament options ──
 // Every option in full, with examples, in a sheet: the button on top of the
 // form opens it at the start, each option's ⓘ at its own section.
 const TN_HELP = [
@@ -825,7 +827,10 @@ function _tnHelpButtons() {
   document.querySelectorAll('#tnForm [data-help] > label').forEach(label => {
     if (label.querySelector('.tn-info')) return;
     const key = label.parentElement.dataset.help;
-    label.insertAdjacentHTML('beforeend', ` <button class="tn-info" type="button" onclick="event.preventDefault(); tnHelp('${key}')" title="${_esc(t('How the options work'))}">ⓘ</button>`);
+    label.insertAdjacentHTML('beforeend', ` <button class="tn-info" type="button" onclick="event.preventDefault(); tnHelp('${key}')" title="${_esc(t('Tournament options'))}">ⓘ</button>`);
+    // Only the ⓘ opens it: a label with no field of its own would otherwise
+    // pass a tap anywhere on it to the button.
+    if (!label.htmlFor) label.addEventListener('click', e => { if (!e.target.closest('.tn-info')) e.preventDefault(); });
   });
 }
 
