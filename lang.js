@@ -42,8 +42,35 @@ const BETA_KEY = 'betaOptIn';
 function betaJoined() {
   try { return localStorage.getItem(BETA_KEY) === '1'; } catch (_) { return false; }
 }
-if (!IS_BETA && location.hostname === 'divilytics.github.io' && betaJoined()) {
-  location.replace(`/beta${location.pathname}${location.search}${location.hash}`);
+// Locally the two are separate origins (release on port 8000, beta on 4173)
+// that don't share BETA_KEY: the switch carries it in the address, ?joinedBeta
+// (sets it on the beta) or ?leftBeta (clears it on the release).
+const IS_LOCAL = location.hostname === 'localhost';
+const LOCAL_PORTS = { release: '8000', beta: '4173' };
+if (IS_LOCAL) {
+  const url = new URL(location.href);
+  const flag = IS_BETA ? 'joinedBeta' : 'leftBeta';
+  if (url.searchParams.has(flag)) {
+    try { if (IS_BETA) localStorage.setItem(BETA_KEY, '1'); else localStorage.removeItem(BETA_KEY); } catch (_) {}
+    url.searchParams.delete(flag);
+    history.replaceState(null, '', url);
+  }
+}
+
+// The same page in the other version: the beta's when `beta`, else the release's.
+function betaSwitchUrl(beta) {
+  const page = location.pathname.replace(/^\/beta(?=\/)/, '') || '/';
+  if (IS_LOCAL) {
+    const url = new URL(page + location.search + location.hash, location.href);
+    url.port = beta ? LOCAL_PORTS.beta : LOCAL_PORTS.release;
+    url.searchParams.set(beta ? 'joinedBeta' : 'leftBeta', '');
+    return url.href;
+  }
+  return (beta ? `/beta${page}` : page) + location.search + location.hash;
+}
+
+if (!IS_BETA && (location.hostname === 'divilytics.github.io' || (IS_LOCAL && location.port === LOCAL_PORTS.release)) && betaJoined()) {
+  location.replace(betaSwitchUrl(true));
 }
 
 // Pick a language (home page switch): remember it and redraw every page in it.
