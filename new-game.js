@@ -770,20 +770,23 @@ function _renderTurnCount() {
 }
 
 // Solo: + ends your turn, and the Phantom's 10-sided die rolls at once (Fated
-// on 1 to the level's number); − takes the round and its roll back. + after
-// the last round ends the game: lost.
+// on 1 to the level's number); − goes back a round, + again shows the roll it
+// already had. + after the last round ends the game: lost.
 function bumpTurn(delta) {
   if (delta < 0 && liveGame.turns <= 1) return;   // round 1 is the lowest (also from the lock screen)
   if (delta > 0 && soloMode && liveGame.turns >= _soloTurns()) { _endSoloLost(); return; }
   _turnBumped    = true;
   _roundsCounted = true;
-  if (soloMode) {
-    if (delta > 0) _soloRolls[liveGame.turns + 1] = soloRollDie();
-    else delete _soloRolls[liveGame.turns];
+  // A round's roll is rolled once, the first time + reaches it, and kept: −
+  // and + again show the same fate (no new roll to try your luck).
+  let rolled = false;
+  if (soloMode && delta > 0 && _soloRolls[liveGame.turns + 1] == null) {
+    _soloRolls[liveGame.turns + 1] = soloRollDie();
+    rolled = true;
   }
   liveGame.bumpTurns(delta);   // the lock screen reads the roll (liveMediaLines)
   _renderTurnCount();
-  if (soloMode && delta > 0) _animateDie();
+  if (rolled) _animateDie();
   if (!liveTimerId) {
     const fTurns = document.getElementById('fTurns');
     if (fTurns) fTurns.value = liveGame.turns || '';
@@ -809,8 +812,19 @@ function _renderSoloDie(rolling = false) {
     <div class="die-text">
       <strong>${roll == null ? t("The Phantom's die") : rolling ? t('Rolling…') : fated ? t('Fated') : t('Safe')}</strong>
       <span>${_esc(soloFatedOn(soloLevel))}</span>
-      ${liveGame.turns >= turns ? `<span class="die-last">${t('Last round: + ends the game, lost.')}</span>` : ''}
     </div>`;
+  // The last round: said plainly under the counter, + in red (and off on the
+  // lock screen: new-game-audio.js asks liveNextAllowed).
+  const last = liveGame.turns >= turns;
+  const note = document.getElementById('liveLast');
+  if (note) { note.textContent = last ? t('Last round: + now ends the game, lost.') : ''; setVisible(note, last); }
+  document.getElementById('livePlusBtn')?.classList.toggle('end', last);
+}
+
+// Whether the lock screen's + may move on (new-game-audio.js): not past a solo
+// game's last round, which only the app's + ends.
+function liveNextAllowed() {
+  return !(soloMode && liveGame.turns >= _soloTurns());
 }
 
 // The roll, shown tumbling for half a second before it lands (not when the
@@ -849,7 +863,7 @@ function liveMediaLines() {
   const roll  = soloMode ? _soloRolls[liveGame.turns] : null;
   if (!soloMode) return { title: round, artist: t('Update Timer and Rounds') };
   return {
-    title:  `${round}/${_soloTurns()}`,
+    title:  `${round}/${_soloTurns()}${liveNextAllowed() ? '' : ` | ${t('Last round')}`}`,
     artist: roll == null ? t('Update Timer and Rounds') : `🎲 ${roll} | ${roll <= SOLO_LEVELS[soloLevel].fate ? t('Fated') : t('Safe')}`,
   };
 }

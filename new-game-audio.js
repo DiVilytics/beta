@@ -99,8 +99,6 @@ function _registerMediaHandlers() {
   navigator.mediaSession.setActionHandler('pause', () => {
     stopLive(); // pauses game timer + pauses audio via wrapped stopLive
   });
-  navigator.mediaSession.setActionHandler('nexttrack',     () => bumpTurn(1));
-  navigator.mediaSession.setActionHandler('seekforward',   () => bumpTurn(1));
   _syncBackHandlers();
 }
 
@@ -111,6 +109,13 @@ function _syncBackHandlers() {
   const back = liveGame.turns > 1 ? () => bumpTurn(-1) : null;
   for (const action of ['previoustrack', 'seekbackward']) {
     try { navigator.mediaSession.setActionHandler(action, back); } catch (_) {}
+  }
+  // + stops at a solo game's last round (the page's liveNextAllowed): only the
+  // app's + ends it, so a game is never lost by accident from the lock screen.
+  const nextOk = typeof liveNextAllowed !== 'function' || liveNextAllowed();
+  const next = nextOk ? () => bumpTurn(1) : null;
+  for (const action of ['nexttrack', 'seekforward']) {
+    try { navigator.mediaSession.setActionHandler(action, next); } catch (_) {}
   }
 }
 

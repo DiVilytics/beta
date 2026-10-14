@@ -65,6 +65,8 @@
       <button class="live-btn" id="livePlusBtn" type="button" onclick="bumpTurn(1)">+</button>
     </div>
     <!-- Solo: the Phantom's die, rolled by + (new-game.js). -->
+    <!-- Solo: the last round, said plainly (new-game.js). -->
+    <p class="solo-last hidden" id="liveLast" role="status"></p>
     <div class="live-die hidden" id="liveDie" aria-live="polite"></div>
     <p class="live-hint" id="liveHint" data-i18n>The counter shows the current round. A round ends when every player has had their turn: tap + when the first player is up again. When you're done, tap Pause game: the duration is filled in automatically, and the rounds too if you used the counter.</p>
     <p class="live-hint hidden" id="liveHintSolo" data-i18n>The counter shows the current round: alone, every turn is a round. At the end of each of your turns tap +, and the die rolls for the Phantom: Fated or Safe. + after your last round ends the game, lost. Reached your Objective? Tap Pause game, mark 👑 and save.</p>
