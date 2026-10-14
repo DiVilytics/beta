@@ -160,7 +160,7 @@ function render() {
     <div class="section-label">${solo ? t('Player') : t('Players')}</div>
     <div class="claim-rows${solo ? ' solo' : ''}">${rowsHTML}</div>
     ${myClaim ? `<p class="claim-success">${_playedAsHTML(myClaim, solo)}</p>` : ''}
-    ${claimGame.tournament && !myClaim ? `<p class="tn-hint">${t('This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.')}</p>` : ''}
+    ${claimGame.tournament && !myClaim ? `<p class="results-hint">${t('This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.')}</p>` : ''}
     ${solo ? soloHintHTML() : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
 }
