@@ -668,8 +668,8 @@ const TN_HELP = [
     'Fixed once the tournament starts.',
   ]],
   ['tables', 'Tables', [
-    'Even: as many tables as needed, all as even as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye.',
-    'Full: every table full, and whoever is left over has a bye. 9 players at tables of 4 play at two tables of 4, and one has a bye; 7 players play at one table of 4, and three have a bye. With fewer players than a table, they all play together.',
+    'Even: as many tables as needed, all as even as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye (see Bye).',
+    'Full: every table full, and whoever is left over has a bye (sits out the stage, see Bye). 9 players at tables of 4 play at two tables of 4, and one has a bye; 7 players play at one table of 4, and three have a bye. With fewer players than a table, they all play together.',
     'Byes go to whoever has had the fewest so far (with Swiss pairing, the lowest ranked of them), so over the stages everyone gets their share.',
     'It can change between stages: once every table of the current stage is saved.',
   ]],
@@ -690,6 +690,7 @@ const TN_HELP = [
     'Fixed once the tournament starts.',
   ]],
   ['bye', 'Bye', [
+    'A bye is a stage a player sits out: when the players can\'t all be seated at the tables, whoever is left over doesn\'t play in that stage and gets the bye\'s points instead.',
     'What a bye scores, a win being what 1st scores at a full table (3 at tables of 4 with Borda count).',
     'Last: 0.',
     'Half a win: half of that (1.5).',
