@@ -220,7 +220,8 @@ async function tnSaveGame() {
     results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round: tnGame.roundsCounted ? round : null, dropped })),
   });
   btn.textContent = t('Save game');
-  if (error) { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error)); }
+  // Saved already by this phone (a save sent twice, the answer lost): done.
+  if (error && error.message !== 'table_saved') { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error)); }
   _tnLeave();
 }
 
