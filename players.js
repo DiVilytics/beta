@@ -134,7 +134,13 @@ async function load() {
 
   const gameIds = [...new Set(myRows.map(r => r.game_id).concat((created?.rows || []).map(r => r.id)))];
 
-  const all = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
+  const fetched = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
+  // A tournament's games are its organizer's, but only the ones they played
+  // show on their profile.
+  await attachTournaments(fetched.games);
+  const played = new Set(myRows.map(r => r.game_id));
+  const keep   = new Set(fetched.games.filter(g => !g.tournament || played.has(g.id)).map(g => g.id));
+  const all    = { games: fetched.games.filter(g => keep.has(g.id)), players: fetched.players.filter(p => keep.has(p.game_id)) };
   const { games, players } = gamesOfVariant(all);
   pfGames   = games;
   pfPlayers = players;

@@ -8,7 +8,7 @@
 // (typically `getCurrentUser()`); a missing user yields all-false.
 function gameUserRole(g, gp, user) {
   if (!user) return { isCreator: false, isClaimant: false, isParticipant: false };
-  const isCreator  = g.created_by === user.id;
+  const isCreator  = g.created_by === user.id && !g.tournament;
   const isClaimant = gp.some(p => p.user_id === user.id);
   return { isCreator, isClaimant, isParticipant: isCreator || isClaimant };
 }

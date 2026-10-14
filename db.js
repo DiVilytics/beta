@@ -84,6 +84,22 @@ async function fetchPlayersForGames(ids) {
     db.from('game_players').select('*').in('game_id', chunk).order('position'));
 }
 
+// Marks the games that belong to a tournament (tournaments.js): g.tournament =
+// { id, name, stage, tableNo }. The game cards show 🏟️ for them, the game
+// page links back, and only the tournament changes them. Games stay as they
+// are when the lookup fails.
+async function attachTournaments(games) {
+  const ids = games.map(g => g.id);
+  if (!ids.length) return games;
+  try {
+    const rows = await _fetchInChunks(ids, chunk => db.from('tournament_tables')
+      .select('game_id, stage, table_no, tournament_id, tournaments(name)').in('game_id', chunk));
+    const byGame = new Map(rows.map(r => [r.game_id, { id: r.tournament_id, name: r.tournaments?.name || '', stage: r.stage, tableNo: r.table_no }]));
+    for (const g of games) if (byGame.has(g.id)) g.tournament = byGame.get(g.id);
+  } catch (_) {}
+  return games;
+}
+
 // Fetch full game rows by id. `orderByPlayedAtDesc` returns newest first.
 async function fetchGamesByIds(ids, { orderByPlayedAtDesc = false } = {}) {
   if (!ids.length) return [];
