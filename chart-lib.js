@@ -91,14 +91,16 @@ const Charts = (() => {
   // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
   // `diverging`: values on both sides of 0 (Δ Wins), the axis from -max to
-  // max with 0 in the middle, each bar drawn from 0.
-  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false } = {}) {
+  // max with 0 in the middle, each bar drawn from 0. `ref` = { value, text }: a
+  // dashed line at value (an average to compare the bars with), with `text`
+  // above the plot on the right.
+  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null } = {}) {
     if (!data.length) return empty();
-    const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value) : d.value)) || 1;
+    const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value) : d.value), ref ? Math.abs(ref.value) : 0) || 1;
     const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4);
     const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
     const lo = diverging ? -max : 0;
-    const top = 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
+    const top = ref ? 24 : 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
     const rowH = Math.min(36, (H - top - B) / data.length), bw = W - labelW - RM;
     const sx = v => labelW + (v - lo) / (max - lo) * bw;
     const botY = top + data.length * rowH;   // baseline = bottom of the last bar
@@ -117,7 +119,12 @@ const Charts = (() => {
         <text x="${labelW - 8}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
         <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>`;
     }).join('');
-    return wrap(axis + rows);
+    const refHTML = ref ? (() => {
+      const x = sx(ref.value);
+      return `<line x1="${x.toFixed(1)}" y1="${top - 4}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-median"/>` +
+        `<text x="${W - RM}" y="${top - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(ref.text)}</text>`;
+    })() : '';
+    return wrap(axis + rows + refHTML);
   }
 
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.
