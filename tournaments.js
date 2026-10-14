@@ -664,7 +664,7 @@ function _tnRenderCustom() {
   const cells = [`<span></span>`, ...Array.from({ length: size }, (_, i) => `<span class="tn-custom-place">${fmtPlace(i + 1)}</span>`)];
   for (let n = size; n >= 2; n--) {
     cells.push(`<span class="tn-custom-n">${tn(n, '{n} player', '{n} players')}</span>`);
-    tnCustom[n].forEach((v, i) => cells.push(`<input type="number" min="0" step="any" value="${v}" aria-label="${_esc(`${tn(n, '{n} player', '{n} players')}, ${fmtPlace(i + 1)}`)}" oninput="tnCustom[${n}][${i}] = Math.max(0, Number(this.value) || 0)">`));
+    tnCustom[n].forEach((v, i) => cells.push(`<input type="number" inputmode="decimal" min="0" step="any" value="${v}" aria-label="${_esc(`${tn(n, '{n} player', '{n} players')}, ${fmtPlace(i + 1)}`)}" oninput="tnCustom[${n}][${i}] = Math.max(0, Number(this.value) || 0)">`));
     for (let i = n; i < size; i++) cells.push('<span></span>');
   }
   const lines = [`<div class="tn-custom-grid" style="--places: ${size}">${cells.join('')}</div>`];
