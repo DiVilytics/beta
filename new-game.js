@@ -930,7 +930,7 @@ function liveMediaLines() {
 }
 
 function showErr(msg) {
-  showError('err', msg, { scroll: true });
+  showError('err', msg);
 }
 
 function _validateLineup() {

@@ -213,10 +213,12 @@ function setVisible(target, visible) {
   el.classList.toggle('hidden', !visible);
 }
 
-// Show an error banner (.err element). The shake animation always re-plays so
-// repeated submits with the same error are still noticeable. Optional
-// `scroll` smooth-scrolls the banner into view.
-function showError(target, msg, { scroll = false } = {}) {
+// Show an error banner (.err element), everywhere the same way: the shake
+// animation always re-plays so repeated submits with the same error are still
+// noticeable, and a banner out of sight (off screen, under the top bar, or
+// scrolled away inside a pop-up) is scrolled into view; one already in view
+// stays put.
+function showError(target, msg) {
   const el = _resolveEl(target);
   if (!el) return;
   el.textContent = msg;
@@ -225,7 +227,22 @@ function showError(target, msg, { scroll = false } = {}) {
   el.classList.remove('shake');
   void el.offsetWidth;
   el.classList.add('shake');
-  if (scroll) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (!_isInView(el)) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Whole in sight: inside the window below the sticky top bar, and inside every
+// scrolling box around it (a pop-up's body).
+function _isInView(el) {
+  const r = el.getBoundingClientRect();
+  let top = Math.max(0, document.querySelector('nav')?.getBoundingClientRect().bottom || 0);
+  let bottom = window.innerHeight;
+  for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+    if (!/(auto|scroll)/.test(getComputedStyle(p).overflowY)) continue;
+    const pr = p.getBoundingClientRect();
+    top = Math.max(top, pr.top);
+    bottom = Math.min(bottom, pr.bottom);
+  }
+  return r.top >= top && r.bottom <= bottom;
 }
 
 function clearError(target) {

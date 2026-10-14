@@ -325,7 +325,7 @@ function _syncResetBtn() {
 }
 
 function showErr(msg) {
-  showError('err', msg, { scroll: true });
+  showError('err', msg);
 }
 
 // "Done" just closes the panel, closing is what commits the selection.
