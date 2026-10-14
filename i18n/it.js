@@ -681,7 +681,7 @@ window.I18N.it = {
     "No game has started yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.": "Nessuna partita è ancora iniziata, quindi ogni impostazione si può cambiare. Cambiare tavoli, fasi, riserva o giocatori sorteggia di nuovo la fase 1.",
     "Up to the villains in the draw pool. An empty name keeps the one shown.": "Fino ai cattivi della riserva. Un nome vuoto tiene quello mostrato.",
     "Organizer: {name}": "Organizzatore: {name}",
-    "Options: {list}": "Opzioni: {list}",
+    "Options": "Opzioni",
     "{n} stage": "{n} fase",
     "{n} stages": "{n} fasi",
     "Edit settings": "Modifica impostazioni",

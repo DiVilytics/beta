@@ -184,9 +184,11 @@ function tnRenderTournament() {
   const pairing = TOURNAMENT_PAIRINGS[tnTour.pairing];
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
   // Each option with its name, as the form calls it.
-  const opt = (label, value) => `${t(label)}: ${value}`;
+  // On top the tournament (name, date, organizer, status); under it, after a
+  // gap, its options one per row, with ⓘ for How the options work.
+  const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
-  const settings = t('Options: {list}', { list: [
+  const options = [
     opt('Max players per table', tnTour.table_size),
     opt('Tables', t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name)),
     opt('Stages', tnTour.stages),
@@ -195,7 +197,7 @@ function tnRenderTournament() {
     opt('Scoring', scoring ? t(scoring.name) : _esc(tnTour.scoring)),
     opt('Bye', t((TOURNAMENT_BYES[tnTour.bye] || TOURNAMENT_BYES.last).name)),
     opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
-  ].join(' | ') });
+  ].join('');
   const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
@@ -212,8 +214,9 @@ function tnRenderTournament() {
       <div class="claim-date">${_esc(tnTour.name)}</div>
       <div class="claim-meta">${fmtTournamentDate(tnTour)}</div>
       <div class="claim-meta">${organizer}</div>
-      <div class="claim-meta">${settings}</div>
       <div class="claim-meta">${status}</div>
+      <div class="claim-meta tn-options-title"><strong>${t('Options')}</strong> <button class="tn-info" type="button" onclick="tnHelp()" title="${_esc(t('How the options work'))}">ⓘ</button></div>
+      ${options}
     </div>
     <div class="claim-share-row">${actions}</div>
     ${lobby ? '' : _tnViewSegHTML()}

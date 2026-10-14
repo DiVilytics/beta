@@ -2308,6 +2308,8 @@ select:disabled {
 }
 .claim-date { font-size: calc(14px * var(--ts)); font-weight: 600; margin-bottom: 2px; }
 .claim-meta { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.tn-options-title { margin-top: 12px; }
+.tn-options-title strong { color: var(--text); }
 
 .claim-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
