@@ -611,7 +611,6 @@ async function tnOpenForm(tour) {
   setVisible('tnFormPlayers', open);
   if (open) _tnRenderFormPlayers();
   _tnPoolChanged();
-  if (!tour) document.getElementById('tnName').focus();
 }
 
 function tnCloseForm() {
