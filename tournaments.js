@@ -44,6 +44,13 @@ async function init() {
   if (params.has('new')) return tnOpenForm(null);
   const id = params.get('t');
   if (id) {
+    // A link with the claim code (the QR code): kept on this phone, out of the address.
+    if (params.get('c')) {
+      _tnSaveCode(id, params.get('c'));
+      const url = new URL(location.href);
+      url.searchParams.delete('c');
+      history.replaceState(null, '', url);
+    }
     setVisible('tnBack', true);
     return tnLoad(id);
   }
@@ -57,6 +64,23 @@ function _tnAuthChanged() {
 }
 
 // ── SHARED BITS ───────────────────────────────────────────────────────────────
+
+// The claim code: names are claimed only with it, as a game is only from its
+// QR code. It comes with the tournament's link or QR code (?c=), kept on this
+// phone; the organizer and whoever claimed a name can read it (and so share
+// it), the others only have it from a link.
+const _tnCodeKey = id => `divilytics_tn_code_${id}${STORAGE_SCOPE}`;
+function _tnSaveCode(id, code) { try { localStorage.setItem(_tnCodeKey(id), code); } catch (_) {} }
+function _tnCode() {
+  if (!tnTour) return null;
+  try { return localStorage.getItem(_tnCodeKey(tnTour.id)); } catch (_) { return null; }
+}
+async function _tnFetchCode() {
+  const user = getCurrentUser();
+  if (_tnCode() || !user || (user.id !== tnTour.organizer && !tnPlayers.some(p => p.user_id === user.id))) return;
+  const { data } = await db.from('tournament_claim_codes').select('code').eq('tournament_id', tnTour.id).maybeSingle();
+  if (data?.code) _tnSaveCode(tnTour.id, data.code);
+}
 
 
 // A player's name as shown everywhere: the nickname of whoever claimed it,
@@ -145,6 +169,7 @@ async function tnLoad(id, { quiet = false } = {}) {
   tnPlayers = playersRes.data || [];
   tnTables  = (tablesRes.data || []).map(tb => ({ ...tb, seats: (tb.tournament_seats || []).sort((a, b) => a.position - b.position) }));
   await _tnLoadProfiles([tnTour.organizer, ...tnPlayers.map(p => p.user_id), ...tnTables.map(tb => tb.recorder)]);
+  await _tnFetchCode();
   _tnSchedulePoll();
   const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);
   if (quiet && snap === tnSnapshot) return;
@@ -222,7 +247,8 @@ function tnRenderTournament() {
     ${lobby || tnView === 'players' ? `
       ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
-      ${user ? '' : `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`}`
+      ${!user ? `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`
+        : !mine && !isOrg && !_tnCode() && tnPlayers.some(p => !p.user_id) ? `<p class="tn-hint">${t('To claim your name, scan the tournament\'s QR code from the organizer, or open its link.')}</p>` : ''}`
       : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnTablesHTML(mine)}
     ${isOrg ? `<div class="claim-delete-row">
       <button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button>
@@ -241,7 +267,7 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
   const avatar = prof
     ? avatarHTML(resolveAvatar(prof), { cls: 'order-slot-portrait' })
     : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">';
-  const canClaim = !p.user_id && !!user && !mine;
+  const canClaim = !p.user_id && !!user && !mine && (!!_tnCode() || isOrg);
   // Drops in saved games, and a withdrawal (the standings leave them out).
   const drops = tnTables.filter(tb => tb.saved_at && tb.seats.some(x => x.player_id === p.id && x.dropped)).length;
   const status = [
@@ -420,8 +446,11 @@ function _tnTableHTML(tb, myId) {
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
 
+// The QR code: with the claim code when you have it (the organizer, a player
+// with a name), so whoever scans it can claim theirs.
 function tnShare() {
-  showQRModal(new URL(`tournaments.html?t=${tnTour.id}`, location.href).href, 'qrCode', 'qrOverlay');
+  const code = _tnCode();
+  showQRModal(new URL(`tournaments.html?t=${tnTour.id}${code ? `&c=${encodeURIComponent(code)}` : ''}`, location.href).href, 'qrCode', 'qrOverlay');
 }
 
 // After an action: the tournament as it is now, and the error if it failed.
@@ -432,7 +461,7 @@ async function _tnAfter(error) {
 
 async function tnClaim(playerId) {
   if (!getCurrentProfile()) return _openNicknameModal();
-  const { error } = await db.rpc('claim_tournament_player', { target_player: playerId });
+  const { error } = await db.rpc('claim_tournament_player', { target_player: playerId, claim_code: _tnCode() });
   await _tnAfter(error);
 }
 
@@ -804,7 +833,7 @@ const TN_HELP = [
     'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
-    'The organizer types the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, and from then on shows by their nickname; Release gives it back.',
+    'The organizer types the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: the organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
     'The organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
     'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
@@ -997,7 +1026,7 @@ async function _tnApplyPlayers(id, plan) {
     const { error } = await db.from('tournament_players').insert(plan.added.map(a => ({ tournament_id: id, ...a })));
     if (error) return error;
   }
-  if (plan.claim) return (await db.rpc('claim_tournament_player', { target_player: plan.claim })).error;
+  if (plan.claim) return (await db.rpc('claim_tournament_player', { target_player: plan.claim, claim_code: _tnCode() })).error;
   return null;
 }
 

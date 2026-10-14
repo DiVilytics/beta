@@ -331,6 +331,7 @@ const TN_ERRORS = {
   table_saved:            'This table has already been saved.',
   invalid_results:        'Every villain needs a place before saving.',
   stage_has_games:        'A game of this stage is already saved: its draw can no longer be undone.',
+  wrong_code:             'This link can\'t claim names: scan the tournament\'s QR code from the organizer.',
 };
 function _tnErrorMsg(error) {
   if (error?.code === '23505') return t('There is already a player with this name.');

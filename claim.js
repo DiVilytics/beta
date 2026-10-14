@@ -124,13 +124,14 @@ function render() {
     const isMine = p.user_id === user.id;
     let nickHTML = '', actionHTML = '';
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
-    else if (myClaim)  nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
+    else if (myClaim || claimGame.tournament) nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
     if (solo) {
       // One seat, always its creator's: nothing to claim or release.
     } else if (isMine) {
       // Your own claim: let you release it (e.g. if you picked the wrong one).
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="releaseCharacter('${p.id}')">${t('Release')}</button>`;
-    } else if (!p.nickname && !myClaim) {
+    } else if (!p.nickname && !myClaim && !claimGame.tournament) {
+      // A tournament game's villains go with the names claimed in the tournament.
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="claimCharacter('${p.id}')">${t('Claim')}</button>`;
     }
     return `
@@ -159,6 +160,7 @@ function render() {
     <div class="section-label">${solo ? t('Player') : t('Players')}</div>
     <div class="claim-rows${solo ? ' solo' : ''}">${rowsHTML}</div>
     ${myClaim ? `<p class="claim-success">${_playedAsHTML(myClaim, solo)}</p>` : ''}
+    ${claimGame.tournament && !myClaim ? `<p class="tn-hint">${t('This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.')}</p>` : ''}
     ${solo ? soloHintHTML() : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
 }
