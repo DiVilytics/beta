@@ -442,6 +442,7 @@ function buildCard(g, gp) {
     isSelf: p => me && p.user_id === me.id,
     onLocationClick: loc => _applyLocationOption(loc),
     layout: 'rows',
+    soloLabel: !size.isSolo(),   // a list of solo games only: no need to say it
   });
 }
 

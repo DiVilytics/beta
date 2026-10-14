@@ -966,6 +966,7 @@ main {
   text-align: right;
   line-height: 1.6;
 }
+
 .card-loc-btn {
   background: none;
   border: none;
@@ -2984,9 +2985,10 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   border-top: 1px solid var(--border);
 }
 
-/* The beta's color (its menu bar): the label and the Join / Leave text. */
-.acct-section.beta-section .section-label,
-.acct-section.beta-section .btn-ghost { color: var(--accent); }
+/* The beta's color (its menu bar) on what leads to the beta: on the beta, its
+   label (Leave the beta stays gray); on the release, Join the beta. */
+:root[data-beta] .acct-section.beta-section .section-label,
+:root:not([data-beta]) .acct-section.beta-section .btn-ghost { color: var(--accent); }
 
 .acct-section .section-label {
   font-size: calc(13px * var(--ts));

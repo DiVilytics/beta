@@ -340,8 +340,8 @@ function _attachPlayerSearch() {
 // of the level picked.
 const _pfData = () => size.isSolo() ? soloOfLevel(pfSolo, size.level()) : { games: pfGames, players: pfPlayers };
 
-function pfFilteredGameIds() {
-  let { games, players } = _pfData();
+function pfFilteredGameIds(data = _pfData()) {
+  let { games, players } = data;
   const n = size.value();
   if (typeof n === 'number') {
     const countMap = {};
@@ -485,13 +485,27 @@ function render() {
 
 let _pfScrollToId = null;
 
-function _renderGamesList(keepIds = pfFilteredGameIds()) {
+// The list of games: on All, the solo games too (dashed, with the same period
+// and location), in date order; the numbers above stay the official games'.
+function _pfListData(keepIds) {
   const data = _pfData();
-  let games = data.games.filter(g => keepIds.has(g.id));
+  if (size.value() !== 'all') return { games: data.games.filter(g => keepIds.has(g.id)), players: data.players };
+  const soloIds = pfFilteredGameIds(pfSolo);
+  const at = g => g.played_at ? new Date(g.played_at).getTime() : -Infinity;
+  return {
+    games: [...data.games.filter(g => keepIds.has(g.id)), ...pfSolo.games.filter(g => soloIds.has(g.id))]
+      .sort((a, b) => at(b) - at(a)),
+    players: [...data.players, ...pfSolo.players],
+  };
+}
+
+function _renderGamesList(keepIds = pfFilteredGameIds()) {
+  const data = _pfListData(keepIds);
+  let games = data.games;
 
   if (pfWinsOnly) {
     const winGameIds = new Set(
-      data.players.filter(p => keepIds.has(p.game_id) && p.nickname === pfNick && p.is_winner).map(p => p.game_id)
+      data.players.filter(p => p.nickname === pfNick && p.is_winner).map(p => p.game_id)
     );
     games = games.filter(g => winGameIds.has(g.id));
   }
@@ -540,7 +554,7 @@ function buildProfileCard(g, gp) {
       ${role.isCreator ? `<button class="btn btn-danger btn-sm" onclick="pfDeleteGame('${g.id}')">${t('Delete')}</button>` : ''}
     </div>` : '';
   const me = getCurrentUser();
-  const card = buildGameCard(g, gp, { isSelf: p => me && p.user_id === me.id, actions, onLocationClick: pfSetLocationFilter, layout: 'rows' });
+  const card = buildGameCard(g, gp, { isSelf: p => me && p.user_id === me.id, actions, onLocationClick: pfSetLocationFilter, layout: 'rows', soloLabel: !size.isSolo() });
   card.id = `pf-game-${g.id}`;   // so we can scroll back to it after opening a game
   return card;
 }

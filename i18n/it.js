@@ -161,6 +161,8 @@ window.I18N.it = {
     "Only {name} is still playing: they win the final, like a bye, and the tournament ends.": "Gioca ancora solo {name}: vince la finale, come un riposo, e il torneo finisce.",
     "Nobody is still playing: there is no final, and the tournament ends on the standings as they are.": "Non gioca più nessuno: non c'è finale, e il torneo finisce con la classifica com'è.",
     "Unclaimed": "Non rivendicato",
+    "Stage {n}": "Fase {n}",
+    "Table {n}": "Tavolo {n}",
     "Release": "Rilascia",
     "Claim": "Rivendica",
     "Edit details": "Modifica dettagli",

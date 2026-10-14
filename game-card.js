@@ -21,9 +21,10 @@ function gameUserRole(g, gp, user) {
 // `layout: 'rows'` lists the players one per row in play order (seat numbers
 // when the order was recorded, crown at the row's end) instead of wrapping chips. The purple highlight
 // always marks the signed-in player (`isSelf`), on every page. A solo game
-// (solo.js) says Solo and its level where the others give the table size, and
+// (solo.js) says Solo and its level where the others give the table size
+// (just the level with `soloLabel: false`, in a list of solo games only), and
 // its rounds out of the level's; its card is dashed.
-function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips' } = {}) {
+function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips', soloLabel = true } = {}) {
   const rows = layout === 'rows';
   if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   // Seat numbers only when the play order was recorded: every seat has its own
@@ -38,7 +39,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     fmtDuration(g.duration_minutes),
     g.num_turns ? (level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds')) : null,
     locationPart,
-    level ? t('Solo') : `${gp.length}p`,
+    level ? (soloLabel ? t('Solo') : null) : `${gp.length}p`,
     level ? soloLevelTagHTML(level) : null,
   ].filter(Boolean);
   // Rows layout: the details may wrap, so they go in as separate items that
@@ -127,7 +128,7 @@ function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank 
 // Wrap the HTML in a <div class="game-card"> and attach the optional
 // location-click handler. Callers that just need HTML should call
 // buildGameCardHTML directly.
-function buildGameCard(g, gp, { isSelf, actions, onLocationClick, layout } = {}) {
+function buildGameCard(g, gp, { isSelf, actions, onLocationClick, layout, soloLabel } = {}) {
   const card = document.createElement('div');
   card.className = g.variant === 'solo' ? 'game-card solo' : 'game-card';
   card.innerHTML = buildGameCardHTML(g, gp, {
@@ -135,6 +136,7 @@ function buildGameCard(g, gp, { isSelf, actions, onLocationClick, layout } = {})
     actions,
     locationClickable: !!onLocationClick,
     layout,
+    soloLabel,
   });
   if (onLocationClick && g.location) {
     card.querySelector('.card-loc-btn')?.addEventListener('click', e => {
