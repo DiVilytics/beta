@@ -843,9 +843,10 @@ function _tnRenderFormPlayers() {
   // 👤 when you're not in the tournament yet (a new one: always).
   const me = !!getCurrentUser() && !(tnFormFor && tnPlayers.some(p => p.user_id === getCurrentUser().id));
   document.getElementById('tnFormRows').innerHTML = tnFormPlayers.map((p, i) => `
-    <div class="order-slot tn-form-row">
+    <div class="order-slot">
       <span class="row-num">${_tnFormNumber(i)}.</span>
-      <input type="text" maxlength="30" value="${_esc(p.name)}" placeholder="${_esc(t('Player {n}', { n: _tnFormNumber(i) }))}"
+      ${p.isMe && getCurrentProfile() ? avatarHTML(resolveAvatar(getCurrentProfile()), { cls: 'order-slot-portrait' }) : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">'}
+      <input class="order-slot-name order-slot-input" type="text" maxlength="30" value="${_esc(p.name)}" placeholder="${_esc(t('Player {n}', { n: _tnFormNumber(i) }))}"
              oninput="tnFormPlayers[${i}].name = this.value" autocomplete="off">
       <div class="order-slot-actions">
         <button class="pf-btn del" type="button" onclick="tnRemoveFormPlayer(${i})" ${n > min ? `title="${t('Remove')}"` : `title="${t('A tournament needs at least 2 players.')}" disabled`}>❌</button>

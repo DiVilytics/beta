@@ -2036,7 +2036,12 @@ select:disabled {
 .owned-toggle.on { color: var(--accent); background: var(--accent-d); border-color: var(--accent); }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
-#orderSlots { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+#orderSlots, #tnFormRows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+/* A row whose name is typed (a tournament's players): the name's look, no box. */
+input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; border: none; background: none; box-shadow: none; font-family: inherit; }
+.order-slot-input:focus { outline: none; box-shadow: none; }
+#tnFormRows .order-slot:focus-within { border-color: var(--accent); }
+.order-slot-input::placeholder { color: var(--dim); font-weight: 400; font-style: italic; }
 .order-slot {
   display: flex;
   align-items: center;
@@ -2384,7 +2389,6 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-villain .mover { zoom: 0.32; }
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
-.tn-form-row { gap: 8px; margin-bottom: 4px; }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
 /* How the options work: a button on top of the form, an ⓘ by each option. */
 .tn-help-row { display: flex; justify-content: flex-end; margin-bottom: 8px; }
@@ -2401,7 +2405,6 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-custom-grid input::-webkit-inner-spin-button, .tn-custom-grid input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .tn-custom-fill { display: grid; grid-template-columns: auto 1fr 1fr; align-items: center; gap: 6px; margin-bottom: 8px; font-size: calc(12px * var(--ts)); color: var(--muted); }
 .tn-custom-fill .btn { justify-content: center; text-align: center; }
-.tn-form-row input { flex: 1; min-width: 0; height: 32px; }
 #tnFormPlayers .lineup-label { display: flex; align-items: center; gap: 10px; }
 #tnFormPlayers .lineup-label .players-legend { margin-left: 0; }
 .tn-view-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
