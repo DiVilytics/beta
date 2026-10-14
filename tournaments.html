@@ -56,13 +56,15 @@
   <!-- New tournament, and the lobby's Edit settings (tournaments.js). -->
   <div id="tnForm" class="hidden">
     <div class="err" id="tnFormErr"></div>
-    <div class="tn-help-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button></div>
     <!-- Every setting, players added included, changes until the first game
          starts (once started, saving draws stage 1 again when the draw
          changes); then only the name and the date (.tn-fixed: the rest). -->
     <p class="modal-hint tn-rule-hint hidden" id="tnRedrawNote" data-i18n>No game has started yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.</p>
     <div class="field">
-      <label for="tnName" data-i18n>Name</label>
+      <div class="tn-name-head">
+        <label for="tnName" data-i18n>Name</label>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button>
+      </div>
       <input type="text" id="tnName" maxlength="60" autocomplete="off">
     </div>
     <div class="field" data-help="date">
