@@ -2061,14 +2061,14 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 #tnFormRows .order-slot:focus-within { border-color: var(--accent); }
 /* The tournament's players: New tournament's rows, with who claimed them. */
 .tn-player-rows { margin-bottom: 20px; }
-.tn-player-row { min-height: 38px; padding: 3px 10px; box-sizing: border-box; }
+.tn-player-row { min-height: calc(38px * var(--ts)); padding: 3px 10px; box-sizing: border-box; }
 .tn-player-row .order-slot-portrait { width: 26px; height: 26px; }
 .tn-player-row.mine { border-color: var(--accent); }
 .tn-player-row .order-slot-info { flex-direction: column; align-items: stretch; gap: 0; }
-.tn-player-row .order-slot-name { flex: none; }
+.tn-player-row .order-slot-name { flex: none; line-height: 1.1; }
 /* Under the name, as a claimed nickname sits under a game page's villain. */
 #tnIntroHelp { white-space: normal; text-align: left; }
-.tn-row-status { font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tn-row-status { line-height: 1.1; font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* As tall as + Add player under them. */
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
