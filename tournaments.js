@@ -645,7 +645,7 @@ const _tnBordaRow  = size => Array.from({ length: size }, (_, i) => size - 1 - i
 const _tnFormSize  = () => Number(document.getElementById('tnSize').value);
 
 // Custom scoring: a row of boxes per table size, the largest on top. The
-// organizer types the largest table's points; Keep 1st and last or Keep the
+// organizer types the largest table's points; Same win or Keep the
 // average fills the smaller tables from them (TOURNAMENT_CUSTOM_FILLS), and
 // each box can still be changed by hand.
 const _tnCustomRows = (size, top = _tnBordaRow(size), fill = 'ends') => {
@@ -713,8 +713,8 @@ const TN_HELP = [
   ['scoring', 'Scoring', [
     'Borda count: at a table of the largest size, 1st scores one point less than the players at the table, 2nd one less, down to 0 for last (at tables of 4: 3, 2, 1, 0). A smaller table keeps 1st\'s and last\'s points and spreads the places in between evenly: at 3 players, 3, 1.5 and 0.',
     'Custom: you type the points for each place at every table size, each place no more than the one above. Type the largest table\'s row, then fill the smaller tables from it with one of two buttons, and change any box by hand if you like.',
-    'Keep 1st and last: a smaller table keeps 1st\'s and last\'s points and spreads the others along your row. 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. A win is worth the same at every table, but the average place scores more at a smaller table (2.33 at 3 and 2.5 at 2, against 2.25 at 4).',
-    'Keep the average: each place at a smaller table scores the average of the largest table\'s places it stands for. 5, 3, 1, 0 at 4 gives 4.5, 2, 0.25 at 3 and 4, 0.5 at 2. The average place scores the same at every table (2.25), so no table is easier to score at, but a win at a smaller table is worth less.',
+    'Same win: a smaller table keeps 1st\'s and last\'s points and spreads the others along your row. 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. A win is worth the same at every table, but the average place scores more at a smaller table (2.33 at 3 and 2.5 at 2, against 2.25 at 4).',
+    'Same average: each place at a smaller table scores the average of the largest table\'s places it stands for. 5, 3, 1, 0 at 4 gives 4.5, 2, 0.25 at 3 and 4, 0.5 at 2. The average place scores the same at every table (2.25), so no table is easier to score at, but a win at a smaller table is worth less.',
     'With both, a player who drops out of a game scores the place they got: drops take the last places, in the order they drop (the first to drop is last).',
     'Fixed once the first game starts.',
   ]],

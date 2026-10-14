@@ -200,7 +200,7 @@ const TOURNAMENT_SCORINGS = {
 // stands for (5 3 1 0 → 4.5 2 0.25 at 3, 4 0.5 at 2).
 const TOURNAMENT_CUSTOM_FILLS = {
   ends: {
-    name: 'Keep 1st and last',
+    name: 'Same win',
     row(top, n) {
       return Array.from({ length: n }, (_, i) => {
         const at = i / (n - 1) * (top.length - 1), lo = Math.floor(at), hi = Math.ceil(at);
@@ -209,7 +209,7 @@ const TOURNAMENT_CUSTOM_FILLS = {
     },
   },
   average: {
-    name: 'Keep the average',
+    name: 'Same average',
     row(top, n) {
       const span = top.length / n;
       return Array.from({ length: n }, (_, i) => {
