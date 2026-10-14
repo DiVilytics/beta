@@ -146,6 +146,8 @@ window.I18N.it = {
     "You need a nickname before you can claim a villain.": "Ti serve un nickname per rivendicare un cattivo.",
     "Set nickname": "Scegli nickname",
     "Unclaimed": "Non rivendicato",
+    "Stage {n}": "Fase {n}",
+    "Table {n}": "Tavolo {n}",
     "Release": "Rilascia",
     "Claim": "Rivendica",
     "Edit details": "Modifica dettagli",

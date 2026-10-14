@@ -146,7 +146,7 @@ async function load(reset = true) {
   const g = newGames || [];
   _totalGames = Number(total) || 0;
 
-  const newPlayers = await fetchPlayersForGames(g.map(x => x.id));
+  const [newPlayers] = await Promise.all([fetchPlayersForGames(g.map(x => x.id)), attachTournaments(g)]);
   if (token !== _loadToken) return;
 
   // Update state atomically so render() sees a consistent snapshot
@@ -442,6 +442,7 @@ function buildCard(g, gp) {
     isSelf: p => me && p.user_id === me.id,
     onLocationClick: loc => _applyLocationOption(loc),
     layout: 'rows',
+    soloLabel: !size.isSolo(),   // a list of solo games only: no need to say it
   });
 }
 
