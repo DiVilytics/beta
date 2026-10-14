@@ -915,6 +915,10 @@ main {
 .ch-ax  { font-size: 9.5px; fill: var(--muted); }
 .ch-axlbl { font-size: 10px; fill: var(--muted); }
 .ch-grid { stroke: var(--border); stroke-width: 1; }
+/* Δ Wins: the 0 line (as expected) and the dashed ±2 (beyond what luck alone
+   gives); in a zooming scatter they keep their width. */
+.ch-ref { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.ch-ref.ch-ref-zero, .ch-grid.ch-ref-zero { stroke: var(--muted); stroke-dasharray: none; }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }
 .ch-cell-empty { fill: var(--s2); }
 .ch-empty { font-size: 12px; fill: var(--muted); }

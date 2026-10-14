@@ -64,43 +64,58 @@ const Charts = (() => {
   // by position), so give it a window of exactly 4 equal round steps that covers
   // the data with a little margin: win rates 21-49 -> 20 30 40 50 60. `cap`
   // (e.g. 100 for a percentage) keeps the window from running past it.
-  function niceWindow4(y0, y1, cap = null) {
+  function niceWindow4(y0, y1, cap = null, floor = 0) {
     const m = Math.max((y1 - y0) * 0.03, 0.5);
     for (let mag = 1; ; mag *= 10) {
       for (const st of [1, 2, 5].map(k => k * mag)) {
         let lo = Math.floor((y0 - m) / st) * st;
-        if (lo < 0) lo = 0;
+        if (floor != null && lo < floor) lo = floor;
         if (cap != null && lo + 4 * st > cap) lo = Math.max(0, Math.floor((cap - 4 * st) / st) * st);
         if (lo <= y0 - m && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };
-        if (lo === 0 && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // 0 is as low as it goes
+        if (lo === floor && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // the floor is as low as it goes
       }
+    }
+  }
+
+  // A window of 4 equal round steps centered on 0 (-2 steps to +2) covering
+  // ±amax with a little margin.
+  function symWindow4(amax) {
+    const need = amax * 1.06 || 1;
+    for (let mag = 1; ; mag *= 10) {
+      const st = [1, 2, 3, 4, 5, 6, 8].map(k => k * mag).find(k => 2 * k >= need);   // whole steps, so the labels stay exact
+      if (st) return { lo: -2 * st, hi: 2 * st };
     }
   }
 
   // Horizontal bars: data = [{ label, value, color?, meta? }]. The x-axis uses
   // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
-  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)' } = {}) {
+  // `diverging`: values on both sides of 0 (Δ Wins), the axis from -max to
+  // max with 0 in the middle, each bar drawn from 0.
+  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false } = {}) {
     if (!data.length) return empty();
-    const dmax = Math.max(...data.map(d => d.value)) || 1;
-    const { max, ticks } = niceTicks(dmax, 4);
+    const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value) : d.value)) || 1;
+    const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4);
+    const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
+    const lo = diverging ? -max : 0;
     const top = 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
     const rowH = Math.min(36, (H - top - B) / data.length), bw = W - labelW - RM;
+    const sx = v => labelW + (v - lo) / (max - lo) * bw;
     const botY = top + data.length * rowH;   // baseline = bottom of the last bar
     // x-axis: a gridline + label at each nice tick, drawn behind the bars.
     let axis = '';
     for (const v of ticks) {
-      const x = labelW + (v / max) * bw;
-      const anchor = v === 0 ? 'start' : v === max ? 'end' : 'middle';
-      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
+      const x = sx(v);
+      const anchor = v === lo ? 'start' : v === max ? 'end' : 'middle';
+      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
     }
     const rows = data.map((d, i) => {
-      const y = top + i * rowH, len = Math.max(2, (d.value / max) * bw);
+      const y = top + i * rowH, x0 = sx(Math.min(0, d.value)), len = Math.max(2, Math.abs(sx(d.value) - sx(0)));
       const name = d.name != null ? d.name : d.label;
       const meta = d.meta != null ? d.meta : String(d.value);
       return `
         <text x="${labelW - 8}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
-        <rect${hit(name, meta, d.href)} x="${labelW}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>`;
+        <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>`;
     }).join('');
     return wrap(axis + rows);
   }
@@ -129,7 +144,11 @@ const Charts = (() => {
 
   // Scatter: points = [{ x, y, label, color? }]. xSuffix/ySuffix label the axis
   // ticks (e.g. '%'); the zoom code re-labels those same ticks as you zoom.
-  function scatter(points, { xLabel = '', xSuffix = '', ySuffix = '', yMax = null } = {}) {
+  // `yFloor: null` lets y go below 0, `ySymmetric` centers the y axis on 0 (Δ
+  // Wins: -2 steps to +2 steps); `refs` are y values marked with
+  // a dashed line across the plot (they zoom with the dots), `include` y values
+  // the axis always covers.
+  function scatter(points, { xLabel = '', xSuffix = '', ySuffix = '', yMax = null, yFloor = 0, ySymmetric = false, refs = [], include = [] } = {}) {
     if (!points.length) return empty();
     const L = 42, R = 14, T = 14, B = 40, PW = W - L - R, PH = H - T - B;
     const xs = points.map(p => p.x), ys = points.map(p => p.y);
@@ -137,10 +156,10 @@ const Charts = (() => {
     // a zero origin, so the cloud fills the plot instead of hugging a corner.
     // Clamp the low end at 0 (games/percent are non-negative) and the high end at
     // yMax when given (e.g. 100 for a percentage axis).
-    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys, ...include), y1 = Math.max(...ys, ...include);
     const xpad = (x1 - x0) * 0.08 || 1;
     const xlo = Math.max(0, x0 - xpad), xhi = x1 + xpad;
-    const { lo: ylo, hi: yhi } = niceWindow4(y0, y1, yMax);   // round gridline values, not 21 28 35 ...
+    const { lo: ylo, hi: yhi } = ySymmetric ? symWindow4(Math.max(-y0, y1)) : niceWindow4(y0, y1, yMax, yFloor);   // round gridline values, not 21 28 35 ...
     const sx = x => L + (x - xlo) / (xhi - xlo) * PW;
     const sy = y => (H - B) - (y - ylo) / (yhi - ylo) * PH;
     let grid = '';
@@ -166,6 +185,8 @@ const Charts = (() => {
       const boxAttr = p.box ? ` data-box="${_esc(p.box)}" data-boxhref="${_esc(p.boxHref || '')}"` : '';
       return `<circle${hit(p.label, p.meta, p.href, 'ch-dot')}${boxAttr} cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="8" fill="${p.color || 'var(--accent)'}" fill-opacity="0.85" stroke="transparent" stroke-width="16"><title>${titleText(p.label, p.meta)}</title></circle>`;
     }).join('');
+    // Reference lines, wide enough to cross the plot at any zoom (the clip trims them).
+    const refLines = refs.map(v => `<line x1="${L - PW}" y1="${sy(v).toFixed(1)}" x2="${W + PW}" y2="${sy(v).toFixed(1)}" class="ch-ref${v === 0 ? ' ch-ref-zero' : ''}"/>`).join('');
     // The dots ride in a group that the zoom transforms, wrapped in a fixed clip
     // (the plot rect) so the zoom never spills over the axes. The plot ranges and
     // tick suffixes ride on the group so the zoom code can re-place dots and
@@ -175,7 +196,7 @@ const Charts = (() => {
       `<g clip-path="url(#scClip)"><g class="ch-pan"` +
       ` data-l="${L}" data-r="${R}" data-t="${T}" data-b="${B}"` +
       ` data-xlo="${xlo}" data-xhi="${xhi}" data-ylo="${ylo}" data-yhi="${yhi}"` +
-      ` data-xsuf="${_esc(xSuffix)}" data-ysuf="${_esc(ySuffix)}">${dots}</g></g>`;
+      ` data-xsuf="${_esc(xSuffix)}" data-ysuf="${_esc(ySuffix)}">${refLines}${dots}</g></g>`;
     const frame = `<rect class="ch-plot-frame" x="${L}" y="${T}" width="${PW}" height="${PH}" fill="none"/>`;
     const badge =
       `<g class="ch-zoom-badge" transform="translate(${W - R - 4} ${T + 4})">` +

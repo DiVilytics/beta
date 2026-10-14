@@ -51,18 +51,30 @@ function _gameDay(g) {
   return isDateOnly(g) ? [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()] : [d.getFullYear(), d.getMonth() + 1, d.getDate()];
 }
 
-// Each villain's games and wins in `games`, with its pace and box.
+// Each villain's games and wins in `games`, with its pace and box, and the
+// wins equal chances would give with their variance (exp, vari: Δ Wins,
+// chanceDelta in stats-table.js).
 function _villainStats(games, chars) {
   const by = {};
   for (const g of games) for (const s of g.seats) {
-    const r = by[s.character] ||= { games: 0, wins: 0 };
+    const r = by[s.character] ||= { games: 0, wins: 0, exp: 0, vari: 0 };
+    const k = g.seats.length;
     r.games++;
     if (s.is_winner) r.wins++;
+    r.exp  += 1 / k;
+    r.vari += 1 / k * (1 - 1 / k);
   }
   return chars.filter(c => by[c.name]).map(c => ({ name: c.name, pace: c.pace || null, box: c.box || null, ...by[c.name] }));
 }
 
 const _avg = vals => vals.length ? vals.reduce((a, v) => a + v, 0) / vals.length : null;
+
+// Δ Wins first, as on the villains' Leaderboard; then the win rate.
+const _CHANCE_PCT = [{ id: 'chance', label: 'Δ Wins' }, { id: 'pct', label: '% Wins' }];
+// A group of villains (a pace, a box) pooled: its Δ Wins from the sums.
+// Δ axis labels: whole steps as they are (+2, -1.5), the 0 plain.
+const _fmtDeltaAxis = v => (v > 0 ? '+' : '') + v.toLocaleString(LOCALE);
+const _pool = rows => rows.reduce((a, c) => ({ games: a.games + c.games, wins: a.wins + c.wins, exp: a.exp + c.exp, vari: a.vari + c.vari }), { games: 0, wins: 0, exp: 0, vari: 0 });
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
@@ -74,67 +86,83 @@ const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', la
 const CHARTS = [
   {
     id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
-    desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
-    render({ games, chars }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances would give, in standard deviations. 0 is exactly as expected; past the dashed lines at +2 and -2, luck alone rarely goes. The more games, the further a real difference shows. Tap a dot to open it.',
+      pct:    'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
+    },
+    render({ games, chars, mode }) {
+      const chance = mode === 'chance';
       const points = _villainStats(games, chars).map(c => {
         const pct = Math.round(c.wins / c.games * 100);
+        const d = chanceDelta(c);
         return {
           x: c.games,
-          y: pct,
+          y: chance ? (d ?? 0) : pct,
           label: villainName(c.name),
           color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           box: c.box || null,
           boxHref: c.box ? `villains.html?box=${boxAnchorId(c.box)}` : null,
-          meta: `${tn(c.games, '{n} game', '{n} games')} | ${t('{pct}% win rate', { pct })}`,
+          meta: `${tn(c.games, '{n} game', '{n} games')} | ${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })}`,
         };
       });
-      return Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100 });
+      return chance
+        ? Charts.scatter(points, { xLabel: t('Games played'), ySymmetric: true, refs: [-2, 0, 2], include: [-2, 2] })
+        : Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100 });
     },
   },
   {
     id: 'pace', icon: '🎨', label: 'Win rate by pace',
-    desc: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-    render({ games, chars }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Each pace band's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances would give, in standard deviations (0: as expected). Tap a band for its games and villains.",
+      pct:    "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
+    },
+    render({ games, chars, mode }) {
+      const chance = mode === 'chance';
       const cs = _villainStats(games, chars);
       const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
       const data = bands.map(b => {
-        const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
-        const games = rows.reduce((a, c) => a + c.games, 0);
-        const wins  = rows.reduce((a, c) => a + c.wins,  0);
-        const pct   = games ? Math.round(wins / games * 100) : 0;
-        return { label: t(b[0].toUpperCase() + b.slice(1)), value: pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}` };
+        const rows = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
+        const sum  = _pool(rows), d = chanceDelta(sum);
+        const pct  = sum.games ? Math.round(sum.wins / sum.games * 100) : 0;
+        return { label: t(b[0].toUpperCase() + b.slice(1)), value: chance ? Math.round((d ?? 0) * 100) / 100 : pct, games: sum.games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(sum.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}` };
       }).filter(d => d.games > 0);
-      return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
+      return chance
+        ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 60, diverging: true })
+        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
     },
   },
   {
     id: 'box', icon: '📦', label: 'Win rate by box',
-    desc: "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
-    render({ games, chars, boxInfo }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Each expansion box's Δ Wins, pooling every villain in the box: how far their wins are from what equal chances would give, in standard deviations (0: as expected); bars are sorted strongest first. Tap a box for its total games.",
+      pct:    "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
+    },
+    render({ games, chars, boxInfo, mode }) {
+      const chance = mode === 'chance';
       const byBox = {};
-      for (const c of _villainStats(games, chars)) {
-        if (!c.box) continue;
-        (byBox[c.box] ||= { games: 0, wins: 0, villains: 0 });
-        byBox[c.box].games += c.games;
-        byBox[c.box].wins  += c.wins;
-        byBox[c.box].villains++;
-      }
+      for (const c of _villainStats(games, chars)) if (c.box) (byBox[c.box] ||= []).push(c);
       const data = Object.entries(byBox)
-        .filter(([, v]) => v.games > 0)
-        .map(([box, v]) => {
+        .map(([box, rows]) => {
+          const v = _pool(rows), d = chanceDelta(v);
           const pct  = Math.round(v.wins / v.games * 100);
           const year = boxInfo[box]?.year;
           return {
             label: box,
-            value: pct,
+            value: chance ? Math.round((d ?? 0) * 100) / 100 : pct,
             games: v.games,
             href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: `${year ? year + ' | ' : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
+            meta: `${year ? year + ' | ' : ''}${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`,
           };
         })
+        .filter(d => d.games > 0)
         .sort((a, b) => b.value - a.value);
-      return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152 });
+      return chance
+        ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 152, diverging: true })
+        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152 });
     },
   },
   {
@@ -308,8 +336,12 @@ const CHARTS = [
   {
     id: 'seatorder', icon: '🪑', label: 'Play-order advantage',
     sizes: false,
-    desc: "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
-    render({ games }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from the fair share (1 / players), in standard deviations. Warmer cells win more than their share. Recorded-seating games only.",
+      pct:    "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
+    },
+    render({ games, mode }) {
       // Only games with a recorded play order (every seat its own position) and
       // one winner; a seat is its rank in the play order, 1 first.
       const bySize = {};
@@ -332,12 +364,15 @@ const CHARTS = [
         const cell = bySize[s] && bySize[s][seat];
         if (!cell || !cell.games) return null;
         const pct = cell.wins / cell.games, fair = 1 / s;
-        const heat = (pct / fair - 0.5) / 1.5;    // 0.5x..2x of fair -> 0..1 on the ramp
+        const d = chanceDelta({ wins: cell.wins, exp: cell.games * fair, vari: cell.games * fair * (1 - fair) });
+        const chance = mode === 'chance';
+        const heat = chance ? ((d ?? 0) + 3) / 6        // -3..+3 -> 0..1 on the ramp
+                            : (pct / fair - 0.5) / 1.5; // 0.5x..2x of fair -> 0..1
         return {
           value: heat,
-          label: `${Math.round(pct * 100)}%`,
+          label: chance ? fmtChance(d) : `${Math.round(pct * 100)}%`,
           name:  t('{size}p, seat {seat}', { size: s, seat }),
-          meta:  `${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
+          meta:  `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
         };
       });
     },
