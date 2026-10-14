@@ -402,7 +402,6 @@ function tnDrawFinal() {
     title:        players.length > 1 ? t('Draw the final?') : t('End the tournament?'),
     bodyHTML:     `<p class="confirm-text">${body}</p>`,
     confirmLabel: players.length > 1 ? t('Draw the final') : t('End tournament'),
-    busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
       const { error } = await db.rpc('draw_tournament_final', { target: tnTour.id, villains, players });
       tnView = 'tables';
@@ -422,7 +421,6 @@ function tnUndoStage() {
       ? t('Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit tournament, and Start draws everything again.')
       : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.', { n: st - 1 })}</p>`,
     confirmLabel: t('Undo draw'),
-    busyLabel:    t('Working…'),
     danger:       true,
     onConfirm:    async () => {
       const { error } = await db.rpc('undo_tournament_stage', { target: tnTour.id });
@@ -502,7 +500,6 @@ function tnRelease(playerId) {
     title:        t('Release this name?'),
     bodyHTML:     `<p class="confirm-text">${t('{name} and its villains in the tournament\'s games go back to unclaimed, for you or someone else to claim.', { name: `<strong class="text-emph">${_esc(tnPlayerName(p))}</strong>` })}</p>`,
     confirmLabel: t('Release'),
-    busyLabel:    t('Releasing…'),
     danger:       true,
     onConfirm:    async () => {
       const { error } = await db.rpc('release_tournament_player', { target_player: playerId });
@@ -525,7 +522,6 @@ function tnStart() {
     title:        t('Start the tournament?'),
     bodyHTML:     `<p class="confirm-text">${t('Stage 1 is drawn: {tables} and a villain for every player.', { tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
     confirmLabel: t('Start tournament'),
-    busyLabel:    t('Drawing…'),
     onConfirm:    async () => _tnAfter(await _tnDrawStart()),
   });
 }
@@ -545,7 +541,6 @@ function tnDelete() {
     bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the tournament, its players and tables. This action cannot be undone.')}</p>`
                 + (games ? `<p class="confirm-text">${tn(games, 'Its {n} game is deleted too, from the Game Log and from every profile.', 'Its {n} games are deleted too, from the Game Log and from every profile.')}</p>` : ''),
     confirmLabel: t('Delete tournament'),
-    busyLabel:    t('Deleting…'),
     danger:       true,
     onConfirm:    async () => {
       const { error } = await db.rpc('delete_tournament', { target: tnTour.id });
@@ -1131,7 +1126,6 @@ async function tnSaveForm() {
       title:        t('Draw stage 1 again?'),
       bodyHTML:     `<p class="confirm-text">${t('The tables, the stages, the pool or the players changed: stage 1\'s tables and every player\'s villains are drawn again.')}</p>`,
       confirmLabel: t('Draw again'),
-      busyLabel:    t('Drawing…'),
       onConfirm:    async () => {
         // The new start, from the new settings and players (withdrawn ones stay so).
         const tour = { ...was, ...row };
@@ -1337,7 +1331,6 @@ function tnNextStage() {
     title:        nobody ? t('End the tournament?') : t('Draw stage {n}?', { n: next }),
     bodyHTML:     `<p class="confirm-text">${_tnDrawSummary(next)}</p>`,
     confirmLabel: nobody ? t('End tournament') : t('Draw stage {n}', { n: next }),
-    busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
       const tables = tournamentDrawStage(tnTour, tnPlayers, tnTables);
       const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables });
@@ -1393,7 +1386,6 @@ function tnEditTable(tableId) {
                      <p class="modal-hint">${t('If the table played in another order than the drawn one, drag the villains into it. Their villains stay the drawn ones.')}</p>
                    </div>`,
     confirmLabel: entering ? t('Save result') : t('Save Changes'),
-    busyLabel:    t('Saving…'),
     onConfirm:    async () => {
       const results = tnEdit.rows.map((r, i) => ({ position: r.position, place: i + 1, dropped: r.dropped }));
       // A new play order: each seat's new position (sent only when it changed).

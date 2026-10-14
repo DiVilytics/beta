@@ -729,7 +729,6 @@ window.I18N.it = {
     "The draw pool has {v} villains for {n} players: every player needs a different one. Add villains in Edit tournament.": "La riserva ha {v} cattivi per {n} giocatori: a ognuno ne serve uno diverso. Aggiungi cattivi in Modifica torneo.",
     "Start the tournament?": "Iniziare il torneo?",
     "Stage 1 is drawn: {tables} and a villain for every player.": "Si sorteggia la fase 1: {tables} e un cattivo per ogni giocatore.",
-    "Drawing…": "Sorteggio…",
     "Delete tournament?": "Eliminare il torneo?",
     "This will permanently delete the tournament, its players and tables. This action cannot be undone.": "Il torneo, i suoi giocatori e i suoi tavoli verranno eliminati definitivamente. L'operazione non si può annullare.",
     "Its {n} game is deleted too, from the Game Log and from every profile.": "Viene eliminata anche la sua {n} partita, dal Registro e da ogni profilo.",

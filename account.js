@@ -293,7 +293,6 @@ async function exportMyTournaments() {
   if (!user) return;
   const btn = document.getElementById('exportTournamentsBtn');
   btn.disabled    = true;
-  btn.textContent = t('Preparing…');
   try {
     const { data: tours, error } = await db.from('tournaments').select('*').eq('organizer', user.id).order('created_at');
     if (error) throw error;

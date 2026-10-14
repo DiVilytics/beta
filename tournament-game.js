@@ -213,7 +213,6 @@ async function tnSaveGame() {
   if (!done) return;
   const btn = document.getElementById('tnSaveBtn');
   btn.disabled = true;
-  btn.textContent = t('Saving…');
   const { error } = await db.rpc('save_tournament_table', {
     target_table: tnGame.tableId,
     played_at:    new Date(tnGame.startedAt).toISOString(),
@@ -231,7 +230,6 @@ function tnDiscardGame() {
     title:        t('Discard this game?'),
     bodyHTML:     `<p class="confirm-text">${t('The timer, the rounds and the places so far are lost, and the table is free again for another phone.')}</p>`,
     confirmLabel: t('Discard game'),
-    busyLabel:    t('Discarding…'),
     danger:       true,
     onConfirm:    async () => {
       // Saved meanwhile by the organizer, or no longer there: nothing to give back, just let go of it.
