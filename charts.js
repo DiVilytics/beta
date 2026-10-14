@@ -68,6 +68,13 @@ function _quantile(sorted, q) {
   return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
 }
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
+// The win rate of every villain pooled (in the games filtered): the line the
+// % Wins bars compare with. With every table size it sits well under 50%.
+function _overallRef(stats) {
+  const games = stats.reduce((a, c) => a + c.games, 0), wins = stats.reduce((a, c) => a + c.wins, 0);
+  const pct = games ? Math.round(wins / games * 100) : 0;
+  return { value: pct, text: t('Average {pct}%', { pct }) };
+}
 const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
@@ -119,7 +126,8 @@ const CHARTS = [
           : `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
         return { label: t(b[0].toUpperCase() + b.slice(1)), value: mode === 'picks' ? share : pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
       }).filter(d => d.games > 0);
-      return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
+      return mode === 'picks' ? Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 })
+        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: _overallRef(cs) });
     },
   },
   {
@@ -158,7 +166,8 @@ const CHARTS = [
           };
         })
         .sort((a, b) => b.value - a.value);
-      return picks ? Charts.barsH(data, { labelW: 152 }) : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152 });
+      return picks ? Charts.barsH(data, { labelW: 152 })
+        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
     },
   },
   {
