@@ -920,7 +920,7 @@ main {
 .vs-abbr { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: -0.02em; }
 /* Two switches on one row (Matchups on the beta), their padding shrinking
    with the screen so both fit a phone. */
-.chart-switches { flex-direction: row; gap: 8px; flex-wrap: nowrap; }
+.controls.chart-switches { flex-direction: row; gap: 8px; flex-wrap: nowrap; }
 .chart-switches .seg-btn { padding: 0 clamp(6px, 2.6vw, 14px); }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
