@@ -23,7 +23,9 @@ const MIN_GAMES_FOR_PCT = 5;
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
-// the part from achievements, shown in parentheses instead of the games)
+// the part from achievements, shown in parentheses instead of the games; and
+// 'chance', the villains' Leaderboard only: rows carry `exp` and `vari`, see
+// chanceDelta)
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
 // the formatted value; statCellHTML → the table cell, "40% (12)" / "5 (12)" with
 // the games played in parentheses (two right-aligned sub-columns, so the digits
@@ -31,13 +33,25 @@ const MIN_GAMES_FOR_PCT = 5;
 // width of the "(games)" sub-column for a table, from its largest count;
 // statValueLabel → its column header. statModeSegHTML renders the toggle
 // control (`fn` is the global handler name the buttons call, e.g. 'setMode').
+// Chance Δ: how far the wins are from what equal chances would give, in
+// standard deviations, (W - E) / √V, with E = Σ 1/k (the wins expected by
+// chance) and V = Σ 1/k (1 - 1/k) (their variance) over the games, k the
+// players in each. 0 is exactly as expected; null without games.
+function chanceDelta(r) {
+  return r.vari > 0 ? (r.wins - r.exp) / Math.sqrt(r.vari) : null;
+}
+const fmtChance = v => v == null ? '-'
+  : v.toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' });
+
 function statValue(r, mode) {
+  if (mode === 'chance') return chanceDelta(r) ?? 0;
   if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
   if (mode === 'games') return r.games;
   return r.games ? r.wins / r.games : 0;
 }
 function statValueDisplay(r, mode) {
+  if (mode === 'chance') return fmtChance(chanceDelta(r));
   if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
   if (mode === 'games') return r.games;
@@ -53,12 +67,13 @@ function _headLabel(key) {
 function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
   if (mode === 'xp') return `${_headLabel('XP')} <span class="lb-head-sub">(${_headLabel('Achievements')})</span>`;
+  if (mode === 'chance') return `${_headLabel('Chance Δ')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
   return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
 }
 // The number in parentheses: the games, or for XP the XP from achievements.
 const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
 function statCellHTML(r, mode) {
-  if (mode === 'pct' && !r.games) return '-';   // no games, no win rate
+  if ((mode === 'pct' || mode === 'chance') && !r.games) return '-';   // no games, no win rate
   const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
   return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${_statSub(r, mode)})</span>`}</span>`;
 }
@@ -68,15 +83,17 @@ function statGamesWidth(rows, mode) {
   return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
 }
 
-// `xp: true` adds XP first (the players' Leaderboard).
-function statModeSegHTML(mode, fn, { xp = false } = {}) {
+// `xp: true` adds XP first (the players' Leaderboard), `chance: true` Chance Δ
+// first (the villains').
+function statModeSegHTML(mode, fn, { xp = false, chance = false } = {}) {
   const btn = (m, label) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg">${xp ? btn('xp', t('XP')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg">${xp ? btn('xp', t('XP')) : ''}${chance ? btn('chance', t('Chance Δ')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {
   const sorted = [...rows];
+  if (mode === 'chance') return sorted.sort((a, b) => (chanceDelta(b) ?? -Infinity) - (chanceDelta(a) ?? -Infinity) || b.games - a.games);
   if (mode === 'xp')    return sorted.sort((a, b) => (b.xp || 0) - (a.xp || 0) || b.wins - a.wins || b.games - a.games);
   if (mode === 'count') return sorted.sort((a, b) => b.wins - a.wins || b.games - a.games);
   if (mode === 'games') return sorted.sort((a, b) => b.games - a.games || b.wins - a.wins);
@@ -101,6 +118,14 @@ function computeRanks(rows, mode) {
 // at 100 (unranked rows can be above the ranked maximum).
 function statBarWidth(r, mode, maxVal) {
   return Math.min(100, Math.round((statValue(r, mode) / (maxVal || 1)) * 100));
+}
+
+// Chance Δ's bar starts from the middle (0, as expected by chance): to the
+// right above it, to the left below it, scaled to the largest distance.
+function chanceBarHTML(r, maxAbs, gold) {
+  const v = chanceDelta(r) ?? 0;
+  const w = Math.min(50, Math.round(Math.abs(v) / (maxAbs || 1) * 50));
+  return `<div class="bar-bg bar-diverge"><div class="bar-fill${v < 0 ? ' neg' : gold ? ' gold' : ''}" style="${v < 0 ? 'right' : 'left'}:50%;width:${w}%"></div></div>`;
 }
 
 // Anchor id for a character's box group on the characters roster page.
@@ -140,6 +165,7 @@ function renderStatTableHTML(rows, opts) {
 
   // Bars scale to the ranked rows (an unranked 100% shouldn't shrink them all).
   const maxVal = Math.max(...(ranked.length ? ranked : unranked).map(r => statValue(r, mode))) || 1;
+  const maxAbs = Math.max(...(ranked.length ? ranked : unranked).map(r => Math.abs(statValue(r, mode)))) || 1;
 
   const ranks      = computeRanks(ranked, mode);
   const medalClass = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
@@ -168,12 +194,13 @@ function renderStatTableHTML(rows, opts) {
         </div>
         <div class="row-val row-val-stack">
           ${dispVal}
-          <div class="bar-bg"><div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div></div>
+          ${mode === 'chance' ? chanceBarHTML(r, maxAbs, rank === 1)
+            : `<div class="bar-bg"><div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div></div>`}
         </div>
       </div>`;
   };
 
-  const unrankedSep = `<div class="lb-row-sep lb-row-sep-muted">${t('Fewer than {n} games', { n: minGames })}</div>`;
+  const unrankedSep = `<div class="lb-row-sep lb-row-sep-muted">${minGames === 1 ? t('No games') : t('Fewer than {n} games', { n: minGames })}</div>`;
   let body = sorted.slice(0, limit)
     .map((r, i) => (i === ranked.length ? unrankedSep : '') + rowHTML(r, i)).join('');
 

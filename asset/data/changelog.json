@@ -1,4 +1,10 @@
 {
+  "2026-10-15": {
+    "title": "Chance Δ on the villains' Leaderboard",
+    "new": [
+      "The villains' Leaderboard opens on Chance Δ: how far each villain's wins are from what equal chances would give, in standard deviations, every game counted at its table size. 0 is exactly as expected, above 0 more wins, below 0 fewer. How it's computed explains the math."
+    ]
+  },
   "2026-10-14": {
     "title": "Solo: the last round and the Phantom's die",
     "improved": [

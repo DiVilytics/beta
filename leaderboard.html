@@ -81,6 +81,17 @@
   </div>
 </div>
 
+<div class="overlay" id="chanceOverlay" onclick="if(event.target===this) closeOverlay('chanceOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>Chance Δ</h3>
+      <button class="sheet-close" onclick="closeOverlay('chanceOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="chanceBody"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="db.js"></script>
