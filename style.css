@@ -2378,6 +2378,12 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
 .tn-form-row { gap: 8px; margin-bottom: 4px; }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
+/* How the options work: a button on top of the form, an ⓘ by each option. */
+.tn-help-row { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.tn-info { border: none; background: none; padding: 0 2px; font: inherit; font-size: calc(12px * var(--ts)); color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.tn-help-section { margin-bottom: 16px; }
+.tn-help-section h4 { margin: 0 0 6px; font-size: calc(14px * var(--ts)); }
+.tn-help-section p { margin: 0 0 8px; font-size: calc(13px * var(--ts)); line-height: 1.5; color: var(--muted); }
 .tn-custom { margin-top: 10px; }
 .tn-custom-row { display: flex; gap: 6px; }
 .tn-custom-row label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: calc(11px * var(--ts)); color: var(--muted); text-align: center; }

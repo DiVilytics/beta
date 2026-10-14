@@ -33,8 +33,8 @@
   <div class="nav-right">
     <div class="nav-links">
       <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
-      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
+      <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
       <a href="players.html" id="navProfile" title="Player" data-i18n-attr="title">👤</a>
@@ -56,6 +56,7 @@
   <!-- New tournament, and the lobby's Edit settings (tournaments.js). -->
   <div id="tnForm" class="hidden">
     <div class="err" id="tnFormErr"></div>
+    <div class="tn-help-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button></div>
     <!-- Fixed once started (they change points): name, sizes, scoring, bye,
          pool, players. The date changes at any time; the draw's rules (tables,
          pairing, play order) between stages. -->
@@ -63,12 +64,12 @@
       <label for="tnName" data-i18n>Name</label>
       <input type="text" id="tnName" maxlength="60" placeholder="e.g. Lucca 2026" autocomplete="off" data-i18n-attr="placeholder">
     </div>
-    <div class="field">
+    <div class="field" data-help="date">
       <label for="tnDate" data-i18n>Date</label>
       <input type="date" id="tnDate">
     </div>
     <div class="form-row tn-fixed">
-      <div class="field">
+      <div class="field" data-help="size">
         <label for="tnSize" data-i18n>Max players per table</label>
         <select id="tnSize" onchange="tnSizeChanged()">
           <option value="2">2</option>
@@ -78,28 +79,28 @@
           <option value="6">6</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field" data-help="stages">
         <label for="tnStages" data-i18n>Stages</label>
         <input type="number" id="tnStages" min="1" max="20" value="3">
       </div>
     </div>
-    <div class="field">
+    <div class="field" data-help="tables">
       <label data-i18n>Tables</label>
       <div class="seg seg-sm tn-rule-seg" id="tnSplit"></div>
       <p class="modal-hint tn-rule-hint" id="tnSplitHint"></p>
     </div>
-    <div class="field">
+    <div class="field" data-help="pairing">
       <label data-i18n>Pairing</label>
       <div class="seg seg-sm tn-rule-seg" id="tnPairing"></div>
       <p class="modal-hint tn-rule-hint" id="tnPairingHint"></p>
     </div>
-    <div class="field">
+    <div class="field" data-help="order">
       <label data-i18n>Play order</label>
       <div class="seg seg-sm tn-rule-seg" id="tnPlayOrder"></div>
       <p class="modal-hint tn-rule-hint" id="tnPlayOrderHint"></p>
     </div>
     <p class="modal-hint tn-rule-hint hidden" id="tnDrawRulesNote" data-i18n>Tables, pairing and play order change between stages: once every table of this stage is saved.</p>
-    <div class="field tn-fixed">
+    <div class="field tn-fixed" data-help="scoring">
       <label data-i18n>Scoring</label>
       <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>
       <p class="modal-hint tn-rule-hint" id="tnScoringHint"></p>
@@ -110,12 +111,17 @@
         <p class="modal-hint tn-rule-hint" id="tnCustomPreview"></p>
       </div>
     </div>
-    <div class="field tn-fixed">
+    <div class="field tn-fixed" data-help="bye">
       <label data-i18n>Bye</label>
       <div class="seg seg-sm tn-rule-seg" id="tnBye"></div>
       <p class="modal-hint tn-rule-hint" id="tnByeHint"></p>
     </div>
-    <div class="field tn-fixed">
+    <div class="field tn-fixed" data-help="final">
+      <label data-i18n>Final table</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnFinal"></div>
+      <p class="modal-hint tn-rule-hint" id="tnFinalHint"></p>
+    </div>
+    <div class="field tn-fixed" data-help="villains">
       <label data-i18n>Villains</label>
       <button class="exclude-toggle" type="button" onclick="tnTogglePool()">
         <span class="exclude-toggle-label" data-i18n>Draw pool</span>
@@ -169,6 +175,18 @@
   </div>
 </main>
 
+
+<!-- How the options work (tournaments.js tnHelp): every option in full. -->
+<div class="overlay" id="tnHelpSheet" onclick="if(event.target===this) closeOverlay('tnHelpSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 data-i18n>How the options work</h3>
+      <button class="sheet-close" onclick="closeOverlay('tnHelpSheet')">×</button>
+    </div>
+    <div class="sheet-body tn-help" id="tnHelpBody"></div>
+  </div>
+</div>
 
 <!-- QR share sheet -->
 <div class="overlay" id="qrOverlay" onclick="if(event.target===this) closeOverlay('qrOverlay')">

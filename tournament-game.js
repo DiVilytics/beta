@@ -83,8 +83,8 @@ function tickLive() {
 function _tnRenderLive() {
   const { left, results, done } = _tnPlaces();
   document.getElementById('liveInfo').innerHTML = [
-    _esc(tnGame.tourName), t('Stage {n}', { n: tnGame.stage }), t('Table {n}', { n: tnGame.tableNo }),
-  ].join(' | ');
+    _esc(tnGame.tourName), tnGame.isFinal ? t('Final') : t('Stage {n}', { n: tnGame.stage }), tnGame.isFinal ? null : t('Table {n}', { n: tnGame.tableNo }),
+  ].filter(Boolean).join(' | ');
   const status = document.getElementById('tnLiveStatus');
   status.textContent = done ? t('Game over') : liveGame.isRunning ? t('Game in progress') : t('Game paused');
   status.classList.toggle('paused', !liveGame.isRunning);
@@ -97,7 +97,7 @@ function _tnRenderLive() {
   const placeOf = new Map(results.map(r => [r.position, r]));
   document.getElementById('liveMovers').innerHTML = tnGame.seats.map(s => {
     const r = placeOf.get(s.position);
-    if (r) return `<span class="tg-mover placed${r.dropped ? ' dropped' : ''}" title="${_esc(s.name)}">${moverImgHTML(s.character)}<span class="tg-mover-place">${r.dropped ? '🏳️' : fmtPlace(r.place)}</span></span>`;
+    if (r) return `<span class="tg-mover placed${r.dropped ? ' dropped' : ''}" title="${_esc(s.name)}">${moverImgHTML(s.character)}<span class="tg-mover-place">${r.dropped ? '🏳️ ' : ''}${fmtPlace(r.place)}</span><span class="tg-mover-name">${_esc(s.name)}</span></span>`;
     return `<button class="tg-mover" type="button" onclick="tnTapPlaying(${s.position})" title="${_esc(s.name)}"${left.length > 1 ? '' : ' disabled'}>${moverImgHTML(s.character)}<span class="tg-mover-name">${_esc(s.name)}</span></button>`;
   }).join('');
 
