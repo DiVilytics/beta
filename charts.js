@@ -112,7 +112,10 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   if (items.length < 2) return Charts.barsV([]);
   // A box's short name: the initials of its words, small words aside (WTIA, DB).
   const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
-  const label = it => boxes ? `<span class="vs-abbr">${_esc(short(it.key))}</span>` : charImgHTML(it.key);
+  // A box: its initials over its year's two digits.
+  const label = it => boxes
+    ? `<span class="vs-abbr">${_esc(short(it.key))}<br>${_esc(String(boxInfo[it.key]?.year ?? '').slice(-2))}</span>`
+    : charImgHTML(it.key);
   const newGroup = i => !boxes && i > 0 && items[i].group !== items[i - 1].group;
   const head = (it, i) => `<th class="vs-head${newGroup(i) ? ' vs-box' : ''}" title="${_esc(it.name)}">${label(it)}</th>`;
   const rows = items.map((r, ri) => {
@@ -419,8 +422,8 @@ function _renderPicker() {
     `</select><span class="chevron chart-chevron" aria-hidden="true">▼</span></div>`;
 }
 
-// Each chart's mode (its switch) and grouping (a second switch, before it on
-// the same row: Matchups' Villains | Boxes), the first one until picked.
+// Each chart's mode (its switch) and grouping (a second switch on the same
+// row, flush right: Matchups' Villains | Boxes), the first one until picked.
 const _modes = {}, _groups = {};
 const _pick = (opts, saved) => opts ? (opts.some(m => m.id === saved) ? saved : opts[0].id) : null;
 const _modeOf  = c => _pick(c.modes, _modes[c.id]);
@@ -432,7 +435,7 @@ function _modesHTML(c) {
   if (!c.modes && !c.groups) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
   const seg = (opts, on, fn) => `<div class="seg">${opts.map(m =>
     `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div>`;
-  return `<div class="controls mb-1 chart-switches">${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup') : ''}${c.modes ? seg(c.modes, _modeOf(c), 'setChartMode') : ''}</div>`;
+  return `<div class="controls mb-1 chart-switches">${c.modes ? seg(c.modes, _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
 }
 
 function setChartMode(mode) {
