@@ -817,7 +817,7 @@ function _renderSoloDie(rolling = false) {
   // lock screen: new-game-audio.js asks liveNextAllowed).
   const last = liveGame.turns >= turns;
   const note = document.getElementById('liveLast');
-  if (note) { note.textContent = last ? t('Last round: + now ends the game, lost.') : ''; setVisible(note, last); }
+  if (note) { note.textContent = last ? t('Last round: + ends the game.') : ''; setVisible(note, last); }
   document.getElementById('livePlusBtn')?.classList.toggle('end', last);
 }
 
