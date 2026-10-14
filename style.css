@@ -902,6 +902,21 @@ main {
    while "Loading…" shows, and nothing jumps when the chart arrives. */
 .chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
 .chart-stage > .chart-svg { flex-shrink: 0; }
+/* Villain against villain: a grid that scrolls inside the chart's box, its
+   portraits fixed on top and on the left; a line between boxes. */
+.vs-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
+.vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; }
+.vs-grid td, .vs-grid th { width: 28px; min-width: 28px; height: 28px; padding: 0; text-align: center; border: 1px solid var(--s1); box-sizing: border-box; }
+.vs-grid td { color: #fff; }
+.vs-grid .vs-head { position: sticky; top: 0; z-index: 2; background: var(--s1); }
+.vs-grid .vs-side { left: 0; top: auto; z-index: 1; }
+.vs-grid .vs-corner { position: sticky; top: 0; left: 0; z-index: 3; background: var(--s1); }
+.vs-grid .vs-head .char-portrait { width: 24px; height: 24px; border-radius: 50%; display: block; margin: auto; }
+.vs-grid .vs-self { background: var(--s1); }
+.vs-grid .vs-few { background: var(--s2); }
+.vs-grid .vs-box { border-left: 2px solid var(--muted); }
+.vs-grid tr.vs-box > * { border-top: 2px solid var(--muted); }
+.vs-grid td.ch-hit.sel { outline: 2px solid var(--text); outline-offset: -2px; }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }

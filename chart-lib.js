@@ -386,5 +386,5 @@ const Charts = (() => {
     return `rgb(${c[0]},${c[1]},${c[2]})`;
   }
 
-  return { barsH, barsV, scatter, histogram, line, donut, heatmap, PALETTE };
+  return { barsH, barsV, scatter, histogram, line, donut, heatmap, heatColor, PALETTE };
 })();
