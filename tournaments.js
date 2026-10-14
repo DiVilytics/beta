@@ -599,8 +599,10 @@ async function tnOpenForm(tour) {
     tnPool.restoreState({ excluded: tnChars.map(c => c.name).filter(n => !inPool.has(n)) });
   } else {
     tnPool.reset();
-    tnPool.defaultToMine();   // your boxes, when you've marked some
   }
+  const draft = tour ? null : _tnLoadDraft();
+  if (draft?.pool) tnPool.restoreState(draft.pool);
+  else if (!tour) tnPool.defaultToMine();   // your boxes, when you've marked some
   tnPool.updatePaceUI();
   // New: the players. Edit settings: the players to add.
   document.getElementById('tnFormPlayersLabel').textContent = tour ? t('Add players') : t('Players');
@@ -608,10 +610,103 @@ async function tnOpenForm(tour) {
     ? t('Up to the villains in the draw pool. An empty name keeps the one shown.')
     : t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.');
   tnFormPlayers = tour ? [] : [{ name: '', isMe: false }, { name: '', isMe: false }];
+  if (draft) _tnApplyDraft(draft);
   setVisible('tnFormPlayers', open);
   if (open) _tnRenderFormPlayers();
   _tnPoolChanged();
+  setVisible('tnFormDiscard', !tour);
+  _tnDraftReady = !tour;
+  _tnUpdateDiscard();
 }
+
+// ── New tournament's draft ──
+// As in New Game: the form (name, date, options, custom points, players and
+// the draw pool) is kept in localStorage as you edit, so leaving the page or
+// Cancel doesn't lose it. It expires an hour after the last change; Discard
+// and Create tournament clear it. An untouched date isn't kept (it comes back
+// as today). Edit settings has no draft: Cancel leaves the tournament as it was.
+const TN_DRAFT_KEY    = 'divilytics_tournament_draft' + STORAGE_SCOPE;   // the beta's apart (config.js)
+const TN_DRAFT_MAX_MS = 60 * 60 * 1000;
+let _tnDraftReady = false;   // only while New tournament's form is open
+
+function _tnDraftState() {
+  const val = id => document.getElementById(id).value;
+  return {
+    name:    val('tnName'),
+    date:    val('tnDate') !== _tnToday() ? val('tnDate') : '',
+    size:    val('tnSize'),
+    stages:  val('tnStages'),
+    rule:    { ...tnRule },
+    custom:  tnCustom,
+    players: tnFormPlayers.map(p => ({ name: p.name, isMe: !!p.isMe })),
+    pool:    { excluded: [...tnPool.excluded], selectedPace: tnPool.selectedPace, pacePlus: !!tnPool.selectedPace && tnPool.pacePlus, mineOn: tnPool.mineOn },
+  };
+}
+
+// Anything changed from a fresh New tournament form?
+function _tnFormChanged() {
+  const d = _tnDraftState();
+  return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== '3'
+    || Object.entries({ table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' }).some(([k, v]) => d.rule[k] !== v)
+    || d.players.length !== 2 || d.players.some(p => p.name.trim() || p.isMe)
+    || !tnPool.isDefault();
+}
+
+function _tnSaveDraft() {
+  if (!_tnDraftReady || tnFormFor) return;
+  _tnUpdateDiscard();
+  try {
+    if (!_tnFormChanged()) return localStorage.removeItem(TN_DRAFT_KEY);
+    localStorage.setItem(TN_DRAFT_KEY, JSON.stringify({ saved: Date.now(), ..._tnDraftState() }));
+  } catch (_) {}
+}
+
+function _tnDropDraft() {
+  try { localStorage.removeItem(TN_DRAFT_KEY); } catch (_) {}
+}
+
+function _tnLoadDraft() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(TN_DRAFT_KEY)); } catch (_) {}
+  if (d && !(Date.now() - d.saved <= TN_DRAFT_MAX_MS)) { _tnDropDraft(); return null; }
+  return d;
+}
+
+function _tnApplyDraft(d) {
+  document.getElementById('tnName').value = d.name || '';
+  if (d.date) document.getElementById('tnDate').value = d.date;
+  if (d.size)   document.getElementById('tnSize').value = d.size;
+  if (d.stages) document.getElementById('tnStages').value = d.stages;
+  for (const k of Object.keys(tnRule)) if (d.rule?.[k]) tnRule[k] = d.rule[k];
+  if (d.custom) tnCustom = d.custom;
+  if (d.players?.length >= 2) tnFormPlayers = d.players.map(p => ({ name: p.name || '', isMe: !!p.isMe && !!getCurrentProfile() }));
+  _tnRenderRules();
+}
+
+function _tnUpdateDiscard() {
+  const btn = document.getElementById('tnFormDiscard');
+  if (btn) btn.disabled = !(_tnDraftReady && _tnFormChanged());
+}
+
+function tnDiscardForm() {
+  openConfirmSheet({
+    id:           'tnDiscardFormSheet',
+    title:        t('Discard this tournament?'),
+    bodyHTML:     `<p class="confirm-text">${t('This resets the form (name, options, draw pool and players) and clears the saved draft.')}</p>`,
+    confirmLabel: t('Discard'),
+    danger:       true,
+    onConfirm:    async () => {
+      _tnDraftReady = false;
+      _tnDropDraft();
+      await tnOpenForm();
+      window.scrollTo(0, 0);
+    },
+  });
+}
+
+// Every change in the form saves the draft (a tap's handler runs first).
+for (const ev of ['input', 'change']) document.getElementById('tnForm')?.addEventListener(ev, _tnSaveDraft);
+document.getElementById('tnForm')?.addEventListener('click', () => setTimeout(_tnSaveDraft));
 
 function tnCloseForm() {
   if (!tnFormFor) return goBack('tournaments.html');
@@ -975,6 +1070,8 @@ async function tnSaveForm() {
   const id = res.data[0].id;
   const { error } = await db.from('tournament_players').insert(newPlayers(id));
   if (error) console.warn('tournament players', error);   // the lobby still adds them
+  _tnDraftReady = false;
+  _tnDropDraft();
   location.replace(`tournaments.html?t=${id}`);
 }
 

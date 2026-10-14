@@ -2384,6 +2384,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-rule-hint { margin: 6px 0 0; }
 #tnForm .exclude-toggle + .exclude-body { margin-top: 0; }
 .tn-form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+#tnFormDiscard { margin-right: auto; }   /* Discard on the left, as in New Game */
 .tn-table .card-actions { justify-content: center; }
 /* Once started: Tables, Standings, Log, a switch across the page. */
 .tn-view-seg { width: 100%; }
