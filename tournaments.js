@@ -279,7 +279,7 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
     : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">';
   const canClaim = !p.user_id && !!user && !mine && (!!_tnCode() || isOrg);
   // Drops in saved games, and a withdrawal (the standings leave them out).
-  const drops = tnTables.filter(tb => tb.saved_at && tb.seats.some(x => x.player_id === p.id && x.dropped)).length;
+  const drops = tnTables.filter(tb => tb.game_id && tb.seats.some(x => x.player_id === p.id && x.dropped)).length;
   const status = [
     p.user_id ? '' : t('Unclaimed'),
     drops ? `🏳️ ${tn(drops, '{n} drop', '{n} drops')}` : '',
@@ -364,6 +364,7 @@ function _tnNextStageHTML(tables) {
 // What the next draw makes: "Stage 3 of 5: 2 tables and 1 bye, Swiss pairing."
 function _tnDrawSummary(stage) {
   const playing = tnPlayers.filter(p => p.withdrawn_after == null).length;
+  if (!playing) return t('Nobody is still playing: the tournament ends here, on the standings as they are.');
   const sizes = tournamentSplit(playing, tnTour.table_size, tnTour.table_split);
   const tables = sizes.filter(n => n > 1).length, byes = sizes.length - tables;
   const what = byes ? t('{tables} and {byes}', { tables: tn(tables, '{n} table', '{n} tables'), byes: tn(byes, '{n} bye', '{n} byes') }) : tn(tables, '{n} table', '{n} tables');
@@ -380,11 +381,17 @@ function tnStageLabel(stage) {
 function tnDrawFinal() {
   const { players, villains } = tournamentDrawFinal(tnTour, tnPlayers, tnTables);
   const names = players.map(id => _esc(tnPlayerName(tnPlayers.find(p => p.id === id))));
+  // Fewer than two still playing: no final to play. One left wins it, like a
+  // bye; nobody left, the standings as they are.
+  const body = players.length > 1
+    ? `${t('The top {n} of the standings play one last table, and its ranking decides the tournament\'s top places: {names}.', { n: players.length, names: `<strong class="text-emph">${new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(names)}</strong>` })} ${t('It can be undone until it is saved.')}`
+    : players.length ? t('Only {name} is still playing: they win the final, like a bye, and the tournament ends.', { name: `<strong class="text-emph">${names[0]}</strong>` })
+    : t('Nobody is still playing: there is no final, and the tournament ends on the standings as they are.');
   openConfirmSheet({
     id:           'tnFinalSheet',
-    title:        t('Draw the final?'),
-    bodyHTML:     `<p class="confirm-text">${t('The top {n} of the standings play one last table, and its ranking decides the tournament\'s top places: {names}.', { n: players.length, names: `<strong class="text-emph">${new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(names)}</strong>` })} ${t('It can be undone until it is saved.')}</p>`,
-    confirmLabel: t('Draw the final'),
+    title:        players.length > 1 ? t('Draw the final?') : t('End the tournament?'),
+    bodyHTML:     `<p class="confirm-text">${body}</p>`,
+    confirmLabel: players.length > 1 ? t('Draw the final') : t('End tournament'),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
       const { error } = await db.rpc('draw_tournament_final', { target: tnTour.id, villains, players });
@@ -420,7 +427,9 @@ function tnUndoStage() {
 function _tnTableHTML(tb, myId) {
   const bye = tb.seats.length === 1;
   const recorder = tb.recorder ? tnProfiles.get(tb.recorder)?.nickname : null;
+  const notPlayed = tournamentTableNotPlayed(tb);
   const status = bye ? t('Bye')
+    : notPlayed   ? t('Not played: everyone withdrew')
     : tb.saved_at ? t('Saved')
     : recorder    ? t("In progress on {name}'s phone", { name: _esc(recorder) })
     : t('Waiting');
@@ -436,7 +445,7 @@ function _tnTableHTML(tb, myId) {
         <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(s.character)}">${charImgHTML(s.character)}</a>
         <div class="chip-body">
           <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(s.character)}">${villainNameHTML(s.character)}</a></div>
-          <div class="chip-nick">${[_esc(name), s.dropped ? `🏳️ ${tb.saved_at ? t('Dropped') : t('Withdrawn')}` : null, tb.saved_at ? _tnPointsLabel(_tnSeatPoints(tb, s)) : null].filter(Boolean).join(' | ')}</div>
+          <div class="chip-nick">${[_esc(name), s.dropped ? `🏳️ ${tb.game_id ? t('Dropped') : t('Withdrawn')}` : null, tb.saved_at ? _tnPointsLabel(_tnSeatPoints(tb, s)) : null].filter(Boolean).join(' | ')}</div>
         </div>
         ${won ? '<span class="win-star">👑</span>' : ''}
       </div>`;
@@ -1091,15 +1100,20 @@ async function tnSaveForm() {
   }
   const plan = _tnPlayersPlan(names);
 
-  // Started, no game yet: a change to the draw (the players' names included)
-  // draws stage 1 again.
-  if (tnFormFor?.current_stage > 0) {
+  // Edit tournament: one call (save_tournament_setup), all or nothing. The
+  // players as they'll be, a new one with an id made here so stage 1 can be
+  // drawn with it.
+  if (tnFormFor) {
     const was = tnFormFor;
+    const players = tnFormPlayers.map((p, i) => ({ id: p.id || crypto.randomUUID(), name: names[i], me: !!p.isMe }));
+    if (was.current_stage === 0) return _tnSaveSetup({ settings: row, players });
+    // Started, no game yet: a change to the draw (the players' names included)
+    // draws stage 1 again; otherwise only the settings (and your name) change.
     const redraw = _tnPlanChangesDraw(plan) || row.table_size !== was.table_size || row.stages !== was.stages
       || row.table_split !== undefined && row.table_split !== (was.table_split || 'even')
       || row.play_order  !== undefined && row.play_order  !== (was.play_order || 'random')
       || pool.length !== was.villain_pool.length || pool.some(v => !was.villain_pool.includes(v));
-    if (!redraw) return _tnSaveSettings(row, plan);
+    if (!redraw) return _tnSaveSetup({ settings: row, plan });
     return openConfirmSheet({
       id:           'tnRedrawSheet',
       title:        t('Draw stage 1 again?'),
@@ -1107,19 +1121,15 @@ async function tnSaveForm() {
       confirmLabel: t('Draw again'),
       busyLabel:    t('Drawing…'),
       onConfirm:    async () => {
-        // Back to before the start, the settings and the players, then Start again.
-        let { error } = await db.rpc('undo_tournament_stage', { target: was.id });
-        if (!error) ({ error } = await db.from('tournaments').update(row).eq('id', was.id));
-        if (!error) error = await _tnApplyPlayers(was.id, plan);
-        setVisible('tnForm', false);
-        setVisible('tnRoot', true);
-        await tnLoad(was.id);
-        if (!error) error = await _tnDrawStart();
-        await _tnAfter(error);
+        // The new start, from the new settings and players (withdrawn ones stay so).
+        const tour = { ...was, ...row };
+        const drawn = players.map(x => ({ id: x.id, withdrawn_after: tnPlayers.find(p => p.id === x.id)?.withdrawn_after ?? null }));
+        const villains = tournamentVillainSchedule(tour, drawn.map(x => x.id));
+        const tables   = tournamentDrawStage(tour, drawn, []);
+        await _tnSaveSetup({ settings: row, players, villains, tables });
       },
     });
   }
-  if (tnFormFor) return _tnSaveSettings(row, plan);
 
   const btn = document.getElementById('tnFormSave');
   btn.disabled = true;
@@ -1134,13 +1144,13 @@ async function tnSaveForm() {
   location.replace(`tournaments.html?t=${id}`);
 }
 
-// The settings and the players, while every setting can change.
-async function _tnSaveSettings(row, plan) {
+// Edit tournament's save. Without the players (started, no new draw): your
+// name moved apart, by claim and release.
+async function _tnSaveSetup({ settings, players = null, villains = null, tables = null, plan = null }) {
   const btn = document.getElementById('tnFormSave');
   btn.disabled = true;
-  const res = await db.from('tournaments').update(row).eq('id', tnFormFor.id).select('id');
-  let error = res.error || (!res.data?.length && { message: 'already_started' });
-  if (!error) error = await _tnApplyPlayers(tnFormFor.id, plan);
+  let { error } = await db.rpc('save_tournament_setup', { target: tnFormFor.id, settings, players, villains, tables });
+  if (!error && plan && (plan.release || plan.claim)) error = await _tnApplyPlayers(tnFormFor.id, { removed: [], renamed: [], added: [], release: plan.release, claim: plan.claim });
   btn.disabled = false;
   if (error) return showError('tnFormErr', _tnErrorMsg(error));
   setVisible('tnForm', false);
@@ -1307,11 +1317,12 @@ function _tnTablesHTML(mine) {
 
 function tnNextStage() {
   const next = tnTour.current_stage + 1;
+  const nobody = !tnPlayers.some(p => p.withdrawn_after == null);   // the tournament ends here
   openConfirmSheet({
     id:           'tnNextSheet',
-    title:        t('Draw stage {n}?', { n: next }),
+    title:        nobody ? t('End the tournament?') : t('Draw stage {n}?', { n: next }),
     bodyHTML:     `<p class="confirm-text">${_tnDrawSummary(next)}</p>`,
-    confirmLabel: t('Draw stage {n}', { n: next }),
+    confirmLabel: nobody ? t('End tournament') : t('Draw stage {n}', { n: next }),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
       const tables = tournamentDrawStage(tnTour, tnPlayers, tnTables);
@@ -1385,6 +1396,8 @@ function tnEditTable(tableId) {
       const error = entering
         ? (await db.rpc('save_tournament_table', { target_table: tableId, played_at: new Date().toISOString(), results })).error
         : (await db.rpc('edit_tournament_table', { target_table: tableId, results })).error;
+      // The recording phone saved it first: its result stands.
+      if (error?.message === 'saved_from_phone') { await _tnAfter(error); return; }
       if (error) { showError('tnEditErr', _tnErrorMsg(error)); throw error; }
       if (entering && _tnSavedGame()?.tournament?.tableId === tableId) { liveGame.clear(); liveGame.emit('close'); updateLiveGameNavBadge(); }
       await tnLoad(tnTour.id);

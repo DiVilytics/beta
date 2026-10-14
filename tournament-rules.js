@@ -333,6 +333,11 @@ const TN_ERRORS = {
   invalid_results:        'Every villain needs a place before saving.',
   stage_has_games:        'A game of this stage is already saved: its draw can no longer be undone.',
   wrong_code:             'This link can\'t claim names: scan the tournament\'s QR code from the organizer.',
+  no_table:               'This table no longer exists: its stage was drawn again, or the tournament was deleted. Discard the game on this phone.',
+  saved_from_phone:       'This table was just saved from the phone recording it.',
+  tournament_locked:      'A game has started: only the name and the date change now.',
+  needs_redraw:           'The players change only with stage 1 drawn again.',
+  invalid_players:        'Every player needs a name.',
 };
 function _tnErrorMsg(error) {
   if (error?.code === '23505') return t('There is already a player with this name.');
@@ -370,6 +375,12 @@ const TOURNAMENT_TIEBREAKS = [
   { id: 'opponents', name: "Opponents' points", value: r => r.opponents },
 ];
 
+// A table whose players all withdrew before its game: saved without a game,
+// everyone in last place (the database settles it, _tournament_settle_table).
+function tournamentTableNotPlayed(tb) {
+  return tb.seats.length > 1 && tb.seats.every(s => s.dropped) && !tb.game_id;
+}
+
 // The ranking from the saved tables (up to opts.stage, if given), one row per
 // player: { player_id, points, firsts, played, byes, opponents, rank } with
 // rank shared by rows equal on points and every tiebreak (1, 1, 3).
@@ -384,11 +395,13 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
   const counted = tables.filter(tb => tb.saved_at && tb.stage <= stage && tb.stage <= tour.stages);
   for (const tb of counted) {
     const n = tb.seats.length;
+    const notPlayed = tournamentTableNotPlayed(tb);
     for (const s of tb.seats) {
       if (s.place == null) continue;
       const r = row(s.player_id);
       r.points += tournamentSeatPoints(tour, n, s);
       if (n === 1) { r.byes++; continue; }
+      if (notPlayed) continue;   // last-place points, but no game, no opponents
       r.played++;
       if (s.place === 1) r.firsts++;
       for (const o of tb.seats) if (o.player_id !== s.player_id) r.faced.push(o.player_id);

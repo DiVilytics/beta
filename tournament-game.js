@@ -234,7 +234,7 @@ function tnDiscardGame() {
     busyLabel:    t('Discarding…'),
     danger:       true,
     onConfirm:    async () => {
-      // Taken over meanwhile: the table isn't ours to give back, just let go of it.
+      // Saved meanwhile by the organizer, or no longer there: nothing to give back, just let go of it.
       await db.rpc('release_tournament_table', { target_table: tnGame.tableId });
       _tnLeave();
     },
