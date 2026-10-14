@@ -77,6 +77,61 @@ function _overallRef(stats) {
 }
 const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
 
+// ── MATCHUPS ──────────────────────────────────────────────────────────────────
+// The grid of who beats whom: villains (by box, as on the Villains page) or
+// boxes (in release order), a cell for every pair that met in `games`, read
+// from its row: the row's wins over the two's, when one of them won. `cell`
+// turns { pct, w, l } into its { heat (0..1), label, meta } (the beta adds Δ
+// Wins). Portraits or short box names stay on top and on the left while the
+// grid scrolls inside the chart's box.
+function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
+  const boxes = group === 'boxes';
+  const boxOf = Object.fromEntries(chars.map(c => [c.name, c.box]));
+  const boxOrder = b => boxInfo[b]?.order ?? 99;
+  // Per ordered pair: games together, and the row's wins over the column. Two
+  // villains of one box at a table are no box against box.
+  const together = {}, wins = {};
+  for (const g of games) {
+    const keyOf = s => boxes ? boxOf[s.character] : s.character;
+    const sides = [...new Set(g.seats.map(keyOf))].filter(Boolean);
+    const winner = g.seats.find(s => s.is_winner);
+    for (const a of sides) for (const b of sides) {
+      if (a === b) continue;
+      const k = a + '|' + b;
+      together[k] = (together[k] || 0) + 1;
+      if (winner && keyOf(winner) === a) wins[k] = (wins[k] || 0) + 1;
+    }
+  }
+  const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
+  const items = boxes
+    ? Object.keys(boxInfo).filter(b => chars.some(c => c.box === b && played.has(c.name))).sort((a, b) => boxOrder(a) - boxOrder(b))
+        .map(b => ({ key: b, name: b, group: b }))
+    : chars.filter(c => played.has(c.name))
+        .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(c => ({ key: c.name, name: villainName(c.name), group: c.box }));
+  if (items.length < 2) return Charts.barsV([]);
+  // A box's short name: the initials of its words, small words aside (WTIA, DB).
+  const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
+  const label = it => boxes ? `<span class="vs-abbr">${_esc(short(it.key))}</span>` : charImgHTML(it.key);
+  const newGroup = i => !boxes && i > 0 && items[i].group !== items[i - 1].group;
+  const head = (it, i) => `<th class="vs-head${newGroup(i) ? ' vs-box' : ''}" title="${_esc(it.name)}">${label(it)}</th>`;
+  const rows = items.map((r, ri) => {
+    const cells = items.map((c, ci) => {
+      const cls = newGroup(ci) ? ' vs-box' : '';
+      if (r.key === c.key) return `<td class="vs-self${cls}"></td>`;
+      const n = together[r.key + '|' + c.key] || 0;
+      const w = wins[r.key + '|' + c.key] || 0, l = wins[c.key + '|' + r.key] || 0;
+      const name = `${r.name} vs ${c.name}`;
+      const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
+      if (n < MIN_GAMES_FOR_PCT || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
+      const v = cell({ pct: w / (w + l), w, l });
+      return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}" data-name="${_esc(name)}" data-meta="${_esc(`${v.meta} | ${meta}`)}">${v.label}</td>`;
+    }).join('');
+    return `<tr${newGroup(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(r.name)}">${label(r)}</th>${cells}</tr>`;
+  }).join('');
+  return `<div class="vs-wrap"><table class="vs-grid${boxes ? ' vs-boxes' : ''}"><thead><tr><th class="vs-corner"></th>${items.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
 // Each: { id, icon, label, desc (a string, or per mode { mode: string }),
 // modes?: [{ id, label }], sizes?: false, render(ctx) -> SVG/HTML string },
@@ -105,44 +160,11 @@ const CHARTS = [
     },
   },
   {
-    id: 'versus', icon: '🆚', label: 'Villain vs villain',
-    desc: "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.",
-    render({ games, chars, boxInfo }) {
-      // Per ordered pair: games together, and the row's wins over the column.
-      const together = {}, wins = {};
-      for (const g of games) {
-        for (const a of g.seats) for (const b of g.seats) {
-          if (a === b || a.character === b.character) continue;
-          const k = a.character + '|' + b.character;
-          together[k] = (together[k] || 0) + 1;
-          if (a.is_winner) wins[k] = (wins[k] || 0) + 1;
-        }
-      }
-      // The villains with games here, grouped by box (in box order), as on the
-      // Villains page; a line between boxes.
-      const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
-      const boxOrder = b => boxInfo[b]?.order ?? 99;
-      const vs = chars.filter(c => played.has(c.name))
-        .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
-      if (vs.length < 2) return Charts.barsV([]);
-      const MIN = MIN_GAMES_FOR_PCT;   // 5, as for the % Wins rankings (stats-table.js)
-      const newBox = i => i > 0 && vs[i].box !== vs[i - 1].box;
-      const head = (c, i) => `<th class="vs-head${newBox(i) ? ' vs-box' : ''}" title="${_esc(villainName(c.name))}">${charImgHTML(c.name)}</th>`;
-      const rows = vs.map((r, ri) => {
-        const cells = vs.map((c, ci) => {
-          const cls = newBox(ci) ? ' vs-box' : '';
-          if (r.name === c.name) return `<td class="vs-self${cls}"></td>`;
-          const n = together[r.name + '|' + c.name] || 0;
-          const w = wins[r.name + '|' + c.name] || 0, l = wins[c.name + '|' + r.name] || 0;
-          const name = `${villainName(r.name)} vs ${villainName(c.name)}`;
-          const meta = `${t('{a} won {w}, {b} won {l}', { a: villainName(r.name), w, b: villainName(c.name), l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-          if (n < MIN || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
-          const pct = w / (w + l);
-          return `<td class="ch-hit${cls}" style="background:${Charts.heatColor((pct - 0.25) / 0.5)}" data-name="${_esc(name)}" data-meta="${_esc(`${Math.round(pct * 100)}% | ${meta}`)}">${Math.round(pct * 100)}</td>`;
-        }).join('');
-        return `<tr${newBox(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(villainName(r.name))}">${charImgHTML(r.name)}</th>${cells}</tr>`;
-      }).join('');
-      return `<div class="vs-wrap"><table class="vs-grid"><thead><tr><th class="vs-corner"></th>${vs.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    id: 'versus', icon: '🆚', label: 'Matchups',
+    groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
+    desc: "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.",
+    render({ games, chars, boxInfo, group }) {
+      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct }) => ({ heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` }) });
     },
   },
   {
@@ -397,21 +419,29 @@ function _renderPicker() {
     `</select><span class="chevron chart-chevron" aria-hidden="true">▼</span></div>`;
 }
 
-// Each chart's mode (its switch), the first one until picked.
-const _modes = {};
-const _modeOf = c => c.modes ? (c.modes.some(m => m.id === _modes[c.id]) ? _modes[c.id] : c.modes[0].id) : null;
+// Each chart's mode (its switch) and grouping (a second switch, before it on
+// the same row: Matchups' Villains | Boxes), the first one until picked.
+const _modes = {}, _groups = {};
+const _pick = (opts, saved) => opts ? (opts.some(m => m.id === saved) ? saved : opts[0].id) : null;
+const _modeOf  = c => _pick(c.modes, _modes[c.id]);
+const _groupOf = c => _pick(c.groups, _groups[c.id]);
 
-// A chart without a switch keeps its place, empty, so every chart starts at
-// the same height.
+// The switches, on one row. A chart without one keeps its place, empty, so
+// every chart starts at the same height.
 function _modesHTML(c) {
-  if (!c.modes) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
-  const mode = _modeOf(c);
-  return `<div class="controls mb-1"><div class="seg">${c.modes.map(m =>
-    `<button class="seg-btn${m.id === mode ? ' on' : ''}" type="button" onclick="setChartMode('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div></div>`;
+  if (!c.modes && !c.groups) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
+  const seg = (opts, on, fn) => `<div class="seg">${opts.map(m =>
+    `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div>`;
+  return `<div class="controls mb-1 chart-switches">${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup') : ''}${c.modes ? seg(c.modes, _modeOf(c), 'setChartMode') : ''}</div>`;
 }
 
 function setChartMode(mode) {
   _modes[_selected] = mode;
+  _rerender();
+}
+
+function setChartGroup(group) {
+  _groups[_selected] = group;
   _rerender();
 }
 
@@ -444,7 +474,7 @@ async function _rerender() {
   try {
     const [all, chars, boxInfo] = await Promise.all([_loadGames(), loadCharacters(), loadBoxInfo()]);
     if (token !== _renderToken) return;
-    stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode });
+    stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
     const z = stage.querySelector('.ch-zoomable');
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
@@ -686,10 +716,11 @@ async function init() {
   const saved = takeViewState();
   if (saved) {
     Object.assign(_modes, saved.modes);
+    Object.assign(_groups, saved.groups);
     size.set(saved.size);
     period.set(saved.period);
   }
-  keepViewState(() => ({ chart: _selected, modes: _modes, size: size.value(), period: period.get() }));
+  keepViewState(() => ({ chart: _selected, modes: _modes, groups: _groups, size: size.value(), period: period.get() }));
   period.load();
   selectChart(CHARTS.some(c => c.id === saved?.chart) ? saved.chart : CHARTS[0].id);
 }
