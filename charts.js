@@ -85,7 +85,7 @@ const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks
 
 const CHARTS = [
   {
-    id: 'scatter', icon: '✨', label: 'Win rate vs popularity',
+    id: 'scatter', icon: '✨', label: 'Wins vs games',
     desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
     render({ games, chars }) {
       const points = _villainStats(games, chars).map(c => {
