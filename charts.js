@@ -78,7 +78,7 @@ const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks
 
 const CHARTS = [
   {
-    id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
+    id: 'scatter', icon: '✨', label: 'Win rate vs popularity',
     desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
     render({ games, chars }) {
       const points = _villainStats(games, chars).map(c => {
@@ -163,7 +163,7 @@ const CHARTS = [
   },
   {
     // The id stays 'duration': it was the minutes-only chart.
-    id: 'duration', icon: '⏱️', label: 'Game length',
+    id: 'duration', icon: '⏳', label: 'Game length',
     modes: _MINUTES_ROUNDS,
     desc: {
       minutes: 'How many games fall into each 15-minute band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded duration.',
