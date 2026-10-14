@@ -2399,7 +2399,8 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-custom-row label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: calc(11px * var(--ts)); color: var(--muted); text-align: center; }
 .tn-custom-row input { width: 100%; text-align: center; }
 .tn-form-row input { flex: 1; min-width: 0; height: 32px; }
-#tnFormPlayers .lineup-label { display: flex; align-items: center; }
+#tnFormPlayers .lineup-label { display: flex; align-items: center; gap: 10px; }
+#tnFormPlayers .lineup-label .players-legend { margin-left: 0; }
 .tn-view-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
 .tn-hint-center { justify-content: center; text-align: center; }
 .tn-standings { margin-bottom: 10px; }

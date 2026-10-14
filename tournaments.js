@@ -183,17 +183,19 @@ function tnRenderTournament() {
 
   const pairing = TOURNAMENT_PAIRINGS[tnTour.pairing];
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
-  const settings = [
-    t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') }),
-    t('Up to {n} per table', { n: tnTour.table_size }),
-    t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name + ' tables'),
-    tn(tnTour.stages, '{n} stage', '{n} stages'),
-    pairing ? t(pairing.name) : _esc(tnTour.pairing),
-    t('Play order: {rule}', { rule: t((TOURNAMENT_PLAY_ORDERS[tnTour.play_order] || TOURNAMENT_PLAY_ORDERS.random).name) }),
-    scoring ? t(scoring.name) : _esc(tnTour.scoring),
-    t('Bye: {rule}', { rule: t((TOURNAMENT_BYES[tnTour.bye] || TOURNAMENT_BYES.last).name) }),
-    tnTour.final_table ? t('Final table') : null,
-  ].filter(Boolean).join(' | ');
+  // Each option with its name, as the form calls it.
+  const opt = (label, value) => `${t(label)}: ${value}`;
+  const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
+  const settings = t('Options: {list}', { list: [
+    opt('Max players per table', tnTour.table_size),
+    opt('Tables', t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name)),
+    opt('Stages', tnTour.stages),
+    opt('Pairing', pairing ? t(pairing.name) : _esc(tnTour.pairing)),
+    opt('Play order', t((TOURNAMENT_PLAY_ORDERS[tnTour.play_order] || TOURNAMENT_PLAY_ORDERS.random).name)),
+    opt('Scoring', scoring ? t(scoring.name) : _esc(tnTour.scoring)),
+    opt('Bye', t((TOURNAMENT_BYES[tnTour.bye] || TOURNAMENT_BYES.last).name)),
+    opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
+  ].join(' | ') });
   const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
@@ -209,6 +211,7 @@ function tnRenderTournament() {
     <div class="claim-game-info">
       <div class="claim-date">${_esc(tnTour.name)}</div>
       <div class="claim-meta">${fmtTournamentDate(tnTour)}</div>
+      <div class="claim-meta">${organizer}</div>
       <div class="claim-meta">${settings}</div>
       <div class="claim-meta">${status}</div>
     </div>
