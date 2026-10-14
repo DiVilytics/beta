@@ -659,7 +659,7 @@ const TN_HELP = [
     'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, also after the start. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Max players per table', [
-    'The largest table: no table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
+    'No table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
     'It also sets the scale of the points: a win scores the same at every table, whatever its size.',
     'Fixed once the tournament starts.',
   ]],
@@ -690,7 +690,10 @@ const TN_HELP = [
     'Fixed once the tournament starts.',
   ]],
   ['bye', 'Bye', [
-    'What a bye scores, a win being what 1st scores at a full table (3 at tables of 4 with Borda count). Last: 0. Half a win: half of that (1.5). A win: as much as a win, as in Swiss chess.',
+    'What a bye scores, a win being what 1st scores at a full table (3 at tables of 4 with Borda count).',
+    'Last: 0.',
+    'Half a win: half of that (1.5).',
+    'A win: as much as a win, as in Swiss chess.',
     'A bye never counts as a 1st place for the tiebreaks, and a player with a bye has no opponents in that stage.',
     'Fixed once the tournament starts.',
   ]],
@@ -716,11 +719,12 @@ const TN_HELP = [
   ]],
 ];
 
+// A paragraph that opens with an option's name ("Random: ...") shows the name in bold.
 function tnHelp(section) {
   document.getElementById('tnHelpBody').innerHTML = TN_HELP.map(([id, title, paras]) => `
     <section class="tn-help-section" id="tnHelp-${id}">
       <h4>${t(title)}</h4>
-      ${paras.map(p => `<p>${t(p)}</p>`).join('')}
+      ${paras.map(p => `<p>${t(p).replace(/^[^:.;,]{1,24}:/, '<strong>$&</strong>')}</p>`).join('')}
     </section>`).join('');
   openOverlay('tnHelpSheet');
   if (section) document.getElementById(`tnHelp-${section}`)?.scrollIntoView({ block: 'start' });
