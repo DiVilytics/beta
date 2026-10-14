@@ -64,6 +64,7 @@ function _villainStats(games, chars) {
 
 const _avg = vals => vals.length ? vals.reduce((a, v) => a + v, 0) / vals.length : null;
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
+const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
 // Each: { id, icon, label, desc (a string, or per mode { mode: string }),
@@ -93,33 +94,50 @@ const CHARTS = [
     },
   },
   {
-    id: 'pace', icon: '🎨', label: 'Win rate by pace',
-    desc: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-    render({ games, chars }) {
+    id: 'pace', icon: '🎨', label: 'By pace',
+    modes: _PCT_PICKS,
+    desc: {
+      pct:   "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
+      picks: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
+    },
+    render({ games, chars, mode }) {
       const cs = _villainStats(games, chars);
+      const total = cs.reduce((a, c) => a + c.games, 0) || 1;
       const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
       const data = bands.map(b => {
         const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
         const games = rows.reduce((a, c) => a + c.games, 0);
         const wins  = rows.reduce((a, c) => a + c.wins,  0);
         const pct   = games ? Math.round(wins / games * 100) : 0;
-        return { label: t(b[0].toUpperCase() + b.slice(1)), value: pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta: `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}` };
+        const share = Math.round(games / total * 100);
+        const meta  = mode === 'picks'
+          ? `${tn(games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+          : `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
+        return { label: t(b[0].toUpperCase() + b.slice(1)), value: mode === 'picks' ? share : pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
       }).filter(d => d.games > 0);
       return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 });
     },
   },
   {
-    id: 'box', icon: '📦', label: 'Win rate by box',
-    desc: "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
-    render({ games, chars, boxInfo }) {
+    // The id stays 'box': it was the win rate chart; Box popularity is its Picks.
+    id: 'box', icon: '📦', label: 'By box',
+    modes: _PCT_PICKS,
+    desc: {
+      pct:   "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
+      picks: "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
+    },
+    render({ games, chars, boxInfo, mode }) {
       const byBox = {};
+      let total = 0;
       for (const c of _villainStats(games, chars)) {
         if (!c.box) continue;
         (byBox[c.box] ||= { games: 0, wins: 0, villains: 0 });
         byBox[c.box].games += c.games;
         byBox[c.box].wins  += c.wins;
         byBox[c.box].villains++;
+        total += c.games;
       }
+      const picks = mode === 'picks';
       const data = Object.entries(byBox)
         .filter(([, v]) => v.games > 0)
         .map(([box, v]) => {
@@ -127,42 +145,16 @@ const CHARTS = [
           const year = boxInfo[box]?.year;
           return {
             label: box,
-            value: pct,
+            value: picks ? v.games : pct,
             games: v.games,
             href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: `${year ? year + ' | ' : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
+            meta: picks
+              ? `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / (total || 1) * 100) })} | ${tn(v.villains, '{n} villain', '{n} villains')}`
+              : `${year ? year + ' | ' : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
           };
         })
         .sort((a, b) => b.value - a.value);
-      return Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152 });
-    },
-  },
-  {
-    id: 'boxpop', icon: '🔥', label: 'Box popularity',
-    desc: "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
-    render({ games, chars, boxInfo }) {
-      const byBox = {};
-      let total = 0;
-      for (const c of _villainStats(games, chars)) {
-        if (!c.box) continue;
-        (byBox[c.box] ||= { games: 0, villains: 0 });
-        byBox[c.box].games += c.games;
-        byBox[c.box].villains++;
-        total += c.games;
-      }
-      const data = Object.entries(byBox)
-        .filter(([, v]) => v.games > 0)
-        .map(([box, v]) => {
-          const year = boxInfo[box]?.year;
-          return {
-            label: box,
-            value: v.games,
-            href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / (total || 1) * 100) })} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
-          };
-        })
-        .sort((a, b) => b.value - a.value);
-      return Charts.barsH(data, { labelW: 152 });
+      return picks ? Charts.barsH(data, { labelW: 152 }) : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152 });
     },
   },
   {
