@@ -822,6 +822,7 @@ window.I18N.it = {
     "You have a bye in this stage (it counts as last).": "In questa fase riposi (vale come ultimo posto).",
     "Saved: you finished {place}.": "Salvata: sei arrivato {place}.",
     "{place} to play.": "{place} a giocare.",
+    "You haven't organized a tournament": "Non hai organizzato tornei",
     "Download my tournaments": "Scarica i miei tornei",
     "Custom": "Personalizzato",
     "Last": "Ultimo",

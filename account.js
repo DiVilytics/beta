@@ -119,7 +119,7 @@ function _renderPage() {
       <div id="identitiesList" class="acct-identities">${_renderIdentitiesHTML()}</div>
       <div class="acct-actions">
         <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
-        ${_acctOrganized ? `<button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()">${t('Download my tournaments')}</button>` : ''}
+        <button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()"${_acctOrganized ? '' : ` disabled title="${_esc(t("You haven't organized a tournament"))}"`}>${t('Download my tournaments')}</button>
         <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
     </div>
