@@ -88,7 +88,7 @@ const CHARTS = [
     id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
     modes: _CHANCE_PCT,
     desc: {
-      chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances would give, in standard deviations. 0 is exactly as expected; past the dashed lines at +2 and -2, luck alone rarely goes. The more games, the further a real difference shows. Tap a dot to open it.',
+      chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.',
       pct:    'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
     },
     render({ games, chars, mode }) {
@@ -116,7 +116,7 @@ const CHARTS = [
     id: 'pace', icon: '🎨', label: 'Win rate by pace',
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Each pace band's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances would give, in standard deviations (0: as expected). Tap a band for its games and villains.",
+      chance: "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.",
       pct:    "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
     },
     render({ games, chars, mode }) {
@@ -138,7 +138,7 @@ const CHARTS = [
     id: 'box', icon: '📦', label: 'Win rate by box',
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Each expansion box's Δ Wins, pooling every villain in the box: how far their wins are from what equal chances would give, in standard deviations (0: as expected); bars are sorted strongest first. Tap a box for its total games.",
+      chance: "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.",
       pct:    "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
     },
     render({ games, chars, boxInfo, mode }) {
@@ -338,7 +338,7 @@ const CHARTS = [
     sizes: false,
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from the fair share (1 / players), in standard deviations. Warmer cells win more than their share. Recorded-seating games only.",
+      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
       pct:    "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
     },
     render({ games, mode }) {
