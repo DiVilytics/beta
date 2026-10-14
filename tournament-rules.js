@@ -1,12 +1,14 @@
 // ── TOURNAMENT RULES ──────────────────────────────────────────────────────────
 // The rules of a tournament (tournaments.js), each kind a registry keyed by the
-// id the database stores (tournaments.pairing, tournaments.scoring): a new
+// id the database stores (tournaments.table_split, .pairing, .scoring): a new
 // option is one entry here plus its translations, no database change. The
 // database keeps the facts (who sat where, with which villain, in which place)
 // and checks every draw; points and standings are computed here from the facts.
 // Draws use the browser's cryptographic random source (as the solo die does).
 // Depends on t (lang.js) and LOCALE (lang.js).
 //
+//   TOURNAMENT_SPLITS[id]         { name, hint, sizes(n, size) }: the table
+//                                 sizes of a stage (1 = a bye)
 //   TOURNAMENT_PAIRINGS[id]       { name, hint, tables(players, ctx) }: the
 //                                 stage's tables, [[playerId, ...], ...]
 //   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat) }
@@ -14,7 +16,7 @@
 //                                 player's villain in every stage
 //   TOURNAMENT_TIEBREAKS          [{ id, name, value(row) }], in order
 //
-//   tournamentSplit(n, size)                 the table sizes of a stage
+//   tournamentSplit(n, size, split)          the table sizes of a stage
 //   tournamentStandings(tour, tables, opts)  the ranking, from saved tables
 //   tournamentDrawStage(tour, players, tables)  the next stage's tables, play
 //                                            order included (start: no tables)
@@ -47,23 +49,52 @@ function _tnShuffle(list) {
 }
 
 // ── Table sizes ──────────────────────────────────────────────────────────────
+// sizes(n, size): the tables of a stage for n players, largest first, a bye
+// (a table of 1) last.
 
-// As few tables as the size allows, as even as possible, largest first: 14 at
-// 4 → 4, 4, 3, 3; 5 at 4 → 3, 2. Only tables of 2 can leave one player alone
-// (an odd number of players): a bye, last.
-function tournamentSplit(n, size) {
+const TOURNAMENT_SPLITS = {
+  // As few tables as the size allows, as even as possible: 14 at 4 → 4, 4, 3,
+  // 3; 5 at 4 → 3, 2. Only tables of 2 can leave one player alone (a bye).
+  even: {
+    name: 'Even',
+    hint: 'As many tables as needed, as even as possible (9 players at tables of 4: 3, 3, 3).',
+    sizes(n, size) {
+      const k = Math.ceil(n / size);
+      const base = Math.floor(n / k), extra = n % k;
+      return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
+    },
+  },
+  // Every table full; whoever is left has a bye (9 at 4 → 4, 4 and a bye; up
+  // to size - 1 byes). Fewer players than a table: they all play together.
+  full: {
+    name: 'Full',
+    hint: 'Every table full, the players left over have a bye (9 players at tables of 4: 4, 4 and a bye).',
+    sizes(n, size) {
+      const k = Math.floor(n / size);
+      if (!k) return [n];
+      return [...Array(k).fill(size), ...Array(n % size).fill(1)];
+    },
+  },
+};
+
+function tournamentSplit(n, size, split = 'even') {
   if (n < 1) return [];
-  const k = Math.ceil(n / size);
-  const base = Math.floor(n / k), extra = n % k;
-  return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
+  return (TOURNAMENT_SPLITS[split] || TOURNAMENT_SPLITS.even).sizes(n, size);
 }
 
-// Cuts an ordered list of players into tables of the split's sizes.
-function _tnCut(players, size) {
-  const out = [];
+// Seats the players, given in pairing order (best first), at the stage's
+// tables: the byes first go to whoever had the fewest so far (the last in the
+// order among them), then the others fill the tables in order.
+function _tnSeat(order, { size, split, byes }) {
+  const sizes = tournamentSplit(order.length, size, split);
+  const byeCount = sizes.filter(x => x === 1).length;
+  const sitOut = order.map((id, i) => ({ id, i, b: byes.get(id) || 0 }))
+    .sort((a, b) => a.b - b.b || b.i - a.i).slice(0, byeCount).map(x => x.id);
+  const rest = order.filter(id => !sitOut.includes(id));
+  const tables = [];
   let i = 0;
-  for (const s of tournamentSplit(players.length, size)) { out.push(players.slice(i, i + s)); i += s; }
-  return out;
+  for (const n of sizes.filter(x => x > 1)) { tables.push(rest.slice(i, i + n)); i += n; }
+  return [...tables, ...sitOut.map(id => [id])];
 }
 
 // ── History ──────────────────────────────────────────────────────────────────
@@ -90,37 +121,18 @@ function _tnRematches(table, met) {
   return n;
 }
 
-// A bye goes to a player with the fewest byes so far: if the one at the bye
-// table already had more, they swap with the last such player before them.
-function _tnFairBye(tables, byes) {
-  const last = tables[tables.length - 1];
-  if (!last || last.length !== 1) return tables;
-  const fewest = Math.min(...tables.flat().map(u => byes.get(u) || 0));
-  if ((byes.get(last[0]) || 0) === fewest) return tables;
-  for (let ti = tables.length - 2; ti >= 0; ti--) {
-    for (let si = tables[ti].length - 1; si >= 0; si--) {
-      const u = tables[ti][si];
-      if ((byes.get(u) || 0) === fewest) {
-        tables[ti][si] = last[0];
-        last[0] = u;
-        return tables;
-      }
-    }
-  }
-  return tables;
-}
 
 // ── Pairing ──────────────────────────────────────────────────────────────────
 // tables(players, ctx): players are the ids of those still playing; ctx is
-// { size, stage (the one being drawn), standings (tournamentStandings rows),
-// met, byes }. Returns the tables, play order not yet drawn.
+// { size, split, stage (the one being drawn), standings (tournamentStandings
+// rows), met, byes }. Returns the tables, play order not yet drawn.
 
 const TOURNAMENT_PAIRINGS = {
   random: {
     name: 'Random',
     hint: 'New random tables every stage.',
-    tables(players, { size, byes }) {
-      return _tnFairBye(_tnCut(_tnShuffle(players), size), byes);
+    tables(players, ctx) {
+      return _tnSeat(_tnShuffle(players), ctx);
     },
   },
   swiss: {
@@ -131,7 +143,7 @@ const TOURNAMENT_PAIRINGS = {
       // By standing, ties in random order: the leaders together.
       const rank = new Map(ctx.standings.map(r => [r.player_id, r.rank]));
       const order = _tnShuffle(players).sort((a, b) => (rank.get(a) ?? 1e9) - (rank.get(b) ?? 1e9));
-      const tables = _tnFairBye(_tnCut(order, ctx.size), ctx.byes);
+      const tables = _tnSeat(order, ctx);
       // Then swaps between neighboring tables while they cut the rematches.
       for (let pass = 0, better = true; better && pass < 20; pass++) {
         better = false;
@@ -244,7 +256,7 @@ function tournamentDrawStage(tour, players, tables = []) {
   const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
   const stage = Math.max(0, ...tables.map(tb => tb.stage)) + 1;
   const standings = tournamentStandings(tour, tables, { players });
-  return pairing.tables(playing, { size: tour.table_size, stage, standings, met, byes })
+  return pairing.tables(playing, { size: tour.table_size, split: tour.table_split || 'even', stage, standings, met, byes })
     .map(tb => _tnShuffle(tb));
 }
 
