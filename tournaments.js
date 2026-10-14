@@ -3,7 +3,7 @@
 // ?new: the New tournament form. ?t=<id>: one tournament, with its settings,
 // its players by name and, once started, the current stage's tables.
 //
-// The organizer types the players' names (New tournament, Edit settings until
+// The organizer types the players' names (New tournament, Edit tournament until
 // the first game starts). A signed-in player claims their name with That's me
 // (and with it every seat of theirs in the tournament's games), at any time.
 // Start draws every stage's
@@ -202,7 +202,7 @@ function tnRenderTournament() {
 
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
-    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
+    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
   ].join('');
 
   const ctx  = { user, isOrg, lobby, mine };
@@ -234,7 +234,7 @@ function tnRenderTournament() {
 // claimed the name (or the default), the name (the nickname once claimed),
 // whether it's claimed or withdrawn, and That's me / Release (and, once
 // started, the organizer's Withdraw / Bring back). Players are added, renamed
-// and removed in Edit settings, not here.
+// and removed in Edit tournament, not here.
 function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
   const prof   = p.user_id ? tnProfiles.get(p.user_id) : null;
   const isMine = !!user && p.user_id === user.id;
@@ -327,7 +327,7 @@ function _tnDrawSummary(stage) {
   const tables = sizes.filter(n => n > 1).length, byes = sizes.length - tables;
   const what = byes ? t('{tables} and {byes}', { tables: tn(tables, '{n} table', '{n} tables'), byes: tn(byes, '{n} bye', '{n} byes') }) : tn(tables, '{n} table', '{n} tables');
   const pairing = (TOURNAMENT_PAIRINGS[tnTour.pairing] || TOURNAMENT_PAIRINGS.random).name;
-  return `${t('Stage {n} of {m}: {what}, {pairing} pairing.', { n: stage, m: tnTour.stages, what, pairing: t(pairing) })} ${t('It can be undone until a table is saved.')}`;
+  return `${t('Stage {n} of {m}: {what}, {pairing} pairing.', { n: stage, m: tnTour.stages, what, pairing: t(pairing) })} ${t('It can be undone until a game is saved (a bye isn\'t a game).')}`;
 }
 
 // A stage's name: "Stage 2 of 3", or "Final" for the final table.
@@ -361,7 +361,7 @@ function tnUndoStage() {
     id:           'tnUndoSheet',
     title:        t('Undo the draw of stage {n}?', { n: st }),
     bodyHTML:     `<p class="confirm-text">${st === 1
-      ? t('Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit settings, and Start draws everything again.')
+      ? t('Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit tournament, and Start draws everything again.')
       : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.', { n: st - 1 })}</p>`,
     confirmLabel: t('Undo draw'),
     busyLabel:    t('Working…'),
@@ -454,7 +454,7 @@ function tnStart() {
   const n = tnPlayers.length;
   if (n < 2) return _tnShowError(t('A tournament needs at least 2 players.'));
   if (tnTour.villain_pool.length < n) {
-    return _tnShowError(t('The draw pool has {v} villains for {n} players: every player needs a different one. Add villains in Edit settings.', { v: tnTour.villain_pool.length, n }));
+    return _tnShowError(t('The draw pool has {v} villains for {n} players: every player needs a different one. Add villains in Edit tournament.', { v: tnTour.villain_pool.length, n }));
   }
   const sizes = tournamentSplit(n, tnTour.table_size, tnTour.table_split);
   openConfirmSheet({
@@ -573,7 +573,7 @@ async function tnOpenForm(tour) {
   setVisible('tnFormPlayers', open);
   if (open) _tnRenderFormPlayers();
   _tnPoolChanged();
-  // New: Discard (the Back link keeps the draft); Edit settings: Cancel.
+  // New: Discard (the Back link keeps the draft); Edit tournament: Cancel.
   setVisible('tnFormDiscard', !tour);
   setVisible('tnFormCancel', !!tour);
   _tnDraftReady = !tour;
@@ -585,7 +585,7 @@ async function tnOpenForm(tour) {
 // the draw pool) is kept in localStorage as you edit, so leaving the page or
 // Cancel doesn't lose it. It expires an hour after the last change; Discard
 // and Create tournament clear it. An untouched date isn't kept (it comes back
-// as today). Edit settings has no draft: Cancel leaves the tournament as it was.
+// as today). Edit tournament has no draft: Cancel leaves the tournament as it was.
 const TN_DRAFT_KEY    = 'divilytics_tournament_draft' + STORAGE_SCOPE;   // the beta's apart (config.js)
 const TN_DRAFT_MAX_MS = 60 * 60 * 1000;
 let _tnDraftReady = false;   // only while New tournament's form is open
@@ -799,13 +799,13 @@ const TN_HELP = [
     'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
-    'The organizer types the names, in New tournament and then in Edit settings until the first game starts. A signed-in player claims theirs with That\'s me, at any time, and from then on shows by their nickname; Release gives it back.',
+    'The organizer types the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, and from then on shows by their nickname; Release gives it back.',
     'The organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
-    'Edit settings adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
+    'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
   ]],
   ['changes', 'After the start', [
-    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
+    'Until the first game starts (a bye isn\'t a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
     'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.',
   ]],
 ];
@@ -863,7 +863,7 @@ function _tnPoolChanged() {
 // New Game's rows: a name each (empty: the "Player 3" shown), 👤 for you (your
 // nickname, your name claimed), ❌ to remove; the count menu from 2 up to the
 // villains in the draw pool (every player needs a different one per stage).
-// Edit settings starts from the tournament's players ({ id, stored, userId }):
+// Edit tournament starts from the tournament's players ({ id, stored, userId }):
 // a name someone claimed shows their nickname and can't be typed over.
 let tnFormPlayers = [];
 
@@ -955,7 +955,7 @@ function tnToggleFormMe(i) {
   _tnRenderFormPlayers();
 }
 
-// What saving Edit settings does to the players: removed, renamed, added, and
+// What saving Edit tournament does to the players: removed, renamed, added, and
 // your claim moved (released, claimed).
 function _tnPlayersPlan(names) {
   const me = getCurrentUser()?.id;
@@ -1084,7 +1084,7 @@ async function tnSaveForm() {
   if (res.error || !res.data?.length) return showError('tnFormErr', _tnErrorMsg(res.error));
   const id = res.data[0].id;
   const error = await _tnApplyPlayers(id, plan);
-  if (error) console.warn('tournament players', error);   // Edit settings can still add them
+  if (error) console.warn('tournament players', error);   // Edit tournament can still add them
   _tnDraftReady = false;
   _tnDropDraft();
   location.replace(`tournaments.html?t=${id}`);
