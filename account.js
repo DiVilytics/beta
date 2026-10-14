@@ -241,7 +241,6 @@ async function exportMyData() {
   if (!user) return;
   const btn = document.getElementById('exportDataBtn');
   btn.disabled    = true;
-  btn.textContent = t('Preparing…');
 
   try {
     const gpAll = await _fetchAllRows(() => db.from('game_players').select('*').eq('user_id', user.id));
@@ -420,7 +419,7 @@ async function commitAvatar() {
 
   const value = _pendingAvatar;
   const btn   = document.getElementById('commitAvatarBtn');
-  if (btn) { btn.disabled = true; btn.textContent = t('Saving…'); }
+  if (btn) btn.disabled = true;
   clearError('avatarErr');
 
   const previous = _acctAvatar;
@@ -504,7 +503,6 @@ async function confirmDeleteAccount() {
 
   const btn = document.getElementById('delAccountBtn');
   btn.disabled    = true;
-  btn.textContent = t('Deleting…');
 
   const fail = msg => {
     showError(errEl, msg);
