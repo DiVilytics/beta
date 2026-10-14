@@ -64,16 +64,26 @@ const Charts = (() => {
   // by position), so give it a window of exactly 4 equal round steps that covers
   // the data with a little margin: win rates 21-49 -> 20 30 40 50 60. `cap`
   // (e.g. 100 for a percentage) keeps the window from running past it.
-  function niceWindow4(y0, y1, cap = null) {
+  function niceWindow4(y0, y1, cap = null, floor = 0) {
     const m = Math.max((y1 - y0) * 0.03, 0.5);
     for (let mag = 1; ; mag *= 10) {
       for (const st of [1, 2, 5].map(k => k * mag)) {
         let lo = Math.floor((y0 - m) / st) * st;
-        if (lo < 0) lo = 0;
+        if (floor != null && lo < floor) lo = floor;
         if (cap != null && lo + 4 * st > cap) lo = Math.max(0, Math.floor((cap - 4 * st) / st) * st);
         if (lo <= y0 - m && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };
-        if (lo === 0 && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // 0 is as low as it goes
+        if (lo === floor && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // the floor is as low as it goes
       }
+    }
+  }
+
+  // A window of 4 equal round steps centered on 0 (-2 steps to +2) covering
+  // ±amax with a little margin.
+  function symWindow4(amax) {
+    const need = amax * 1.06 || 1;
+    for (let mag = 1; ; mag *= 10) {
+      const st = [1, 2, 3, 4, 5, 6, 8].map(k => k * mag).find(k => 2 * k >= need);   // whole steps, so the labels stay exact
+      if (st) return { lo: -2 * st, hi: 2 * st };
     }
   }
 
@@ -116,10 +126,11 @@ const Charts = (() => {
   // `spread` = { mid, lo, hi, text }: positions in bars (2.5 = halfway through
   // the third bar) of a dashed line (the median) over a shaded span (the middle
   // half), with `text` above the plot on the right.
-  function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1, spread = null } = {}) {
+  // `note`: a text above the plot on the right, without the spread.
+  function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1, spread = null, note = null } = {}) {
     if (!data.length) return empty();
     const { max, ticks } = niceCountTicks(Math.max(...data.map(d => d.value)) || 1);
-    const L = 14 + 7 * String(max).length, R = 10, T = spread ? 28 : 14, B = 26;   // room for the widest y label (1000), and the spread's text
+    const L = 14 + 7 * String(max).length, R = 10, T = spread || note ? 28 : 14, B = 26;   // room for the widest y label (1000), and the spread's text
     const bw = (W - L - R) / data.length;
     const sy = v => (H - B) - v / max * (H - T - B);
     let grid = '';
@@ -140,6 +151,7 @@ const Charts = (() => {
       marks = `<rect x="${px(spread.lo).toFixed(1)}" y="${T}" width="${Math.max(1, px(spread.hi) - px(spread.lo)).toFixed(1)}" height="${(H - B - T).toFixed(1)}" class="ch-spread"/>` +
         `<text x="${W - R}" y="${T - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(spread.text)}</text>`;
     }
+    if (note) marks += `<text x="${W - R}" y="${T - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(note)}</text>`;
     // The shading behind the bars, the median line over them.
     const median = spread ? `<line x1="${(L + spread.mid * bw).toFixed(1)}" y1="${T - 4}" x2="${(L + spread.mid * bw).toFixed(1)}" y2="${H - B}" class="ch-median"/>` : '';
     return wrap(marks + grid + bars + median);
@@ -147,7 +159,13 @@ const Charts = (() => {
 
   // Scatter: points = [{ x, y, label, color? }]. xSuffix/ySuffix label the axis
   // ticks (e.g. '%'); the zoom code re-labels those same ticks as you zoom.
-  function scatter(points, { xLabel = '', xSuffix = '', ySuffix = '', yMax = null } = {}) {
+  // `yFloor: null` lets y go below 0, `ySymmetric` centers the y axis on 0 (Δ
+  // Wins: -2 steps to +2 steps); `refs` are y values marked with
+  // a dashed line across the plot (they zoom with the dots), `include` y values
+  // the axis always covers.
+  // `avg` = { value, text }: a dashed line at that y (the average), `text` above
+  // the plot on the right.
+  function scatter(points, { xLabel = '', xSuffix = '', ySuffix = '', yMax = null, yFloor = 0, ySymmetric = false, refs = [], include = [], avg = null } = {}) {
     if (!points.length) return empty();
     const L = 42, R = 14, T = 14, B = 40, PW = W - L - R, PH = H - T - B;
     const xs = points.map(p => p.x), ys = points.map(p => p.y);
@@ -155,10 +173,11 @@ const Charts = (() => {
     // a zero origin, so the cloud fills the plot instead of hugging a corner.
     // Clamp the low end at 0 (games/percent are non-negative) and the high end at
     // yMax when given (e.g. 100 for a percentage axis).
-    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    if (avg) include = [...include, avg.value];
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys, ...include), y1 = Math.max(...ys, ...include);
     const xpad = (x1 - x0) * 0.08 || 1;
     const xlo = Math.max(0, x0 - xpad), xhi = x1 + xpad;
-    const { lo: ylo, hi: yhi } = niceWindow4(y0, y1, yMax);   // round gridline values, not 21 28 35 ...
+    const { lo: ylo, hi: yhi } = ySymmetric ? symWindow4(Math.max(-y0, y1)) : niceWindow4(y0, y1, yMax, yFloor);   // round gridline values, not 21 28 35 ...
     const sx = x => L + (x - xlo) / (xhi - xlo) * PW;
     const sy = y => (H - B) - (y - ylo) / (yhi - ylo) * PH;
     let grid = '';
@@ -184,6 +203,9 @@ const Charts = (() => {
       const boxAttr = p.box ? ` data-box="${_esc(p.box)}" data-boxhref="${_esc(p.boxHref || '')}"` : '';
       return `<circle${hit(p.label, p.meta, p.href, 'ch-dot')}${boxAttr} cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="8" fill="${p.color || 'var(--accent)'}" fill-opacity="0.85" stroke="transparent" stroke-width="16"><title>${titleText(p.label, p.meta)}</title></circle>`;
     }).join('');
+    // Reference lines, wide enough to cross the plot at any zoom (the clip trims them).
+    const refLines = refs.map(v => `<line x1="${L - PW}" y1="${sy(v).toFixed(1)}" x2="${W + PW}" y2="${sy(v).toFixed(1)}" class="ch-ref${v === 0 ? ' ch-ref-zero' : ''}"/>`).join('') +
+      (avg ? `<line x1="${L - PW}" y1="${sy(avg.value).toFixed(1)}" x2="${W + PW}" y2="${sy(avg.value).toFixed(1)}" class="ch-median"/>` : '');
     // The dots ride in a group that the zoom transforms, wrapped in a fixed clip
     // (the plot rect) so the zoom never spills over the axes. The plot ranges and
     // tick suffixes ride on the group so the zoom code can re-place dots and
@@ -193,14 +215,15 @@ const Charts = (() => {
       `<g clip-path="url(#scClip)"><g class="ch-pan"` +
       ` data-l="${L}" data-r="${R}" data-t="${T}" data-b="${B}"` +
       ` data-xlo="${xlo}" data-xhi="${xhi}" data-ylo="${ylo}" data-yhi="${yhi}"` +
-      ` data-xsuf="${_esc(xSuffix)}" data-ysuf="${_esc(ySuffix)}">${dots}</g></g>`;
+      ` data-xsuf="${_esc(xSuffix)}" data-ysuf="${_esc(ySuffix)}">${refLines}${dots}</g></g>`;
     const frame = `<rect class="ch-plot-frame" x="${L}" y="${T}" width="${PW}" height="${PH}" fill="none"/>`;
     const badge =
       `<g class="ch-zoom-badge" transform="translate(${W - R - 4} ${T + 4})">` +
       `<rect class="ch-zoom-badge-bg" x="-44" y="0" width="44" height="17" rx="4"/>` +
       `<text class="ch-zoom-badge-txt" x="-22" y="12" text-anchor="middle">1×</text></g>`;
     const axis = xLabel ? `<text x="${((L + W - R) / 2).toFixed(1)}" y="${H - 6}" class="ch-axlbl" text-anchor="middle">${_esc(xLabel)}</text>` : '';
-    return wrap(grid + plot + frame + badge + axis, { cls: 'ch-zoomable' });
+    const note = avg ? `<text x="${W - R}" y="${T - 4}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(avg.text)}</text>` : '';
+    return wrap(grid + plot + frame + badge + axis + note, { cls: 'ch-zoomable' });
   }
 
   // Histogram from raw values; bins evenly across [min, max], then drawn as barsV.
@@ -226,10 +249,11 @@ const Charts = (() => {
   // panning (charts.js _attachLinePan). It starts on the most recent points.
   // The y scale stays fixed to the global max so the axis doesn't jump while
   // panning; gridlines + y labels stay put and only the data pans.
-  function line(points, { fmt = v => v, color = 'var(--accent)', visible = null } = {}) {
+  // `avg` = { value, text }: a dashed line at that value, `text` above the plot.
+  function line(points, { fmt = v => v, color = 'var(--accent)', visible = null, avg = null } = {}) {
     if (!points.length) return empty();
     const { max, ticks: yTicks } = niceCountTicks(Math.max(...points.map(p => p.value)) || 1);
-    const L = 14 + 7 * String(max).length, R = 12, T = 14, B = 28, PW = W - L - R;   // room for the widest y label
+    const L = 14 + 7 * String(max).length, R = 12, T = avg ? 28 : 14, B = 28, PW = W - L - R;   // room for the widest y label
     const n = points.length;
     const pannable = !!visible && n > visible;
     const PAD = 10;                                  // pannable: room at both ends so the edge labels (wider on phones) fit
@@ -273,6 +297,8 @@ const Charts = (() => {
       return `<circle${hit(name, meta, p.href)} cx="${sx(i).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="4" fill="${color}" stroke="transparent" stroke-width="16"><title>${titleText(name, meta)}</title></circle>`;
     }).join('');
     const data = `<path d="${area}" fill="${color}" fill-opacity="0.12"/><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>`;
+    if (avg) grid += `<line x1="${L}" y1="${sy(avg.value).toFixed(1)}" x2="${W - R}" y2="${sy(avg.value).toFixed(1)}" class="ch-median"/>` +
+      `<text x="${W - R}" y="${T - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(avg.text)}</text>`;
     if (!pannable) return wrap(`${data}${grid}${ticks}${dots}`);
 
     // The pan groups start translated so the last `visible` points are in view;
@@ -291,8 +317,9 @@ const Charts = (() => {
       { cls: 'ch-pannable' });
   }
 
-  // Donut: segments = [{ label, value, color? }] + side legend.
-  function donut(segments) {
+  // Donut: segments = [{ label, value, color? }] + side legend. `center`:
+  // [big, ...small] texts in the hole, one line each.
+  function donut(segments, { center = null } = {}) {
     segments = segments.filter(s => s.value > 0);
     if (!segments.length) return empty();
     const total = segments.reduce((a, s) => a + s.value, 0);
@@ -319,7 +346,9 @@ const Charts = (() => {
       const col = s.color || PALETTE[i % PALETTE.length], y = ly + i * 26;
       return `<rect x="${lx}" y="${y}" width="13" height="13" rx="2" fill="${col}"/><text x="${lx + 19}" y="${y + 11}" class="ch-lbl">${_esc(s.label)}</text>`;
     }).join('');
-    return wrap(arcs + legend);
+    const mid = center ? `<text x="${cx}" y="${cy - 6}" class="ch-donut-big" text-anchor="middle">${_esc(center[0])}</text>` +
+      center.slice(1).map((c, i) => `<text x="${cx}" y="${cy + 12 + i * 13}" class="ch-ax" text-anchor="middle">${_esc(c)}</text>`).join('') : '';
+    return wrap(arcs + legend + mid);
   }
 
   // Heatmap: rowLabels[], colLabels[], cell(ri, ci) -> { value: 0..1 | null, label, title }.

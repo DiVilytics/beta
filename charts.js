@@ -101,7 +101,7 @@ const CHARTS = [
           meta: `${tn(c.games, '{n} game', '{n} games')} | ${t('{pct}% win rate', { pct })}`,
         };
       });
-      return Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100 });
+      return Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100, avg: _overallRef(_villainStats(games, chars)) });
     },
   },
   {
@@ -230,7 +230,9 @@ const CHARTS = [
         const c = games.filter(g => g.seats.length === n).length;
         return { label: `${n}p`, value: c, meta: `${tn(c, '{n} game', '{n} games')} | ${Math.round(c / total * 100)}%` };
       });
-      return Charts.donut(segs);
+      // In the hole: how many games, and how many players a game on average.
+      const avg = games.reduce((a, g) => a + g.seats.length, 0) / total;
+      return Charts.donut(segs, { center: [String(games.length), tn(games.length, 'game', 'games'), t('{n} players a game', { n: avg.toLocaleString(LOCALE, { maximumFractionDigits: 1 }) })] });
     },
   },
   {
@@ -274,7 +276,13 @@ const CHARTS = [
         const c = mode === 'players' ? sets.get(k).size : sets.get(k).length;
         return { label: label(k), name: name(k), value: c, meta: mode === 'players' ? tn(c, '{n} player', '{n} players') : tn(c, '{n} game', '{n} games') };
       });
-      return Charts.line(pts, { visible: period.isAll() ? 12 : null });
+      // Above it: the period's total (players counted once) and the average a
+      // month (or a day), dashed.
+      const total = mode === 'players' ? new Set(dated.flatMap(g => g.seats.map(s => s.user_id).filter(Boolean))).size : dated.length;
+      const avg = pts.length ? pts.reduce((a, p) => a + p.value, 0) / pts.length : 0;
+      const avgTxt = avg.toLocaleString(LOCALE, { maximumFractionDigits: avg < 10 ? 1 : 0 });
+      const text = `${mode === 'players' ? tn(total, '{n} player', '{n} players') : tn(total, '{n} game', '{n} games')} | ${t(p.month != null ? '{n} a day on average' : '{n} a month on average', { n: avgTxt })}`;
+      return Charts.line(pts, { visible: period.isAll() ? 12 : null, avg: pts.length ? { value: avg, text } : null });
     },
   },
   {
@@ -292,8 +300,10 @@ const CHARTS = [
       const day    = (d, weekday) => new Date(2025, 0, 5 + d).toLocaleDateString(LOCALE, { weekday });
       const labels = order.map(d => day(d, 'short').replace('.', ''));
       const full   = order.map(d => { const s = day(d, 'long'); return s[0].toUpperCase() + s.slice(1); });
-      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: tn(counts[d], '{n} game', '{n} games') }));
-      return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1 });
+      const total = counts.reduce((a, c) => a + c, 0) || 1;
+      const pct = c => Math.round(c / total * 100);
+      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${tn(counts[d], '{n} game', '{n} games')} | ${pct(counts[d])}%` }));
+      return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1, note: t('Weekends {pct}%', { pct: pct(counts[6] + counts[0]) }) });
     },
   },
   {
