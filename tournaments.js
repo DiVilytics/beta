@@ -570,6 +570,8 @@ async function tnOpenForm(tour) {
   setVisible('tnRoot', false);
   setVisible('tnBack', true);
   setVisible('tnForm', true);
+  // New tournament only: an open tournament has its ⓘ next to Options.
+  setVisible('tnIntroHelp', !tour);
   document.getElementById('tnFormSave').textContent = tour ? t('Save Changes') : t('Create tournament');
   clearError('tnFormErr');
 

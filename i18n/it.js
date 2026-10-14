@@ -870,6 +870,7 @@ window.I18N.it = {
     "On": "Sì",
     "The standings after the last stage are the final ranking.": "La classifica dopo l'ultima fase è quella finale.",
     "After the last stage, the top of the standings play one final table, which decides the top places.": "Dopo l'ultima fase, i primi della classifica giocano un tavolo finale, che decide i primi posti.",
+    "How the tournament options work ›": "Come funzionano le opzioni del torneo ›",
     "Tournament options": "Opzioni torneo",
     "1st scores the most, then one point less per place, down to 0 for last; a smaller table scales to the largest.": "Il 1º prende di più, poi un punto in meno per posto, fino a 0 per l'ultimo; un tavolo più piccolo è riportato al più grande.",
     "Your points for each place, at every table size.": "I tuoi punti per ogni posto, a ogni dimensione di tavolo.",
