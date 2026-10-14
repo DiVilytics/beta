@@ -200,7 +200,7 @@ function tnRenderTournament() {
 
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
-    isOrg && _tnAllOpen(tnTour) ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
+    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
     isOrg && lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start')}</button>` : '',
   ].join('');
 
@@ -564,7 +564,10 @@ async function tnOpenForm(tour) {
   tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
   tnRule.final       = tour?.final_table ? 'on' : 'off';
   tnCustom = tour?.custom_points?.length ? tournamentCustomRows(tour) : _tnCustomRows(tour?.table_size || 4);
-  setVisible('tnRedrawNote', !!tour && tour.current_stage > 0);
+  // Once a game has started: only the name and the date (fixing a typo).
+  const open = _tnAllOpen(tour);
+  document.querySelectorAll('#tnForm .tn-fixed').forEach(el => setVisible(el, open));
+  setVisible('tnRedrawNote', !!tour && open && tour.current_stage > 0);
   _tnRenderRules();
   _tnHelpButtons();
 
@@ -602,7 +605,8 @@ async function tnOpenForm(tour) {
     ? t('Up to the villains in the draw pool. An empty name keeps the one shown.')
     : t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.');
   tnFormPlayers = tour ? [] : [{ name: '', isMe: false }, { name: '', isMe: false }];
-  _tnRenderFormPlayers();
+  setVisible('tnFormPlayers', open);
+  if (open) _tnRenderFormPlayers();
   _tnPoolChanged();
   if (!tour) document.getElementById('tnName').focus();
 }
@@ -677,7 +681,7 @@ function tnCustomFill(fill) {
 // form opens it at the start, each option's ⓘ at its own section.
 const TN_HELP = [
   ['date', 'Date', [
-    'The day of the tournament, shown on its page and in the lists. The organizer can change it until the first game starts. The games keep the day and time they were actually played.',
+    'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, like the name, to fix a mistake. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Max players per table', [
     'No table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
@@ -740,7 +744,7 @@ const TN_HELP = [
     'Edit settings adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
   ]],
   ['changes', 'After the start', [
-    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, the settings are fixed. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to sign-ups, and the start draws everything again).',
+    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to sign-ups, and the start draws everything again).',
     'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.',
   ]],
 ];
@@ -884,7 +888,21 @@ async function tnSaveForm() {
       || (tnFormFor && names.some(n => tnPlayers.some(p => p.name.toLowerCase() === n.toLowerCase())))) {
     return showError('tnFormErr', t('Every player needs a different name.'));
   }
-  if (tnFormFor && !_tnAllOpen(tnFormFor)) return showError('tnFormErr', t('A game has started: the settings no longer change.'));
+  // A game has started: the name and the date only.
+  if (tnFormFor && !_tnAllOpen(tnFormFor)) {
+    const name = document.getElementById('tnName').value.trim();
+    if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
+    const btn = document.getElementById('tnFormSave');
+    btn.disabled = true;
+    let error = null;
+    if (name !== tnFormFor.name) error = (await db.rpc('set_tournament_name', { target: tnFormFor.id, new_name: name })).error;
+    if (!error && date !== tnFormFor.event_date) error = (await db.rpc('set_tournament_date', { target: tnFormFor.id, new_date: date })).error;
+    btn.disabled = false;
+    if (error) return showError('tnFormErr', _tnErrorMsg(error));
+    setVisible('tnForm', false);
+    setVisible('tnRoot', true);
+    return tnLoad(tnFormFor.id);
+  }
   const name   = document.getElementById('tnName').value.trim();
   const stages = Number(document.getElementById('tnStages').value);
   if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
@@ -1060,6 +1078,19 @@ function _tnSeatPoints(tb, seat) {
 }
 const _tnPointsLabel = p => t(p === 1 ? '{n} pt' : '{n} pts', { n: fmtTournamentPoints(p) });
 
+// Under a row tied on points with a neighbor (finalists aside: the final
+// orders them): the tiebreak that separates them, with its value, or that the
+// place is shared.
+function _tnTieNote(rows, r) {
+  const i = rows.indexOf(r);
+  const tied = [rows[i - 1], rows[i + 1]].filter(x => x && !x.final && x.points === r.points);
+  if (!tied.length) return '';
+  for (const tb of TOURNAMENT_TIEBREAKS) {
+    if (tied.some(x => tb.value(x) !== tb.value(r))) return `${t('Tiebreak')}: ${t(tb.name)} ${fmtTournamentPoints(tb.value(r))}`;
+  }
+  return t('Shared place');
+}
+
 // The standings, drawn like the Leaderboard's table: rank (medals for the
 // top three), player, points with their 1st places in parentheses, a bar.
 function _tnStandingsHTML(mine) {
@@ -1073,7 +1104,7 @@ function _tnStandingsHTML(mine) {
     const p = byId.get(r.player_id);
     const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
     const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
-    const sub = r.final ? t('Final: {place}', { place: fmtPlace(r.final) }) : '';
+    const sub = r.final ? '' : _tnTieNote(rows, r);
     // A claimed name links to its player page, as in the Leaderboard.
     const name = prof
       ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
@@ -1094,7 +1125,7 @@ function _tnStandingsHTML(mine) {
       <div class="lb-head"><span>#</span><span>${t('Player')}</span><span class="text-right">${t('Points')} <span class="lb-head-sub">(${t('1st places')})</span></span></div>
       ${body}
     </div>
-    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}</p>`;
+    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
 }
 
 // Every stage's saved tables, in order, with places and points (the ones
