@@ -139,7 +139,7 @@ const CHARTS = [
   },
   {
     id: 'boxpop', icon: '🔥', label: 'Box popularity',
-    desc: "How often each box's villains are picked across all recorded games. Bars are sorted most-played first; tap one to open the box.",
+    desc: "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
     render({ games, chars, boxInfo }) {
       const byBox = {};
       let total = 0;
@@ -171,7 +171,7 @@ const CHARTS = [
     modes: _MINUTES_ROUNDS,
     desc: {
       minutes: 'How many games fall into each 15-minute band (0-15, 15-30, and so on); the band start in minutes is under each bar. Counts only games with a recorded duration.',
-      rounds:  'How many games fall into each 3-round band, grouped to smooth out noise. Counts only games with a recorded round count.',
+      rounds:  'How many games fall into each 3-round band (0-2, 3-5, and so on); the band start is under each bar. Counts only games with a recorded round count.',
     },
     render({ games, mode }) {
       if (mode === 'rounds') {
@@ -209,8 +209,8 @@ const CHARTS = [
     modes: _MINUTES_ROUNDS,
     sizes: false,
     desc: {
-      minutes: 'Average recorded game duration in minutes for each table size, from 2 to 6 players. Averaged only over games that recorded a duration.',
-      rounds:  'Average rounds per game for each table size, from 2 to 6 players. Averaged only over games that recorded their rounds.',
+      minutes: 'Average game length in minutes for each table size, from 2 to 6 players, over the games that recorded a duration. Tap a bar for its number of games.',
+      rounds:  'Average rounds per game for each table size, from 2 to 6 players, over the games that recorded their rounds. Tap a bar for its number of games.',
     },
     render({ games, mode }) {
       const rounds = mode === 'rounds';
@@ -232,7 +232,7 @@ const CHARTS = [
   {
     id: 'tablesize', icon: '👥', label: 'Players per game',
     sizes: false,
-    desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact game count and percentage.',
+    desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact number of games and its percentage of all the games played.',
     render({ games }) {
       const total = games.length || 1;
       const segs = TABLE_SIZES.map(n => {
@@ -246,8 +246,8 @@ const CHARTS = [
     id: 'time', icon: '📈', label: 'Games over time',
     modes: [{ id: 'games', label: 'Games' }, { id: 'players', label: 'Players' }],
     desc: {
-      games:   'Games played each month, by play date (labeled YYYY/MM). All time shows the latest 12 months: drag sideways to see earlier ones. A year shows its months, a month its days.',
-      players: 'Players who claimed a villain in a game of each month, each counted once a month, by play date. All time shows the latest 12 months: drag sideways to see earlier ones. A year shows its months, a month its days.',
+      games:   'Games played each month, by play date. All time shows the latest 12 months (drag sideways for earlier ones); a year shows its months, a month its days.',
+      players: 'Players who claimed a villain each month, each counted once. All time shows the latest 12 months (drag sideways for earlier ones); a year its months, a month its days.',
     },
     render({ games, mode }) {
       // The buckets: every month from the first game to the last (All time), the
@@ -288,7 +288,7 @@ const CHARTS = [
   },
   {
     id: 'weekday', icon: '📅', label: 'Games by weekday',
-    desc: 'Number of games recorded on each weekday, by play date. Weekday is derived from your local time zone.',
+    desc: 'Games played on each weekday, by play date, Monday first. The weekday follows your time zone (or the recorded day, for games saved without a time).',
     render({ games }) {
       const counts = new Array(7).fill(0);   // 0 = Sunday
       for (const g of games) {
@@ -359,8 +359,10 @@ function _renderPicker() {
 const _modes = {};
 const _modeOf = c => c.modes ? (c.modes.some(m => m.id === _modes[c.id]) ? _modes[c.id] : c.modes[0].id) : null;
 
+// A chart without a switch keeps its place, empty, so every chart starts at
+// the same height.
 function _modesHTML(c) {
-  if (!c.modes) return '';
+  if (!c.modes) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
   const mode = _modeOf(c);
   return `<div class="controls mb-1"><div class="seg">${c.modes.map(m =>
     `<button class="seg-btn${m.id === mode ? ' on' : ''}" type="button" onclick="setChartMode('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div></div>`;

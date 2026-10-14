@@ -899,6 +899,7 @@ main {
 .chart-card-desc { display: grid; }
 .chart-card-desc > span { grid-area: 1 / 1; }
 .chart-card-desc > .chart-desc-off { visibility: hidden; }
+.chart-modes-none { visibility: hidden; }
 /* Every chart is drawn on a 440x280 viewBox and scales to the card width, so
    reserve exactly that ratio up front: the card is already its final size
    while "Loading…" shows, and nothing jumps when the chart arrives. */
