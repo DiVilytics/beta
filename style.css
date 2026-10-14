@@ -2064,7 +2064,10 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .tn-player-row { min-height: 38px; padding: 3px 10px; box-sizing: border-box; }
 .tn-player-row .order-slot-portrait { width: 26px; height: 26px; }
 .tn-player-row.mine { border-color: var(--accent); }
-.tn-row-status { flex-shrink: 0; padding-right: 2px; font-size: calc(12px * var(--ts)); color: var(--dim); font-style: italic; }
+.tn-player-row .order-slot-info { flex-direction: column; align-items: stretch; gap: 0; }
+.tn-player-row .order-slot-name { flex: none; }
+/* Under the name, as a claimed nickname sits under a game page's villain. */
+.tn-row-status { font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* As tall as + Add player under them. */
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }

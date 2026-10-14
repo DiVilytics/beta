@@ -1274,7 +1274,9 @@ function _tnTieNote(rows, r) {
 // top three), player, points with their 1st places in parentheses, a bar.
 function _tnStandingsHTML(mine) {
   const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
-  if (!rows.some(r => r.played || r.byes)) return emptyStateHTML('🏟️', t('No results yet'), t('The standings fill in as the tables are saved.'));
+  // Shown from the start: everyone at 0 until the first table is saved (no
+  // tie notes until then).
+  const started = rows.some(r => r.played || r.byes);
   const byId = new Map(tnPlayers.map(p => [p.id, p]));
   const max = Math.max(...rows.map(r => r.points)) || 1;
   const medal = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
@@ -1283,7 +1285,7 @@ function _tnStandingsHTML(mine) {
     const p = byId.get(r.player_id);
     const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
     const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
-    const sub = r.final ? '' : _tnTieNote(rows, r);
+    const sub = r.final || !started ? '' : _tnTieNote(rows, r);
     // A claimed name links to its player page, as in the Leaderboard.
     const name = prof
       ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`

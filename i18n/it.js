@@ -799,8 +799,6 @@ window.I18N.it = {
     "Standings": "Classifica",
     "{n} pt": "{n} pt",
     "{n} pts": "{n} pt",
-    "No results yet": "Ancora nessun risultato",
-    "The standings fill in as the tables are saved.": "La classifica si riempie man mano che i tavoli vengono salvati.",
     "Points": "Punti",
     "Tiebreak": "Spareggio",
     "Shared place": "Posto condiviso",
