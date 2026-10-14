@@ -388,7 +388,10 @@ async function _rerender() {
   const token = ++_renderToken;
   const mode = _modeOf(c);
   size.setDisabled(c.sizes === false);
-  document.getElementById('chartDesc').textContent = t(typeof c.desc === 'string' ? c.desc : c.desc[mode]);
+  // Every mode's description in the same spot, only the picked one visible:
+  // the card is as tall as the longest, so a switch never moves the chart.
+  document.getElementById('chartDesc').innerHTML = typeof c.desc === 'string' ? _esc(t(c.desc))
+    : Object.entries(c.desc).map(([m, d]) => `<span${m === mode ? '' : ' class="chart-desc-off" aria-hidden="true"'}>${_esc(t(d))}</span>`).join('');
   document.getElementById('chartModes').innerHTML = _modesHTML(c);
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
