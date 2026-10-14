@@ -89,7 +89,7 @@ const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks
 
 const CHARTS = [
   {
-    id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
+    id: 'scatter', icon: '✨', label: 'Win rate vs popularity',
     modes: _CHANCE_PCT,
     desc: {
       chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.',
@@ -181,7 +181,7 @@ const CHARTS = [
   },
   {
     // The id stays 'duration': it was the minutes-only chart.
-    id: 'duration', icon: '⏱️', label: 'Game length',
+    id: 'duration', icon: '⏳', label: 'Game length',
     modes: _MINUTES_ROUNDS,
     desc: {
       minutes: 'How many games fall into each 15-minute band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded duration.',
