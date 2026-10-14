@@ -1,4 +1,13 @@
 {
+  "2026-10-14": {
+    "title": "Solitario: l'ultimo round e il dado del fantasma",
+    "improved": [
+      "Solitario: all'ultimo round, un avviso chiaro sotto il contatore dice che + chiude la partita, persa, e + diventa rosso; sulla schermata di blocco, + si ferma lì."
+    ],
+    "fixed": [
+      "Solitario: tornando indietro di un round e poi avanti, il dado del fantasma mostra lo stesso tiro, invece di tirarlo di nuovo."
+    ]
+  },
   "2026-10-10": {
     "title": "Il solitario, le pedine dei cattivi e i nuovi XP",
     "new": [

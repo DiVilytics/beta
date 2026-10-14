@@ -1,4 +1,13 @@
 {
+  "2026-10-14": {
+    "title": "Solo: the last round and the Phantom's die",
+    "improved": [
+      "Solo: on your last round, a clear warning under the counter says that + ends the game, lost, and + turns red; on the lock screen, + stops there."
+    ],
+    "fixed": [
+      "Solo: going back a round and forward again shows the same roll of the Phantom's die, instead of rolling it again."
+    ]
+  },
   "2026-10-10": {
     "title": "Solo, Villain Movers and the new XP",
     "new": [
