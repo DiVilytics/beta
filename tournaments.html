@@ -57,9 +57,12 @@
   <div id="tnForm" class="hidden">
     <div class="err" id="tnFormErr"></div>
     <div class="tn-help-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button></div>
-    <!-- Fixed once started (they change points): name, sizes, scoring, bye,
-         pool, players. The date changes at any time; the draw's rules (tables,
-         pairing, play order) between stages. -->
+    <!-- Every setting changes until a game is saved (once started, saving
+         draws stage 1 again when the draw changes). Then fixed (they change
+         points): name, sizes, scoring, bye, pool; the date changes at any
+         time, the draw's rules (tables, pairing, play order) between stages,
+         and players are added while a stage is left to draw. -->
+    <p class="modal-hint tn-rule-hint hidden" id="tnRedrawNote" data-i18n>No game is saved yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.</p>
     <div class="field tn-fixed">
       <label for="tnName" data-i18n>Name</label>
       <input type="text" id="tnName" maxlength="60" placeholder="e.g. Lucca 2026" autocomplete="off" data-i18n-attr="placeholder">
@@ -153,11 +156,11 @@
       </div>
       <p class="modal-hint tn-rule-hint" data-i18n>Every stage, each player gets a different villain from the pool, and nobody plays the same villain twice while the pool allows it.</p>
     </div>
-    <!-- New tournament only: the players, New Game's rows (a name each, 👤 for
-         you, ❌ to remove); later ones join from the lobby. -->
-    <div id="tnFormPlayers" class="tn-fixed">
+    <!-- The players, New Game's rows (a name each, 👤 for you, ❌ to remove);
+         in Edit settings, the players to add. -->
+    <div id="tnFormPlayers">
       <div class="section-label lineup-label">
-        <span data-i18n>Players</span>
+        <span id="tnFormPlayersLabel"></span>
         <span class="players-legend"><span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>❌ = remove</span></span>
         <span class="count-select-wrap draw-mode-count">
           <select id="tnPlayerCount" class="players-count-select" onchange="tnSetPlayerCount(+this.value)"></select>
@@ -166,7 +169,7 @@
       </div>
       <div id="tnFormRows"></div>
       <button class="add-row-btn" id="tnAddRowBtn" type="button" onclick="tnSetPlayerCount(tnFormPlayers.length + 1)" data-i18n>+ Add player</button>
-      <p class="modal-hint tn-rule-hint" data-i18n>From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.</p>
+      <p class="modal-hint tn-rule-hint" id="tnFormPlayersHint"></p>
     </div>
     <div class="tn-form-actions">
       <button class="btn btn-ghost" type="button" onclick="tnCloseForm()" data-i18n>Cancel</button>

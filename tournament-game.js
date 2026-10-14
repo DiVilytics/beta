@@ -108,14 +108,14 @@ function _tnRenderLive() {
     const place = i + 1, r = byPlace.get(place);
     if (!r) return `<div class="tn-slot empty"><span class="tn-slot-place">${fmtPlace(place)}</span></div>`;
     const s = seat(r.position);
-    const undo = !r.auto && r === lastAction;
+    const undo = !r.auto && !r.withdrawn && r === lastAction;
     const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null && tnGame.roundsCounted ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
     return `
       <${undo ? 'button type="button" onclick="tnUndoLast()" title="' + t('Undo') + '"' : 'div'} class="tn-slot${place === 1 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}${undo ? ' undo' : ''}">
         <span class="tn-slot-place">${fmtPlace(place)}${place === 1 ? ' 👑' : ''}</span>
         ${charImgHTML(s.character)}
         <span class="tn-mover-villain">${villainNameHTML(s.character)}</span><span class="tn-mover-name">${_esc(s.name)}</span>
-        <span class="tn-slot-when">${r.dropped ? `🏳️ ${t('Dropped')}` : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
+        <span class="tn-slot-when">${r.dropped ? `🏳️ ${r.withdrawn ? t('Withdrawn') : t('Dropped')}` : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
       </${undo ? 'button' : 'div'}>`;
   }).join('');
 
@@ -153,6 +153,7 @@ function _tnPlace(position, dropped) {
 // Undoing the placement that ended the game: the timer goes on from where it
 // stopped by itself (a game paused by hand stays paused).
 function tnUndoLast() {
+  if (tnGame.actions[tnGame.actions.length - 1]?.withdrawn) return;   // withdrawn: not this game's to undo
   tnGame.actions.pop();
   if (tnGame.autoStopped) { tnGame.autoStopped = false; startLive(); }
   _tnPersist();

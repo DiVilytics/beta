@@ -331,6 +331,8 @@ const TN_ERRORS = {
   table_saved:            'This table has already been saved.',
   invalid_results:        'Every villain needs a place before saving.',
   stage_has_games:        'A game of this stage is already saved: its draw can no longer be undone.',
+  no_stages_left:         'No stage is left for new players.',
+  invalid_players:        'Type the players to add.',
 };
 function _tnErrorMsg(error) {
   if (error?.code === '23505') return t('There is already a player with this name.');
