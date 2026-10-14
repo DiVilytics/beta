@@ -108,8 +108,8 @@ const Charts = (() => {
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.
   function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1 } = {}) {
     if (!data.length) return empty();
-    const L = 32, R = 10, T = 14, B = 26;
     const { max, ticks } = niceCountTicks(Math.max(...data.map(d => d.value)) || 1);
+    const L = 14 + 7 * String(max).length, R = 10, T = 14, B = 26;   // room for the widest y label (1000)
     const bw = (W - L - R) / data.length;
     const sy = v => (H - B) - v / max * (H - T - B);
     let grid = '';
@@ -210,8 +210,8 @@ const Charts = (() => {
   // panning; gridlines + y labels stay put and only the data pans.
   function line(points, { fmt = v => v, color = 'var(--accent)', visible = null } = {}) {
     if (!points.length) return empty();
-    const L = 34, R = 12, T = 14, B = 28, PW = W - L - R;
     const { max, ticks: yTicks } = niceCountTicks(Math.max(...points.map(p => p.value)) || 1);
+    const L = 14 + 7 * String(max).length, R = 12, T = 14, B = 28, PW = W - L - R;   // room for the widest y label
     const n = points.length;
     const pannable = !!visible && n > visible;
     const PAD = 10;                                  // pannable: room at both ends so the edge labels (wider on phones) fit
