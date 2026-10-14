@@ -723,7 +723,6 @@ window.I18N.it = {
     "Pairing": "Abbinamento",
     "Scoring": "Punteggio",
     "Every stage, each player gets a different villain from the pool, and nobody plays the same villain twice while the pool allows it.": "A ogni fase ogni giocatore riceve un cattivo diverso dalla riserva, e nessuno gioca due volte lo stesso cattivo finché la riserva lo permette.",
-    "e.g. Lucca 2026": "es. Lucca 2026",
     "Create tournament": "Crea torneo",
     "Give the tournament a name.": "Dai un nome al torneo.",
     "Stages: from 1 to 20.": "Fasi: da 1 a 20.",
