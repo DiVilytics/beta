@@ -189,7 +189,7 @@ function tnRenderTournament() {
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
   const options = [
-    opt('Max players per table', tnTour.table_size),
+    opt('Table size', tnTour.table_size),
     opt('Tables', t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name)),
     opt('Stages', tnTour.stages),
     opt('Pairing', pairing ? t(pairing.name) : _esc(tnTour.pairing)),
@@ -688,7 +688,7 @@ const TN_HELP = [
   ['date', 'Date', [
     'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, like the name, to fix a mistake. The games keep the day and time they were actually played.',
   ]],
-  ['size', 'Max players per table', [
+  ['size', 'Table size', [
     'No table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
     'It also sets the scale of the points: a win scores the same at every table, whatever its size.',
     'Fixed once the first game starts.',

@@ -718,7 +718,7 @@ window.I18N.it = {
     "Its {n} game is deleted too, from the Game Log and from every profile.": "Viene eliminata anche la sua {n} partita, dal Registro e da ogni profilo.",
     "Its {n} games are deleted too, from the Game Log and from every profile.": "Vengono eliminate anche le sue {n} partite, dal Registro e da ogni profilo.",
     "Name": "Nome",
-    "Max players per table": "Giocatori per tavolo (max)",
+    "Table size": "Giocatori per tavolo",
     "Stages": "Fasi",
     "Pairing": "Abbinamento",
     "Scoring": "Punteggio",
