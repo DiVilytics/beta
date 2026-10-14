@@ -562,7 +562,7 @@ window.I18N.it = {
     "Games by weekday": "Partite per giorno della settimana",
     "Games played on each weekday, by play date, Monday first. The weekday follows your time zone (or the recorded day, for games saved without a time).": "Partite giocate in ogni giorno della settimana, in base alla data di gioco, dal lunedì. Il giorno segue il tuo fuso orario (o il giorno registrato, per le partite salvate senza ora).",
     "Each pair of villains that met: the row villain's Δ Wins against the column's, when one of the two won (0: even). Warmer cells win more; gray under 10 games together.": "Ogni coppia di cattivi che si sono incontrati: le Δ Vittorie del cattivo della riga contro quello della colonna, quando ha vinto uno dei due (0: pari). Le celle più calde vincono di più; grigie sotto 10 partite insieme.",
-    "Villain against villain": "Cattivo contro cattivo",
+    "Villain vs villain": "Cattivo vs cattivo",
     "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.": "Ogni coppia di cattivi che si sono incontrati: quanto spesso ha vinto il cattivo della riga, quando ha vinto uno dei due. Le celle più calde vincono di più; grigie sotto 10 partite insieme. Scorri la griglia.",
     "{a} won {w}, {b} won {l}": "{a} ha vinto {w}, {b} ha vinto {l}",
     "{n} game together": "{n} partita insieme",

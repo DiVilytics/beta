@@ -124,7 +124,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'versus', icon: '🆚', label: 'Villain against villain',
+    id: 'versus', icon: '🆚', label: 'Villain vs villain',
     modes: _CHANCE_PCT,
     desc: {
       chance: "Each pair of villains that met: the row villain's Δ Wins against the column's, when one of the two won (0: even). Warmer cells win more; gray under 10 games together.",
