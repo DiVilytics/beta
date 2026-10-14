@@ -127,8 +127,8 @@ const CHARTS = [
     id: 'versus', icon: '🆚', label: 'Villain vs villain',
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Each pair of villains that met: the row villain's Δ Wins against the column's, when one of the two won (0: even). Warmer cells win more; gray under 10 games together.",
-      pct:    "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
+      chance: "Each pair of villains that met: the row villain's Δ Wins against the column's, when one of the two won (0: even). Warmer cells win more; gray under 5 games together.",
+      pct:    "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.",
     },
     render({ games, chars, boxInfo, mode }) {
       // Per ordered pair: games together, and the row's wins over the column.
@@ -148,7 +148,7 @@ const CHARTS = [
       const vs = chars.filter(c => played.has(c.name))
         .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
       if (vs.length < 2) return Charts.barsV([]);
-      const MIN = 10;
+      const MIN = MIN_GAMES_FOR_PCT;   // 5, as for the % Wins rankings (stats-table.js)
       const newBox = i => i > 0 && vs[i].box !== vs[i - 1].box;
       const head = (c, i) => `<th class="vs-head${newBox(i) ? ' vs-box' : ''}" title="${_esc(villainName(c.name))}">${charImgHTML(c.name)}</th>`;
       const rows = vs.map((r, ri) => {
