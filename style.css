@@ -922,6 +922,10 @@ main {
 .ch-ax  { font-size: 9.5px; fill: var(--muted); }
 .ch-axlbl { font-size: 10px; fill: var(--muted); }
 .ch-grid { stroke: var(--border); stroke-width: 1; }
+/* Game length: the middle half of the games shaded, the median dashed. */
+.ch-spread { fill: var(--accent); fill-opacity: 0.12; }
+.ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.ch-spread-txt { fill: var(--text); }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }
 .ch-cell-empty { fill: var(--s2); }
 .ch-empty { font-size: 12px; fill: var(--muted); }

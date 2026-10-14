@@ -62,7 +62,11 @@ function _villainStats(games, chars) {
   return chars.filter(c => by[c.name]).map(c => ({ name: c.name, pace: c.pace || null, box: c.box || null, ...by[c.name] }));
 }
 
-const _avg = vals => vals.length ? vals.reduce((a, v) => a + v, 0) / vals.length : null;
+// The q-quantile of sorted values (0.5: the median), between the two nearest.
+function _quantile(sorted, q) {
+  const at = (sorted.length - 1) * q, i = Math.floor(at);
+  return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
+}
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
 const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
 
@@ -162,10 +166,19 @@ const CHARTS = [
     id: 'duration', icon: '⏱️', label: 'Game length',
     modes: _MINUTES_ROUNDS,
     desc: {
-      minutes: 'How many games fall into each 15-minute band (0-15, 15-30, and so on); the band start in minutes is under each bar. Counts only games with a recorded duration.',
-      rounds:  'How many games fall into each 3-round band (0-2, 3-5, and so on); the band start is under each bar. Counts only games with a recorded round count.',
+      minutes: 'How many games fall into each 15-minute band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded duration.',
+      rounds:  'How many games fall into each 3-round band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded round count.',
     },
     render({ games, mode }) {
+      // The median and the middle half (25% to 75%), as positions in the bars:
+      // a value v sits (v - start) / band bars in, `shift` centering whole rounds.
+      const spreadOf = (vals, start, band, shift, unit) => {
+        const sorted = vals.slice().sort((a, b) => a - b);
+        const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(sorted, q));
+        const pos = v => (v - start + shift) / band;
+        return { mid: pos(mid), lo: pos(q1), hi: pos(q3),
+          text: t(unit, { m: Math.round(mid), a: Math.round(q1), b: Math.round(q3) }) };
+      };
       if (mode === 'rounds') {
         const vals = games.map(g => g.num_turns).filter(v => v != null);
         if (!vals.length) return Charts.barsV([]);
@@ -180,6 +193,7 @@ const CHARTS = [
           fmt: (v, d) => `${t('{lo}-{hi} rounds', d)}: ${v}`,
           xTick: i => buckets[i].lo,
           xEvery: 1,
+          spread: spreadOf(vals, lo0, SIZE, 0.5, 'Median {m} | middle half {a}-{b} rounds'),
         });
       }
       const vals = games.map(g => g.duration_minutes).filter(v => v != null);
@@ -193,32 +207,8 @@ const CHARTS = [
         fmt: (v, d) => `${d.lo}-${d.hi} min: ${v}`,
         xTick: i => buckets[i].lo,
         xEvery: 1,
+        spread: spreadOf(vals, 0, SIZE, 0, 'Median {m} | middle half {a}-{b} min'),
       });
-    },
-  },
-  {
-    id: 'avglen', icon: '⏳', label: 'Avg length by players',
-    modes: _MINUTES_ROUNDS,
-    sizes: false,
-    desc: {
-      minutes: 'Average game length in minutes for each table size, from 2 to 6 players, over the games that recorded a duration. Tap a bar for its number of games.',
-      rounds:  'Average rounds per game for each table size, from 2 to 6 players, over the games that recorded their rounds. Tap a bar for its number of games.',
-    },
-    render({ games, mode }) {
-      const rounds = mode === 'rounds';
-      const data = TABLE_SIZES.map(n => {              // always show every table size, even empty
-        const ofSize = games.filter(g => g.seats.length === n);
-        const avg = _avg(ofSize.map(g => rounds ? g.num_turns : g.duration_minutes).filter(v => v != null));
-        const v = avg == null ? 0 : rounds ? Math.round(avg * 10) / 10 : Math.round(avg);
-        return {
-          label: `${n}p`,
-          value: v,
-          meta: avg != null
-            ? `${rounds ? t('{n} rounds on average', { n: v.toLocaleString(LOCALE) }) : t('{n} min average', { n: v })} | ${tn(ofSize.length, '{n} game', '{n} games')}`
-            : t(!ofSize.length ? 'no games recorded' : rounds ? 'no rounds recorded' : 'no duration recorded'),
-        };
-      });
-      return Charts.barsH(data, { labelW: 48 });
     },
   },
   {
