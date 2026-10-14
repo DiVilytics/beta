@@ -254,6 +254,7 @@ window.I18N.it = {
     "Save Nickname": "Salva nickname",
     "Change your nickname": "Cambia il tuo nickname",
     "Your nickname will be updated on all past and future game records.": "Il nickname verrà aggiornato in tutte le partite passate e future.",
+    "A nickname can't be \"Player\" and a number.": "Un nickname non può essere \"Giocatore\" e un numero.",
     "Nickname must be at least 2 characters.": "Il nickname deve avere almeno 2 caratteri.",
     "That nickname is already taken. Try another.": "Questo nickname è già in uso. Provane un altro.",
     "#": "N.",
