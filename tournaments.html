@@ -57,12 +57,10 @@
   <div id="tnForm" class="hidden">
     <div class="err" id="tnFormErr"></div>
     <div class="tn-help-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button></div>
-    <!-- Every setting changes until a game is saved (once started, saving
-         draws stage 1 again when the draw changes). Then fixed (they change
-         points): name, sizes, scoring, bye, pool; the date changes at any
-         time, the draw's rules (tables, pairing, play order) between stages,
-         and players are added while a stage is left to draw. -->
-    <p class="modal-hint tn-rule-hint hidden" id="tnRedrawNote" data-i18n>No game is saved yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.</p>
+    <!-- Every setting, players added included, changes until the first game
+         starts (once started, saving draws stage 1 again when the draw
+         changes); then Edit settings is gone. -->
+    <p class="modal-hint tn-rule-hint hidden" id="tnRedrawNote" data-i18n>No game has started yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.</p>
     <div class="field tn-fixed">
       <label for="tnName" data-i18n>Name</label>
       <input type="text" id="tnName" maxlength="60" placeholder="e.g. Lucca 2026" autocomplete="off" data-i18n-attr="placeholder">
@@ -102,7 +100,6 @@
       <div class="seg seg-sm tn-rule-seg" id="tnPlayOrder"></div>
       <p class="modal-hint tn-rule-hint" id="tnPlayOrderHint"></p>
     </div>
-    <p class="modal-hint tn-rule-hint hidden" id="tnDrawRulesNote" data-i18n>Tables, pairing and play order change between stages: once every table of this stage is saved.</p>
     <div class="field tn-fixed" data-help="scoring">
       <label data-i18n>Scoring</label>
       <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>

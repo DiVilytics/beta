@@ -200,7 +200,7 @@ function tnRenderTournament() {
 
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
-    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
+    isOrg && _tnAllOpen(tnTour) ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
     isOrg && lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start')}</button>` : '',
   ].join('');
 
@@ -372,7 +372,7 @@ function tnUndoStage() {
     title:        t('Undo the draw of stage {n}?', { n: st }),
     bodyHTML:     `<p class="confirm-text">${st === 1
       ? t('Its tables are cancelled, games in progress included, and the tournament goes back to sign-ups: players can join or leave, the settings change, and Start draws everything again.')
-      : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back or change the draw\'s rules, then draw again.', { n: st - 1 })}</p>`,
+      : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.', { n: st - 1 })}</p>`,
     confirmLabel: t('Undo draw'),
     busyLabel:    t('Working…'),
     danger:       true,
@@ -539,8 +539,9 @@ function tnDelete() {
 // per rule in tournament-rules.js) and the draw pool (New Game's draw pool).
 
 const _tnFormOpen = () => !document.getElementById('tnForm').classList.contains('hidden');
-// Every setting changes until one of the tournament's games is saved.
-const _tnAllOpen = tour => !tour || !tnTables.some(tb => tb.game_id);
+// The settings change until one of the tournament's games starts (or is
+// entered): once started, saving draws stage 1 again when the draw changes.
+const _tnAllOpen = tour => !tour || (tour.current_stage <= 1 && !tnTables.some(tb => tb.started_at || tb.game_id));
 
 async function tnOpenForm(tour) {
   tnFormFor = tour;
@@ -563,14 +564,7 @@ async function tnOpenForm(tour) {
   tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
   tnRule.final       = tour?.final_table ? 'on' : 'off';
   tnCustom = tour?.custom_points?.length ? tournamentCustomRows(tour) : _tnCustomRows(tour?.table_size || 4);
-  // Every setting until a game is saved; then the date, the draw's rules
-  // between stages and the players to add.
-  const open = _tnAllOpen(tour);
-  document.querySelectorAll('#tnForm .tn-fixed').forEach(el => setVisible(el, open));
-  const between = open || !tnTables.some(tb => tb.stage === tour.current_stage && !tb.saved_at);
-  document.querySelectorAll('#tnSplit, #tnPairing, #tnPlayOrder').forEach(el => el.classList.toggle('disabled', !between));
-  setVisible('tnDrawRulesNote', !open);
-  setVisible('tnRedrawNote', !!tour && open && tour.current_stage > 0);
+  setVisible('tnRedrawNote', !!tour && tour.current_stage > 0);
   _tnRenderRules();
   _tnHelpButtons();
 
@@ -602,17 +596,13 @@ async function tnOpenForm(tour) {
     tnPool.defaultToMine();   // your boxes, when you've marked some
   }
   tnPool.updatePaceUI();
-  // New: the players. Edit settings: the players to add, while a stage is left.
-  const adding = !tour || (!tour.finished_at && (open || tour.current_stage < tour.stages));
-  setVisible('tnFormPlayers', adding);
+  // New: the players. Edit settings: the players to add.
   document.getElementById('tnFormPlayersLabel').textContent = tour ? t('Add players') : t('Players');
-  document.getElementById('tnFormPlayersHint').textContent = !tour
-    ? t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.')
-    : tour.current_stage === 0 || open
-      ? t('Up to the villains in the draw pool. An empty name keeps the one shown.')
-      : t('Up to the villains in the draw pool. They play from stage {n}, with villains drawn for the stages to come. An empty name keeps the one shown.', { n: tour.current_stage + 1 });
+  document.getElementById('tnFormPlayersHint').textContent = tour
+    ? t('Up to the villains in the draw pool. An empty name keeps the one shown.')
+    : t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.');
   tnFormPlayers = tour ? [] : [{ name: '', isMe: false }, { name: '', isMe: false }];
-  if (adding) _tnRenderFormPlayers();
+  _tnRenderFormPlayers();
   _tnPoolChanged();
   if (!tour) document.getElementById('tnName').focus();
 }
@@ -687,32 +677,32 @@ function tnCustomFill(fill) {
 // form opens it at the start, each option's ⓘ at its own section.
 const TN_HELP = [
   ['date', 'Date', [
-    'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, also after the start. The games keep the day and time they were actually played.',
+    'The day of the tournament, shown on its page and in the lists. The organizer can change it until the first game starts. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Max players per table', [
     'No table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
     'It also sets the scale of the points: a win scores the same at every table, whatever its size.',
-    'Fixed once the tournament starts.',
+    'Fixed once the first game starts.',
   ]],
   ['stages', 'Stages', [
     'How many rounds of tables the tournament plays. In every stage, each player still in the tournament plays one game, or has a bye. The final table, when on, comes after the last stage.',
-    'Fixed once the tournament starts.',
+    'Fixed once the first game starts.',
   ]],
   ['tables', 'Tables', [
     'Even: as many tables as needed, all as even as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye (see Bye).',
     'Full: every table full, and whoever is left over has a bye (sits out the stage, see Bye). 9 players at tables of 4 play at two tables of 4, and one has a bye; 7 players play at one table of 4, and three have a bye. With fewer players than a table, they all play together.',
     'Byes go to whoever has had the fewest so far (with Swiss pairing, the lowest ranked of them), so over the stages everyone gets their share.',
-    'It can change between stages: once every table of the current stage is saved.',
+    'Fixed once the first game starts.',
   ]],
   ['pairing', 'Pairing', [
     'Random: new random tables every stage.',
     'Swiss: stage 1 at random. From stage 2, the players are sorted by the standings (points, then the tiebreaks, see Ranking) and seated in that order, the leaders at the same table; then players swap between neighboring tables whenever that lowers how many players at a table already met. A rematch still happens when there is no way around it.',
-    'It can change between stages.',
+    'Fixed once the first game starts.',
   ]],
   ['order', 'Play order', [
     'Random: each table\'s play order is drawn at random.',
     'Rotation: each table plays in the order that puts as few players as possible back in a seat they already had (every repeat counts: sitting 2nd twice counts twice); among equally good orders, whoever sat later so far, on average, plays earlier. Seats compare across table sizes by where they fall between first and last. With 4 players at one table for 4 stages, everyone sits in every seat once.',
-    'It can change between stages.',
+    'Fixed once the first game starts.',
   ]],
   ['scoring', 'Scoring', [
     'Borda count: at a table of the largest size, 1st scores one point less than the players at the table, 2nd one less, down to 0 for last (at tables of 4: 3, 2, 1, 0). A smaller table keeps 1st\'s and last\'s points and spreads the places in between evenly: at 3 players, 3, 1.5 and 0.',
@@ -720,7 +710,7 @@ const TN_HELP = [
     'Keep 1st and last: a smaller table keeps 1st\'s and last\'s points and spreads the others along your row. 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. A win is worth the same at every table, but the average place scores more at a smaller table (2.33 at 3 and 2.5 at 2, against 2.25 at 4).',
     'Keep the average: each place at a smaller table scores the average of the largest table\'s places it stands for. 5, 3, 1, 0 at 4 gives 4.5, 2, 0.25 at 3 and 4, 0.5 at 2. The average place scores the same at every table (2.25), so no table is easier to score at, but a win at a smaller table is worth less.',
     'With both, a player who drops out of a game scores the place they got: drops take the last places, in the order they drop (the first to drop is last).',
-    'Fixed once the tournament starts.',
+    'Fixed once the first game starts.',
   ]],
   ['bye', 'Bye', [
     'A bye is a stage a player sits out: when the players can\'t all be seated at the tables, whoever is left over doesn\'t play in that stage and gets the bye\'s points instead.',
@@ -729,7 +719,7 @@ const TN_HELP = [
     'Half a win: half of that (1.5).',
     'A win: as much as a win, as in Swiss chess.',
     'A bye never counts as a 1st place for the tiebreaks, and a player with a bye has no opponents in that stage.',
-    'Fixed once the tournament starts.',
+    'Fixed once the first game starts.',
   ]],
   ['ranking', 'Ranking and tiebreaks', [
     'The standings rank by points. Equal points are separated by the most 1st places, then by the opponents\' points: the sum of the current points of every opponent faced, once for each time they met. Players still equal share their place.',
@@ -737,20 +727,20 @@ const TN_HELP = [
   ['final', 'Final table', [
     'Off: the standings after the last stage are the final ranking.',
     'On: after the last stage, the top of the standings (as many as a table holds, among the players still in the tournament; equal places in the standings\' order) play one final table. Its ranking decides the top places: its winner wins the tournament, its 2nd is 2nd, and so on; everyone else keeps their order from the standings, after the finalists. The final scores no points. Each finalist gets a villain they haven\'t played in the tournament, when the pool allows.',
-    'Fixed once the tournament starts.',
+    'Fixed once the first game starts.',
   ]],
   ['villains', 'Villains', [
     'At the start, every player\'s villain for every stage is drawn at once, from the draw pool: in each stage all villains are different, and nobody gets the same villain twice while the pool has enough of them (with more stages than villains, everyone plays every villain once before any repeats). A stage\'s villains show only once it is drawn.',
-    'The draw pool needs at least as many villains as players. Fixed once the tournament starts.',
+    'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
     'The organizer types the names; a signed-in player claims theirs with That\'s me (or joins by themselves), and from then on shows by their nickname. Sign-ups close at the start.',
     'The organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
-    'Edit settings adds players after the start too, up to the villains in the draw pool: before any game is saved they join stage 1, drawn again; later, they play from the next stage, with villains drawn for the stages to come. With Player N as their name when none is typed.',
+    'Edit settings adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
   ]],
   ['changes', 'After the start', [
-    'Until a game is saved every setting can change; changing the tables, the stages, the pool or the players draws stage 1 again. Then the date changes at any time; tables, pairing and play order between stages. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to sign-ups, and the start draws everything again).',
+    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, the settings are fixed. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to sign-ups, and the start draws everything again).',
     'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.',
   ]],
 ];
@@ -894,29 +884,7 @@ async function tnSaveForm() {
       || (tnFormFor && names.some(n => tnPlayers.some(p => p.name.toLowerCase() === n.toLowerCase())))) {
     return showError('tnFormErr', t('Every player needs a different name.'));
   }
-  // A game saved: the date at any time, the draw's rules between stages, and
-  // players added (from the next stage).
-  if (tnFormFor && !_tnAllOpen(tnFormFor)) {
-    const btn = document.getElementById('tnFormSave');
-    btn.disabled = true;
-    let error = null;
-    if (date !== tnFormFor.event_date) error = (await db.rpc('set_tournament_date', { target: tnFormFor.id, new_date: date })).error;
-    const rulesChanged = ['table_split', 'pairing', 'play_order'].some(k => tnRule[k] !== (tnFormFor[k] || (k === 'pairing' ? 'random' : k === 'table_split' ? 'even' : 'random')));
-    if (!error && rulesChanged) {
-      error = (await db.rpc('set_tournament_draw_rules', { target: tnFormFor.id, new_split: tnRule.table_split, new_pairing: tnRule.pairing, new_play_order: tnRule.play_order })).error;
-    }
-    if (!error && names.length) error = (await db.rpc('add_tournament_players', { target: tnFormFor.id, names })).error;
-    if (!error && me >= 0) {
-      // You among them: your name, claimed.
-      const { data } = await db.from('tournament_players').select('id').eq('tournament_id', tnFormFor.id).eq('name', names[me]);
-      if (data?.[0]) error = (await db.rpc('claim_tournament_player', { target_player: data[0].id })).error;
-    }
-    btn.disabled = false;
-    if (error) return showError('tnFormErr', _tnErrorMsg(error));
-    setVisible('tnForm', false);
-    setVisible('tnRoot', true);
-    return tnLoad(tnFormFor.id);
-  }
+  if (tnFormFor && !_tnAllOpen(tnFormFor)) return showError('tnFormErr', t('A game has started: the settings no longer change.'));
   const name   = document.getElementById('tnName').value.trim();
   const stages = Number(document.getElementById('tnStages').value);
   if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
@@ -957,7 +925,7 @@ async function tnSaveForm() {
     return openConfirmSheet({
       id:           'tnRedrawSheet',
       title:        t('Draw stage 1 again?'),
-      bodyHTML:     `<p class="confirm-text">${t('The tables, the stages, the pool or the players changed: stage 1\'s tables and every player\'s villains are drawn again. Games in progress are cancelled.')}</p>`,
+      bodyHTML:     `<p class="confirm-text">${t('The tables, the stages, the pool or the players changed: stage 1\'s tables and every player\'s villains are drawn again.')}</p>`,
       confirmLabel: t('Draw again'),
       busyLabel:    t('Drawing…'),
       onConfirm:    async () => {
@@ -1105,15 +1073,15 @@ function _tnStandingsHTML(mine) {
     const p = byId.get(r.player_id);
     const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
     const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
-    const sub = [
-      p?.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after }) : null,
-      r.final ? t('Final: {place}', { place: fmtPlace(r.final) }) : null,
-      t("Opponents' points: {n}", { n: fmtTournamentPoints(r.opponents) }),
-    ].filter(Boolean).join(' | ');
+    const sub = r.final ? t('Final: {place}', { place: fmtPlace(r.final) }) : '';
+    // A claimed name links to its player page, as in the Leaderboard.
+    const name = prof
+      ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
+      : `<span class="row-name">${_esc(tnPlayerName(p))}</span>`;
     return `
       <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
         <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[r.rank - 1]}</span>` : r.rank}</div>
-        <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(tnPlayerName(p))}</span><div class="row-sub">${sub}</div></div></div>
+        <div class="row-identity">${avatar}<div class="row-id-text">${name}${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
           <div class="bar-bg"><div class="bar-fill${r.rank === 1 ? ' gold' : ''}" style="width:${Math.max(0, r.points / max * 100)}%"></div></div>
