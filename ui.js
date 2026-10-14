@@ -228,6 +228,25 @@ function showError(target, msg) {
   void el.offsetWidth;
   el.classList.add('shake');
   if (!_isInView(el)) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  _clearOnEdit(el);
+}
+
+// A banner goes at the next edit around it (typing, a pick, a tap on a
+// control in its pop-up, form or section), so a mistake fixed doesn't keep its
+// message. Caught before the control's own handler: a Save that fails again
+// shows the error again.
+function _clearOnEdit(el) {
+  if (el._offEdit) return;
+  const scope = el.closest('.sheet') || el.parentElement;
+  if (!scope) return;
+  const evs = ['input', 'change', 'click'];
+  const clear = e => {
+    if (e.type === 'click' && !e.target.closest('button, select, input, label, a, [onclick]')) return;
+    clearError(el);
+  };
+  el._offEdit = () => { evs.forEach(ev => scope.removeEventListener(ev, clear, true)); el._offEdit = null; };
+  // Armed after the tap that showed it has finished.
+  setTimeout(() => { if (el._offEdit) evs.forEach(ev => scope.addEventListener(ev, clear, true)); });
 }
 
 // Whole in sight: inside the window below the sticky top bar, and inside every
@@ -246,7 +265,9 @@ function _isInView(el) {
 }
 
 function clearError(target) {
-  _resolveEl(target)?.classList.remove('show');
+  const el = _resolveEl(target);
+  el?.classList.remove('show');
+  el?._offEdit?.();
 }
 
 // An empty page, or one that went wrong: the card with an icon, a title, a line
