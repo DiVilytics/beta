@@ -75,6 +75,16 @@ function _tnCode() {
   if (!tnTour) return null;
   try { return localStorage.getItem(_tnCodeKey(tnTour.id)); } catch (_) { return null; }
 }
+// Signing in from here: the code rides along in the return address, so it
+// comes back even if sign-in ends in another browser.
+onBeforeSignIn(() => {
+  const code = _tnCode();
+  if (!code) return;
+  const url = new URL(location.href);
+  url.searchParams.set('c', code);
+  history.replaceState(null, '', url);
+});
+
 async function _tnFetchCode() {
   const user = getCurrentUser();
   if (_tnCode() || !user || (user.id !== tnTour.organizer && !tnPlayers.some(p => p.user_id === user.id))) return;
@@ -776,7 +786,7 @@ function tnCustomFill(fill) {
 // form opens it at the start, each option's ⓘ at its own section.
 const TN_HELP = [
   ['date', 'Date', [
-    'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, like the name, to fix a mistake. The games keep the day and time they were actually played.',
+    'The day of the tournament, shown on its page and in the lists. It can be a day to come: create the tournament in advance and share it. The organizer can change it at any time, like the name. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Table size', [
     'No table has more players than this. With Balanced tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
