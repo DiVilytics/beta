@@ -759,10 +759,10 @@ window.I18N.it = {
     "Opponents' points": "Punti degli avversari",
     "Only the players at this table who claimed their name, or the organizer, can record it.": "Solo i giocatori di questo tavolo che hanno rivendicato il proprio nome, o l'organizzatore, possono registrarlo.",
     "Another phone is already recording this table.": "Un altro telefono sta già registrando questo tavolo.",
-    "Another phone records this table now (the organizer took it over).": "Ora questo tavolo lo registra un altro telefono (l'ha preso l'organizzatore).",
-    "This table has already been saved.": "Questo tavolo è già stato salvato.",
+    "Another phone records this table now.": "Ora questo tavolo lo registra un altro telefono.",
+    "This table's result is already saved (maybe the organizer entered it): discard the game on this phone.": "Il risultato di questo tavolo è già salvato (forse l'ha inserito l'organizzatore): elimina la partita su questo telefono.",
+    "{name}'s phone has this game open: once you save the result here, it can no longer save it.": "Il telefono di {name} ha questa partita aperta: quando salvi il risultato qui, non potrà più salvarla.",
     "Every villain needs a place before saving.": "Prima di salvare ogni cattivo deve avere un posto.",
-    "Take over": "Subentra",
     "Another game is in progress on this phone: save it or discard it first.": "Su questo telefono c'è già una partita in corso: prima salvala o eliminala.",
     "Stage {n}": "Fase {n}",
     "Game over": "Partita finita",
@@ -897,7 +897,7 @@ window.I18N.it = {
     "Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.": "Abbandonare una partita non è ritirarsi: il giocatore lascia solo quella partita (gli ultimi posti) e viene sorteggiato nella fase successiva come sempre.",
     "Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.": "Modifica torneo aggiunge giocatori anche dopo l'inizio, finché non inizia la prima partita: la fase 1 viene sorteggiata di nuovo con loro. Una volta iniziata una partita, non si possono aggiungere giocatori. Un giocatore senza nome scritto è Giocatore N finché non viene rivendicato.",
     "Until the first game starts (a bye isn't a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage's draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).": "Finché non inizia la prima partita (un riposo non è una partita) si può cambiare ogni impostazione, in Modifica torneo; cambiare tavoli, fasi, riserva o giocatori sorteggia di nuovo la fase 1. Una volta iniziata una partita, cambiano solo il nome e la data, niente delle regole. Annulla sorteggio cancella il sorteggio della fase in corso finché nessuna delle sue partite è salvata (annullare la fase 1 riporta a prima dell'inizio, e Inizia sorteggia tutto di nuovo).",
-    "The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.": "L'organizzatore può correggere qualsiasi tavolo salvato con Modifica risultato (posti, abbandoni, durata, round, ordine di gioco) e inserire il risultato di un tavolo che nessuno ha registrato.",
+    "The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it.": "L'organizzatore può correggere qualsiasi tavolo salvato con Modifica risultato (posti, abbandoni, durata, round, ordine di gioco) e inserire con Inserisci risultato il risultato di qualsiasi tavolo non ancora salvato, anche uno che un telefono ha aperto (per esempio con la batteria scarica): quel telefono non potrà più salvarlo.",
   },
 
   // From the Villainous Italia F.A.Q. (the last three confirmed separately).

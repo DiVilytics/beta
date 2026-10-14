@@ -850,7 +850,7 @@ const TN_HELP = [
   ]],
   ['changes', 'After the start', [
     'Until the first game starts (a bye isn\'t a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
-    'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.',
+    'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it.',
   ]],
 ];
 
@@ -1167,7 +1167,9 @@ function _tnCanRecord(tb) {
 }
 
 // The table card's button: Resume on the phone that runs it; Start game when
-// nobody records it (or you do, from another session); Take over for the organizer.
+// nobody records it (or you do, from another session). The organizer can
+// always Enter result instead, also when another phone has the game open (a
+// phone gone flat): that phone can't save it any more.
 function _tnTableActionHTML(tb) {
   if (tb.saved_at) {
     if (!tb.game_id) return '';
@@ -1183,8 +1185,7 @@ function _tnTableActionHTML(tb) {
   // The organizer can also type a table's result without playing it on a phone.
   const enter = isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Enter result')}</button>` : '';
   if (!tb.recorder || tb.recorder === user.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Start game')}</button>${enter}`;
-  if (isOrg) return `<button class="btn btn-ghost btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Take over')}</button>${enter}`;
-  return '';
+  return enter;
 }
 
 async function tnStartTable(tableId) {
@@ -1346,7 +1347,9 @@ function tnEditTable(tableId) {
   openConfirmSheet({
     id:           'tnEditSheet',
     title:        t('Table {n}', { n: tb.table_no }),
-    bodyHTML:     `<div class="form-row">
+    bodyHTML:     `${entering && tb.recorder && tb.recorder !== getCurrentUser()?.id
+                     ? `<p class="modal-hint">${t("{name}'s phone has this game open: once you save the result here, it can no longer save it.", { name: _esc(tnProfiles.get(tb.recorder)?.nickname || '-') })}</p>` : ''}
+                   <div class="form-row">
                      <div class="field"><label>${t('Duration <span class="optional">(min)</span>')}</label><input type="number" id="tnEditDur" min="1" max="999" value="${first?.minutes || ''}"></div>
                      <div class="field"><label>${t('Rounds <span class="optional"></span>')}</label><input type="number" id="tnEditTurns" min="1" max="999" value="${first?.round || ''}"></div>
                    </div>
