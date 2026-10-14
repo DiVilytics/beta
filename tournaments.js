@@ -3,9 +3,10 @@
 // ?new: the New tournament form. ?t=<id>: one tournament, with its settings,
 // its players by name and, once started, the current stage's tables.
 //
-// The organizer adds the players by name. A signed-in player claims their name
-// with That's me (and with it every seat of theirs in the tournament's games),
-// or joins by themselves. Start closes sign-ups and draws every stage's
+// The organizer types the players' names (New tournament, Edit settings until
+// the first game starts). A signed-in player claims their name with That's me
+// (and with it every seat of theirs in the tournament's games), at any time.
+// Start draws every stage's
 // villains and stage 1's tables. The rules (pairing, scoring, villain draw)
 // live in tournament-rules.js; the database (DiVilytics-Sync, the tournaments
 // migration) keeps the facts, checks every write and answers with the codes in
@@ -206,7 +207,7 @@ function tnRenderTournament() {
   ].join('');
 
   const ctx  = { user, isOrg, lobby, mine };
-  const rows = tnPlayers.map(p => _tnPlayerRowHTML(p, ctx)).join('');
+  const rows = tnPlayers.map((p, i) => _tnPlayerRowHTML(p, i, ctx)).join('');
 
   root.innerHTML = `
     <div class="claim-game-info">
@@ -222,53 +223,38 @@ function tnRenderTournament() {
     ${lobby || tnView === 'tables' || tnView === 'players' ? `
       ${lobby || tnView === 'players' ? '' : _tnYourGameHTML(mine) + _tnStageHTML(mine)}
       <div class="section-label">${t('Players')}</div>
-      ${tnPlayers.length ? `<div class="claim-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
-      ${_tnJoinHTML(ctx)}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
+      ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
+      ${user ? '' : `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
     ${isOrg ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button></div>` : ''}`;
 }
 
-// A player: their name, the avatar and nickname of whoever claimed it (the
-// nickname only when it differs from the name), and what you can do with it.
-function _tnPlayerRowHTML(p, { user, isOrg, lobby, mine }) {
+// A player, in New tournament's row: their number, the avatar of whoever
+// claimed the name (or the default), the name (the nickname once claimed),
+// whether it's claimed or withdrawn, and That's me / Release (and, once
+// started, the organizer's Withdraw / Bring back). Players are added, renamed
+// and removed in Edit settings, not here.
+function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
   const prof   = p.user_id ? tnProfiles.get(p.user_id) : null;
   const isMine = !!user && p.user_id === user.id;
   const avatar = prof
-    ? avatarHTML(resolveAvatar(prof), { cls: 'tn-avatar' })
-    : '<img class="tn-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
+    ? avatarHTML(resolveAvatar(prof), { cls: 'order-slot-portrait' })
+    : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">';
   const canClaim = !p.user_id && !!user && !mine;
-  let sub = '';
-  if (p.withdrawn_after != null)        sub = `<div class="claim-nick">${t('Withdrawn after stage {n}', { n: p.withdrawn_after })}</div>`;
-  else if (!p.user_id && !canClaim)      sub = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
+  const status = p.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after })
+    : p.user_id ? '' : t('Unclaimed');
   const actions = [
     canClaim ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnClaim('${p.id}')">${t("That's me")}</button>` : '',
     isMine   ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnRelease('${p.id}')">${t('Release')}</button>` : '',
-    isOrg && lobby ? `<button class="pf-btn del" type="button" onclick="tnRemove('${p.id}')" title="${t('Remove')}">❌</button>` : '',
     isOrg && !lobby && !tnTour.finished_at
       ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnWithdraw('${p.id}', ${p.withdrawn_after == null})">${p.withdrawn_after == null ? t('Withdraw') : t('Bring back')}</button>` : '',
   ].join('');
   return `
-    <div class="claim-row${isMine ? ' mine' : ''}">
-      <div class="claim-char">${avatar}<div class="claim-who"><div class="claim-name">${_esc(tnPlayerName(p))}</div>${sub}</div></div>
-      ${actions ? `<div class="tn-row-actions">${actions}</div>` : ''}
+    <div class="order-slot tn-player-row${isMine ? ' mine' : ''}">
+      <span class="row-num">${i + 1}.</span>
+      ${avatar}
+      <div class="order-slot-info"><span class="order-slot-name">${_esc(tnPlayerName(p))}</span>${status ? `<span class="tn-row-status">${status}</span>` : ''}</div>
+      ${actions ? `<div class="order-slot-actions">${actions}</div>` : ''}
     </div>`;
-}
-
-// Under the players: the organizer's Add a player (lobby), Join as a player
-// for whoever signed in has no name yet (lobby), and Sign in for guests.
-function _tnJoinHTML({ user, isOrg, lobby, mine }) {
-  if (!user) {
-    return `<p class="tn-hint">${lobby ? t('Sign in to join, or to claim your name.') : t('Sign in to claim your name.')}
-      <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`;
-  }
-  if (!lobby) return '';
-  return `
-    ${isOrg ? `
-      <div class="tn-add-row">
-        <input type="text" id="tnAddName" maxlength="30" placeholder="${t('Player name')}" autocomplete="off"
-               onkeydown="if (event.key === 'Enter') tnAddPlayer()">
-        <button class="btn btn-ghost" type="button" onclick="tnAddPlayer()">${t('Add')}</button>
-      </div>` : ''}
-    ${mine ? '' : `<div class="claim-share-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnJoin()">${t('Join as a player')}</button></div>`}`;
 }
 
 // Your game in the current stage, on top: your table, your villain and your
@@ -373,7 +359,7 @@ function tnUndoStage() {
     id:           'tnUndoSheet',
     title:        t('Undo the draw of stage {n}?', { n: st }),
     bodyHTML:     `<p class="confirm-text">${st === 1
-      ? t('Its tables are cancelled, games in progress included, and the tournament goes back to sign-ups: players can join or leave, the settings change, and Start draws everything again.')
+      ? t('Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit settings, and Start draws everything again.')
       : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.', { n: st - 1 })}</p>`,
     confirmLabel: t('Undo draw'),
     busyLabel:    t('Working…'),
@@ -437,32 +423,6 @@ async function _tnAfter(error) {
   if (error) _tnShowError(_tnErrorMsg(error));
 }
 
-async function tnAddPlayer() {
-  const input = document.getElementById('tnAddName');
-  const name  = input?.value.trim();
-  if (!name) return;
-  const { error } = await db.from('tournament_players').insert({ tournament_id: tnTour.id, name });
-  if (!error) input.value = '';
-  await _tnAfter(error);
-  document.getElementById('tnAddName')?.focus();   // the next name
-}
-
-async function tnJoin() {
-  const user = getCurrentUser();
-  if (!user) return goToSignIn();
-  const profile = getCurrentProfile();
-  if (!profile) return _openNicknameModal();
-  // A name typed for you already: claim it instead.
-  if (tnPlayers.some(p => !p.user_id && p.name.toLowerCase() === profile.nickname.toLowerCase())) {
-    return _tnShowError(t("There is already a player named {name}: if it's you, tap That's me.", { name: profile.nickname }));
-  }
-  // Your nickname shows while you hold the name; the name itself is "Player N",
-  // so it stays its own if you release it.
-  const name = _tnFreeName(new Set(tnPlayers.map(p => p.name.toLowerCase())), tnPlayers.length + 1);
-  const { error } = await db.from('tournament_players').insert({ tournament_id: tnTour.id, name, user_id: user.id });
-  await _tnAfter(error);
-}
-
 async function tnClaim(playerId) {
   if (!getCurrentProfile()) return _openNicknameModal();
   const { error } = await db.rpc('claim_tournament_player', { target_player: playerId });
@@ -486,12 +446,7 @@ function tnRelease(playerId) {
   });
 }
 
-async function tnRemove(playerId) {
-  const { error } = await db.from('tournament_players').delete().eq('id', playerId);
-  await _tnAfter(error);
-}
-
-// Start: sign-ups close; every player's villains for every stage and stage 1's
+// Start: every player's villains for every stage and stage 1's
 // tables are drawn here (tournament-rules.js) and checked by the database.
 function tnStart() {
   const n = tnPlayers.length;
@@ -503,7 +458,7 @@ function tnStart() {
   openConfirmSheet({
     id:           'tnStartSheet',
     title:        t('Start the tournament?'),
-    bodyHTML:     `<p class="confirm-text">${t('Sign-ups close, and stage 1 is drawn: {tables} and a villain for every player.', { tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t('Stage 1 is drawn: {tables} and a villain for every player.', { tables: tn(sizes.length, '{n} table', '{n} tables') })}</p>`,
     confirmLabel: t('Start'),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => _tnAfter(await _tnDrawStart()),
@@ -603,17 +558,22 @@ async function tnOpenForm(tour) {
   if (draft?.pool) tnPool.restoreState(draft.pool);
   else if (!tour) tnPool.defaultToMine();   // your boxes, when you've marked some
   tnPool.updatePaceUI();
-  // New: the players. Edit settings: the players to add.
-  document.getElementById('tnFormPlayersLabel').textContent = tour ? t('Add players') : t('Players');
-  document.getElementById('tnFormPlayersHint').textContent = tour
-    ? t('Up to the villains in the draw pool. An empty name keeps the one shown.')
-    : t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown; more players can join later from the tournament page.');
-  tnFormPlayers = tour ? [] : [{ name: '', isMe: false }, { name: '', isMe: false }];
+  // The players: two empty rows, or the tournament's (a default name shows as
+  // the empty row's placeholder; a claimed one as its nickname).
+  document.getElementById('tnFormPlayersLabel').textContent = t('Players');
+  document.getElementById('tnFormPlayersHint').textContent =
+    t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown. Players change here until the first game starts.');
+  const meId = getCurrentUser()?.id;
+  tnFormPlayers = tour
+    ? tnPlayers.map(p => ({ id: p.id, stored: p.name, name: _tnIsDefaultName(p.name) ? '' : p.name, userId: p.user_id, isMe: !!meId && p.user_id === meId }))
+    : [{ name: '', isMe: false }, { name: '', isMe: false }];
   if (draft) _tnApplyDraft(draft);
   setVisible('tnFormPlayers', open);
   if (open) _tnRenderFormPlayers();
   _tnPoolChanged();
+  // New: Discard (the Back link keeps the draft); Edit settings: Cancel.
   setVisible('tnFormDiscard', !tour);
+  setVisible('tnFormCancel', !!tour);
   _tnDraftReady = !tour;
   _tnUpdateDiscard();
 }
@@ -837,13 +797,13 @@ const TN_HELP = [
     'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
-    'The organizer types the names; a signed-in player claims theirs with That\'s me (or joins by themselves), and from then on shows by their nickname. Sign-ups close at the start.',
+    'The organizer types the names, in New tournament and then in Edit settings until the first game starts. A signed-in player claims theirs with That\'s me, at any time, and from then on shows by their nickname; Release gives it back.',
     'The organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
     'Edit settings adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
   ]],
   ['changes', 'After the start', [
-    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to sign-ups, and the start draws everything again).',
+    'Until the first game starts every setting can change, in Edit settings; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
     'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of a table nobody recorded.',
   ]],
 ];
@@ -894,30 +854,39 @@ function _tnPoolChanged() {
   if (!document.getElementById('tnFormPlayers').classList.contains('hidden')) _tnRenderFormPlayers();
 }
 
-// ── The form's players (New tournament) ──
+// ── The form's players ──
 // New Game's rows: a name each (empty: the "Player 3" shown), 👤 for you (your
 // nickname, your name claimed), ❌ to remove; the count menu from 2 up to the
 // villains in the draw pool (every player needs a different one per stage).
+// Edit settings starts from the tournament's players ({ id, stored, userId }):
+// a name someone claimed shows their nickname and can't be typed over.
 let tnFormPlayers = [];
 
 function _tnPoolSize() { return tnChars.length - (tnPool?.excluded.size || 0); }
+const _tnFormMax = () => Math.max(2, _tnPoolSize());
 
-// Edit settings adds players: none to start with, up to the pool's villains
-// for everyone still playing (the lobby: everyone).
-const _tnFormMin    = () => tnFormFor ? 0 : 2;
-const _tnFormMax    = () => Math.max(_tnFormMin(), _tnPoolSize() - (tnFormFor ? tnPlayers.filter(p => p.withdrawn_after == null).length : 0));
-const _tnFormNumber = i => (tnFormFor ? tnPlayers.length : 0) + i + 1;
+// "Player 3" (or "Giocatore 3"): a name nobody typed.
+const _tnIsDefaultName = name => /^(player|giocatore) \d+$/i.test(name || '');
 
-// The names to store: typed, or "Player N" (yours too: your nickname shows
-// while you hold it, and the name stays its own if you release it), never one
-// already taken.
+// The nickname a row shows instead of its name: yours with 👤, or whoever
+// claimed it.
+function _tnRowNick(p) {
+  if (p.isMe) return getCurrentProfile()?.nickname || null;
+  return p.userId ? tnProfiles.get(p.userId)?.nickname || null : null;
+}
+
+// The names to store: a claimed name stays as it is; a typed one; an existing
+// name left empty keeps its own; a new one left empty (or yours) is
+// "Player N" (your nickname shows while you hold it, and the name stays its own
+// if you release it), never one already taken.
 function _tnFormNames() {
-  const taken = new Set(tnFormFor ? tnPlayers.map(p => p.name.toLowerCase()) : []);
-  tnFormPlayers.forEach(p => { if (!p.isMe && p.name.trim()) taken.add(p.name.trim().toLowerCase()); });
-  return tnFormPlayers.map((p, i) => {
-    if (!p.isMe && p.name.trim()) return p.name.trim();
-    return _tnFreeName(taken, _tnFormNumber(i));
+  const kept = p => p.id && (p.userId || p.isMe || !p.name.trim()) ? p.stored : null;
+  const taken = new Set();
+  tnFormPlayers.forEach(p => {
+    const n = kept(p) ?? (!p.isMe && p.name.trim());
+    if (n) taken.add(n.toLowerCase());
   });
+  return tnFormPlayers.map((p, i) => kept(p) ?? ((!p.isMe && p.name.trim()) || _tnFreeName(taken, i + 1)));
 }
 
 // "Player N" from n up, the first one not taken (and now taken).
@@ -929,52 +898,97 @@ function _tnFreeName(taken, n) {
 }
 
 function _tnRenderFormPlayers() {
-  const min = _tnFormMin(), max = _tnFormMax();
+  const max = _tnFormMax();
   const n = tnFormPlayers.length;
   const sel = document.getElementById('tnPlayerCount');
-  sel.innerHTML = Array.from({ length: Math.max(max, n) - min + 1 }, (_, i) => i + min)
+  sel.innerHTML = Array.from({ length: Math.max(max, n) - 1 }, (_, i) => i + 2)
     .map(k => `<option value="${k}"${k === n ? ' selected' : ''}${k > max ? ' disabled' : ''}>${k}p</option>`).join('');
-  // 👤 when you're not in the tournament yet (a new one: always).
-  const me = !!getCurrentUser() && !(tnFormFor && tnPlayers.some(p => p.user_id === getCurrentUser().id));
-  document.getElementById('tnFormRows').innerHTML = tnFormPlayers.map((p, i) => `
+  const signedIn = !!getCurrentUser();
+  document.getElementById('tnFormRows').innerHTML = tnFormPlayers.map((p, i) => {
+    const nick = _tnRowNick(p);
+    const prof = p.isMe ? getCurrentProfile() : p.userId ? tnProfiles.get(p.userId) : null;
+    const placeholder = p.stored && _tnIsDefaultName(p.stored) ? p.stored : t('Player {n}', { n: i + 1 });
+    return `
     <div class="order-slot">
-      <span class="row-num">${_tnFormNumber(i)}.</span>
-      ${p.isMe && getCurrentProfile() ? avatarHTML(resolveAvatar(getCurrentProfile()), { cls: 'order-slot-portrait' }) : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">'}
-      <input class="order-slot-name order-slot-input" type="text" maxlength="30" value="${_esc(p.name)}" placeholder="${_esc(t('Player {n}', { n: _tnFormNumber(i) }))}"
-             oninput="tnFormPlayers[${i}].name = this.value" autocomplete="off">
+      <span class="row-num">${i + 1}.</span>
+      ${prof ? avatarHTML(resolveAvatar(prof), { cls: 'order-slot-portrait' }) : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">'}
+      ${nick
+        ? `<input class="order-slot-name order-slot-input" type="text" value="${_esc(nick)}" readonly tabindex="-1">`
+        : `<input class="order-slot-name order-slot-input" type="text" maxlength="30" value="${_esc(p.name)}" placeholder="${_esc(placeholder)}"
+             oninput="tnFormPlayers[${i}].name = this.value" autocomplete="off">`}
       <div class="order-slot-actions">
-        <button class="pf-btn del" type="button" onclick="tnRemoveFormPlayer(${i})" ${n > min ? `title="${t('Remove')}"` : `title="${t('A tournament needs at least 2 players.')}" disabled`}>❌</button>
-        <button class="pf-btn me${p.isMe ? ' on' : ''}${me ? '' : ' locked'}" type="button" onclick="tnToggleFormMe(${i})" title="${t('Me')}">👤</button>
+        <button class="pf-btn del" type="button" onclick="tnRemoveFormPlayer(${i})" ${n > 2 ? `title="${t('Remove')}"` : `title="${t('A tournament needs at least 2 players.')}" disabled`}>❌</button>
+        <button class="pf-btn me${p.isMe ? ' on' : ''}${signedIn && !(p.userId && !p.isMe) ? '' : ' locked'}" type="button" onclick="tnToggleFormMe(${i})" title="${t('Me')}">👤</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.getElementById('tnAddRowBtn').disabled = n >= max;
 }
 
 function tnSetPlayerCount(n) {
-  n = Math.max(_tnFormMin(), Math.min(n, _tnFormMax()));
+  n = Math.max(2, Math.min(n, _tnFormMax()));
   while (tnFormPlayers.length < n) tnFormPlayers.push({ name: '', isMe: false });
   tnFormPlayers.length = n;
   _tnRenderFormPlayers();
 }
 
 function tnRemoveFormPlayer(i) {
-  if (tnFormPlayers.length <= _tnFormMin()) return;
+  if (tnFormPlayers.length <= 2) return;
   tnFormPlayers.splice(i, 1);
   _tnRenderFormPlayers();
 }
 
-// 👤: you play too (one row): your nickname, your name already claimed.
+// 👤: you play too (one row, not a name someone else claimed): your nickname
+// shows, your name is claimed when the form is saved.
 function tnToggleFormMe(i) {
-  const nick = getCurrentProfile()?.nickname;
-  if (!nick || (tnFormFor && tnPlayers.some(p => p.user_id === getCurrentUser()?.id))) return;
-  const on = !tnFormPlayers[i].isMe;
-  tnFormPlayers.forEach((p, k) => {
-    if (p.isMe && k !== i) { p.isMe = false; if (p.name === nick) p.name = ''; }
-  });
-  tnFormPlayers[i].isMe = on;
-  if (on) tnFormPlayers[i].name = nick;
-  else if (tnFormPlayers[i].name === nick) tnFormPlayers[i].name = '';
+  if (!getCurrentProfile()?.nickname) return;
+  const p = tnFormPlayers[i];
+  if (p.userId && !p.isMe) return;
+  const on = !p.isMe;
+  tnFormPlayers.forEach(x => { x.isMe = false; });
+  p.isMe = on;
   _tnRenderFormPlayers();
+}
+
+// What saving Edit settings does to the players: removed, renamed, added, and
+// your claim moved (released, claimed).
+function _tnPlayersPlan(names) {
+  const me = getCurrentUser()?.id;
+  const before = tnFormFor ? tnPlayers : [];   // a new tournament has none yet
+  const kept = new Set(tnFormPlayers.filter(p => p.id).map(p => p.id));
+  const mineBefore = before.find(p => p.user_id === me);
+  const mineAfter  = tnFormPlayers.find(p => p.isMe);
+  return {
+    removed: before.filter(p => !kept.has(p.id)).map(p => p.id),
+    renamed: tnFormPlayers.map((p, i) => p.id && names[i] !== p.stored ? { id: p.id, name: names[i] } : null).filter(Boolean),
+    added:   tnFormPlayers.map((p, i) => p.id ? null : { name: names[i], user_id: p.isMe ? me : null }).filter(Boolean),
+    release: mineBefore && mineBefore.id !== mineAfter?.id && kept.has(mineBefore.id) ? mineBefore.id : null,
+    claim:   mineAfter?.id && mineAfter.id !== mineBefore?.id ? mineAfter.id : null,
+  };
+}
+const _tnPlanChangesDraw = plan => plan.removed.length + plan.renamed.length + plan.added.length > 0;
+
+// Carries out the plan, in an order no unique name (or one name per player)
+// trips over: removals and your old claim's release first.
+async function _tnApplyPlayers(id, plan) {
+  if (plan.removed.length) {
+    const { error } = await db.from('tournament_players').delete().in('id', plan.removed);
+    if (error) return error;
+  }
+  if (plan.release) {
+    const { error } = await db.rpc('release_tournament_player', { target_player: plan.release });
+    if (error) return error;
+  }
+  for (const r of plan.renamed) {
+    const { error } = await db.from('tournament_players').update({ name: r.name }).eq('id', r.id);
+    if (error) return error;
+  }
+  if (plan.added.length) {
+    const { error } = await db.from('tournament_players').insert(plan.added.map(a => ({ tournament_id: id, ...a })));
+    if (error) return error;
+  }
+  if (plan.claim) return (await db.rpc('claim_tournament_player', { target_player: plan.claim })).error;
+  return null;
 }
 
 async function tnSaveForm() {
@@ -982,12 +996,7 @@ async function tnSaveForm() {
   if (!user) return goToSignIn();
   const date  = document.getElementById('tnDate').value || _tnToday();
   const names = _tnFormNames();
-  const me    = tnFormPlayers.findIndex(p => p.isMe);
   const pool  = tnChars.map(c => c.name).filter(n => !tnPool.excluded.has(n));
-  if (new Set(names.map(n => n.toLowerCase())).size !== names.length
-      || (tnFormFor && names.some(n => tnPlayers.some(p => p.name.toLowerCase() === n.toLowerCase())))) {
-    return showError('tnFormErr', t('Every player needs a different name.'));
-  }
   // A game has started: the name and the date only.
   if (tnFormFor && !_tnAllOpen(tnFormFor)) {
     const name = document.getElementById('tnName').value.trim();
@@ -1005,10 +1014,11 @@ async function tnSaveForm() {
   }
   const name   = document.getElementById('tnName').value.trim();
   const stages = Number(document.getElementById('tnStages').value);
+  if (new Set(names.map(n => n.toLowerCase())).size !== names.length) return showError('tnFormErr', t('Every player needs a different name.'));
   if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
   if (!Number.isInteger(stages) || stages < 1 || stages > 20) return showError('tnFormErr', t('Stages: from 1 to 20.'));
   if (pool.length < 2) return showError('tnFormErr', t('The draw pool needs at least 2 villains.'));
-  const total = names.length + (tnFormFor ? tnPlayers.length : 0);
+  const total = names.length;
   if (total > pool.length) return showError('tnFormErr', t('The draw pool has {v} villains for {n} players: every player needs a different one.', { v: pool.length, n: total }));
   const row = {
     name, stages,
@@ -1030,16 +1040,17 @@ async function tnSaveForm() {
   ]) {
     if (value !== dflt || (tnFormFor && (tnFormFor[key] ?? dflt) !== value)) row[key] = value;
   }
-  const newPlayers = id => names.map((name, i) => ({ tournament_id: id, name, user_id: i === me ? user.id : null }));
+  const plan = _tnPlayersPlan(names);
 
-  // Started, no game saved: a change to the draw draws stage 1 again.
+  // Started, no game yet: a change to the draw (the players' names included)
+  // draws stage 1 again.
   if (tnFormFor?.current_stage > 0) {
     const was = tnFormFor;
-    const redraw = names.length || row.table_size !== was.table_size || row.stages !== was.stages
+    const redraw = _tnPlanChangesDraw(plan) || row.table_size !== was.table_size || row.stages !== was.stages
       || row.table_split !== undefined && row.table_split !== (was.table_split || 'even')
       || row.play_order  !== undefined && row.play_order  !== (was.play_order || 'random')
       || pool.length !== was.villain_pool.length || pool.some(v => !was.villain_pool.includes(v));
-    if (!redraw) return _tnSaveSettings(row, []);
+    if (!redraw) return _tnSaveSettings(row, plan);
     return openConfirmSheet({
       id:           'tnRedrawSheet',
       title:        t('Draw stage 1 again?'),
@@ -1047,10 +1058,10 @@ async function tnSaveForm() {
       confirmLabel: t('Draw again'),
       busyLabel:    t('Drawing…'),
       onConfirm:    async () => {
-        // Back to sign-ups, the settings and the players, then Start again.
+        // Back to before the start, the settings and the players, then Start again.
         let { error } = await db.rpc('undo_tournament_stage', { target: was.id });
         if (!error) ({ error } = await db.from('tournaments').update(row).eq('id', was.id));
-        if (!error && names.length) ({ error } = await db.from('tournament_players').insert(newPlayers(was.id)));
+        if (!error) error = await _tnApplyPlayers(was.id, plan);
         setVisible('tnForm', false);
         setVisible('tnRoot', true);
         await tnLoad(was.id);
@@ -1059,7 +1070,7 @@ async function tnSaveForm() {
       },
     });
   }
-  if (tnFormFor) return _tnSaveSettings(row, names.length ? newPlayers(tnFormFor.id) : []);
+  if (tnFormFor) return _tnSaveSettings(row, plan);
 
   const btn = document.getElementById('tnFormSave');
   btn.disabled = true;
@@ -1067,20 +1078,20 @@ async function tnSaveForm() {
   btn.disabled = false;
   if (res.error || !res.data?.length) return showError('tnFormErr', _tnErrorMsg(res.error));
   const id = res.data[0].id;
-  const { error } = await db.from('tournament_players').insert(newPlayers(id));
-  if (error) console.warn('tournament players', error);   // the lobby still adds them
+  const error = await _tnApplyPlayers(id, plan);
+  if (error) console.warn('tournament players', error);   // Edit settings can still add them
   _tnDraftReady = false;
   _tnDropDraft();
   location.replace(`tournaments.html?t=${id}`);
 }
 
-// The settings (and the players added), while every setting can change.
-async function _tnSaveSettings(row, players) {
+// The settings and the players, while every setting can change.
+async function _tnSaveSettings(row, plan) {
   const btn = document.getElementById('tnFormSave');
   btn.disabled = true;
   const res = await db.from('tournaments').update(row).eq('id', tnFormFor.id).select('id');
   let error = res.error || (!res.data?.length && { message: 'already_started' });
-  if (!error && players.length) error = (await db.from('tournament_players').insert(players)).error;
+  if (!error) error = await _tnApplyPlayers(tnFormFor.id, plan);
   btn.disabled = false;
   if (error) return showError('tnFormErr', _tnErrorMsg(error));
   setVisible('tnForm', false);

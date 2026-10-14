@@ -2050,11 +2050,17 @@ select:disabled {
 .owned-toggle.on { color: var(--accent); background: var(--accent-d); border-color: var(--accent); }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
-#orderSlots, #tnFormRows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+#orderSlots, #tnFormRows, .tn-player-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
 /* A row whose name is typed (a tournament's players): the name's look, no box. */
 input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; border: none; background: none; box-shadow: none; font-family: inherit; }
 .order-slot-input:focus { outline: none; box-shadow: none; }
 #tnFormRows .order-slot:focus-within { border-color: var(--accent); }
+/* The tournament's players: New tournament's rows, with who claimed them. */
+.tn-player-rows { margin-bottom: 20px; }
+.tn-player-row { min-height: 38px; padding: 3px 10px; box-sizing: border-box; }
+.tn-player-row .order-slot-portrait { width: 26px; height: 26px; }
+.tn-player-row.mine { border-color: var(--accent); }
+.tn-row-status { flex-shrink: 0; font-size: calc(12px * var(--ts)); color: var(--dim); font-style: italic; }
 /* As tall as + Add player under them. */
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
@@ -2388,8 +2394,6 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .tn-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .tn-row-actions .pf-btn { width: 30px; height: 30px; font-size: calc(12px * var(--ts)); }
-.tn-add-row { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px; }
-.tn-add-row input { flex: 1; min-width: 0; }
 .tn-hint { font-size: calc(13px * var(--ts)); color: var(--muted); margin: 0 0 14px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .tn-seats .chip-seat { width: auto; min-width: 12px; }
 /* The form: each rule's buttons share the row; its explanation under it. */
@@ -2398,7 +2402,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-rule-hint { margin: 6px 0 0; }
 #tnForm .exclude-toggle + .exclude-body { margin-top: 0; }
 .tn-form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-#tnFormDiscard { margin-right: auto; }   /* Discard on the left, as in New Game */
+.tn-form-actions .btn { flex: 1; min-width: 0; justify-content: center; text-align: center; }   /* two buttons sharing the row */
 .tn-table .card-actions { justify-content: center; }
 /* Once started: Tables, Standings, Log, a switch across the page. */
 .tn-view-seg { width: 100%; }

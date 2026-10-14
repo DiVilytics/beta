@@ -98,7 +98,7 @@ function fmtTournamentDate(tour) {
 
 function tournamentStatus(tour) {
   if (tour.finished_at)    return t('Finished');
-  if (!tour.current_stage) return t('Sign-ups open');
+  if (!tour.current_stage) return t('Not started');
   if (tour.current_stage > tour.stages) return t('Final');
   return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
 }
