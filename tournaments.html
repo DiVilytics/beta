@@ -56,14 +56,21 @@
   <!-- New tournament, and the lobby's Edit settings (tournaments.js). -->
   <div id="tnForm" class="hidden">
     <div class="err" id="tnFormErr"></div>
-    <div class="field">
+    <!-- Fixed once started (they change points): name, sizes, scoring, bye,
+         pool, players. The date changes at any time; the draw's rules (tables,
+         pairing, play order) between stages. -->
+    <div class="field tn-fixed">
       <label for="tnName" data-i18n>Name</label>
       <input type="text" id="tnName" maxlength="60" placeholder="e.g. Lucca 2026" autocomplete="off" data-i18n-attr="placeholder">
     </div>
-    <div class="form-row">
+    <div class="field">
+      <label for="tnDate" data-i18n>Date</label>
+      <input type="date" id="tnDate">
+    </div>
+    <div class="form-row tn-fixed">
       <div class="field">
         <label for="tnSize" data-i18n>Max players per table</label>
-        <select id="tnSize">
+        <select id="tnSize" onchange="tnSizeChanged()">
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
@@ -87,11 +94,28 @@
       <p class="modal-hint tn-rule-hint" id="tnPairingHint"></p>
     </div>
     <div class="field">
+      <label data-i18n>Play order</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnPlayOrder"></div>
+      <p class="modal-hint tn-rule-hint" id="tnPlayOrderHint"></p>
+    </div>
+    <p class="modal-hint tn-rule-hint hidden" id="tnDrawRulesNote" data-i18n>Tables, pairing and play order change between stages: once every table of this stage is saved.</p>
+    <div class="field tn-fixed">
       <label data-i18n>Scoring</label>
       <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>
       <p class="modal-hint tn-rule-hint" id="tnScoringHint"></p>
+      <!-- Custom: the points for each place at the largest table; the smaller
+           tables' rows follow them (tournament-rules.js). -->
+      <div class="tn-custom hidden" id="tnCustom">
+        <div class="tn-custom-row" id="tnCustomRow"></div>
+        <p class="modal-hint tn-rule-hint" id="tnCustomPreview"></p>
+      </div>
     </div>
-    <div class="field">
+    <div class="field tn-fixed">
+      <label data-i18n>Bye</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnBye"></div>
+      <p class="modal-hint tn-rule-hint" id="tnByeHint"></p>
+    </div>
+    <div class="field tn-fixed">
       <label data-i18n>Villains</label>
       <button class="exclude-toggle" type="button" onclick="tnTogglePool()">
         <span class="exclude-toggle-label" data-i18n>Draw pool</span>
@@ -125,7 +149,7 @@
     </div>
     <!-- New tournament only: the players, New Game's rows (a name each, 👤 for
          you, ❌ to remove); later ones join from the lobby. -->
-    <div id="tnFormPlayers">
+    <div id="tnFormPlayers" class="tn-fixed">
       <div class="section-label lineup-label">
         <span data-i18n>Players</span>
         <span class="players-legend"><span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>❌ = remove</span></span>
@@ -143,56 +167,8 @@
       <button class="btn btn-primary" type="button" id="tnFormSave" onclick="tnSaveForm()"></button>
     </div>
   </div>
-  <!-- A table's game in progress (tournaments.js): New Game's live panel, then
-       the villains still playing and the ranking as it fills. -->
-  <div id="tnLive" class="hidden">
-    <div class="err" id="tnLiveErr"></div>
-    <div class="live-status" id="tnLiveStatus" data-i18n>Game in progress</div>
-    <div class="live-info" id="liveInfo"></div>
-    <div class="live-time" id="liveTime">00:00</div>
-    <div class="live-turns">
-      <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
-      <div class="live-turn-count"><span class="live-turn-num"><span id="liveTurnCount">1</span></span><span class="live-turn-lbl" data-i18n>round</span></div>
-      <button class="live-btn" id="livePlusBtn" type="button" onclick="bumpTurn(1)">+</button>
-    </div>
-    <div class="section-label" data-i18n>Playing</div>
-    <div class="tn-playing" id="tnPlaying"></div>
-    <div class="section-label" data-i18n>Ranking</div>
-    <div class="tn-ranking" id="tnRanking"></div>
-    <p class="live-hint" id="tnLiveHint" data-i18n>Tap a villain when they win (the next place from the top) or drop out (the next place from the bottom). Tap the last one placed to undo it. With one villain left, the game ends.</p>
-    <!-- The lock screen's album line (new-game-audio.js reads it). -->
-    <input type="hidden" id="fLocation">
-    <div class="new-game-footer">
-      <button class="btn btn-danger" type="button" onclick="tnDiscardGame()" data-i18n>Discard game</button>
-      <button class="btn btn-primary" type="button" id="tnPauseBtn" onclick="tnTogglePause()" data-i18n>Pause game</button>
-      <button class="btn btn-save" type="button" id="tnSaveBtn" onclick="tnSaveGame()" disabled data-i18n>Save game</button>
-    </div>
-  </div>
 </main>
 
-<!-- Tapping a villain still playing: won (the next place from the top) or dropped (from the bottom). -->
-<div class="overlay" id="tnPlaceSheet" onclick="if(event.target===this) closeOverlay('tnPlaceSheet')">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <h3 id="tnPlaceTitle"></h3>
-      <button class="sheet-close" onclick="closeOverlay('tnPlaceSheet')">×</button>
-    </div>
-    <div class="sheet-body tn-place-choices">
-      <button class="btn btn-save" type="button" id="tnPlaceWon"></button>
-      <button class="btn btn-ghost" type="button" id="tnPlaceDropped"></button>
-    </div>
-  </div>
-</div>
-
-<audio id="bgAudio" src="asset/audio/empty.mp3" preload="metadata" loop></audio>
-<div class="tap-resume hidden" id="tapResume" role="button" tabindex="0" onclick="resumeLockScreen()" onkeydown="if(event.key==='Enter'||event.key===' ')resumeLockScreen()">
-  <div class="tap-resume-card">
-    <div class="tap-resume-ico">🔒</div>
-    <div class="tap-resume-title" data-i18n>Tap to continue</div>
-    <p class="tap-resume-text" data-i18n>The game is still running. Tap anywhere to turn the lock-screen controls (timer and rounds) back on.</p>
-  </div>
-</div>
 
 <!-- QR share sheet -->
 <div class="overlay" id="qrOverlay" onclick="if(event.target===this) closeOverlay('qrOverlay')">
@@ -235,6 +211,5 @@
 <script src="pace-filter.js"></script>
 <script src="tournament-rules.js"></script>
 <script src="tournaments.js"></script>
-<script src="new-game-audio.js"></script>
 </body>
 </html>

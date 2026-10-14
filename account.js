@@ -316,7 +316,6 @@ async function exportMyTournaments() {
     const header = ['Tournament', 'Stage', 'Table', 'Game ID', 'Date', 'Duration (min)', 'Rounds', 'Player', 'Nickname', 'Villain', 'Seat', 'Place', 'Dropped', 'Bye', 'Placed at (min)', 'Placed in round', 'Points'];
     const rows = [header];
     for (const tour of tours) {
-      const scoring = TOURNAMENT_SCORINGS[tour.scoring] || TOURNAMENT_SCORINGS.borda;
       const mine = tables.filter(tb => tb.tournament_id === tour.id).sort((a, b) => a.stage - b.stage || a.table_no - b.table_no);
       for (const tb of mine) {
         const g = gameById.get(tb.game_id);
@@ -330,7 +329,7 @@ async function exportMyTournaments() {
             st.character, seats.length > 1 ? st.position + 1 : '',
             st.place ?? '', st.dropped ? 'yes' : 'no', seats.length === 1 ? 'yes' : 'no',
             st.minutes ?? '', st.round ?? '',
-            st.place != null ? scoring.points(st.place, seats.length, tour.table_size, st) : '',
+            st.place != null ? tournamentSeatPoints(tour, seats.length, st) : '',
           ]);
         }
       }

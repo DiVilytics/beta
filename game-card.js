@@ -91,6 +91,11 @@ function fmtPlace(n) {
 }
 const TOURNAMENT_MEDALS = ['🥇', '🥈', '🥉'];
 
+// The tournament's day, set by its organizer (the creation day before it had one).
+function fmtTournamentDate(tour) {
+  return tour.event_date ? fmtDayLong(tour.event_date) : fmtDateShort(tour.created_at);
+}
+
 function tournamentStatus(tour) {
   if (tour.finished_at)    return t('Finished');
   if (!tour.current_stage) return t('Sign-ups open');
@@ -103,7 +108,7 @@ function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank 
   const meta = [
     isOrganizer ? t('Organizer') : organizer ? _esc(organizer) : null,
     tn(n, '{n} player', '{n} players'),
-    fmtDateShort(tour.created_at),
+    fmtTournamentDate(tour),
     rank ? (rank <= 3 ? TOURNAMENT_MEDALS[rank - 1] : fmtPlace(rank)) : null,
   ].filter(Boolean).join(' | ');
   return `

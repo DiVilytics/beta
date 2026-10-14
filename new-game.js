@@ -1042,7 +1042,7 @@ function _checkResume() {
     const card = document.createElement('div');
     card.innerHTML = emptyStateHTML('🏟️', t('A tournament game is in progress'),
       t('{name}, table {n}: save it or discard it on its tournament page before starting another game.', { name: _esc(g.tourName), n: g.tableNo }),
-      `<a class="btn btn-primary btn-sm" href="tournaments.html?t=${g.tourId}&table=${g.tableId}">${t('Open it')}</a>`);
+      `<a class="btn btn-primary btn-sm" href="tournament-game.html?table=${g.tableId}">${t('Open it')}</a>`);
     document.getElementById('formContent').before(card);
     setVisible('formContent', false);
     setVisible('footerDefault', false);

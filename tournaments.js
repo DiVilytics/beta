@@ -21,31 +21,12 @@ let tnTables   = [];          // its tables, each with .seats in play order
 let tnProfiles = new Map();   // user id → profile (organizers, claimed names, recorders)
 let tnPool     = null;        // the form's draw pool (pace-filter.js)
 let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
-const tnRule   = { table_split: 'even', pairing: 'random', scoring: 'borda' };
+const tnRule   = { table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half' };
+let   tnCustom = [];   // the custom scoring's points, 1st first, at the largest table
 
 const TN_POLL_MS  = 8000;
 let   tnPollTimer = null;
 let   tnSnapshot  = '';       // the data last drawn: a reload redraws only on a change
-
-// The database's answers (tournaments migration).
-const TN_ERRORS = {
-  not_organizer:         'Only the organizer can do this.',
-  already_started:       'The tournament has already started.',
-  too_few_players:       'A tournament needs at least 2 players.',
-  invalid_pool:          'The draw pool needs at least as many villains as there are players.',
-  invalid_villains:      "The villains couldn't be drawn. Try again.",
-  invalid_tables:        "The tables couldn't be drawn. Try again.",
-  name_claimed:          'Someone else just claimed this name.',
-  already_in_tournament: 'You already have a name in this tournament.',
-  no_profile:            'You need a nickname first.',
-  not_your_name:         "This name isn't yours to release.",
-  not_running:           "The tournament isn't running.",
-  stage_not_done:        'Every table of this stage has to be saved first.',
-};
-function _tnErrorMsg(error) {
-  if (error?.code === '23505') return t('There is already a player with this name.');
-  return TN_ERRORS[error?.message] ? t(TN_ERRORS[error.message]) : (error?.message || '');
-}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -70,6 +51,14 @@ function _tnAuthChanged() {
 }
 
 // ── SHARED BITS ───────────────────────────────────────────────────────────────
+
+
+// A player's name as shown everywhere: the nickname of whoever claimed it,
+// else the name the organizer typed.
+function tnPlayerName(p) {
+  if (!p) return '';
+  return (p.user_id && tnProfiles.get(p.user_id)?.nickname) || p.name;
+}
 
 async function _tnLoadProfiles(ids) {
   const want = [...new Set(ids.filter(id => id && !tnProfiles.has(id)))];
@@ -96,7 +85,7 @@ function _tnShowError(msg) {
 async function tnLoadList() {
   const root = document.getElementById('tnRoot');
   const { data, error } = await db.from('tournaments')
-    .select('id, name, organizer, created_at, stages, current_stage, finished_at, tournament_players(count)')
+    .select('*, tournament_players(count)')
     .order('created_at', { ascending: false });
   root.className = '';
   if (error) { root.innerHTML = loadErrorHTML(t("Couldn't load the tournaments"), error); return; }
@@ -155,10 +144,7 @@ async function tnLoad(id, { quiet = false } = {}) {
   const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);
   if (quiet && snap === tnSnapshot) return;
   tnSnapshot = snap;
-  if (!_tnFormOpen() && !_tnLiveOpen()) tnRenderTournament();
-  // A reload on the table's game: back into it.
-  const table = new URLSearchParams(location.search).get('table');
-  if (!quiet && table && _tnSavedGame()?.tournament?.tableId === table) tnResumeTable();
+  if (!_tnFormOpen()) tnRenderTournament();
 }
 
 // The reloads: every few seconds while the page is visible and the tournament
@@ -178,7 +164,7 @@ document.addEventListener('visibilitychange', () => {
 
 function _tnBusy() {
   const input = document.getElementById('tnAddName');
-  return _tnFormOpen() || _tnLiveOpen() || !!document.querySelector('.overlay.open')
+  return _tnFormOpen() || !!document.querySelector('.overlay.open')
     || (!!input && (input.value.trim() !== '' || document.activeElement === input));
 }
 
@@ -198,13 +184,15 @@ function tnRenderTournament() {
     t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name + ' tables'),
     tn(tnTour.stages, '{n} stage', '{n} stages'),
     pairing ? t(pairing.name) : _esc(tnTour.pairing),
+    t('Play order: {rule}', { rule: t((TOURNAMENT_PLAY_ORDERS[tnTour.play_order] || TOURNAMENT_PLAY_ORDERS.random).name) }),
     scoring ? t(scoring.name) : _esc(tnTour.scoring),
+    t('Bye: {rule}', { rule: t((TOURNAMENT_BYES[tnTour.bye] || TOURNAMENT_BYES.last).name) }),
   ].join(' | ');
   const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
-    isOrg && lobby ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
+    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit settings')}</button>` : '',
     isOrg && lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start')}</button>` : '',
   ].join('');
 
@@ -214,6 +202,7 @@ function tnRenderTournament() {
   root.innerHTML = `
     <div class="claim-game-info">
       <div class="claim-date">${_esc(tnTour.name)}</div>
+      <div class="claim-meta">${fmtTournamentDate(tnTour)}</div>
       <div class="claim-meta">${settings}</div>
       <div class="claim-meta">${status}</div>
     </div>
@@ -238,7 +227,6 @@ function _tnPlayerRowHTML(p, { user, isOrg, lobby, mine }) {
   const canClaim = !p.user_id && !!user && !mine;
   let sub = '';
   if (p.withdrawn_after != null)        sub = `<div class="claim-nick">${t('Withdrawn after stage {n}', { n: p.withdrawn_after })}</div>`;
-  else if (prof && prof.nickname !== p.name) sub = `<div class="claim-nick">${_esc(prof.nickname)}</div>`;
   else if (!p.user_id && !canClaim)      sub = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
   const actions = [
     canClaim ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnClaim('${p.id}')">${t("That's me")}</button>` : '',
@@ -249,7 +237,7 @@ function _tnPlayerRowHTML(p, { user, isOrg, lobby, mine }) {
   ].join('');
   return `
     <div class="claim-row${isMine ? ' mine' : ''}">
-      <div class="claim-char">${avatar}<div class="claim-who"><div class="claim-name">${_esc(p.name)}</div>${sub}</div></div>
+      <div class="claim-char">${avatar}<div class="claim-who"><div class="claim-name">${_esc(tnPlayerName(p))}</div>${sub}</div></div>
       ${actions ? `<div class="tn-row-actions">${actions}</div>` : ''}
     </div>`;
 }
@@ -311,16 +299,52 @@ function _tnStageHTML(mine) {
     ${_tnNextStageHTML(tables)}`;
 }
 
-// The organizer's Next stage: once every table of the stage is saved.
+// The organizer's Draw stage (once every table of the stage is saved) and
+// Undo draw (while none of its games is saved; a bye isn't a game).
 function _tnNextStageHTML(tables) {
   const user = getCurrentUser();
-  if (!user || user.id !== tnTour.organizer || tnTour.finished_at || tnTour.current_stage >= tnTour.stages) return '';
+  if (!user || user.id !== tnTour.organizer) return '';
+  const canUndo = !tables.some(tb => tb.game_id);
+  const more  = !tnTour.finished_at && tnTour.current_stage < tnTour.stages;
   const ready = tables.every(tb => tb.saved_at);
+  if (!more && !canUndo) return '';
   return `
     <div class="claim-share-row">
-      <button class="btn btn-primary btn-sm" type="button" onclick="tnNextStage()"${ready ? '' : ' disabled'}>${t('Draw stage {n}', { n: tnTour.current_stage + 1 })}</button>
+      ${canUndo ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()">${t('Undo draw')}</button>` : ''}
+      ${more ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnNextStage()"${ready ? '' : ' disabled'}>${t('Draw stage {n}', { n: tnTour.current_stage + 1 })}</button>` : ''}
     </div>
-    ${ready ? '' : `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>`}`;
+    ${more && !ready ? `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>` : ''}`;
+}
+
+// What the next draw makes: "Stage 3 of 5: 2 tables and 1 bye, Swiss pairing."
+function _tnDrawSummary(stage) {
+  const playing = tnPlayers.filter(p => p.withdrawn_after == null).length;
+  const sizes = tournamentSplit(playing, tnTour.table_size, tnTour.table_split);
+  const tables = sizes.filter(n => n > 1).length, byes = sizes.length - tables;
+  const what = byes ? t('{tables} and {byes}', { tables: tn(tables, '{n} table', '{n} tables'), byes: tn(byes, '{n} bye', '{n} byes') }) : tn(tables, '{n} table', '{n} tables');
+  const pairing = (TOURNAMENT_PAIRINGS[tnTour.pairing] || TOURNAMENT_PAIRINGS.random).name;
+  return `${t('Stage {n} of {m}: {what}, {pairing} pairing.', { n: stage, m: tnTour.stages, what, pairing: t(pairing) })} ${t('It can be undone until a table is saved.')}`;
+}
+
+// Undo draw: the stage's tables go (games in progress on a phone too) and the
+// tournament is back at the stage before, or in the lobby from stage 1.
+function tnUndoStage() {
+  const st = tnTour.current_stage;
+  openConfirmSheet({
+    id:           'tnUndoSheet',
+    title:        t('Undo the draw of stage {n}?', { n: st }),
+    bodyHTML:     `<p class="confirm-text">${st === 1
+      ? t('Its tables are cancelled, games in progress included, and the tournament goes back to sign-ups: players can join or leave, the settings change, and Start draws everything again.')
+      : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back or change the draw\'s rules, then draw again.', { n: st - 1 })}</p>`,
+    confirmLabel: t('Undo draw'),
+    busyLabel:    t('Working…'),
+    danger:       true,
+    onConfirm:    async () => {
+      const { error } = await db.rpc('undo_tournament_stage', { target: tnTour.id });
+      tnView = 'tables';
+      await _tnAfter(error);
+    },
+  });
 }
 
 // A table, drawn like a game card: its players in play order with their
@@ -337,7 +361,7 @@ function _tnTableHTML(tb, myId) {
   const chips = seats.map(s => {
     const won  = tb.saved_at && !bye && s.place === 1;
     const self = s.player_id === myId;
-    const name = byName.get(s.player_id)?.name || '';
+    const name = tnPlayerName(byName.get(s.player_id));
     return `
       <div class="chip${won ? ' winner' : ''}${self ? ' self' : ''}">
         <span class="chip-seat">${bye ? '' : tb.saved_at ? fmtPlace(s.place) : s.position + 1}</span>
@@ -407,7 +431,7 @@ function tnRelease(playerId) {
   openConfirmSheet({
     id:           'tnReleaseSheet',
     title:        t('Release this name?'),
-    bodyHTML:     `<p class="confirm-text">${t('{name} and its villains in the tournament\'s games go back to unclaimed, for you or someone else to claim.', { name: `<strong class="text-emph">${_esc(p.name)}</strong>` })}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t('{name} and its villains in the tournament\'s games go back to unclaimed, for you or someone else to claim.', { name: `<strong class="text-emph">${_esc(tnPlayerName(p))}</strong>` })}</p>`,
     confirmLabel: t('Release'),
     busyLabel:    t('Releasing…'),
     danger:       true,
@@ -483,11 +507,21 @@ async function tnOpenForm(tour) {
   clearError('tnFormErr');
 
   document.getElementById('tnName').value   = tour?.name || '';
+  document.getElementById('tnDate').value   = tour?.event_date || _tnToday();
   document.getElementById('tnSize').value   = String(tour?.table_size || 4);
   document.getElementById('tnStages').value = String(tour?.stages || 3);
   tnRule.table_split = tour?.table_split || 'even';
-  tnRule.pairing = tour?.pairing || 'random';
-  tnRule.scoring = tour?.scoring || 'borda';
+  tnRule.pairing     = tour?.pairing || 'random';
+  tnRule.play_order  = tour?.play_order || 'random';
+  tnRule.scoring     = tour?.scoring || 'borda';
+  tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
+  tnCustom = tour?.custom_points?.map(Number) || _tnBordaRow(tour?.table_size || 4);
+  // Started: only the date and, between stages, the draw's rules.
+  const started = !!tour && tour.current_stage > 0;
+  document.querySelectorAll('#tnForm .tn-fixed').forEach(el => setVisible(el, !started));
+  const between = !started || !tnTables.some(tb => tb.stage === tour.current_stage && !tb.saved_at);
+  document.querySelectorAll('#tnSplit, #tnPairing, #tnPlayOrder').forEach(el => el.classList.toggle('disabled', !between));
+  setVisible('tnDrawRulesNote', started);
   _tnRenderRules();
 
   if (!tnPool) {
@@ -540,12 +574,49 @@ function _tnRenderRules() {
   for (const [kind, rules, segId, hintId] of [
     ['table_split', TOURNAMENT_SPLITS, 'tnSplit', 'tnSplitHint'],
     ['pairing', TOURNAMENT_PAIRINGS, 'tnPairing', 'tnPairingHint'],
+    ['play_order', TOURNAMENT_PLAY_ORDERS, 'tnPlayOrder', 'tnPlayOrderHint'],
     ['scoring', TOURNAMENT_SCORINGS, 'tnScoring', 'tnScoringHint'],
+    ['bye', TOURNAMENT_BYES, 'tnBye', 'tnByeHint'],
   ]) {
-    document.getElementById(segId).innerHTML = Object.entries(rules).map(([id, r]) =>
-      `<button class="seg-btn${id === tnRule[kind] ? ' on' : ''}" type="button" onclick="tnPickRule('${kind}', '${id}')">${t(r.name)}</button>`).join('');
+    const seg = document.getElementById(segId);
+    const off = seg.classList.contains('disabled');
+    seg.innerHTML = Object.entries(rules).map(([id, r]) =>
+      `<button class="seg-btn${id === tnRule[kind] ? ' on' : ''}" type="button" onclick="tnPickRule('${kind}', '${id}')"${off ? ' disabled' : ''}>${t(r.name)}</button>`).join('');
     document.getElementById(hintId).textContent = t(rules[tnRule[kind]]?.hint || '');
   }
+  _tnRenderCustom();
+}
+
+const _tnToday     = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+const _tnBordaRow  = size => Array.from({ length: size }, (_, i) => size - 1 - i);
+const _tnFormSize  = () => Number(document.getElementById('tnSize').value);
+
+// Custom scoring: a box per place at the largest table, and the smaller
+// tables' points as they'll be used (1st's and last's kept, the others spread).
+function _tnRenderCustom() {
+  const on = tnRule.scoring === 'custom';
+  setVisible('tnCustom', on);
+  if (!on) return;
+  const size = _tnFormSize();
+  if (tnCustom.length !== size) tnCustom = _tnBordaRow(size);
+  document.getElementById('tnCustomRow').innerHTML = tnCustom.map((v, i) => `
+    <label>${fmtPlace(i + 1)}<input type="number" min="0" step="any" value="${v}" oninput="tnCustom[${i}] = Math.max(0, Number(this.value) || 0); _tnRenderCustomPreview()"></label>`).join('');
+  _tnRenderCustomPreview();
+}
+
+function _tnRenderCustomPreview() {
+  const size = _tnFormSize();
+  const tour = { table_size: size, scoring: 'custom', custom_points: tnCustom };
+  const lines = [];
+  for (let n = size - 1; n >= 2; n--) {
+    lines.push(`${tn(n, '{n} player', '{n} players')}: ${tournamentPointsRow(tour, n).map(fmtTournamentPoints).join(' | ')}`);
+  }
+  document.getElementById('tnCustomPreview').innerHTML = lines.length ? `${t('Smaller tables:')}<br>${lines.join('<br>')}` : '';
+}
+
+function tnSizeChanged() {
+  tnCustom = _tnBordaRow(_tnFormSize());
+  _tnRenderCustom();
 }
 
 function tnPickRule(kind, id) {
@@ -626,6 +697,23 @@ function tnToggleFormMe(i) {
 async function tnSaveForm() {
   const user = getCurrentUser();
   if (!user) return goToSignIn();
+  const date = document.getElementById('tnDate').value || _tnToday();
+  // Started: the date at any time, the draw's rules between stages.
+  if (tnFormFor && tnFormFor.current_stage > 0) {
+    const btn = document.getElementById('tnFormSave');
+    btn.disabled = true;
+    let error = null;
+    if (date !== tnFormFor.event_date) error = (await db.rpc('set_tournament_date', { target: tnFormFor.id, new_date: date })).error;
+    const rulesChanged = ['table_split', 'pairing', 'play_order'].some(k => tnRule[k] !== (tnFormFor[k] || (k === 'pairing' ? 'random' : k === 'table_split' ? 'even' : 'random')));
+    if (!error && rulesChanged) {
+      error = (await db.rpc('set_tournament_draw_rules', { target: tnFormFor.id, new_split: tnRule.table_split, new_pairing: tnRule.pairing, new_play_order: tnRule.play_order })).error;
+    }
+    btn.disabled = false;
+    if (error) return showError('tnFormErr', _tnErrorMsg(error));
+    setVisible('tnForm', false);
+    setVisible('tnRoot', true);
+    return tnLoad(tnFormFor.id);
+  }
   const name   = document.getElementById('tnName').value.trim();
   const stages = Number(document.getElementById('tnStages').value);
   const pool   = tnChars.map(c => c.name).filter(n => !tnPool.excluded.has(n));
@@ -644,8 +732,18 @@ async function tnSaveForm() {
     scoring:      tnRule.scoring,
     villain_pool: pool,
   };
-  // Even is the database's default: only Full is written (and back to Even when editing).
-  if (tnRule.table_split !== 'even' || (tnFormFor && (tnFormFor.table_split || 'even') !== 'even')) row.table_split = tnRule.table_split;
+  if (tnRule.scoring === 'custom') {
+    if (tnCustom.some((v, i) => i && v > tnCustom[i - 1])) return showError('tnFormErr', t('Custom points: each place scores no more than the one above it.'));
+    row.custom_points = tnCustom;
+  }
+  // The options the database adds a default for are written only when they
+  // differ from it (or from what the tournament had).
+  for (const [key, value, dflt] of [
+    ['table_split', tnRule.table_split, 'even'], ['play_order', tnRule.play_order, 'random'],
+    ['bye', tnRule.bye, 'half'], ['event_date', date, _tnToday()],
+  ]) {
+    if (value !== dflt || (tnFormFor && (tnFormFor[key] ?? dflt) !== value)) row[key] = value;
+  }
   const btn = document.getElementById('tnFormSave');
   btn.disabled = true;
   const res = tnFormFor
@@ -667,36 +765,14 @@ async function tnSaveForm() {
   await tnLoad(tnFormFor.id);
 }
 
-// ── A TABLE'S GAME IN PROGRESS ────────────────────────────────────────────────
-// The phone that records a table (take_tournament_table: the organizer, or a
-// player at it who claimed their name; one at a time) runs its game here, on
-// New Game's engine: the timer and rounds of liveGame (shared.js), the same
-// live panel and the lock-screen controls (new-game-audio.js, which calls the
-// startLive / stopLive / bumpTurn / liveMediaLines below). One game in
+// ── RECORDING A TABLE ─────────────────────────────────────────────────────────
+// Who can record a table, its card's buttons, and Start game: the phone takes
+// the table (take_tournament_table: the organizer, or a player at it who
+// claimed their name; one at a time) and the game runs on its own page,
+// tournament-game.html (tournament-game.js), on New Game's engine. One game in
 // progress per phone, New Game's or a table's.
-//
-// Tapping a villain still playing places it: won (the next place from the
-// top) or dropped (the next place from the bottom), with the time and round
-// it happened at (the round only once the counter was used, as in New Game:
-// otherwise the rounds are saved empty). The last one placed can be undone. With one villain left it
-// takes the free place, the game stops and Save sends it all at once
-// (save_tournament_table: the standard game is 1st place's).
-
-let tnGame      = null;   // { tourId, tableId, stage, tableNo, tourName, startedAt, seats, actions }
-let liveTimerId = null;
-let tnSaveTimer = null;
-
-Object.assign(TN_ERRORS, {
-  table_not_saved: 'Only a saved table can be edited.',
-  not_at_table:    'Only the players at this table who claimed their name, or the organizer, can record it.',
-  table_taken:     'Another phone is already recording this table.',
-  not_recorder:    'Another phone records this table now (the organizer took it over).',
-  table_saved:     'This table has already been saved.',
-  invalid_results: 'Every villain needs a place before saving.',
-});
 
 const _tnSavedGame = () => liveGame.loadSaved();
-const _tnLiveOpen  = () => !document.getElementById('tnLive').classList.contains('hidden');
 
 // Who can record a table: the organizer, or a player at it who claimed their name.
 function _tnCanRecord(tb) {
@@ -717,7 +793,7 @@ function _tnTableActionHTML(tb) {
       + (isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Edit result')}</button>` : '');
   }
   const saved = _tnSavedGame();
-  if (saved?.tournament?.tableId === tb.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnResumeTable()">${t('Resume game')}</button>`;
+  if (saved?.tournament?.tableId === tb.id) return `<a class="btn btn-primary btn-sm" href="tournament-game.html?table=${tb.id}">${t('Resume game')}</a>`;
   if (!_tnCanRecord(tb)) return '';
   const user = getCurrentUser();
   const isOrg = user.id === tnTour.organizer;
@@ -738,241 +814,17 @@ async function tnStartTable(tableId) {
   const { error } = await db.rpc('take_tournament_table', { target_table: tableId });
   if (error) return _tnAfter(error);
   const byId = new Map(tnPlayers.map(p => [p.id, p]));
-  tnGame = {
+  const game = {
     tourId: tnTour.id, tableId, stage: tb.stage, tableNo: tb.table_no, tourName: tnTour.name,
     startedAt: Date.now(),
-    seats: tb.seats.map(s => ({ position: s.position, player_id: s.player_id, character: s.character, name: byId.get(s.player_id)?.name || '' })),
+    seats: tb.seats.map(s => ({ position: s.position, player_id: s.player_id, character: s.character, name: tnPlayerName(byId.get(s.player_id)) })),
     actions: [],
   };
   liveGame.clear();
   liveGame.markStarted(Date.now());
   liveGame.setTurns(1);
-  _tnPersist();
-  _tnOpenLive();
-  liveGame.emit('start');
-}
-
-function tnResumeTable() {
-  const saved = _tnSavedGame();
-  if (!saved?.tournament) return;
-  tnGame = saved.tournament;
-  liveGame.restoreFrom(saved);
-  if (liveGame.turns < 1) liveGame.setTurns(1);
-  _tnOpenLive();
-  if (liveGame.isRunning) liveGame.emit('start');
-}
-
-function _tnPersist() {
-  if (!tnGame) return;
-  liveGame.persist({ slots: tnGame.seats, tournament: tnGame });
-  updateLiveGameNavBadge();
-}
-
-function _tnOpenLive() {
-  clearTimeout(tnPollTimer);
-  const url = new URL(location.href);
-  url.searchParams.set('table', tnGame.tableId);
-  history.replaceState(null, '', url);
-  setVisible('tnRoot', false);
-  setVisible('tnBack', false);
-  setVisible('tnLive', true);
-  clearError('tnLiveErr');
-  document.getElementById('fLocation').value = tnGame.tourName;
-  clearInterval(liveTimerId);
-  if (liveGame.isRunning) liveTimerId = setInterval(tickLive, 1000);
-  clearInterval(tnSaveTimer);
-  tnSaveTimer = setInterval(_tnPersist, 30000);
-  _tnRenderLive();
-  window.scrollTo(0, 0);
-}
-
-function _tnCloseLive() {
-  clearInterval(liveTimerId); liveTimerId = null;
-  clearInterval(tnSaveTimer); tnSaveTimer = null;
-  tnGame = null;
-  const url = new URL(location.href);
-  url.searchParams.delete('table');
-  history.replaceState(null, '', url);
-  setVisible('tnLive', false);
-  setVisible('tnRoot', true);
-  setVisible('tnBack', true);
-}
-
-// The places: winners from the top, drops from the bottom; with one villain
-// left, it takes the free place (not stored until Save).
-function _tnPlaces() {
-  const n = tnGame.seats.length;
-  const placed = new Set(tnGame.actions.map(a => a.position));
-  const left = tnGame.seats.filter(s => !placed.has(s.position));
-  const top = tnGame.actions.filter(a => !a.dropped).length + 1;
-  const bottom = n - tnGame.actions.filter(a => a.dropped).length;
-  const last = tnGame.actions[tnGame.actions.length - 1];
-  const results = tnGame.actions.slice();
-  if (left.length === 1) results.push({ position: left[0].position, place: top, minutes: last?.minutes ?? null, round: last?.round ?? null, dropped: false, auto: true });
-  return { n, left, top, bottom, results, done: left.length <= 1 };
-}
-
-function fmtElapsed(ms) {
-  const s = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-  const pad = x => String(x).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
-}
-
-function tickLive() {
-  document.getElementById('liveTime').textContent = fmtElapsed(liveGame.isRunning ? liveGame.elapsedMs : (liveGame.exactDurMs || 0));
-}
-
-function _tnRenderLive() {
-  const { left, top, bottom, results, done } = _tnPlaces();
-  document.getElementById('liveInfo').innerHTML = [
-    _esc(tnGame.tourName), t('Stage {n}', { n: tnGame.stage }), t('Table {n}', { n: tnGame.tableNo }),
-  ].join(' | ');
-  document.getElementById('tnLiveStatus').textContent = done ? t('Game over') : liveGame.isRunning ? t('Game in progress') : t('Game paused');
-  document.getElementById('tnLiveStatus').classList.toggle('paused', !liveGame.isRunning);
-  document.getElementById('liveTurnCount').textContent = liveGame.turns;
-  document.getElementById('liveMinusBtn').disabled = liveGame.turns <= 1;
-  tickLive();
-
-  const seat = pos => tnGame.seats.find(s => s.position === pos);
-  const who  = s => `<span class="tn-mover-villain">${villainNameHTML(s.character)}</span><span class="tn-mover-name">${_esc(s.name)}</span>`;
-  document.getElementById('tnPlaying').innerHTML = left.length > 1
-    ? left.map(s => `<button class="tn-mover" type="button" onclick="tnTapPlaying(${s.position})">${moverImgHTML(s.character)}${who(s)}</button>`).join('')
-    : `<p class="tn-hint">${t('Everyone is placed.')}</p>`;
-
-  const byPlace = new Map(results.map(r => [r.place, r]));
-  const lastAction = tnGame.actions[tnGame.actions.length - 1];
-  document.getElementById('tnRanking').innerHTML = tnGame.seats.map((_, i) => {
-    const place = i + 1, r = byPlace.get(place);
-    if (!r) return `<div class="tn-slot empty"><span class="tn-slot-place">${fmtPlace(place)}</span></div>`;
-    const s = seat(r.position);
-    const undo = !r.auto && r === lastAction;
-    const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null && tnGame.roundsCounted ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
-    return `
-      <${undo ? 'button type="button" onclick="tnUndoLast()" title="' + t('Undo') + '"' : 'div'} class="tn-slot${place === 1 ? ' winner' : ''}${r.dropped ? ' dropped' : ''}${undo ? ' undo' : ''}">
-        <span class="tn-slot-place">${fmtPlace(place)}${place === 1 ? ' 👑' : ''}</span>
-        ${moverImgHTML(s.character)}${who(s)}
-        <span class="tn-slot-when">${r.dropped ? `🏳️ ${t('Dropped')}` : ''}${r.dropped && when ? ' | ' : ''}${when}</span>
-      </${undo ? 'button' : 'div'}>`;
-  }).join('');
-
-  document.getElementById('tnPauseBtn').textContent = liveGame.isRunning ? t('Pause game') : t('Resume game');
-  document.getElementById('tnPauseBtn').disabled = done;
-  document.getElementById('tnSaveBtn').disabled = !done;
-  setVisible('tnLiveHint', !done);
-}
-
-function tnTapPlaying(position) {
-  const { top, bottom } = _tnPlaces();
-  const s = tnGame.seats.find(x => x.position === position);
-  document.getElementById('tnPlaceTitle').innerHTML = `${villainNameInline(s.character)} | ${_esc(s.name)}`;
-  const won = document.getElementById('tnPlaceWon');
-  const dropped = document.getElementById('tnPlaceDropped');
-  won.textContent = `👑 ${t('Won: {place}', { place: fmtPlace(top) })}`;
-  dropped.textContent = `🏳️ ${t('Dropped: {place}', { place: fmtPlace(bottom) })}`;
-  won.onclick = () => _tnPlace(position, false);
-  dropped.onclick = () => _tnPlace(position, true);
-  openOverlay('tnPlaceSheet');
-}
-
-function _tnPlace(position, dropped) {
-  closeOverlay('tnPlaceSheet');
-  const { top, bottom } = _tnPlaces();
-  const ms = liveGame.isRunning ? liveGame.elapsedMs : (liveGame.exactDurMs || 0);
-  tnGame.actions.push({ position, place: dropped ? bottom : top, minutes: Math.round(ms / 60000), round: liveGame.turns, dropped });
-  // One left: the game is over and stops by itself (an undo starts it again).
-  if (_tnPlaces().done && liveGame.isRunning) { stopLive(); tnGame.autoStopped = true; }
-  _tnPersist();
-  _tnRenderLive();
-  _updateMediaMetadata();   // the lock screen's count (new-game-audio.js)
-}
-
-// Undoing the placement that ended the game: the timer goes on from where it
-// stopped by itself (a game paused by hand stays paused).
-function tnUndoLast() {
-  tnGame.actions.pop();
-  if (tnGame.autoStopped) { tnGame.autoStopped = false; startLive(); }
-  _tnPersist();
-  _tnRenderLive();
-  _updateMediaMetadata();
-}
-
-// New Game's names, for the lock-screen controls (new-game-audio.js).
-function startLive() {
-  if (!tnGame || liveGame.isRunning || _tnPlaces().done) return;
-  liveGame.markStarted(Date.now() - (liveGame.exactDurMs || 0));
-  clearInterval(liveTimerId);
-  liveTimerId = setInterval(tickLive, 1000);
-  liveGame.emit('start');
-  _tnPersist();
-  _tnRenderLive();
-}
-
-function stopLive() {
-  if (!tnGame || !liveGame.isRunning) return;
-  liveGame.markStopped(liveGame.elapsedMs);
-  clearInterval(liveTimerId); liveTimerId = null;
-  liveGame.emit('stop');
-  _tnPersist();
-  _tnRenderLive();
-}
-
-function bumpTurn(delta) {
-  if (!tnGame || (delta < 0 && liveGame.turns <= 1)) return;
-  tnGame.roundsCounted = true;   // as in New Game: rounds only when the counter was used
-  liveGame.bumpTurns(delta);
-  _tnPersist();
-  _tnRenderLive();
-}
-
-// The lock screen: the round, and how many villains are still in the game.
-function liveMediaLines() {
-  const left = tnGame ? _tnPlaces().left.length : 0;
-  return { title: t('Round {n}', { n: liveGame.turns }), artist: tn(left, '{n} player still in the game', '{n} players still in the game') };
-}
-
-function tnTogglePause() { tnGame.autoStopped = false; liveGame.isRunning ? stopLive() : startLive(); }
-
-async function tnSaveGame() {
-  const { results, done } = _tnPlaces();
-  if (!done) return;
-  const btn = document.getElementById('tnSaveBtn');
-  btn.disabled = true;
-  btn.textContent = t('Saving…');
-  const { error } = await db.rpc('save_tournament_table', {
-    target_table: tnGame.tableId,
-    played_at:    new Date(tnGame.startedAt).toISOString(),
-    results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round: tnGame.roundsCounted ? round : null, dropped })),
-  });
-  btn.textContent = t('Save game');
-  if (error) { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error), { scroll: true }); }
-  const tourId = tnGame.tourId;
-  liveGame.clear();
-  liveGame.emit('close');
-  updateLiveGameNavBadge();
-  _tnCloseLive();
-  await tnLoad(tourId);
-}
-
-function tnDiscardGame() {
-  openConfirmSheet({
-    id:           'tnDiscardSheet',
-    title:        t('Discard this game?'),
-    bodyHTML:     `<p class="confirm-text">${t('The timer, the rounds and the places so far are lost, and the table is free again for another phone.')}</p>`,
-    confirmLabel: t('Discard game'),
-    busyLabel:    t('Discarding…'),
-    danger:       true,
-    onConfirm:    async () => {
-      // Taken over meanwhile: the table isn't ours to give back, just let go of it.
-      await db.rpc('release_tournament_table', { target_table: tnGame.tableId });
-      const tourId = tnGame.tourId;
-      liveGame.clear();
-      liveGame.emit('close');
-      updateLiveGameNavBadge();
-      _tnCloseLive();
-      await tnLoad(tourId);
-    },
-  });
+  liveGame.persist({ slots: game.seats, tournament: game });
+  location.href = `tournament-game.html?table=${tableId}`;   // the game has a page of its own
 }
 
 // ── STANDINGS, LOG, NEXT STAGE ────────────────────────────────────────────────
@@ -990,7 +842,7 @@ function _tnViewSegHTML() {
   if (!tnView || (done && tnView === 'tables')) tnView = done ? 'standings' : 'tables';
   const btn = (v, label) => `<button class="seg-btn${tnView === v ? ' on' : ''}" type="button" onclick="tnSetView('${v}')">${label}</button>`;
   return `<div class="controls mb-1"><div class="seg tn-view-seg">${done
-    ? btn('standings', t('Final ranking')) + btn('log', t('Log')) + btn('players', t('Players'))
+    ? btn('players', t('Players')) + btn('standings', t('Final ranking')) + btn('log', t('Log'))
     : btn('tables', t('Tables')) + btn('standings', t('Standings')) + btn('log', t('Log'))}</div></div>`;
 }
 
@@ -1000,8 +852,7 @@ function tnSetView(v) {
 }
 
 function _tnSeatPoints(tb, seat) {
-  const scoring = TOURNAMENT_SCORINGS[tnTour.scoring] || TOURNAMENT_SCORINGS.borda;
-  return scoring.points(seat.place, tb.seats.length, tnTour.table_size, seat);
+  return tournamentSeatPoints(tnTour, tb.seats.length, seat);
 }
 const _tnPointsLabel = p => t(p === 1 ? '{n} pt' : '{n} pts', { n: fmtTournamentPoints(p) });
 
@@ -1025,7 +876,7 @@ function _tnStandingsHTML(mine) {
     return `
       <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
         <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[r.rank - 1]}</span>` : r.rank}</div>
-        <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(p?.name || '')}</span><div class="row-sub">${sub}</div></div></div>
+        <div class="row-identity">${avatar}<div class="row-id-text"><span class="row-name">${_esc(tnPlayerName(p))}</span><div class="row-sub">${sub}</div></div></div>
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
           <div class="bar-bg"><div class="bar-fill${r.rank === 1 ? ' gold' : ''}" style="width:${Math.max(0, r.points / max * 100)}%"></div></div>
@@ -1041,16 +892,18 @@ function _tnStandingsHTML(mine) {
     <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}</p>`;
 }
 
-// Every stage's tables, in order, with places and points.
+// Every stage's saved tables, in order, with places and points (the ones
+// still being played are in Tables).
 function _tnLogHTML(mine) {
   const myId = mine?.id;
   const out = [];
   for (let st = 1; st <= tnTour.current_stage; st++) {
-    const tables = tnTables.filter(tb => tb.stage === st);
+    const tables = tnTables.filter(tb => tb.stage === st && tb.saved_at);
+    if (!tables.length) continue;
     out.push(`<div class="section-label">${t('Stage {n} of {m}', { n: st, m: tnTour.stages })}</div>
       <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>`);
   }
-  return out.join('');
+  return out.length ? out.join('') : emptyStateHTML('🏟️', t('No results yet'), t('The tables appear here once they are saved.'));
 }
 
 function tnNextStage() {
@@ -1058,6 +911,7 @@ function tnNextStage() {
   openConfirmSheet({
     id:           'tnNextSheet',
     title:        t('Draw stage {n}?', { n: next }),
+    bodyHTML:     `<p class="confirm-text">${_tnDrawSummary(next)}</p>`,
     confirmLabel: t('Draw stage {n}', { n: next }),
     busyLabel:    t('Drawing…'),
     onConfirm:    async () => {
@@ -1146,7 +1000,7 @@ function tnEditTable(tableId) {
 
 // A villain's row in the sheet: ⠿, the place or seat number, portrait, names.
 function _tnEditRowHTML(s, num, cls = '', actions = '') {
-  const name = tnPlayers.find(p => p.id === s.player_id)?.name || '';
+  const name = tnPlayerName(tnPlayers.find(p => p.id === s.player_id));
   return `
     <div class="order-slot tn-edit-row${cls}">
       <div class="drag-handle">

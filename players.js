@@ -198,7 +198,7 @@ async function _loadTournaments() {
   try {
     const prof = await fetchProfile({ nickname: pfNick }, 'id');
     if (!prof) return none;
-    const sel = 'id, name, organizer, created_at, stages, current_stage, finished_at, table_size, scoring, tournament_players(count)';
+    const sel = '*, tournament_players(count)';
     const [org, played] = await Promise.all([
       db.from('tournaments').select(sel).eq('organizer', prof.id),
       db.from('tournament_players').select('id, tournament_id').eq('user_id', prof.id),

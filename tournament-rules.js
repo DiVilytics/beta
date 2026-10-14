@@ -1,6 +1,7 @@
 // ── TOURNAMENT RULES ──────────────────────────────────────────────────────────
 // The rules of a tournament (tournaments.js), each kind a registry keyed by the
-// id the database stores (tournaments.table_split, .pairing, .scoring): a new
+// id the database stores (tournaments.table_split, .pairing, .scoring, .bye,
+// .play_order): a new
 // option is one entry here plus its translations, no database change. The
 // database keeps the facts (who sat where, with which villain, in which place)
 // and checks every draw; points and standings are computed here from the facts.
@@ -11,7 +12,9 @@
 //                                 sizes of a stage (1 = a bye)
 //   TOURNAMENT_PAIRINGS[id]       { name, hint, tables(players, ctx) }: the
 //                                 stage's tables, [[playerId, ...], ...]
-//   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat) }
+//   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat, tour) }
+//   TOURNAMENT_BYES[id]           { name, hint, points(win) }: a bye's points
+//   TOURNAMENT_PLAY_ORDERS[id]    { name, hint, order(table, ctx) }
 //   TOURNAMENT_VILLAIN_DRAWS[id]  { schedule(playerIds, pool, stages) }: every
 //                                 player's villain in every stage
 //   TOURNAMENT_TIEBREAKS          [{ id, name, value(row) }], in order
@@ -164,20 +167,120 @@ const TOURNAMENT_PAIRINGS = {
 };
 
 // ── Scoring ──────────────────────────────────────────────────────────────────
-// points(place, n, size, seat): what place (1 = first) at a table of n
-// players scores, size being the tournament's largest table; n = 1 is a bye.
-// seat.dropped: the place was a drop (the last free one when they left).
+// points(place, n, size, seat, tour): what place (1 = first) at a table of n
+// players scores (n ≥ 2), size being the tournament's largest table.
+// seat.dropped: the place was a drop (the last free one when they left). A
+// bye (n = 1) is TOURNAMENT_BYES' (tournamentSeatPoints).
 
 const TOURNAMENT_SCORINGS = {
   borda: {
     name: 'Borda count',
-    hint: 'At a table of n players, 1st scores n - 1, 2nd n - 2, down to 0 for last; a smaller table scales to the largest, so its 1st scores the same. A drop scores its place; a bye counts as last: 0.',
+    hint: 'At a table of n players, 1st scores n - 1, 2nd n - 2, down to 0 for last; a smaller table scales to the largest, so its 1st scores the same. A drop scores its place.',
     points(place, n, size) {
-      if (n === 1) return 0;   // a bye: last
       return (n - place) / (n - 1) * (size - 1);
     },
   },
+  // The organizer's points for each place at the largest table (custom_points,
+  // 1st first). A smaller table keeps 1st's and last's and spreads the places
+  // in between along them (as Borda does): 5 3 1 0 at 4 → 5 2 0 at 3, 5 0 at 2.
+  custom: {
+    name: 'Custom',
+    hint: "Your points for each place at the largest table; a smaller table keeps 1st's and last's points and spreads the others between them. A drop scores its place.",
+    points(place, n, size, seat, tour) {
+      const row = tour?.custom_points?.length ? tour.custom_points.map(Number) : [];
+      if (row.length < 2) return 0;
+      const at = (place - 1) / (n - 1) * (row.length - 1);
+      const lo = Math.floor(at), hi = Math.ceil(at);
+      return row[lo] + (at - lo) * (row[hi] - row[lo]);
+    },
+  },
 };
+
+// A table's points, 1st to last (the form's preview of a custom scoring).
+function tournamentPointsRow(tour, n) {
+  const scoring = TOURNAMENT_SCORINGS[tour.scoring] || TOURNAMENT_SCORINGS.borda;
+  return Array.from({ length: n }, (_, i) => scoring.points(i + 1, n, tour.table_size, {}, tour));
+}
+
+// What a bye scores, a win being what 1st scores at a full table. Never a 1st
+// place for the tiebreaks.
+const TOURNAMENT_BYES = {
+  last: { name: 'Last',     hint: 'A bye counts as last place.',  points: win => 0 },
+  half: { name: 'Half a win', hint: 'A bye scores half of what a win does.', points: win => win / 2 },
+  win:  { name: 'A win',    hint: 'A bye scores what a win does (as in Swiss chess).', points: win => win },
+};
+
+// What a seat scored: its place at its table (n players), or the bye's.
+function tournamentSeatPoints(tour, n, seat) {
+  const scoring = TOURNAMENT_SCORINGS[tour.scoring] || TOURNAMENT_SCORINGS.borda;
+  if (n === 1) {
+    const win = scoring.points(1, tour.table_size, tour.table_size, {}, tour);
+    return (TOURNAMENT_BYES[tour.bye] || TOURNAMENT_BYES.last).points(win);
+  }
+  return scoring.points(seat.place, n, tour.table_size, seat, tour);
+}
+
+// ── Play order ───────────────────────────────────────────────────────────────
+// order(table, ctx): a table's players in their play order; ctx.seats maps a
+// player to where they sat so far (0 = first, 1 = last, at any table size),
+// ctx.size is the largest table.
+
+const TOURNAMENT_PLAY_ORDERS = {
+  random: {
+    name: 'Random',
+    hint: 'A new random play order at every table.',
+    order: table => _tnShuffle(table),
+  },
+  // Every seat in turn: the order (of all a table's, up to 720) in which the
+  // players sit least where they already sat. Seats compare across table sizes
+  // by where they fall between first and last.
+  rotation: {
+    name: 'Rotation',
+    hint: 'Everyone takes turns at every seat: each table plays in the order where players sit least where they already sat.',
+    order(table, { seats, size }) {
+      const n = table.length;
+      if (n < 2) return table;
+      const bucket = x => Math.round(x * (size - 1));   // 0 (first) … size - 1 (last)
+      const sat = id => (seats.get(id) || []).map(bucket);
+      const cost = order => order.reduce((sum, id, i) => sum + sat(id).filter(b => b === bucket(i / (n - 1))).length, 0);
+      let best = null, bestCost = Infinity;
+      const permute = (done, rest) => {
+        if (!rest.length) { const c = cost(done); if (c < bestCost) { best = done; bestCost = c; } return; }
+        rest.forEach((id, i) => permute([...done, id], [...rest.slice(0, i), ...rest.slice(i + 1)]));
+      };
+      permute([], _tnShuffle(table));   // ties: the first found, at random
+      return best;
+    },
+  },
+};
+
+// ── Database answers ─────────────────────────────────────────────────────────
+// The tournament functions' error codes, shown by both tournament pages.
+const TN_ERRORS = {
+  not_organizer:          'Only the organizer can do this.',
+  already_started:        'The tournament has already started.',
+  too_few_players:        'A tournament needs at least 2 players.',
+  invalid_pool:           'The draw pool needs at least as many villains as there are players.',
+  invalid_villains:       "The villains couldn't be drawn. Try again.",
+  invalid_tables:         "The tables couldn't be drawn. Try again.",
+  name_claimed:           'Someone else just claimed this name.',
+  already_in_tournament:  'You already have a name in this tournament.',
+  no_profile:             'You need a nickname first.',
+  not_your_name:          "This name isn't yours to release.",
+  not_running:            "The tournament isn't running.",
+  stage_not_done:         'Every table of this stage has to be saved first.',
+  table_not_saved:        'Only a saved table can be edited.',
+  not_at_table:           'Only the players at this table who claimed their name, or the organizer, can record it.',
+  table_taken:            'Another phone is already recording this table.',
+  not_recorder:           'Another phone records this table now (the organizer took it over).',
+  table_saved:            'This table has already been saved.',
+  invalid_results:        'Every villain needs a place before saving.',
+  stage_has_games:        'A game of this stage is already saved: its draw can no longer be undone.',
+};
+function _tnErrorMsg(error) {
+  if (error?.code === '23505') return t('There is already a player with this name.');
+  return TN_ERRORS[error?.message] ? t(TN_ERRORS[error.message]) : (error?.message || '');
+}
 
 // ── Villains ─────────────────────────────────────────────────────────────────
 
@@ -214,7 +317,6 @@ const TOURNAMENT_TIEBREAKS = [
 // player: { player_id, points, firsts, played, byes, opponents, rank } with
 // rank shared by rows equal on points and every tiebreak (1, 1, 3).
 function tournamentStandings(tour, tables, { players = [], stage = Infinity } = {}) {
-  const scoring = TOURNAMENT_SCORINGS[tour.scoring] || TOURNAMENT_SCORINGS.borda;
   const rows = new Map();
   const row = id => {
     if (!rows.has(id)) rows.set(id, { player_id: id, points: 0, firsts: 0, played: 0, byes: 0, opponents: 0, faced: [] });
@@ -227,7 +329,7 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
     for (const s of tb.seats) {
       if (s.place == null) continue;
       const r = row(s.player_id);
-      r.points += scoring.points(s.place, n, tour.table_size, s);
+      r.points += tournamentSeatPoints(tour, n, s);
       if (n === 1) { r.byes++; continue; }
       r.played++;
       if (s.place === 1) r.firsts++;
@@ -248,16 +350,21 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
 
 // ── Draws ────────────────────────────────────────────────────────────────────
 
-// The next stage's tables, each in its play order (drawn at random): the
-// players still playing, paired by the tournament's rule.
+// The next stage's tables, each in its play order (the tournament's play
+// order rule): the players still playing, paired by its pairing rule.
 function tournamentDrawStage(tour, players, tables = []) {
   const pairing = TOURNAMENT_PAIRINGS[tour.pairing] || TOURNAMENT_PAIRINGS.random;
   const playing = players.filter(p => p.withdrawn_after == null).map(p => p.id);
   const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
   const stage = Math.max(0, ...tables.map(tb => tb.stage)) + 1;
   const standings = tournamentStandings(tour, tables, { players });
+  const playOrder = TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random;
+  const seats = new Map();   // where each player sat so far, 0 (first) to 1 (last)
+  for (const tb of tables.filter(x => x.saved_at && x.seats.length > 1)) {
+    for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (tb.seats.length - 1));
+  }
   return pairing.tables(playing, { size: tour.table_size, split: tour.table_split || 'even', stage, standings, met, byes })
-    .map(tb => _tnShuffle(tb));
+    .map(tb => playOrder.order(tb, { seats, size: tour.table_size }));
 }
 
 // Every player's villain in every stage, for Start.
