@@ -100,6 +100,13 @@ function tnPlayerName(p) {
   return (p.user_id && tnProfiles.get(p.user_id)?.nickname) || p.name;
 }
 
+// Every list of the players: the claimed names first, then the others, each
+// block alphabetical by the name shown ("Player 2" before "Player 10").
+function _tnSortPlayers() {
+  tnPlayers.sort((a, b) => (!a.user_id - !b.user_id)
+    || tnPlayerName(a).localeCompare(tnPlayerName(b), LOCALE, { numeric: true, sensitivity: 'base' }));
+}
+
 async function _tnLoadProfiles(ids) {
   const want = [...new Set(ids.filter(id => id && !tnProfiles.has(id)))];
   if (!want.length) return;
@@ -179,6 +186,7 @@ async function tnLoad(id, { quiet = false } = {}) {
   tnPlayers = playersRes.data || [];
   tnTables  = (tablesRes.data || []).map(tb => ({ ...tb, seats: (tb.tournament_seats || []).sort((a, b) => a.position - b.position) }));
   await _tnLoadProfiles([tnTour.organizer, ...tnPlayers.map(p => p.user_id), ...tnTables.map(tb => tb.recorder)]);
+  _tnSortPlayers();
   await _tnFetchCode();
   _tnSchedulePoll();
   const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);

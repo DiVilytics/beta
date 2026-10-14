@@ -335,7 +335,7 @@ const TN_ERRORS = {
   wrong_code:             'This link can\'t claim names: scan the tournament\'s QR code from the organizer.',
   no_table:               'This table no longer exists: its stage was drawn again, or the tournament was deleted. Discard the game on this phone.',
   saved_from_phone:       'This table was just saved from the phone recording it.',
-  tournament_locked:      'A game has started: only the name and the date change now.',
+  tournament_locked:      'A game has started: only the name and the date can change.',
   needs_redraw:           'The players change only with stage 1 drawn again.',
   invalid_players:        'Every player needs a name.',
 };

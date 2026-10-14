@@ -154,7 +154,7 @@ window.I18N.it = {
     "This link can't claim names: scan the tournament's QR code from the organizer.": "Questo link non permette di rivendicare nomi: inquadra il QR code del torneo dall'organizzatore.",
     "This table no longer exists: its stage was drawn again, or the tournament was deleted. Discard the game on this phone.": "Questo tavolo non esiste più: la sua fase è stata sorteggiata di nuovo, o il torneo è stato eliminato. Elimina la partita su questo telefono.",
     "This table was just saved from the phone recording it.": "Questo tavolo è appena stato salvato dal telefono che lo registrava.",
-    "A game has started: only the name and the date change now.": "Una partita è iniziata: ora si cambiano solo il nome e la data.",
+    "A game has started: only the name and the date can change.": "Una partita è iniziata: si possono cambiare solo il nome e la data.",
     "The players change only with stage 1 drawn again.": "I giocatori si cambiano solo sorteggiando di nuovo la fase 1.",
     "Every player needs a name.": "Ogni giocatore ha bisogno di un nome.",
     "Not played: everyone withdrew": "Non giocato: si sono ritirati tutti",
