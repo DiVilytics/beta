@@ -111,7 +111,7 @@ function _renderPage() {
       <div class="box-picker" id="boxPicker"></div>
     </div>
 
-    <div class="acct-section" id="betaSection">${_betaSectionHTML()}</div>
+    <div class="acct-section beta-section" id="betaSection">${_betaSectionHTML()}</div>
 
     <div class="acct-section">
       <div class="section-label">${t('Account')}</div>
