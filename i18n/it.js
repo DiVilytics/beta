@@ -642,6 +642,7 @@ window.I18N.it = {
     "Choose your villain.": "Scegli il tuo cattivo.",
     "A solo game on {level} ends by round {n}.": "Una partita in solitario a difficoltà {level} finisce entro il round {n}.",
     "The counter shows the current round: alone, every turn is a round. At the end of each of your turns tap +, and the die rolls for the Phantom: Fated or Safe. + after your last round ends the game, lost. Reached your Objective? Tap Pause game, mark 👑 and save.": "Il contatore mostra il round in corso: da soli ogni turno è un round. Alla fine di ogni tuo turno tocca +, e il dado tira per il fantasma: Fato o Al sicuro. + dopo il tuo ultimo round chiude la partita, persa. Hai raggiunto l'Obiettivo? Tocca Pausa partita, segna 👑 e salva.",
+    "This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.": "Questa è una partita di un torneo: i suoi cattivi vanno ai giocatori che rivendicano il proprio nome nel torneo, con il suo QR code.",
     "A solo game's difficulty, villain and result can't be changed.": "Difficoltà, cattivo e risultato di una partita in solitario non si possono cambiare.",
     "A solo game is always its creator's.": "Una partita in solitario è sempre di chi l'ha registrata.",
     "You won this solo game with {villain}.": "Hai vinto questa partita in solitario con {villain}.",
