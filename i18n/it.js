@@ -647,7 +647,7 @@ window.I18N.it = {
     "Rolling…": "Lancio…",
     "Fated": "Fato",
     "Safe": "Al sicuro",
-    "Last round: + now ends the game, lost.": "Ultimo round: ora + chiude la partita, persa.",
+    "Last round: + ends the game.": "Ultimo round: + termina la partita.",
     "Last round": "Ultimo round",
     "Round {n} is over: the game is lost. Save it, or tap Resume game if + was a mistake.": "Il round {n} è finito: la partita è persa. Salvala, o tocca Riprendi partita se + era un errore.",
     "Shows the solo games of the <strong>selected</strong> villain (a solo game has only one).": "Mostra le partite in solitario del cattivo <strong>selezionato</strong> (una partita in solitario ne ha uno solo).",
