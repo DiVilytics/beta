@@ -227,7 +227,9 @@ function showError(target, msg) {
   el.classList.remove('shake');
   void el.offsetWidth;
   el.classList.add('shake');
-  if (!_isInView(el)) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // A jump, not a smooth scroll: the banner appearing shifts the page, and the
+  // browser's scroll anchoring can stop a smooth scroll halfway.
+  if (!_isInView(el)) el.scrollIntoView({ block: 'center' });
   _clearOnEdit(el);
 }
 
