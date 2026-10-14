@@ -121,10 +121,13 @@ const Charts = (() => {
   }
 
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.
-  function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1 } = {}) {
+  // `spread` = { mid, lo, hi, text }: positions in bars (2.5 = halfway through
+  // the third bar) of a dashed line (the median) over a shaded span (the middle
+  // half), with `text` above the plot on the right.
+  function barsV(data, { fmt = v => v, color = 'var(--accent)', xTick = null, xEvery = 1, spread = null } = {}) {
     if (!data.length) return empty();
     const { max, ticks } = niceCountTicks(Math.max(...data.map(d => d.value)) || 1);
-    const L = 14 + 7 * String(max).length, R = 10, T = 14, B = 26;   // room for the widest y label (1000)
+    const L = 14 + 7 * String(max).length, R = 10, T = spread ? 28 : 14, B = 26;   // room for the widest y label (1000), and the spread's text
     const bw = (W - L - R) / data.length;
     const sy = v => (H - B) - v / max * (H - T - B);
     let grid = '';
@@ -139,7 +142,15 @@ const Charts = (() => {
       const meta = d.meta != null ? d.meta : String(fmt(d.value, d));
       return `<rect${hit(name, meta)} x="${(x + 1.5).toFixed(1)}" y="${yv.toFixed(1)}" width="${Math.max(1, bw - 3).toFixed(1)}" height="${Math.max(0, h).toFixed(1)}" rx="2" fill="${color}"><title>${titleText(name, meta)}</title></rect>${tick}`;
     }).join('');
-    return wrap(grid + bars);
+    let marks = '';
+    if (spread) {
+      const px = p => L + p * bw;
+      marks = `<rect x="${px(spread.lo).toFixed(1)}" y="${T}" width="${Math.max(1, px(spread.hi) - px(spread.lo)).toFixed(1)}" height="${(H - B - T).toFixed(1)}" class="ch-spread"/>` +
+        `<text x="${W - R}" y="${T - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(spread.text)}</text>`;
+    }
+    // The shading behind the bars, the median line over them.
+    const median = spread ? `<line x1="${(L + spread.mid * bw).toFixed(1)}" y1="${T - 4}" x2="${(L + spread.mid * bw).toFixed(1)}" y2="${H - B}" class="ch-median"/>` : '';
+    return wrap(marks + grid + bars + median);
   }
 
   // Scatter: points = [{ x, y, label, color? }]. xSuffix/ySuffix label the axis
