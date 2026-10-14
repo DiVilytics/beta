@@ -1531,16 +1531,15 @@ select:disabled {
 .bar-bg { height: 4px; background: var(--s4); border-radius: 2px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
-/* Chance Δ's formulas (leaderboard.js, How it's computed). */
+/* Δ Win's formulas (leaderboard.js, How it's computed). */
 .math-block { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; margin: 10px 0; font-size: calc(15px * var(--ts)); font-style: italic; color: var(--text); }
 .math-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
 .math-frac > span:first-child { padding: 0 3px 1px; border-bottom: 1px solid currentColor; }
 .math-frac > span:last-child { padding: 1px 3px 0; }
-.math-over { border-top: 1px solid currentColor; padding: 0 1px; }
 .math-sum { display: inline-flex; flex-direction: column; align-items: center; font-style: normal; line-height: 1; margin-right: 2px; }
 .math-sum > span:nth-child(2) { font-size: 1.5em; }
 .math-sum > span:first-child, .math-sum > span:last-child { font-size: 0.6em; font-style: italic; }
-/* Chance Δ: from the middle, right above 0, left below it (stats-table.js). */
+/* Δ Win: from the middle, right above 0, left below it (stats-table.js). */
 .bar-diverge { position: relative; }
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
 .bar-diverge .bar-fill { position: absolute; top: 0; }

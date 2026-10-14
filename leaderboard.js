@@ -7,7 +7,7 @@ let lbNickAvatarMap = {};
 let lbTab    = 'characters';   // 'characters' | 'players'
 let lbMode   = 'chance';       // 'pct' | 'count' | 'games', or 'chance' (villains only) or 'xp' (players only)
 
-// Each tab keeps its own ranking: villains open on Chance Δ, players on XP.
+// Each tab keeps its own ranking: villains open on Δ Win, players on XP.
 const _lbModeByTab = { characters: 'chance', players: 'xp' };
 
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
@@ -161,7 +161,7 @@ async function _fetchAllTime() {
     _fetchAllRows(buildRows),
     db.rpc('game_stats', lbFilter === 'all' ? {} : { player_count_filter: lbFilter }),
     _fetchXp(),
-    // Chance Δ needs each villain's games by table size: the rows themselves
+    // Δ Win needs each villain's games by table size: the rows themselves
     // when a size is picked.
     isChar && lbFilter === 'all' ? _fetchAllRows(() => db.from('character_stats_by_size').select('*')) : null,
   ]);
@@ -187,7 +187,7 @@ async function _fetchAllTime() {
 async function _fetchPeriod() {
   const lbFilter = size.value();
   const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
-  // Chance Δ, every table size: each size's games apart.
+  // Δ Win, every table size: each size's games apart.
   const sizes = lbTab === 'characters' ? (lbFilter === 'all' ? CHANCE_SIZES : [lbFilter]) : [];
   const [stats, summary, xp, ...bySize] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
@@ -235,14 +235,14 @@ function _addChance(rows, bySize) {
   return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r.character] }));
 }
 
-// How Chance Δ is computed (How it's computed ›, under the explanation).
+// How Δ Win is computed (How it's computed ›, under the explanation).
 function openChanceInfo() {
   const frac = (top, bottom) => `<span class="math-frac"><span>${top}</span><span>${bottom}</span></span>`;
-  const sqrt = x => `√<span class="math-over">${x}</span>`;
+  const sqrt = x => `√${x}`;
   const sum  = x => `<span class="math-sum"><span>N</span><span>Σ</span><span>g=1</span></span>${x}`;
   const kg   = 'k<sub>g</sub>';
   document.getElementById('chanceBody').innerHTML = `
-    <p class="modal-hint">${t('Chance Δ compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
+    <p class="modal-hint">${t('Δ Win compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
     <div class="math-block">Δ = ${frac('W − E', sqrt('V'))}</div>
     <div class="math-block">E = ${sum(frac('1', kg))}</div>
     <div class="math-block">V = ${sum(`${frac('1', kg)} (1 − ${frac('1', kg)})`)}</div>
@@ -250,7 +250,7 @@ function openChanceInfo() {
     <p class="modal-hint">${t('W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
     <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
     <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.58.')}</p>
-    <p class="modal-hint">${t('With a table size picked, only its games count. Solo has no Chance Δ: the Phantom isn\'t a player with the same chance.')}</p>`;
+    <p class="modal-hint">${t('With a table size picked, only its games count. Solo has no Δ Win: the Phantom isn\'t a player with the same chance.')}</p>`;
   openOverlay('chanceOverlay');
 }
 
@@ -392,7 +392,7 @@ function render({ rows, summary }) {
   // % Wins only: a 1-2 game sample can sit at 100% (or 0%) purely by noise, so
   // those rows follow the ranking under a divider, unranked. # Wins / # Games
   // rank everyone, a low count there isn't misleading the same way.
-  // Chance Δ ranks every villain with games (few games can't swing it far):
+  // Δ Win ranks every villain with games (few games can't swing it far):
   // those without, under "No games".
   const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : mode === 'chance' ? 1 : 0;   // stats-table.js
   // Registered players who never played have no % at all: only in the counts.
