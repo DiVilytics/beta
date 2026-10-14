@@ -437,12 +437,11 @@ function showQRModal(url, codeElId, overlayId) {
 //   title        – sheet heading
 //   bodyHTML     – inner HTML for the sheet body (already escaped by the caller)
 //   confirmLabel – confirm button text (default "Confirm")
-//   busyLabel    – confirm button text while onConfirm runs (default "Working…")
 //   danger       – style the confirm button as destructive (btn-danger)
 //   onConfirm()  – sync/async; the sheet closes when it resolves. The button
-//                  shows busyLabel meanwhile; if onConfirm throws, the sheet stays
+//                  is disabled meanwhile, keeping its text; if onConfirm throws, the sheet stays
 //                  open with the button reset so the user can retry.
-function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'), busyLabel = t('Working…'), danger = false, onConfirm }) {
+function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'), danger = false, onConfirm }) {
   let overlay = document.getElementById(id);
   if (!overlay) {
     overlay = document.createElement('div');
@@ -477,12 +476,10 @@ function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'
   okBtn.disabled = false;
   okBtn.onclick = async () => {
     okBtn.disabled = true;
-    okBtn.textContent = busyLabel;
     try {
       await onConfirm?.();
     } catch (_) {
       okBtn.disabled = false;
-      okBtn.textContent = confirmLabel;
       return;
     }
     closeOverlay(id);

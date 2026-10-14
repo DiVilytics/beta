@@ -236,7 +236,6 @@ async function saveGameDetails() {
     return;
   }
   btn.disabled    = true;
-  btn.textContent = t('Saving…');
 
   const { error } = await db.from('games').update(patch).eq('id', claimGame.id);
 
@@ -270,7 +269,6 @@ function claimCharacter(playerId) {
     title:        t('Confirm your villain'),
     bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`,
     confirmLabel: t('Claim villain'),
-    busyLabel:    t('Claiming…'),
     onConfirm:    () => _doClaim(playerId),
   });
 }
@@ -302,7 +300,6 @@ function releaseCharacter(playerId) {
     title:        t('Release this villain?'),
     bodyHTML:     `<p class="confirm-text">${t('This frees up {villain} so it can be claimed again, by you or another player.', { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`,
     confirmLabel: t('Release'),
-    busyLabel:    t('Releasing…'),
     danger:       true,
     onConfirm:    () => _doRelease(playerId),
   });
@@ -388,7 +385,6 @@ async function saveLineup() {
   const btn   = document.getElementById('lineupSaveBtn');
   const errEl = document.getElementById('lineupErr');
   btn.disabled    = true;
-  btn.textContent = t('Saving…');
 
   const { error } = await db.rpc('edit_lineup', { target_game: claimGame.id, lineup: lineupDraft });
 
@@ -425,7 +421,6 @@ function deleteGame() {
     bodyHTML:     `<p class="confirm-text">${t('This will permanently delete the game and all player records. This action cannot be undone.')}</p>`
                 + (others.length ? `<p class="confirm-text">${tn(others.length, '{names} claimed a villain in it: the game will disappear from their profile too.', '{names} claimed a villain in it: the game will disappear from their profiles too.', { names: `<strong class="text-emph">${names}</strong>` })}</p>` : ''),
     confirmLabel: t('Delete game'),
-    busyLabel:    t('Deleting…'),
     danger:       true,
     onConfirm:    _doDeleteGame,
   });

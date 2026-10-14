@@ -1186,7 +1186,6 @@ async function submitForm() {
       }));
 
   btn.disabled    = true;
-  btn.textContent = t('Saving…');
 
   const gameData = {
     played_at:        new Date(date).toISOString(),
