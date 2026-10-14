@@ -105,7 +105,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'versus', icon: '🆚', label: 'Villain against villain',
+    id: 'versus', icon: '🆚', label: 'Villain vs villain',
     desc: "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
     render({ games, chars, boxInfo }) {
       // Per ordered pair: games together, and the row's wins over the column.
