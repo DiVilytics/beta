@@ -593,6 +593,11 @@ async function _saveNickname() {
     showError(errEl, t('Nickname must be at least 2 characters.'));
     return;
   }
+  // "Player 3" is what a tournament calls a player nobody named.
+  if (/^(player|giocatore)\s*\d+$/i.test(nick)) {
+    showError(errEl, t('A nickname can\'t be "Player" and a number.'));
+    return;
+  }
 
   const friendlyDupMsg = err =>
     err.message.includes('unique') || err.message.includes('duplicate')
