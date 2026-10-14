@@ -100,11 +100,13 @@ function tnPlayerName(p) {
   return (p.user_id && tnProfiles.get(p.user_id)?.nickname) || p.name;
 }
 
-// Every list of the players: the claimed names first, then the others, each
-// block alphabetical by the name shown ("Player 2" before "Player 10").
+// By the name shown ("Player 2" before "Player 10").
+const _tnByName = (a, b) => tnPlayerName(a).localeCompare(tnPlayerName(b), LOCALE, { numeric: true, sensitivity: 'base' });
+
+// The Players tab and the form: the claimed names first, then the others, each
+// block alphabetical. The standings ignore claims: equal places alphabetical.
 function _tnSortPlayers() {
-  tnPlayers.sort((a, b) => (!a.user_id - !b.user_id)
-    || tnPlayerName(a).localeCompare(tnPlayerName(b), LOCALE, { numeric: true, sensitivity: 'base' }));
+  tnPlayers.sort((a, b) => (!a.user_id - !b.user_id) || _tnByName(a, b));
 }
 
 async function _tnLoadProfiles(ids) {
@@ -1275,7 +1277,7 @@ function _tnTieNote(rows, r) {
 // The standings, drawn like the Leaderboard's table: rank (medals for the
 // top three), player, points with their 1st places in parentheses, a bar.
 function _tnStandingsHTML(mine) {
-  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
+  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers.slice().sort(_tnByName) });
   // Shown from the start: everyone at 0 until the first table is saved (no
   // tie notes until then).
   const started = rows.some(r => r.played || r.byes);
