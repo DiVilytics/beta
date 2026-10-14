@@ -1,7 +1,12 @@
 {
   "2026-10-14": {
-    "title": "Solitario: l'ultimo round e il dado del fantasma",
+    "title": "Grafici per periodo e numero di giocatori, e l'ultimo round del Solo",
+    "new": [
+      "Grafici: i filtri per numero di giocatori e per periodo della Classifica, su ogni grafico."
+    ],
     "improved": [
+      "Grafici: Durata delle partite e Durata media per giocatori passano dai minuti ai round, e Partite nel tempo conta anche i giocatori; un anno mostra i suoi mesi, un mese i suoi giorni.",
+      "Le pagine dei giocatori elencano le partite in solo insieme alle altre, tratteggiate.",
       "Solitario: all'ultimo round, un avviso chiaro sotto il contatore dice che + chiude la partita, persa, e + diventa rosso; sulla schermata di blocco, + si ferma lì."
     ],
     "fixed": [

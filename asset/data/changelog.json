@@ -1,7 +1,12 @@
 {
   "2026-10-14": {
-    "title": "Solo: the last round and the Phantom's die",
+    "title": "Charts by period and table size, and Solo's last round",
+    "new": [
+      "Charts: the Leaderboard's table size and period filters, for every chart."
+    ],
     "improved": [
+      "Charts: Game length and Avg length by players switch between minutes and rounds, and Games over time also counts the players; a year shows its months, a month its days.",
+      "Player pages list solo games with the others, dashed.",
       "Solo: on your last round, a clear warning under the counter says that + ends the game, lost, and + turns red; on the lock screen, + stops there."
     ],
     "fixed": [
