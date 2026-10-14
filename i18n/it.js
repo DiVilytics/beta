@@ -148,6 +148,8 @@ window.I18N.it = {
     "Set a nickname first": "Prima scegli un nickname",
     "You need a nickname before you can claim a villain.": "Ti serve un nickname per rivendicare un cattivo.",
     "Set nickname": "Scegli nickname",
+    "{n} drop": "{n} abbandono",
+    "{n} drops": "{n} abbandoni",
     "Unclaimed": "Non rivendicato",
     "Release": "Rilascia",
     "Claim": "Rivendica",

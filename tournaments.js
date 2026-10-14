@@ -242,8 +242,13 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
     ? avatarHTML(resolveAvatar(prof), { cls: 'order-slot-portrait' })
     : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">';
   const canClaim = !p.user_id && !!user && !mine;
-  const status = p.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after })
-    : p.user_id ? '' : t('Unclaimed');
+  // Drops in saved games, and a withdrawal (the standings leave them out).
+  const drops = tnTables.filter(tb => tb.saved_at && tb.seats.some(x => x.player_id === p.id && x.dropped)).length;
+  const status = [
+    p.user_id ? '' : t('Unclaimed'),
+    drops ? `🏳️ ${tn(drops, '{n} drop', '{n} drops')}` : '',
+    p.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after }) : '',
+  ].filter(Boolean).join(' | ');
   const actions = [
     canClaim ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnClaim('${p.id}')">${t("That's me")}</button>` : '',
     isMine   ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnRelease('${p.id}')">${t('Release')}</button>` : '',
