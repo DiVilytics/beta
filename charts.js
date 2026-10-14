@@ -96,7 +96,7 @@ const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks
 
 const CHARTS = [
   {
-    id: 'scatter', icon: '✨', label: 'Win rate vs popularity',
+    id: 'scatter', icon: '✨', label: 'Wins vs games',
     modes: _CHANCE_PCT,
     desc: {
       chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.',

@@ -3,7 +3,7 @@
     "title": "Δ Wins on the villains' Leaderboard",
     "new": [
       "The villains' Leaderboard opens on Δ Wins: how far each villain's wins are from what equal chances would give, in standard deviations, every game counted at its table size. 0 is exactly as expected, above 0 more wins, below 0 fewer. How it's computed explains the math.",
-      "Charts: Win rate vs popularity, by pace, by box and Play-order advantage switch between Δ Wins and % Wins."
+      "Charts: Wins vs games, By pace, By box, Play-order advantage and Villain against villain switch between Δ Wins and % Wins."
     ]
   },
   "2026-10-14": {
