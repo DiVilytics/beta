@@ -25,6 +25,7 @@ const CLAIM_ERRORS = {
   invalid_lineup:  'Each player needs a different villain, and there must be one winner.',
   solo_seat:       'A solo game is always its creator\'s.',
   solo_locked:     "A solo game's difficulty, villain and result can't be changed.",
+  tournament_seat: "This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.",
 };
 const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
 
