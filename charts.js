@@ -105,29 +105,44 @@ const CHARTS = [
     },
   },
   {
-    id: 'pace', icon: '🎨', label: 'By pace',
-    modes: _PCT_PICKS,
-    desc: {
-      pct:   "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-      picks: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
-    },
-    render({ games, chars, mode }) {
-      const cs = _villainStats(games, chars);
-      const total = cs.reduce((a, c) => a + c.games, 0) || 1;
-      const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
-      const data = bands.map(b => {
-        const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
-        const games = rows.reduce((a, c) => a + c.games, 0);
-        const wins  = rows.reduce((a, c) => a + c.wins,  0);
-        const pct   = games ? Math.round(wins / games * 100) : 0;
-        const share = Math.round(games / total * 100);
-        const meta  = mode === 'picks'
-          ? `${tn(games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
-          : `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
-        return { label: t(b[0].toUpperCase() + b.slice(1)), value: mode === 'picks' ? share : pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
-      }).filter(d => d.games > 0);
-      return mode === 'picks' ? Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 })
-        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: _overallRef(cs) });
+    id: 'versus', icon: '🆚', label: 'Villain against villain',
+    desc: "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
+    render({ games, chars, boxInfo }) {
+      // Per ordered pair: games together, and the row's wins over the column.
+      const together = {}, wins = {};
+      for (const g of games) {
+        for (const a of g.seats) for (const b of g.seats) {
+          if (a === b || a.character === b.character) continue;
+          const k = a.character + '|' + b.character;
+          together[k] = (together[k] || 0) + 1;
+          if (a.is_winner) wins[k] = (wins[k] || 0) + 1;
+        }
+      }
+      // The villains with games here, grouped by box (in box order), as on the
+      // Villains page; a line between boxes.
+      const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
+      const boxOrder = b => boxInfo[b]?.order ?? 99;
+      const vs = chars.filter(c => played.has(c.name))
+        .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
+      if (vs.length < 2) return Charts.barsV([]);
+      const MIN = 10;
+      const newBox = i => i > 0 && vs[i].box !== vs[i - 1].box;
+      const head = (c, i) => `<th class="vs-head${newBox(i) ? ' vs-box' : ''}" title="${_esc(villainName(c.name))}">${charImgHTML(c.name)}</th>`;
+      const rows = vs.map((r, ri) => {
+        const cells = vs.map((c, ci) => {
+          const cls = newBox(ci) ? ' vs-box' : '';
+          if (r.name === c.name) return `<td class="vs-self${cls}"></td>`;
+          const n = together[r.name + '|' + c.name] || 0;
+          const w = wins[r.name + '|' + c.name] || 0, l = wins[c.name + '|' + r.name] || 0;
+          const name = `${villainName(r.name)} vs ${villainName(c.name)}`;
+          const meta = `${t('{a} won {w}, {b} won {l}', { a: villainName(r.name), w, b: villainName(c.name), l })} | ${tn(n, '{n} game together', '{n} games together')}`;
+          if (n < MIN || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
+          const pct = w / (w + l);
+          return `<td class="ch-hit${cls}" style="background:${Charts.heatColor((pct - 0.25) / 0.5)}" data-name="${_esc(name)}" data-meta="${_esc(`${Math.round(pct * 100)}% | ${meta}`)}">${Math.round(pct * 100)}</td>`;
+        }).join('');
+        return `<tr${newBox(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(villainName(r.name))}">${charImgHTML(r.name)}</th>${cells}</tr>`;
+      }).join('');
+      return `<div class="vs-wrap"><table class="vs-grid"><thead><tr><th class="vs-corner"></th>${vs.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
     },
   },
   {
@@ -168,6 +183,32 @@ const CHARTS = [
         .sort((a, b) => b.value - a.value);
       return picks ? Charts.barsH(data, { labelW: 152 })
         : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
+    },
+  },
+  {
+    id: 'pace', icon: '🎨', label: 'By pace',
+    modes: _PCT_PICKS,
+    desc: {
+      pct:   "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
+      picks: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
+    },
+    render({ games, chars, mode }) {
+      const cs = _villainStats(games, chars);
+      const total = cs.reduce((a, c) => a + c.games, 0) || 1;
+      const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
+      const data = bands.map(b => {
+        const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
+        const games = rows.reduce((a, c) => a + c.games, 0);
+        const wins  = rows.reduce((a, c) => a + c.wins,  0);
+        const pct   = games ? Math.round(wins / games * 100) : 0;
+        const share = Math.round(games / total * 100);
+        const meta  = mode === 'picks'
+          ? `${tn(games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+          : `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
+        return { label: t(b[0].toUpperCase() + b.slice(1)), value: mode === 'picks' ? share : pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
+      }).filter(d => d.games > 0);
+      return mode === 'picks' ? Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 })
+        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: _overallRef(cs) });
     },
   },
   {
@@ -304,47 +345,6 @@ const CHARTS = [
       const pct = c => Math.round(c / total * 100);
       const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${tn(counts[d], '{n} game', '{n} games')} | ${pct(counts[d])}%` }));
       return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1, note: t('Weekends {pct}%', { pct: pct(counts[6] + counts[0]) }) });
-    },
-  },
-  {
-    id: 'versus', icon: '🆚', label: 'Villain against villain',
-    desc: "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
-    render({ games, chars, boxInfo }) {
-      // Per ordered pair: games together, and the row's wins over the column.
-      const together = {}, wins = {};
-      for (const g of games) {
-        for (const a of g.seats) for (const b of g.seats) {
-          if (a === b || a.character === b.character) continue;
-          const k = a.character + '|' + b.character;
-          together[k] = (together[k] || 0) + 1;
-          if (a.is_winner) wins[k] = (wins[k] || 0) + 1;
-        }
-      }
-      // The villains with games here, grouped by box (in box order), as on the
-      // Villains page; a line between boxes.
-      const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
-      const boxOrder = b => boxInfo[b]?.order ?? 99;
-      const vs = chars.filter(c => played.has(c.name))
-        .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
-      if (vs.length < 2) return Charts.barsV([]);
-      const MIN = 10;
-      const newBox = i => i > 0 && vs[i].box !== vs[i - 1].box;
-      const head = (c, i) => `<th class="vs-head${newBox(i) ? ' vs-box' : ''}" title="${_esc(villainName(c.name))}">${charImgHTML(c.name)}</th>`;
-      const rows = vs.map((r, ri) => {
-        const cells = vs.map((c, ci) => {
-          const cls = newBox(ci) ? ' vs-box' : '';
-          if (r.name === c.name) return `<td class="vs-self${cls}"></td>`;
-          const n = together[r.name + '|' + c.name] || 0;
-          const w = wins[r.name + '|' + c.name] || 0, l = wins[c.name + '|' + r.name] || 0;
-          const name = `${villainName(r.name)} vs ${villainName(c.name)}`;
-          const meta = `${t('{a} won {w}, {b} won {l}', { a: villainName(r.name), w, b: villainName(c.name), l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-          if (n < MIN || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
-          const pct = w / (w + l);
-          return `<td class="ch-hit${cls}" style="background:${Charts.heatColor((pct - 0.25) / 0.5)}" data-name="${_esc(name)}" data-meta="${_esc(`${Math.round(pct * 100)}% | ${meta}`)}">${Math.round(pct * 100)}</td>`;
-        }).join('');
-        return `<tr${newBox(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(villainName(r.name))}">${charImgHTML(r.name)}</th>${cells}</tr>`;
-      }).join('');
-      return `<div class="vs-wrap"><table class="vs-grid"><thead><tr><th class="vs-corner"></th>${vs.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
     },
   },
   {
