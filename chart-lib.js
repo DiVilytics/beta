@@ -202,7 +202,7 @@ const Charts = (() => {
     });
   }
 
-  // Line + soft area over ordered points = [{ label, value }].
+  // Line + soft area over ordered points = [{ label, value, name?, meta? }].
   // `visible`: when set and there are more points than that, only `visible`
   // points are shown at a time and the rest sit off to the left, reachable by
   // panning (charts.js _attachLinePan). It starts on the most recent points.
@@ -251,7 +251,8 @@ const Charts = (() => {
     // Same invisible-stroke tap padding as the scatter's dots (see there for why).
     const dots = points.map((p, i) => {
       const meta = p.meta != null ? p.meta : String(fmt(p.value));
-      return `<circle${hit(p.label, meta, p.href)} cx="${sx(i).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="4" fill="${color}" stroke="transparent" stroke-width="16"><title>${titleText(p.label, meta)}</title></circle>`;
+      const name = p.name != null ? p.name : p.label;   // the tap caption's name (a day's full date), else the tick label
+      return `<circle${hit(name, meta, p.href)} cx="${sx(i).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="4" fill="${color}" stroke="transparent" stroke-width="16"><title>${titleText(name, meta)}</title></circle>`;
     }).join('');
     const data = `<path d="${area}" fill="${color}" fill-opacity="0.12"/><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>`;
     if (!pannable) return wrap(`${data}${grid}${ticks}${dots}`);

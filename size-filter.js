@@ -12,17 +12,20 @@
 // gives way, its label cut short (style.css .size-row). Depends on t (lang.js), _esc (db.js), SOLO_LEVELS, SOLO_LEVEL_IDS and
 // soloLevelName (solo.js).
 //
-// createSizeFilter(rootId, { onChange }) builds the controls into #rootId,
+// createSizeFilter(rootId, { onChange, solo }) builds the controls into
+// #rootId (without Solo and Difficulty when `solo` is false: the Charts page),
 // calls onChange() on every change, and returns:
 //   value()      : 'all' | 2…6 | 'solo'
 //   set(v)       : picks v without calling onChange (a language switch)
 //   isSolo()     : true on Solo, any level
 //   level()      : the solo level, 'all' | 'easy' | 'medium' | 'hard' ('all' off Solo)
 //   setLevel(l)  : picks it without calling onChange (after set('solo'))
+//   setDisabled(d): grays the row out, for a view the table size doesn't apply
+//                   to (the pick stays, ready for the next view)
 
 const TABLE_SIZES = [2, 3, 4, 5, 6];
 
-function createSizeFilter(rootId, { onChange }) {
+function createSizeFilter(rootId, { onChange, solo = true }) {
   let value = 'all';
   let level = 'all';
 
@@ -33,12 +36,12 @@ function createSizeFilter(rootId, { onChange }) {
     <span class="period-pill-wrap">
       <select class="period-pill" data-menu="size" aria-label="${t('Players')}"></select>
       <span class="chevron" aria-hidden="true">▼</span>
-    </span>
+    </span>${solo ? `
     <button class="pill pill-solo" type="button" data-size="solo">${t('Solo')}</button>
     <span class="period-pill-wrap">
       <select class="period-pill pill-solo" data-menu="level" aria-label="${t('Difficulty')}"></select>
       <span class="chevron" aria-hidden="true">▼</span>
-    </span>`;
+    </span>` : ''}`;
   const allBtn  = root.querySelector('[data-size="all"]');
   const soloBtn = root.querySelector('[data-size="solo"]');
   const sel     = root.querySelector('[data-menu="size"]');
@@ -48,14 +51,15 @@ function createSizeFilter(rootId, { onChange }) {
     const sized   = typeof value === 'number';
     const leveled = value === 'solo' && level !== 'all';
     allBtn.classList.toggle('on', value === 'all');
-    soloBtn.classList.toggle('on', value === 'solo' && !leveled);
     sel.classList.toggle('on', sized);
-    lvlSel.classList.toggle('on', leveled);
-    // The picked level in its color, as wherever a level is the one in effect.
-    for (const id of SOLO_LEVEL_IDS) lvlSel.classList.toggle(`lvl-${id}`, leveled && id === level);
     sel.innerHTML =
       `<option value="" hidden${sized ? '' : ' selected'}>${_esc(t('Players'))}</option>` +
       TABLE_SIZES.map(n => `<option value="${n}"${n === value ? ' selected' : ''}>${n}p</option>`).join('');
+    if (!solo) return;
+    soloBtn.classList.toggle('on', value === 'solo' && !leveled);
+    lvlSel.classList.toggle('on', leveled);
+    // The picked level in its color, as wherever a level is the one in effect.
+    for (const id of SOLO_LEVEL_IDS) lvlSel.classList.toggle(`lvl-${id}`, leveled && id === level);
     lvlSel.innerHTML =
       `<option value="" hidden${leveled ? '' : ' selected'}>${_esc(t('Difficulty'))}</option>` +
       SOLO_LEVEL_IDS.map(id => `<option value="${id}"${leveled && id === level ? ' selected' : ''}>${_esc(soloLevelName(id))}</option>`).join('');
@@ -70,13 +74,13 @@ function createSizeFilter(rootId, { onChange }) {
     onChange();
   };
   allBtn.addEventListener('click', () => pick('all'));
-  soloBtn.addEventListener('click', () => pick('solo'));
+  soloBtn?.addEventListener('click', () => pick('solo'));
   sel.addEventListener('change', () => pick(sel.value ? +sel.value : 'all'));
-  lvlSel.addEventListener('change', () => pick('solo', lvlSel.value || 'all'));
+  lvlSel?.addEventListener('change', () => pick('solo', lvlSel.value || 'all'));
 
   // Picked with a tap or a click, a menu lets go of the focus (no ring left on
   // it); with the keyboard it keeps it. As in the period filter.
-  for (const menu of [sel, lvlSel]) {
+  for (const menu of [sel, lvlSel].filter(Boolean)) {
     let pointer = false;
     menu.addEventListener('pointerdown', () => { pointer = true; });
     menu.addEventListener('keydown',     () => { pointer = false; });
@@ -88,7 +92,7 @@ function createSizeFilter(rootId, { onChange }) {
   return {
     value: () => value,
     set(v) {
-      value = v === 'solo' || TABLE_SIZES.includes(v) ? v : 'all';
+      value = (solo && v === 'solo') || TABLE_SIZES.includes(v) ? v : 'all';
       if (value !== 'solo') level = 'all';
       render();
     },
@@ -97,6 +101,10 @@ function createSizeFilter(rootId, { onChange }) {
     setLevel(l) {
       level = value === 'solo' && SOLO_LEVELS[l] ? l : 'all';
       render();
+    },
+    setDisabled(d) {
+      root.classList.toggle('disabled', d);
+      root.querySelectorAll('button, select').forEach(el => { el.disabled = d; });
     },
   };
 }

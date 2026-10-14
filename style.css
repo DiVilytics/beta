@@ -2395,6 +2395,8 @@ select:disabled {
 /* The size row (size-filter.js) never wraps: where even so it doesn't fit, the
    Difficulty menu, last, gives way and cuts its label short. */
 .size-row { flex-wrap: nowrap; }
+/* A view the table size doesn't apply to (Charts): the row grayed out. */
+.size-row.disabled { opacity: 0.45; }
 /* All and Players on the left, Solo and Difficulty, a world apart, on the right. */
 .size-row > [data-size="solo"] { margin-left: auto; }
 .size-row > .period-pill-wrap:last-child { flex: 0 1 auto; min-width: 0; }

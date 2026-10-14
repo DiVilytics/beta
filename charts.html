@@ -51,7 +51,15 @@
 
   <div class="chart-picker" id="chartPicker"></div>
 
+  <div class="controls period-controls" id="chartControls">
+    <!-- Table size: All / Players menu (size-filter.js, no Solo here) -->
+    <div id="chartSize"></div>
+    <!-- Period: All time / Year / Month (period-filter.js) -->
+    <div id="chartPeriod"></div>
+  </div>
+
   <div class="chart-card">
+    <div id="chartModes"></div>
     <div class="chart-card-desc" id="chartDesc"></div>
     <div class="chart-stage" id="chartStage"></div>
     <div class="chart-caption" id="chartCaption"></div>
@@ -69,6 +77,8 @@
   <script src="search.js"></script>
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
+  <script src="period-filter.js"></script>
+  <script src="size-filter.js"></script>
   <script src="chart-lib.js"></script>
 <script src="charts.js"></script>
 </body>

@@ -1,71 +1,82 @@
 // ── CHARTS PAGE ──────────────────────────────────────────────────────────────
-// A hub of visualizations: a row of chips picks a chart, rendered lazily into the
-// card below via the hand-rolled SVG helpers in chart-lib.js. Data is fetched on
-// first view of a chart and cached for the session. Charts that need a not-yet-
-// installed RPC degrade to a short "add this function" note.
+// A hub of visualizations: a menu picks a chart, rendered into the card below
+// via the hand-rolled SVG helpers in chart-lib.js. Every chart reads the same
+// games, fetched once: the official games with their seats. The table size
+// (size-filter.js, without Solo) and the period (period-filter.js) filter them
+// here, as on the Leaderboard; a chart whose view is by table size already
+// (sizes: false) grays the size filter out. A chart with `modes` gets a switch
+// above it (Minutes | Rounds, ...), each mode remembered.
 
-// ── SHARED DATASETS (lazy + cached) ────────────────────────────────────────────
+const size   = createSizeFilter('chartSize', { onChange: () => _rerender(), solo: false });
+const period = createPeriodFilter('chartPeriod', { onChange: () => _rerender() });
 
-const _data = {};
+// ── THE GAMES (one fetch, filtered per view) ───────────────────────────────────
 
-// Per-character games/wins (character_stats view) joined with pace + box.
-async function _characterStats() {
-  if (_data.charStats) return _data.charStats;
-  const [{ rows }, chars] = await Promise.all([
-    _fetchAllRows(() => db.from('character_stats').select('*')),
-    loadCharacters(),
-  ]);
-  const byName = Object.fromEntries(chars.map(c => [c.name, c]));
-  _data.charStats = rows.map(r => ({
-    name:  r.character,
-    games: Number(r.games),
-    wins:  Number(r.wins),
-    pace:  byName[r.character]?.pace || null,
-    box:   byName[r.character]?.box  || null,
-  }));
-  return _data.charStats;
+// Every official game with its seats, { id, played_at, at (ms, null when
+// undated), duration_minutes, num_turns, source, seats: [{ character, user_id,
+// position, is_winner }] }. Fetched in parallel pages (past PostgREST's
+// 1000-row cap), once per visit; a failed load is retried next time.
+let _allGames = null;
+function _loadGames() {
+  return _allGames ||= (async () => {
+    const sel = 'id, played_at, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
+    const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
+    if (error) throw error;
+    const PAGE = 1000;
+    const pages = await Promise.all(Array.from({ length: Math.ceil((count || 0) / PAGE) + 1 }, (_, i) =>
+      db.from('games').select(sel).is('variant', null).order('id').range(i * PAGE, i * PAGE + PAGE - 1)));
+    const failed = pages.find(r => r.error);
+    if (failed) throw failed.error;
+    return pages.flatMap(r => r.data || []).map(({ game_players, ...g }) => ({
+      ...g, seats: game_players || [], at: g.played_at ? Date.parse(g.played_at) : null,
+    }));
+  })().catch(e => { _allGames = null; throw e; });
 }
 
-// All official games' played_at / duration / rounds / source (small rows, paged past the cap).
-async function _gamesLite() {
-  if (_data.games) return _data.games;
-  const { rows } = await _fetchAllRows(() => db.from('games').select('played_at, duration_minutes, num_turns, source').is('variant', null));
-  _data.games = rows;
-  return _data.games;
+// The games of the period picked, and of the table size picked unless the
+// chart is by table size itself.
+function _filterGames(all, { sized = true } = {}) {
+  const { from_ts, to_ts } = period.range();
+  const from = from_ts && Date.parse(from_ts), to = to_ts && Date.parse(to_ts);
+  const n = sized ? size.value() : 'all';
+  return all.filter(g =>
+    (!from || (g.at != null && g.at >= from && g.at < to)) &&
+    (n === 'all' || g.seats.length === n));
 }
 
-// Games + avg duration per table size, via the existing game_stats RPC (one call
-// per size, 2..6).
-async function _sizeStats() {
-  if (_data.sizeStats) return _data.sizeStats;
-  const sizes = [2, 3, 4, 5, 6];
-  const res = await Promise.all(sizes.map(n => db.rpc('game_stats', { player_count_filter: n })));
-  _data.sizeStats = sizes.map((n, i) => {
-    const row = (res[i].data || [])[0] || { games: 0, avg_duration: null };
-    return { size: n, games: Number(row.games) || 0, avgDur: row.avg_duration };
-  });
-  return _data.sizeStats;
+// A game's [year, month (1-12), day] as it was played: in local time, or the
+// recorded day for sources without a time (isDateOnly, ui.js).
+function _gameDay(g) {
+  const d = new Date(g.at);
+  return isDateOnly(g) ? [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()] : [d.getFullYear(), d.getMonth() + 1, d.getDate()];
 }
 
-// Games-per-player counts (player_stats view); players with at least one game.
-async function _playerStats() {
-  if (_data.playerStats) return _data.playerStats;
-  const { rows } = await _fetchAllRows(() => db.from('player_stats').select('games'));
-  _data.playerStats = rows.map(r => Number(r.games)).filter(g => g > 0);
-  return _data.playerStats;
+// Each villain's games and wins in `games`, with its pace and box.
+function _villainStats(games, chars) {
+  const by = {};
+  for (const g of games) for (const s of g.seats) {
+    const r = by[s.character] ||= { games: 0, wins: 0 };
+    r.games++;
+    if (s.is_winner) r.wins++;
+  }
+  return chars.filter(c => by[c.name]).map(c => ({ name: c.name, pace: c.pace || null, box: c.box || null, ...by[c.name] }));
 }
+
+const _avg = vals => vals.length ? vals.reduce((a, v) => a + v, 0) / vals.length : null;
+const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
-// Each: { id, icon, label, desc, render() -> SVG/HTML string }. label and desc
-// are English keys, translated where they are shown.
+// Each: { id, icon, label, desc (a string, or per mode { mode: string }),
+// modes?: [{ id, label }], sizes?: false, render(ctx) -> SVG/HTML string },
+// ctx = { games (filtered), chars, boxInfo, mode }. label, desc and the mode
+// labels are English keys, translated where they are shown.
 
 const CHARTS = [
   {
     id: 'scatter', icon: '🎯', label: 'Win rate vs popularity',
     desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
-    async render() {
-      const cs = (await _characterStats()).filter(c => c.games > 0);
-      const points = cs.map(c => {
+    render({ games, chars }) {
+      const points = _villainStats(games, chars).map(c => {
         const pct = Math.round(c.wins / c.games * 100);
         return {
           x: c.games,
@@ -84,8 +95,8 @@ const CHARTS = [
   {
     id: 'pace', icon: '🎨', label: 'Win rate by pace',
     desc: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-    async render() {
-      const cs = await _characterStats();
+    render({ games, chars }) {
+      const cs = _villainStats(games, chars);
       const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
       const data = bands.map(b => {
         const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
@@ -100,10 +111,9 @@ const CHARTS = [
   {
     id: 'box', icon: '📦', label: 'Win rate by box',
     desc: "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
-    async render() {
-      const [cs, boxInfo] = await Promise.all([_characterStats(), loadBoxInfo()]);
+    render({ games, chars, boxInfo }) {
       const byBox = {};
-      for (const c of cs) {
+      for (const c of _villainStats(games, chars)) {
         if (!c.box) continue;
         (byBox[c.box] ||= { games: 0, wins: 0, villains: 0 });
         byBox[c.box].games += c.games;
@@ -130,11 +140,10 @@ const CHARTS = [
   {
     id: 'boxpop', icon: '🔥', label: 'Box popularity',
     desc: "How often each box's villains are picked across all recorded games. Bars are sorted most-played first; tap one to open the box.",
-    async render() {
-      const [cs, boxInfo] = await Promise.all([_characterStats(), loadBoxInfo()]);
+    render({ games, chars, boxInfo }) {
       const byBox = {};
       let total = 0;
-      for (const c of cs) {
+      for (const c of _villainStats(games, chars)) {
         if (!c.box) continue;
         (byBox[c.box] ||= { games: 0, villains: 0 });
         byBox[c.box].games += c.games;
@@ -157,14 +166,34 @@ const CHARTS = [
     },
   },
   {
-    id: 'duration', icon: '⏱️', label: 'Game duration',
-    desc: 'How many games fall into each 15-minute band (0-15, 15-30, and so on); the band start in minutes is under each bar. Counts only games with a recorded duration.',
-    async render() {
-      const vals = (await _gamesLite()).map(g => g.duration_minutes).filter(v => v != null);
+    // The id stays 'duration': it was the minutes-only chart.
+    id: 'duration', icon: '⏱️', label: 'Game length',
+    modes: _MINUTES_ROUNDS,
+    desc: {
+      minutes: 'How many games fall into each 15-minute band (0-15, 15-30, and so on); the band start in minutes is under each bar. Counts only games with a recorded duration.',
+      rounds:  'How many games fall into each 3-round band, grouped to smooth out noise. Counts only games with a recorded round count.',
+    },
+    render({ games, mode }) {
+      if (mode === 'rounds') {
+        const vals = games.map(g => g.num_turns).filter(v => v != null);
+        if (!vals.length) return Charts.barsV([]);
+        const SIZE = 3;   // group rounds into 3-round bands to smooth out noise
+        const lo0 = Math.floor(Math.min(...vals) / SIZE) * SIZE;
+        const hi0 = Math.floor(Math.max(...vals) / SIZE) * SIZE;
+        const buckets = [];
+        for (let b = lo0; b <= hi0; b += SIZE) buckets.push({ lo: b, hi: b + SIZE - 1, value: 0 });
+        for (const v of vals) buckets[Math.floor((v - lo0) / SIZE)].value++;
+        for (const b of buckets) { b.name = t('{lo}-{hi} rounds', b); b.meta = tn(b.value, '{n} game', '{n} games'); }
+        return Charts.barsV(buckets, {
+          fmt: (v, d) => `${t('{lo}-{hi} rounds', d)}: ${v}`,
+          xTick: i => buckets[i].lo,
+          xEvery: 1,
+        });
+      }
+      const vals = games.map(g => g.duration_minutes).filter(v => v != null);
       if (!vals.length) return Charts.barsV([]);
       const SIZE = 15;   // 15-minute buckets
-      const max = Math.max(...vals);
-      const n = Math.floor(max / SIZE) + 1;
+      const n = Math.floor(Math.max(...vals) / SIZE) + 1;
       const buckets = Array.from({ length: n }, (_, b) => ({ lo: b * SIZE, hi: (b + 1) * SIZE, value: 0 }));
       for (const v of vals) buckets[Math.min(n - 1, Math.floor(v / SIZE))].value++;
       for (const b of buckets) { b.name = `${b.lo}-${b.hi} min`; b.meta = tn(b.value, '{n} game', '{n} games'); }
@@ -176,107 +205,95 @@ const CHARTS = [
     },
   },
   {
-    id: 'avglen', icon: '⏳', label: 'Avg duration by players',
-    desc: 'Average recorded game duration in minutes for each table size, from 2 to 6 players. Averaged only over games that recorded a duration.',
-    async render() {
-      const bySize = Object.fromEntries((await _sizeStats()).map(s => [s.size, s]));
-      const data = [2, 3, 4, 5, 6].map(size => {              // always show every table size, even empty
-        const s = bySize[size];
-        const has = s && s.games > 0 && s.avgDur != null;
-        const m = has ? Math.round(s.avgDur) : 0;
+    id: 'avglen', icon: '⏳', label: 'Avg length by players',
+    modes: _MINUTES_ROUNDS,
+    sizes: false,
+    desc: {
+      minutes: 'Average recorded game duration in minutes for each table size, from 2 to 6 players. Averaged only over games that recorded a duration.',
+      rounds:  'Average rounds per game for each table size, from 2 to 6 players. Averaged only over games that recorded their rounds.',
+    },
+    render({ games, mode }) {
+      const rounds = mode === 'rounds';
+      const data = TABLE_SIZES.map(n => {              // always show every table size, even empty
+        const ofSize = games.filter(g => g.seats.length === n);
+        const avg = _avg(ofSize.map(g => rounds ? g.num_turns : g.duration_minutes).filter(v => v != null));
+        const v = avg == null ? 0 : rounds ? Math.round(avg * 10) / 10 : Math.round(avg);
         return {
-          label: `${size}p`,
-          value: m,
-          has,
-          meta: has ? `${t('{n} min average', { n: m })} | ${tn(s.games, '{n} game', '{n} games')}` : t(s && s.games > 0 ? 'no duration recorded' : 'no games recorded'),
+          label: `${n}p`,
+          value: v,
+          meta: avg != null
+            ? `${rounds ? t('{n} rounds on average', { n: v.toLocaleString(LOCALE) }) : t('{n} min average', { n: v })} | ${tn(ofSize.length, '{n} game', '{n} games')}`
+            : t(!ofSize.length ? 'no games recorded' : rounds ? 'no rounds recorded' : 'no duration recorded'),
         };
       });
       return Charts.barsH(data, { labelW: 48 });
     },
   },
   {
-    id: 'rounds', icon: '🔁', label: 'Rounds per game',
-    desc: 'How many games fall into each 3-round band, grouped to smooth out noise. Counts only games with a recorded round count.',
-    async render() {
-      const vals = (await _gamesLite()).map(g => g.num_turns).filter(v => v != null);
-      if (!vals.length) return Charts.barsV([]);
-      const SIZE = 3;   // group rounds into 3-round bands to smooth out noise
-      const lo0 = Math.floor(Math.min(...vals) / SIZE) * SIZE;
-      const hi0 = Math.floor(Math.max(...vals) / SIZE) * SIZE;
-      const buckets = [];
-      for (let b = lo0; b <= hi0; b += SIZE) buckets.push({ lo: b, hi: b + SIZE - 1, value: 0 });
-      for (const v of vals) buckets[Math.floor((v - lo0) / SIZE)].value++;
-      for (const b of buckets) { b.name = t('{lo}-{hi} rounds', b); b.meta = tn(b.value, '{n} game', '{n} games'); }
-      return Charts.barsV(buckets, {
-        fmt: (v, d) => `${t('{lo}-{hi} rounds', d)}: ${v}`,
-        xTick: i => buckets[i].lo,
-        xEvery: 1,
-      });
-    },
-  },
-  {
     id: 'tablesize', icon: '👥', label: 'Players per game',
+    sizes: false,
     desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact game count and percentage.',
-    async render() {
-      const ss = (await _sizeStats()).filter(s => s.games > 0);
-      const total = ss.reduce((a, s) => a + s.games, 0) || 1;
-      const segs = ss.map(s => ({ label: `${s.size}p`, value: s.games, meta: `${tn(s.games, '{n} game', '{n} games')} | ${Math.round(s.games / total * 100)}%` }));
+    render({ games }) {
+      const total = games.length || 1;
+      const segs = TABLE_SIZES.map(n => {
+        const c = games.filter(g => g.seats.length === n).length;
+        return { label: `${n}p`, value: c, meta: `${tn(c, '{n} game', '{n} games')} | ${Math.round(c / total * 100)}%` };
+      });
       return Charts.donut(segs);
     },
   },
   {
-    id: 'perplayer', icon: '🎮', label: 'Games per player',
-    desc: 'How many games each player has recorded, as a distribution. Most players appear in a few games; a few are very active.',
-    async render() {
-      const vals = await _playerStats();
-      if (!vals.length) return Charts.barsV([]);
-      const max = Math.max(...vals);
-      const SIZE = 5;   // fixed 5-game bands (1-5, 6-10, ...)
-      const n = Math.floor((max - 1) / SIZE) + 1;
-      const buckets = Array.from({ length: n }, (_, b) => ({ lo: b * SIZE + 1, hi: (b + 1) * SIZE, value: 0 }));
-      for (const p of vals) buckets[Math.min(n - 1, Math.floor((p - 1) / SIZE))].value++;
-      for (const b of buckets) {
-        b.name = t('{lo}-{hi} games', b);
-        b.meta = tn(b.value, '{n} player', '{n} players');
-      }
-      return Charts.barsV(buckets, { xTick: i => buckets[i].lo, xEvery: Math.max(1, Math.ceil(n / 12)) });
-    },
-  },
-  {
     id: 'time', icon: '📈', label: 'Games over time',
-    desc: 'Games recorded per calendar month, by play date (labeled YYYY/MM). Shows the latest 12 months; drag sideways to see earlier ones.',
-    async render() {
-      const byMonth = {};
-      for (const g of await _gamesLite()) {
-        if (!g.played_at) continue;
-        const k = String(g.played_at).slice(0, 7);   // YYYY-MM
-        byMonth[k] = (byMonth[k] || 0) + 1;
+    modes: [{ id: 'games', label: 'Games' }, { id: 'players', label: 'Players' }],
+    desc: {
+      games:   'Games played each month, by play date (labeled YYYY/MM). All time shows the latest 12 months: drag sideways to see earlier ones. A year shows its months, a month its days.',
+      players: 'Players who claimed a villain in a game of each month, each counted once a month, by play date. All time shows the latest 12 months: drag sideways to see earlier ones. A year shows its months, a month its days.',
+    },
+    render({ games, mode }) {
+      // The buckets: every month from the first game to the last (All time), the
+      // year's months, or the month's days, up to today; empty ones as 0.
+      const p = period.get();
+      const now = new Date();
+      const keyOf = g => { const [y, m, d] = _gameDay(g); return p.month != null ? d : p.year != null ? m : y * 12 + m - 1; };
+      const dated = games.filter(g => g.at != null);
+      let keys = [];
+      if (p.month != null) {
+        const days = new Date(p.year, p.month + 1, 0).getDate();
+        const last = p.year === now.getFullYear() && p.month === now.getMonth() ? now.getDate() : days;
+        keys = Array.from({ length: last }, (_, i) => i + 1);
+      } else if (p.year != null) {
+        const last = p.year === now.getFullYear() ? now.getMonth() + 1 : 12;
+        keys = Array.from({ length: last }, (_, i) => i + 1);
+      } else if (dated.length) {
+        const ks = dated.map(keyOf);
+        for (let k = Math.min(...ks); k <= Math.max(...ks); k++) keys.push(k);
       }
-      // Every calendar month from the first to the last, empty ones as 0, so the
-      // 12 visible points are really 12 consecutive months.
-      const months = Object.keys(byMonth).sort();
-      const pts = [];
-      if (months.length) {
-        let [y, m] = months[0].split('-').map(Number);
-        const last = months[months.length - 1];
-        for (let k = months[0]; k <= last; ) {
-          const c = byMonth[k] || 0;
-          pts.push({ label: k.replace('-', '/'), value: c, meta: tn(c, '{n} game', '{n} games') });   // YYYY/MM
-          m++; if (m > 12) { m = 1; y++; }
-          k = `${y}-${String(m).padStart(2, '0')}`;
-        }
+      const sets = new Map(keys.map(k => [k, mode === 'players' ? new Set() : []]));
+      for (const g of dated) {
+        const bucket = sets.get(keyOf(g));
+        if (!bucket) continue;
+        if (mode === 'players') g.seats.forEach(s => s.user_id && bucket.add(s.user_id));
+        else bucket.push(g);
       }
-      return Charts.line(pts, { visible: 12 });
+      const label = k => p.month != null ? String(k)
+        : p.year != null ? `${p.year}/${String(k).padStart(2, '0')}`
+        : `${Math.floor(k / 12)}/${String(k % 12 + 1).padStart(2, '0')}`;   // YYYY/MM
+      const name = k => p.month != null ? fmtDayLong(`${p.year}-${String(p.month + 1).padStart(2, '0')}-${String(k).padStart(2, '0')}`) : label(k);
+      const pts = keys.map(k => {
+        const c = mode === 'players' ? sets.get(k).size : sets.get(k).length;
+        return { label: label(k), name: name(k), value: c, meta: mode === 'players' ? tn(c, '{n} player', '{n} players') : tn(c, '{n} game', '{n} games') };
+      });
+      return Charts.line(pts, { visible: period.isAll() ? 12 : null });
     },
   },
   {
     id: 'weekday', icon: '📅', label: 'Games by weekday',
     desc: 'Number of games recorded on each weekday, by play date. Weekday is derived from your local time zone.',
-    async render() {
+    render({ games }) {
       const counts = new Array(7).fill(0);   // 0 = Sunday
-      for (const g of await _gamesLite()) {
-        if (!g.played_at) continue;
-        const d = new Date(g.played_at);
+      for (const g of games) {
+        if (g.at == null) continue;
+        const d = new Date(g.at);
         counts[isDateOnly(g) ? d.getUTCDay() : d.getDay()]++;   // date-only: the recorded day
       }
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
@@ -290,21 +307,27 @@ const CHARTS = [
   },
   {
     id: 'seatorder', icon: '🪑', label: 'Play-order advantage',
+    sizes: false,
     desc: "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
-    async render() {
-      const { data, error } = await db.rpc('position_stats');
-      if (error || !data || !data.length) return _needRpc('position_stats');
+    render({ games }) {
+      // Only games with a recorded play order (every seat its own position) and
+      // one winner; a seat is its rank in the play order, 1 first.
       const bySize = {};
-      for (const r of data) {
-        const size = Number(r.player_count), seat = Number(r.seat);
-        (bySize[size] ||= {})[seat] = { games: Number(r.games), wins: Number(r.wins) };
+      for (const g of games) {
+        const seats = g.seats;
+        if (seats.some(s => s.position == null) || new Set(seats.map(s => s.position)).size !== seats.length) continue;
+        if (seats.filter(s => s.is_winner).length !== 1) continue;
+        seats.slice().sort((a, b) => a.position - b.position).forEach((s, i) => {
+          const cell = ((bySize[seats.length] ||= {})[i + 1] ||= { games: 0, wins: 0 });
+          cell.games++;
+          if (s.is_winner) cell.wins++;
+        });
       }
-      const sizes = [2, 3, 4, 5, 6];              // always render the full grid; cells with no data show grayed
       const maxSeat = 6;
-      const rowLabels = sizes.map(s => `${s}p`);
+      const rowLabels = TABLE_SIZES.map(s => `${s}p`);
       const colLabels = Array.from({ length: maxSeat }, (_, i) => t('Seat {n}', { n: i + 1 }));
       return Charts.heatmap(rowLabels, colLabels, (ri, ci) => {
-        const s = sizes[ri], seat = ci + 1;       // seats are 1-based (ranked play order)
+        const s = TABLE_SIZES[ri], seat = ci + 1;  // seats are 1-based (ranked play order)
         if (seat > s) return null;                // that seat does not exist for this size
         const cell = bySize[s] && bySize[s][seat];
         if (!cell || !cell.games) return null;
@@ -321,10 +344,6 @@ const CHARTS = [
   },
 ];
 
-function _needRpc(name) {
-  return `<div class="chart-note">${t('This chart needs the {name} function in Supabase. Add it, then refresh.', { name: `<code>${_esc(name)}</code>` })}</div>`;
-}
-
 // ── PICKER + RENDER ────────────────────────────────────────────────────────────
 
 let _selected = null;
@@ -336,23 +355,55 @@ function _renderPicker() {
     `</select><span class="chevron chart-chevron" aria-hidden="true">▼</span></div>`;
 }
 
+// Each chart's mode (its switch), the first one until picked.
+const _modes = {};
+const _modeOf = c => c.modes ? (c.modes.some(m => m.id === _modes[c.id]) ? _modes[c.id] : c.modes[0].id) : null;
+
+function _modesHTML(c) {
+  if (!c.modes) return '';
+  const mode = _modeOf(c);
+  return `<div class="controls mb-1"><div class="seg">${c.modes.map(m =>
+    `<button class="seg-btn${m.id === mode ? ' on' : ''}" type="button" onclick="setChartMode('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div></div>`;
+}
+
+function setChartMode(mode) {
+  _modes[_selected] = mode;
+  _rerender();
+}
+
 async function selectChart(id) {
   const c = CHARTS.find(x => x.id === id);
   if (!c) return;
   _selected = id;
   _renderPicker();
-  document.getElementById('chartDesc').textContent = t(c.desc);
+  await _rerender();
+}
+
+// Draws the chart picked, for the filters and mode picked. A newer call wins
+// over one still loading.
+let _renderToken = 0;
+async function _rerender() {
+  const c = CHARTS.find(x => x.id === _selected);
+  if (!c) return;
+  const token = ++_renderToken;
+  const mode = _modeOf(c);
+  size.setDisabled(c.sizes === false);
+  document.getElementById('chartDesc').textContent = t(typeof c.desc === 'string' ? c.desc : c.desc[mode]);
+  document.getElementById('chartModes').innerHTML = _modesHTML(c);
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
   const stage = document.getElementById('chartStage');
-  stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
+  if (!_allGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
   try {
-    stage.innerHTML = await c.render();
+    const [all, chars, boxInfo] = await Promise.all([_loadGames(), loadCharacters(), loadBoxInfo()]);
+    if (token !== _renderToken) return;
+    stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode });
     const z = stage.querySelector('.ch-zoomable');
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
     if (lp) _attachLinePan(lp);
   } catch (e) {
+    if (token !== _renderToken) return;
     console.error('chart render failed:', e);
     stage.innerHTML = `<div class="chart-note">${t('Could not load this chart.')}</div>`;
   }
@@ -583,9 +634,16 @@ async function init() {
     ].filter(Boolean);
     nodes.forEach((n, i) => { if (i) cap.append(' | '); cap.append(n); });
   });
-  // A language switch brings back the chart being shown (lang.js).
+  // A language switch brings back the chart being shown, its mode and the
+  // filters (lang.js).
   const saved = takeViewState();
-  keepViewState(() => ({ chart: _selected }));
+  if (saved) {
+    Object.assign(_modes, saved.modes);
+    size.set(saved.size);
+    period.set(saved.period);
+  }
+  keepViewState(() => ({ chart: _selected, modes: _modes, size: size.value(), period: period.get() }));
+  period.load();
   selectChart(CHARTS.some(c => c.id === saved?.chart) ? saved.chart : CHARTS[0].id);
 }
 
