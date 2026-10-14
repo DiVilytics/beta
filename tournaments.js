@@ -219,11 +219,11 @@ function tnRenderTournament() {
     </div>
     <div class="claim-share-row">${actions}</div>
     ${lobby ? '' : _tnViewSegHTML()}
-    ${lobby || tnView === 'tables' || tnView === 'players' ? `
-      ${lobby || tnView === 'players' ? '' : _tnYourGameHTML(mine) + _tnStageHTML(mine)}
-      <div class="section-label">${t('Players')}</div>
+    ${lobby || tnView === 'players' ? `
+      ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
-      ${user ? '' : `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`}` : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnLogHTML(mine)}
+      ${user ? '' : `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`}`
+      : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnTablesHTML(mine)}
     ${isOrg ? `<div class="claim-delete-row">
       <button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button>
       ${lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start tournament')}</button>` : ''}
@@ -1178,17 +1178,15 @@ async function tnStartTable(tableId) {
 // Log (every stage's tables, places and points). A finished tournament opens on
 // its final standings, the top three with their medals (🥇 🥈 🥉; tied places share one).
 
-let tnView = null;   // 'tables' | 'standings' | 'log' (null: the default for the tournament)
+let tnView = null;   // 'players' | 'tables' | 'standings' (null: the default for the tournament)
 
-// A finished tournament has no current tables: it opens on its Standings,
-// then the Log and the Players (whose names can still be claimed).
+// The same three tabs while it runs and once finished: Players (claims, drops,
+// withdrawals), Tables (your game, the current stage, then every earlier one)
+// and Standings. It opens on Tables while running, on Standings once finished.
 function _tnViewSegHTML() {
-  const done = !!tnTour.finished_at;
-  if (!tnView || (done && tnView === 'tables')) tnView = done ? 'standings' : 'tables';
+  if (!tnView) tnView = tnTour.finished_at ? 'standings' : 'tables';
   const btn = (v, label) => `<button class="seg-btn${tnView === v ? ' on' : ''}" type="button" onclick="tnSetView('${v}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg tn-view-seg">${done
-    ? btn('players', t('Players')) + btn('standings', t('Standings')) + btn('log', t('Log'))
-    : btn('tables', t('Tables')) + btn('standings', t('Standings')) + btn('log', t('Log'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg tn-view-seg">${btn('players', t('Players')) + btn('tables', t('Tables')) + btn('standings', t('Standings'))}</div></div>`;
 }
 
 function tnSetView(v) {
@@ -1251,18 +1249,20 @@ function _tnStandingsHTML(mine) {
     <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
 }
 
-// Every stage's saved tables, in order, with places and points (the ones
-// still being played are in Tables).
-function _tnLogHTML(mine) {
+// Tables: your game and the current stage (all its tables, with the
+// organizer's draw buttons), then the earlier stages' saved tables and byes,
+// newest first. A finished tournament has only those.
+function _tnTablesHTML(mine) {
   const myId = mine?.id;
   const out = [];
-  for (let st = 1; st <= tnTour.current_stage; st++) {
+  if (!tnTour.finished_at) out.push(_tnYourGameHTML(mine) + _tnStageHTML(mine));
+  for (let st = tnTour.finished_at ? tnTour.current_stage : tnTour.current_stage - 1; st >= 1; st--) {
     const tables = tnTables.filter(tb => tb.stage === st && tb.saved_at);
     if (!tables.length) continue;
     out.push(`<div class="section-label">${tnStageLabel(st)}</div>
       <div class="tn-tables">${tables.map(tb => _tnTableHTML(tb, myId)).join('')}</div>`);
   }
-  return out.length ? out.join('') : emptyStateHTML('🏟️', t('No results yet'), t('The tables appear here once they are saved.'));
+  return out.join('');
 }
 
 function tnNextStage() {
