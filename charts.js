@@ -324,8 +324,12 @@ const CHARTS = [
   },
   {
     id: 'versus', icon: '🆚', label: 'Villain against villain',
-    desc: "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
-    render({ games, chars, boxInfo }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Each pair of villains that met: the row villain's Δ Wins against the column's, when one of the two won (0: even). Warmer cells win more; gray under 10 games together.",
+      pct:    "Each pair of villains that met: how often the row's villain won, when one of the two did. Warmer cells win more; gray under 10 games together. Scroll the grid.",
+    },
+    render({ games, chars, boxInfo, mode }) {
       // Per ordered pair: games together, and the row's wins over the column.
       const together = {}, wins = {};
       for (const g of games) {
@@ -356,7 +360,12 @@ const CHARTS = [
           const meta = `${t('{a} won {w}, {b} won {l}', { a: villainName(r.name), w, b: villainName(c.name), l })} | ${tn(n, '{n} game together', '{n} games together')}`;
           if (n < MIN || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
           const pct = w / (w + l);
-          return `<td class="ch-hit${cls}" style="background:${Charts.heatColor((pct - 0.25) / 0.5)}" data-name="${_esc(name)}" data-meta="${_esc(`${Math.round(pct * 100)}% | ${meta}`)}">${Math.round(pct * 100)}</td>`;
+          // Δ Wins between the two: even odds over the games one of them won.
+          const d = chanceDelta({ wins: w, exp: (w + l) / 2, vari: (w + l) / 4 });
+          const chance = mode === 'chance';
+          const label = chance ? (d > 0 ? '+' : '') + d.toLocaleString(LOCALE, { maximumFractionDigits: 1 }) : Math.round(pct * 100);
+          const heat  = chance ? (d + 3) / 6 : (pct - 0.25) / 0.5;
+          return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(heat)}" data-name="${_esc(name)}" data-meta="${_esc(`${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${Math.round(pct * 100)}% | ${meta}`)}">${label}</td>`;
         }).join('');
         return `<tr${newBox(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(villainName(r.name))}">${charImgHTML(r.name)}</th>${cells}</tr>`;
       }).join('');
