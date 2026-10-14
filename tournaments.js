@@ -660,11 +660,14 @@ function _tnRenderCustom() {
   if (!on) return;
   const size = _tnFormSize();
   if (tnCustom[size]?.length !== size) tnCustom = _tnCustomRows(size);
-  const lines = [];
+  // A triangle: the places once on top, a row per table size under them.
+  const cells = [`<span></span>`, ...Array.from({ length: size }, (_, i) => `<span class="tn-custom-place">${fmtPlace(i + 1)}</span>`)];
   for (let n = size; n >= 2; n--) {
-    lines.push(`<div class="tn-custom-line"><span class="tn-custom-n">${tn(n, '{n} player', '{n} players')}</span><div class="tn-custom-row">${tnCustom[n].map((v, i) => `
-      <label>${fmtPlace(i + 1)}<input type="number" min="0" step="any" value="${v}" oninput="tnCustom[${n}][${i}] = Math.max(0, Number(this.value) || 0)"></label>`).join('')}</div></div>`);
+    cells.push(`<span class="tn-custom-n">${tn(n, '{n} player', '{n} players')}</span>`);
+    tnCustom[n].forEach((v, i) => cells.push(`<input type="number" min="0" step="any" value="${v}" aria-label="${_esc(`${tn(n, '{n} player', '{n} players')}, ${fmtPlace(i + 1)}`)}" oninput="tnCustom[${n}][${i}] = Math.max(0, Number(this.value) || 0)">`));
+    for (let i = n; i < size; i++) cells.push('<span></span>');
   }
+  const lines = [`<div class="tn-custom-grid" style="--places: ${size}">${cells.join('')}</div>`];
   document.getElementById('tnCustomRows').innerHTML = lines.join('');
   setVisible('tnCustomFill', size > 2);
   document.getElementById('tnCustomFill').innerHTML = `<span>${t('Fill the smaller tables:')}</span>` +
