@@ -33,8 +33,10 @@ try { if (localStorage.getItem('textSize') === 'large') document.documentElement
 // it never paints otherwise, and its storage keys are its own (config.js). A
 // browser that joined it (the account page, BETA_KEY) opens it in place of the
 // release: any page of the release goes to the same page of the beta before
-// anything shows.
-const IS_BETA  = location.pathname.startsWith('/beta/');
+// anything shows. Locally, the beta's dev server (port 4173, the beta worktree)
+// counts as the beta too, so it looks and stores like the live one.
+const IS_BETA  = location.pathname.startsWith('/beta/')
+  || (location.hostname === 'localhost' && location.port === '4173');
 if (IS_BETA) document.documentElement.dataset.beta = '';
 const BETA_KEY = 'betaOptIn';
 function betaJoined() {

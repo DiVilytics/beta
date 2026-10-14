@@ -2843,6 +2843,10 @@ select:disabled {
   border-top: 1px solid var(--border);
 }
 
+/* The beta's color (its menu bar): the label and the Join / Leave text. */
+.acct-section.beta-section .section-label,
+.acct-section.beta-section .btn-ghost { color: var(--accent); }
+
 .acct-section .section-label {
   font-size: calc(13px * var(--ts));
   font-weight: 700;
