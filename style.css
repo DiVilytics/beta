@@ -925,7 +925,8 @@ main {
 .ch-ref.ch-ref-zero, .ch-grid.ch-ref-zero { stroke: var(--muted); stroke-dasharray: none; }
 /* Game length: the middle half of the games shaded, the median dashed. */
 .ch-spread { fill: var(--accent); fill-opacity: 0.12; }
-.ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.ch-donut-big { font-size: 17px; font-weight: 700; fill: var(--text); }
 .ch-spread-txt { fill: var(--text); }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }
 .ch-cell-empty { fill: var(--s2); }
