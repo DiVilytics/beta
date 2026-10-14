@@ -1179,7 +1179,7 @@ function tnEditTable(tableId) {
       if (turns > 0) results[0].round   = turns;
       // A new result: the organizer takes the table (another phone's game can't
       // save any more) and saves it; this phone's game of it, if any, is over.
-      const { error } = entering
+      const error = entering
         ? (await db.rpc('take_tournament_table', { target_table: tableId })).error
           || (await db.rpc('save_tournament_table', { target_table: tableId, played_at: new Date().toISOString(), results })).error
         : (await db.rpc('edit_tournament_table', { target_table: tableId, results })).error;
