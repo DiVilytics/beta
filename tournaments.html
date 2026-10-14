@@ -104,11 +104,11 @@
       <label data-i18n>Scoring</label>
       <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>
       <p class="modal-hint tn-rule-hint" id="tnScoringHint"></p>
-      <!-- Custom: the points for each place at the largest table; the smaller
-           tables' rows follow them (tournament-rules.js). -->
+      <!-- Custom: the points for each place at every table size; the smaller
+           tables' rows filled from the largest's (tournament-rules.js). -->
       <div class="tn-custom hidden" id="tnCustom">
-        <div class="tn-custom-row" id="tnCustomRow"></div>
-        <p class="modal-hint tn-rule-hint" id="tnCustomPreview"></p>
+        <div id="tnCustomRows"></div>
+        <div class="tn-custom-fill" id="tnCustomFill"></div>
       </div>
     </div>
     <div class="field tn-fixed" data-help="bye">

@@ -27,7 +27,7 @@ const TN_FINAL = {
   off: { name: 'Off', hint: 'The standings after the last stage are the final ranking.' },
   on:  { name: 'On',  hint: 'After the last stage, the top of the standings play one final table, which decides the top places.' },
 };
-let   tnCustom = [];   // the custom scoring's points, 1st first, at the largest table
+let   tnCustom = {};   // the custom scoring's points, { n: row } for every table size, 1st first
 
 const TN_POLL_MS  = 8000;
 let   tnPollTimer = null;
@@ -550,7 +550,7 @@ async function tnOpenForm(tour) {
   tnRule.scoring     = tour?.scoring || 'borda';
   tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
   tnRule.final       = tour?.final_table ? 'on' : 'off';
-  tnCustom = tour?.custom_points?.map(Number) || _tnBordaRow(tour?.table_size || 4);
+  tnCustom = tour?.custom_points?.length ? tournamentCustomRows(tour) : _tnCustomRows(tour?.table_size || 4);
   // Started: only the date and, between stages, the draw's rules.
   const started = !!tour && tour.current_stage > 0;
   document.querySelectorAll('#tnForm .tn-fixed').forEach(el => setVisible(el, !started));
@@ -628,27 +628,38 @@ const _tnToday     = () => { const d = new Date(); return new Date(d - d.getTime
 const _tnBordaRow  = size => Array.from({ length: size }, (_, i) => size - 1 - i);
 const _tnFormSize  = () => Number(document.getElementById('tnSize').value);
 
-// Custom scoring: a box per place at the largest table, and the smaller
-// tables' points as they'll be used (1st's and last's kept, the others spread).
+// Custom scoring: a row of boxes per table size, the largest on top. The
+// organizer types the largest table's points; Keep 1st and last or Keep the
+// average fills the smaller tables from them (TOURNAMENT_CUSTOM_FILLS), and
+// each box can still be changed by hand.
+const _tnCustomRows = (size, top = _tnBordaRow(size), fill = 'ends') => {
+  const rows = { [size]: top };
+  for (let n = size - 1; n >= 2; n--) rows[n] = tournamentCustomFill(top, n, fill);
+  return rows;
+};
+
 function _tnRenderCustom() {
   const on = tnRule.scoring === 'custom';
   setVisible('tnCustom', on);
   if (!on) return;
   const size = _tnFormSize();
-  if (tnCustom.length !== size) tnCustom = _tnBordaRow(size);
-  document.getElementById('tnCustomRow').innerHTML = tnCustom.map((v, i) => `
-    <label>${fmtPlace(i + 1)}<input type="number" min="0" step="any" value="${v}" oninput="tnCustom[${i}] = Math.max(0, Number(this.value) || 0); _tnRenderCustomPreview()"></label>`).join('');
-  _tnRenderCustomPreview();
+  if (tnCustom[size]?.length !== size) tnCustom = _tnCustomRows(size);
+  const lines = [];
+  for (let n = size; n >= 2; n--) {
+    lines.push(`<div class="tn-custom-line"><span class="tn-custom-n">${tn(n, '{n} player', '{n} players')}</span><div class="tn-custom-row">${tnCustom[n].map((v, i) => `
+      <label>${fmtPlace(i + 1)}<input type="number" min="0" step="any" value="${v}" oninput="tnCustom[${n}][${i}] = Math.max(0, Number(this.value) || 0)"></label>`).join('')}</div></div>`);
+  }
+  document.getElementById('tnCustomRows').innerHTML = lines.join('');
+  setVisible('tnCustomFill', size > 2);
+  document.getElementById('tnCustomFill').innerHTML = `<span>${t('Fill the smaller tables:')}</span>` +
+    Object.entries(TOURNAMENT_CUSTOM_FILLS).map(([id, f]) =>
+      `<button class="btn btn-ghost btn-sm" type="button" onclick="tnCustomFill('${id}')">${t(f.name)}</button>`).join('');
 }
 
-function _tnRenderCustomPreview() {
+function tnCustomFill(fill) {
   const size = _tnFormSize();
-  const tour = { table_size: size, scoring: 'custom', custom_points: tnCustom };
-  const lines = [];
-  for (let n = size - 1; n >= 2; n--) {
-    lines.push(`${tn(n, '{n} player', '{n} players')}: ${tournamentPointsRow(tour, n).map(fmtTournamentPoints).join(' | ')}`);
-  }
-  document.getElementById('tnCustomPreview').innerHTML = lines.length ? `${t('Smaller tables:')}<br>${lines.join('<br>')}` : '';
+  tnCustom = _tnCustomRows(size, tnCustom[size], fill);
+  _tnRenderCustom();
 }
 
 // ── How the options work ──
@@ -685,7 +696,9 @@ const TN_HELP = [
   ]],
   ['scoring', 'Scoring', [
     'Borda count: at a table of the largest size, 1st scores one point less than the players at the table, 2nd one less, down to 0 for last (at tables of 4: 3, 2, 1, 0). A smaller table keeps 1st\'s and last\'s points and spreads the places in between evenly: at 3 players, 3, 1.5 and 0.',
-    'Custom: you type the points for each place at the largest table, each place no more than the one above. A smaller table keeps 1st\'s and last\'s points and spreads the others along your row: 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. The form shows the smaller tables as they will be used.',
+    'Custom: you type the points for each place at every table size, each place no more than the one above. Type the largest table\'s row, then fill the smaller tables from it with one of two buttons, and change any box by hand if you like.',
+    'Keep 1st and last: a smaller table keeps 1st\'s and last\'s points and spreads the others along your row. 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. A win is worth the same at every table, but the average place scores more at a smaller table (2.33 at 3 and 2.5 at 2, against 2.25 at 4).',
+    'Keep the average: each place at a smaller table scores the average of the largest table\'s places it stands for. 5, 3, 1, 0 at 4 gives 4.5, 2, 0.25 at 3 and 4, 0.5 at 2. The average place scores the same at every table (2.25), so no table is easier to score at, but a win at a smaller table is worth less.',
     'With both, a player who drops out of a game scores the place they got: drops take the last places, in the order they drop (the first to drop is last).',
     'Fixed once the tournament starts.',
   ]],
@@ -742,7 +755,7 @@ function _tnHelpButtons() {
 }
 
 function tnSizeChanged() {
-  tnCustom = _tnBordaRow(_tnFormSize());
+  tnCustom = _tnCustomRows(_tnFormSize());
   _tnRenderCustom();
 }
 
@@ -860,8 +873,9 @@ async function tnSaveForm() {
     villain_pool: pool,
   };
   if (tnRule.scoring === 'custom') {
-    if (tnCustom.some((v, i) => i && v > tnCustom[i - 1])) return showError('tnFormErr', t('Custom points: each place scores no more than the one above it.'));
-    row.custom_points = tnCustom;
+    const rows = Object.keys(tnCustom).map(Number).filter(n => n <= row.table_size).sort((a, b) => b - a).map(n => tnCustom[n]);
+    if (rows.some(r => r.some((v, i) => i && v > r[i - 1]))) return showError('tnFormErr', t('Custom points: each place scores no more than the one above it.'));
+    row.custom_points = rows.flat();
   }
   // The options the database adds a default for are written only when they
   // differ from it (or from what the tournament had).

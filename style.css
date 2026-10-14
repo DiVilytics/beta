@@ -2392,6 +2392,10 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-help-section p { margin: 0 0 8px; font-size: calc(13px * var(--ts)); line-height: 1.5; color: var(--muted); }
 .tn-custom { margin-top: 10px; }
 .tn-custom-row { display: flex; gap: 6px; }
+.tn-custom-line { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px; }
+.tn-custom-n { width: 64px; flex-shrink: 0; padding-bottom: 8px; font-size: calc(12px * var(--ts)); color: var(--muted); }
+.tn-custom-line .tn-custom-row { flex: 1; min-width: 0; }
+.tn-custom-fill { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; font-size: calc(12px * var(--ts)); color: var(--muted); }
 .tn-custom-row label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: calc(11px * var(--ts)); color: var(--muted); text-align: center; }
 .tn-custom-row input { width: 100%; text-align: center; }
 .tn-form-row input { flex: 1; min-width: 0; height: 32px; }

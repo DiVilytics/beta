@@ -181,21 +181,67 @@ const TOURNAMENT_SCORINGS = {
       return (n - place) / (n - 1) * (size - 1);
     },
   },
-  // The organizer's points for each place at the largest table (custom_points,
-  // 1st first). A smaller table keeps 1st's and last's and spreads the places
-  // in between along them (as Borda does): 5 3 1 0 at 4 → 5 2 0 at 3, 5 0 at 2.
+  // The organizer's points for each place at every table size (custom_points,
+  // tournamentCustomRows).
   custom: {
     name: 'Custom',
-    hint: 'Your points for each place at the largest table; smaller tables follow them.',
+    hint: 'Your points for each place, at every table size.',
     points(place, n, size, seat, tour) {
-      const row = tour?.custom_points?.length ? tour.custom_points.map(Number) : [];
-      if (row.length < 2) return 0;
-      const at = (place - 1) / (n - 1) * (row.length - 1);
-      const lo = Math.floor(at), hi = Math.ceil(at);
-      return row[lo] + (at - lo) * (row[hi] - row[lo]);
+      const row = tournamentCustomRows(tour)[n];
+      return row ? row[place - 1] : 0;
     },
   },
 };
+
+// Custom scoring, the smaller tables' rows filled from the largest table's:
+// 'ends' keeps 1st's and last's points and spreads the places in between
+// along the row (5 3 1 0 at 4 → 5 2 0 at 3, 5 0 at 2); 'average' keeps the
+// average, each place scoring the average of the largest table's places it
+// stands for (5 3 1 0 → 4.5 2 0.25 at 3, 4 0.5 at 2).
+const TOURNAMENT_CUSTOM_FILLS = {
+  ends: {
+    name: 'Keep 1st and last',
+    row(top, n) {
+      return Array.from({ length: n }, (_, i) => {
+        const at = i / (n - 1) * (top.length - 1), lo = Math.floor(at), hi = Math.ceil(at);
+        return top[lo] + (at - lo) * (top[hi] - top[lo]);
+      });
+    },
+  },
+  average: {
+    name: 'Keep the average',
+    row(top, n) {
+      const span = top.length / n;
+      return Array.from({ length: n }, (_, i) => {
+        let sum = 0;
+        top.forEach((v, j) => { sum += v * Math.max(0, Math.min(j + 1, (i + 1) * span) - Math.max(j, i * span)); });
+        return sum / span;
+      });
+    },
+  },
+};
+
+// A filled row, rounded to hundredths (what the form shows and saves).
+function tournamentCustomFill(top, n, fill) {
+  return (TOURNAMENT_CUSTOM_FILLS[fill] || TOURNAMENT_CUSTOM_FILLS.ends).row(top, n).map(v => Math.round(v * 100) / 100);
+}
+
+// custom_points: the rows one after the other, the largest table's first,
+// then one player fewer each, down to 2 (at 4: 4 + 3 + 2 numbers), 1st first
+// in each. Only the largest table's row (the tournaments before 2026-10-15):
+// the others keep 1st and last. → { n: row }
+function tournamentCustomRows(tour) {
+  const flat = (tour?.custom_points || []).map(Number), size = tour?.table_size || flat.length;
+  const rows = {};
+  if (flat.length < 2) return rows;
+  if (flat.length === size) {
+    for (let n = size; n >= 2; n--) rows[n] = n === size ? flat : TOURNAMENT_CUSTOM_FILLS.ends.row(flat, n);
+    return rows;
+  }
+  let at = 0;
+  for (let n = size; n >= 2; n--) { rows[n] = flat.slice(at, at + n); at += n; }
+  return rows;
+}
 
 // A table's points, 1st to last (the form's preview of a custom scoring).
 function tournamentPointsRow(tour, n) {
