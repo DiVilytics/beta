@@ -88,7 +88,7 @@ function statGamesWidth(rows, mode) {
 function statModeSegHTML(mode, fn, { xp = false, chance = false } = {}) {
   const btn = (m, label) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg">${xp ? btn('xp', t('XP')) : ''}${chance ? btn('chance', t('Δ Win')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', t('XP')) : ''}${chance ? btn('chance', t('Δ Win')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {

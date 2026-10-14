@@ -1402,6 +1402,11 @@ select:disabled {
   white-space: nowrap;
 }
 .seg-btn.on { background: var(--s3); color: var(--text); }
+/* The ranking switch (% Wins, # Wins…, stats-table.js): its padding shrinks
+   with the screen so four options fit one row down to 320px (14px from about
+   390px up); with Large text on the narrowest phones it scrolls instead. */
+.stat-mode-seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.stat-mode-seg .seg-btn { padding: 0 clamp(4px, calc((100vw - 290px * var(--ts)) / 7), 14px); }
 
 .summary {
   display: grid;
