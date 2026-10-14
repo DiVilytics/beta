@@ -933,11 +933,15 @@ const _tnFormMax = () => Math.max(2, _tnPoolSize());
 // "Player 3" (or "Giocatore 3"): a name nobody typed.
 const _tnIsDefaultName = name => /^(player|giocatore) \d+$/i.test(name || '');
 
+// A row someone else claimed (locked). Your own claim follows 👤: moved to
+// another row, the old one is a plain name again at once.
+const _tnOthersClaim = p => !!p.userId && p.userId !== getCurrentUser()?.id;
+
 // The nickname a row shows instead of its name: yours with 👤, or whoever
-// claimed it.
+// else claimed it.
 function _tnRowNick(p) {
   if (p.isMe) return getCurrentProfile()?.nickname || null;
-  return p.userId ? tnProfiles.get(p.userId)?.nickname || null : null;
+  return _tnOthersClaim(p) ? tnProfiles.get(p.userId)?.nickname || null : null;
 }
 
 // The names to store: a claimed name stays as it is; a typed one; an existing
@@ -945,7 +949,7 @@ function _tnRowNick(p) {
 // "Player N" (your nickname shows while you hold it, and the name stays its own
 // if you release it), never one already taken.
 function _tnFormNames() {
-  const kept = p => p.id && (p.userId || p.isMe || !p.name.trim()) ? p.stored : null;
+  const kept = p => p.id && (_tnOthersClaim(p) || p.isMe || !p.name.trim()) ? p.stored : null;
   const taken = new Set();
   tnFormPlayers.forEach(p => {
     const n = kept(p) ?? (!p.isMe && p.name.trim());
@@ -971,7 +975,7 @@ function _tnRenderFormPlayers() {
   const signedIn = !!getCurrentUser();
   document.getElementById('tnFormRows').innerHTML = tnFormPlayers.map((p, i) => {
     const nick = _tnRowNick(p);
-    const prof = p.isMe ? getCurrentProfile() : p.userId ? tnProfiles.get(p.userId) : null;
+    const prof = p.isMe ? getCurrentProfile() : _tnOthersClaim(p) ? tnProfiles.get(p.userId) : null;
     const placeholder = p.stored && _tnIsDefaultName(p.stored) ? p.stored : t('Player {n}', { n: i + 1 });
     return `
     <div class="order-slot">
@@ -983,7 +987,7 @@ function _tnRenderFormPlayers() {
              oninput="tnFormPlayers[${i}].name = this.value" autocomplete="off">`}
       <div class="order-slot-actions">
         <button class="pf-btn del" type="button" onclick="tnRemoveFormPlayer(${i})" ${n > 2 ? `title="${t('Remove')}"` : `title="${t('A tournament needs at least 2 players.')}" disabled`}>❌</button>
-        <button class="pf-btn me${p.isMe ? ' on' : ''}${signedIn && !(p.userId && !p.isMe) ? '' : ' locked'}" type="button" onclick="tnToggleFormMe(${i})" title="${t('Me')}">👤</button>
+        <button class="pf-btn me${p.isMe ? ' on' : ''}${signedIn && !_tnOthersClaim(p) ? '' : ' locked'}" type="button" onclick="tnToggleFormMe(${i})" title="${t('Me')}">👤</button>
       </div>
     </div>`;
   }).join('');
@@ -1008,7 +1012,7 @@ function tnRemoveFormPlayer(i) {
 function tnToggleFormMe(i) {
   if (!getCurrentProfile()?.nickname) return;
   const p = tnFormPlayers[i];
-  if (p.userId && !p.isMe) return;
+  if (_tnOthersClaim(p)) return;
   const on = !p.isMe;
   tnFormPlayers.forEach(x => { x.isMe = false; });
   p.isMe = on;
