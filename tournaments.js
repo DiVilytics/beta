@@ -201,8 +201,8 @@ function tnRenderTournament() {
   const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
-    `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
+    `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
   ].join('');
 
   const ctx  = { user, isOrg, lobby, mine };
@@ -1175,14 +1175,14 @@ async function tnStartTable(tableId) {
 
 let tnView = null;   // 'tables' | 'standings' | 'log' (null: the default for the tournament)
 
-// A finished tournament has no current tables: it opens on its Final ranking,
+// A finished tournament has no current tables: it opens on its Standings,
 // then the Log and the Players (whose names can still be claimed).
 function _tnViewSegHTML() {
   const done = !!tnTour.finished_at;
   if (!tnView || (done && tnView === 'tables')) tnView = done ? 'standings' : 'tables';
   const btn = (v, label) => `<button class="seg-btn${tnView === v ? ' on' : ''}" type="button" onclick="tnSetView('${v}')">${label}</button>`;
   return `<div class="controls mb-1"><div class="seg tn-view-seg">${done
-    ? btn('players', t('Players')) + btn('standings', t('Final ranking')) + btn('log', t('Log'))
+    ? btn('players', t('Players')) + btn('standings', t('Standings')) + btn('log', t('Log'))
     : btn('tables', t('Tables')) + btn('standings', t('Standings')) + btn('log', t('Log'))}</div></div>`;
 }
 

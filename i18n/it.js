@@ -780,7 +780,6 @@ window.I18N.it = {
     "Edit result": "Modifica risultato",
     "Tables": "Tavoli",
     "Standings": "Classifica",
-    "Final ranking": "Classifica finale",
     "Log": "Registro",
     "{n} pt": "{n} pt",
     "{n} pts": "{n} pt",
