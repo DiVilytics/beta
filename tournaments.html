@@ -48,7 +48,8 @@
   <div class="page-header">
     <h2><span class="page-ico" aria-hidden="true">🏟️</span><span data-i18n>Tournaments</span></h2>
   </div>
-  <p class="page-intro" data-i18n>Organize a tournament: the players, the tables and the villains of every stage, and the points.</p>
+  <p class="page-intro"><span data-i18n>Organize a tournament: the players, the tables and the villains of every stage, and the points.</span>
+    <button class="tn-info tn-intro-help" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button></p>
 
   <a class="back-link hidden" id="tnBack" href="tournaments.html" onclick="goBack('tournaments.html'); return false;" data-i18n>← Back</a>
   <div id="tnRoot" class="spinner" data-i18n>Loading…</div>
@@ -61,10 +62,7 @@
          changes); then only the name and the date (.tn-fixed: the rest). -->
     <p class="modal-hint tn-rule-hint hidden" id="tnRedrawNote" data-i18n>No game has started yet, so every setting can change. Changing the tables, the stages, the pool or the players draws stage 1 again.</p>
     <div class="field">
-      <div class="tn-name-head">
-        <label for="tnName" data-i18n>Name</label>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="tnHelp()" data-i18n>ⓘ How the options work</button>
-      </div>
+      <label for="tnName" data-i18n>Name</label>
       <input type="text" id="tnName" maxlength="60" autocomplete="off">
     </div>
     <div class="field" data-help="date">
