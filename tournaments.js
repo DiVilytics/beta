@@ -79,10 +79,9 @@ function _tnShowError(msg) {
   const root = document.getElementById('tnRoot');
   root.querySelector(':scope > .err')?.remove();
   const el = document.createElement('div');
-  el.className = 'err show';
-  el.textContent = msg;
+  el.className = 'err';
   root.prepend(el);
-  el.scrollIntoView({ block: 'nearest' });
+  showError(el, msg);
 }
 
 // ── THE LIST ──────────────────────────────────────────────────────────────────
