@@ -917,6 +917,9 @@ main {
 .vs-grid .vs-box { border-left: 2px solid var(--muted); }
 .vs-grid tr.vs-box > * { border-top: 2px solid var(--muted); }
 .vs-grid td.ch-hit.sel { outline: 2px solid var(--text); outline-offset: -2px; }
+.vs-abbr { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: -0.02em; }
+/* Two switches on one row (Matchups on the beta). */
+.chart-switches { gap: 8px; flex-wrap: nowrap; }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }
