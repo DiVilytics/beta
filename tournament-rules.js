@@ -57,11 +57,11 @@ function _tnShuffle(list) {
 // (a table of 1) last.
 
 const TOURNAMENT_SPLITS = {
-  // As few tables as the size allows, as even as possible: 14 at 4 → 4, 4, 3,
+  // As few tables as the size allows, as balanced as possible: 14 at 4 → 4, 4, 3,
   // 3; 5 at 4 → 3, 2. Only tables of 2 can leave one player alone (a bye).
   even: {
-    name: 'Even',
-    hint: 'As many tables as needed, as even as possible (9 players at tables of 4: 3, 3, 3).',
+    name: 'Balanced',
+    hint: 'As many tables as needed, as balanced as possible (9 players at tables of 4: 3, 3, 3).',
     sizes(n, size) {
       const k = Math.ceil(n / size);
       const base = Math.floor(n / k), extra = n % k;

@@ -689,7 +689,7 @@ const TN_HELP = [
     'The day of the tournament, shown on its page and in the lists. The organizer can change it at any time, like the name, to fix a mistake. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Table size', [
-    'No table has more players than this. With Even tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
+    'No table has more players than this. With Balanced tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
     'It also sets the scale of the points: a win scores the same at every table, whatever its size.',
     'Fixed once the first game starts.',
   ]],
@@ -698,7 +698,7 @@ const TN_HELP = [
     'Fixed once the first game starts.',
   ]],
   ['tables', 'Tables', [
-    'Even: as many tables as needed, all as even as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye (see Bye).',
+    'Balanced: as many tables as needed, all as balanced as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye (see Bye).',
     'Full: every table full, and whoever is left over has a bye (sits out the stage, see Bye). 9 players at tables of 4 play at two tables of 4, and one has a bye; 7 players play at one table of 4, and three have a bye. With fewer players than a table, they all play together.',
     'Byes go to whoever has had the fewest so far (with Swiss pairing, the lowest ranked of them), so over the stages everyone gets their share.',
     'Fixed once the first game starts.',
