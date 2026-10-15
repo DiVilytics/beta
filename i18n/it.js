@@ -525,7 +525,7 @@ window.I18N.it = {
     "Games over time": "Partite nel tempo",
     "Games played each month, by play date. All time shows the latest 12 months (drag sideways for earlier ones); a year shows its months, a month its days.": "Partite giocate ogni mese, in base alla data di gioco. Con Sempre, gli ultimi 12 mesi (trascina di lato per i precedenti); un anno mostra i suoi mesi, un mese i suoi giorni.",
     "Players who claimed a villain each month, each counted once. All time shows the latest 12 months (drag sideways for earlier ones); a year its months, a month its days.": "Giocatori che hanno rivendicato un cattivo ogni mese, ognuno contato una volta. Con Sempre, gli ultimi 12 mesi (trascina di lato per i precedenti); un anno i suoi mesi, un mese i suoi giorni.",
-    "Games by weekday": "Partite per giorno della settimana",
+    "Games by weekday": "Giorni della settimana",
     "Games played on each weekday, by play date, Monday first. The weekday follows your time zone (or the recorded day, for games saved without a time).": "Partite giocate in ogni giorno della settimana, in base alla data di gioco, dal lunedì. Il giorno segue il tuo fuso orario (o il giorno registrato, per le partite salvate senza ora).",
     "Matchups": "Scontri",
     "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.": "Ogni coppia di cattivi, o di scatole, che si sono incontrati: quanto spesso ha vinto la riga, quando ha vinto uno dei due. Le celle più calde vincono di più; grigie sotto 5 partite insieme. Scorri la griglia.",
