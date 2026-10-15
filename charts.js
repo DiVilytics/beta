@@ -266,6 +266,50 @@ const CHARTS = [
     },
   },
   {
+    id: 'seatorder', icon: '🪑', label: 'Play order',
+    sizes: false,
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
+      pct:    "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
+    },
+    render({ games, mode }) {
+      // Only games with a recorded play order (every seat its own position) and
+      // one winner; a seat is its rank in the play order, 1 first.
+      const bySize = {};
+      for (const g of games) {
+        const seats = g.seats;
+        if (seats.some(s => s.position == null) || new Set(seats.map(s => s.position)).size !== seats.length) continue;
+        if (seats.filter(s => s.is_winner).length !== 1) continue;
+        seats.slice().sort((a, b) => a.position - b.position).forEach((s, i) => {
+          const cell = ((bySize[seats.length] ||= {})[i + 1] ||= { games: 0, wins: 0 });
+          cell.games++;
+          if (s.is_winner) cell.wins++;
+        });
+      }
+      const maxSeat = 6;
+      const rowLabels = TABLE_SIZES.map(s => `${s}p`);
+      const colLabels = Array.from({ length: maxSeat }, (_, i) => t('Seat {n}', { n: i + 1 }));
+      return Charts.heatmap(rowLabels, colLabels, (ri, ci) => {
+        const s = TABLE_SIZES[ri], seat = ci + 1;  // seats are 1-based (ranked play order)
+        if (seat > s) return null;                // that seat does not exist for this size
+        const cell = bySize[s] && bySize[s][seat];
+        if (!cell || !cell.games) return null;
+        const pct = cell.wins / cell.games, fair = 1 / s;
+        const d = chanceDelta({ wins: cell.wins, exp: cell.games * fair, vari: cell.games * fair * (1 - fair) });
+        const chance = mode === 'chance';
+        const heat = chance ? ((d ?? 0) + 3) / 6        // -3..+3 -> 0..1 on the ramp
+                            : (pct / fair - 0.5) / 1.5; // 0.5x..2x of fair -> 0..1
+        return {
+          value: heat,
+          label: chance ? fmtChance(d) : `${Math.round(pct * 100)}%`,
+          name:  t('{size}p, seat {seat}', { size: s, seat }),
+          meta:  `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
+        };
+      });
+    },
+  },
+  {
     // The id stays 'duration': it was the minutes-only chart.
     id: 'duration', icon: '⏳', label: 'Game length',
     modes: _MINUTES_ROUNDS,
@@ -316,7 +360,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'tablesize', icon: '👥', label: 'Players per game',
+    id: 'tablesize', icon: '👥', label: 'Table sizes',
     sizes: false,
     desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact number of games and its percentage of all the games played.',
     render({ games }) {
@@ -399,50 +443,6 @@ const CHARTS = [
       const pct = c => Math.round(c / total * 100);
       const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${tn(counts[d], '{n} game', '{n} games')} | ${pct(counts[d])}%` }));
       return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1, note: t('Weekends {pct}%', { pct: pct(counts[6] + counts[0]) }) });
-    },
-  },
-  {
-    id: 'seatorder', icon: '🪑', label: 'Play-order advantage',
-    sizes: false,
-    modes: _CHANCE_PCT,
-    desc: {
-      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
-      pct:    "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
-    },
-    render({ games, mode }) {
-      // Only games with a recorded play order (every seat its own position) and
-      // one winner; a seat is its rank in the play order, 1 first.
-      const bySize = {};
-      for (const g of games) {
-        const seats = g.seats;
-        if (seats.some(s => s.position == null) || new Set(seats.map(s => s.position)).size !== seats.length) continue;
-        if (seats.filter(s => s.is_winner).length !== 1) continue;
-        seats.slice().sort((a, b) => a.position - b.position).forEach((s, i) => {
-          const cell = ((bySize[seats.length] ||= {})[i + 1] ||= { games: 0, wins: 0 });
-          cell.games++;
-          if (s.is_winner) cell.wins++;
-        });
-      }
-      const maxSeat = 6;
-      const rowLabels = TABLE_SIZES.map(s => `${s}p`);
-      const colLabels = Array.from({ length: maxSeat }, (_, i) => t('Seat {n}', { n: i + 1 }));
-      return Charts.heatmap(rowLabels, colLabels, (ri, ci) => {
-        const s = TABLE_SIZES[ri], seat = ci + 1;  // seats are 1-based (ranked play order)
-        if (seat > s) return null;                // that seat does not exist for this size
-        const cell = bySize[s] && bySize[s][seat];
-        if (!cell || !cell.games) return null;
-        const pct = cell.wins / cell.games, fair = 1 / s;
-        const d = chanceDelta({ wins: cell.wins, exp: cell.games * fair, vari: cell.games * fair * (1 - fair) });
-        const chance = mode === 'chance';
-        const heat = chance ? ((d ?? 0) + 3) / 6        // -3..+3 -> 0..1 on the ramp
-                            : (pct / fair - 0.5) / 1.5; // 0.5x..2x of fair -> 0..1
-        return {
-          value: heat,
-          label: chance ? fmtChance(d) : `${Math.round(pct * 100)}%`,
-          name:  t('{size}p, seat {seat}', { size: s, seat }),
-          meta:  `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
-        };
-      });
     },
   },
 ];
