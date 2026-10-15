@@ -62,7 +62,7 @@ window.I18N.it = {
     "Pace rainbow": "Arcobaleno di velocità",
     "Played a villain of every pace": "Giocato un cattivo di ogni velocità",
     "Won with a villain of every pace": "Vinto con un cattivo di ogni velocità",
-    "Starting position": "Posizione di partenza",
+    "Play order": "Ordine di gioco",
     "Played from every seat (1st–6th)": "Giocato da ogni posto (1°–6°)",
     "Won from every seat (1st–6th)": "Vinto da ogni posto (1°–6°)",
     "None earned ({n})": "Nessuno ottenuto ({n})",
