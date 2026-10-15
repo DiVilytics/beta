@@ -270,7 +270,7 @@ window.I18N.it = {
     "Δ Wins": "Δ Vittorie",
     "No games": "Nessuna partita",
     "How it's computed": "Come si calcola",
-    "Wins above or below what equal chances would give: 0 is as expected.": "Vittorie in più o in meno rispetto a chance uguali: 0 è come atteso.",
+    "0 is what chance alone would score; above 0 is better than chance, below 0 worse.": "0 è il punteggio del solo caso; sopra 0 meglio del caso, sotto 0 peggio.",
     "Δ Wins compares a villain's wins with the wins it would have if everyone at the table had the same chance to win.": "Δ Vittorie confronta le vittorie di un cattivo con quelle che avrebbe se tutti al tavolo avessero la stessa probabilità di vincere.",
     "<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: the wins expected by chance, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.": "<b>W</b>: le sue vittorie. <b>N</b>: le sue partite. <b>k<sub>g</sub></b>: i giocatori della partita g. <b>E</b>: le vittorie attese per caso, 1/k<sub>g</sub> per partita (una partita in 4 si aspetta un quarto di vittoria). <b>V</b>: la loro varianza, quanto variano le vittorie per puro caso.",
     "W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn't stand out the way it does in % Wins.": "W − E è quante vittorie in più (o in meno) del previsto; dividere per √V, la deviazione standard, mette sulla stessa scala i cattivi con tante partite e con poche, così una serie fortunata in poche partite non spicca come in % Vittorie.",
