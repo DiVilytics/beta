@@ -1,10 +1,10 @@
 {
   "2026-10-12": {
-    "title": "Δ Wins, and charts by period and table size",
+    "title": "Tournaments, Δ Wins and new charts",
     "items": [
+      "Tournaments: set one up with its players and options, and DiVilytics draws the tables and villains of every stage and keeps the standings; players claim their name with its QR code, and one phone records each table's game.",
       "Δ Wins: how far each villain's wins are from what equal chances give, on the villains' Leaderboard and the charts.",
-      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians, and Matchups: who beats whom, villain against villain or box against box.",
-      "Solo: a clear warning on your last round, and the Phantom's die keeps its roll."
+      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians, and Matchups: who beats whom; and Solo warns you on your last round."
     ]
   },
   "2026-10-05": {

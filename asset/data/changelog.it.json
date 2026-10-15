@@ -1,10 +1,10 @@
 {
   "2026-10-12": {
-    "title": "Δ Vittorie, e grafici per periodo e numero di giocatori",
+    "title": "Tornei, Δ Vittorie e nuovi grafici",
     "items": [
+      "Tornei: crealo con i suoi giocatori e le sue opzioni, e DiVilytics sorteggia tavoli e cattivi di ogni fase e tiene la classifica; i giocatori rivendicano il proprio nome con il suo codice QR, e un telefono registra la partita di ogni tavolo.",
       "Δ Vittorie: quanto le vittorie di ogni cattivo si scostano da quelle di chance uguali, nella classifica dei cattivi e nei grafici.",
-      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi, cattivo contro cattivo o scatola contro scatola.",
-      "Solo: un avviso chiaro all'ultimo round, e il dado del giocatore Fantasma mantiene il suo tiro."
+      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi; e il Solo ti avvisa all'ultimo round."
     ]
   },
   "2026-10-05": {
