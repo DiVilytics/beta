@@ -1,244 +1,80 @@
 {
-  "2026-10-15": {
-    "title": "Δ Wins on the villains' Leaderboard",
-    "new": [
-      "The villains' Leaderboard opens on Δ Wins: how far each villain's wins are from what equal chances would give, in standard deviations, every game counted at its table size. 0 is exactly as expected, above 0 more wins, below 0 fewer. How it's computed explains the math.",
-      "Charts: Wins vs games, By pace, By box, Play-order advantage and Matchups switch between Δ Wins and % Wins."
-    ]
-  },
-  "2026-10-14": {
-    "title": "Charts by period and table size, and Solo's last round",
-    "new": [
-      "Charts: the Leaderboard's table size and period filters, for every chart."
-    ],
-    "improved": [
-      "Charts: Game length and Avg length by players switch between minutes and rounds, and Games over time also counts the players; a year shows its months, a month its days.",
-      "Solo: on your last round, a clear warning under the counter says that + ends the game, lost, and + turns red; on the lock screen, + stops there."
-    ],
-    "fixed": [
-      "Solo: going back a round and forward again shows the same roll of the Phantom's die, instead of rolling it again."
-    ]
-  },
-  "2026-10-10": {
-    "title": "Solo difficulty, new solo rules and the XP table",
-    "new": [
-      "Solo has three difficulty levels: Easy, Medium and Hard, with 25, 20 or 15 rounds, and Fated on 1-2, 1-4 or 1-6. In a game in progress, + rolls the Phantom's die and shows whether you're Fated, and + after your last round ends the game, lost. The Difficulty menu next to Solo filters by level, and a villain's page has a row for each."
-    ],
-    "improved": [
-      "Under the players' Leaderboard, XP table shows what a game is worth: by how many players claimed their villain, lost or won.",
-      "Solo has new rules in the FAQ: you play against a Phantom player, and eight villains get a fix of their own.",
-      "Your avatar, top right, now opens the settings too (theme, text size, language), with your account on top."
-    ],
-    "fixed": [
-      "A game timed in New Game without the round counter is no longer recorded with 1 round."
-    ]
-  },
-  "2026-10-09": {
-    "title": "Solo, XP, and fixing a recorded game",
-    "new": [
-      "Solo, an unofficial variant for one player: your villain against the game, with 20 turns to reach the Objective. Record it from New Game; solo games have their own rankings and stats, under the dashed Solo pill, and never count with the others. The FAQ summarizes its rules.",
-      "The players' Leaderboard opens on XP: for every game where you claimed your villain, 1 for each player who claimed theirs, you included, and if you won, 1 more for each of the others; plus 1 for each achievement.",
-      "Whoever recorded a game can change its villains and its winner until another player claims a villain, and can delete the game from its page.",
-      "Villain Movers: next to each villain's name, and in a row while a game is in progress.",
-      "Seven new avatar images.",
-      "Join the beta from your account page to try new features before everyone else."
-    ],
-    "improved": [
-      "After saving a game, its page opens with the QR code on top: close it to check the villains, the winner and the details.",
-      "On a villain's page, tap a table size, or Solo, to see its numbers in the boxes on top.",
-      "Achievements are now only on player pages: the ones earned, and with Show all also those still to earn.",
-      "The villains' Leaderboard always lists every villain, even those without games in the chosen filters."
-    ]
-  },
-  "2026-10-07": {
-    "title": "Leaderboard and Game Log by year and month",
-    "new": [
-      "All time, Year and Month in the Leaderboard, the Game Log and player pages: pick a year, then a month to narrow it down. On a player page, achievements and Most played with stay all-time.",
-      "The monthly report moved from the Villains page into the Leaderboard, with the full ranking instead of the top and bottom three, for players too and for each table size.",
-      "This page: what's new on DiVilytics, update by update."
-    ],
-    "improved": [
-      "% Wins no longer hides entries with fewer than 5 games: they're listed after the ranking, without a position.",
-      "What's new tints in purple what changed since your last visit."
-    ]
-  },
-  "2026-10-06": {
-    "title": "Every villain guide, more games, keyboard shortcuts",
-    "new": [
-      "A guide for every villain, Introduction to Evil included: the objective and how each villain plays.",
-      "Game logs shared on the Disney Villainous Subreddit. Imported games without a date say Date unknown and come last in the Game Log.",
-      "Keyboard shortcuts on a computer: a key for each page and setting, / for the search box. Press ? for the list."
-    ],
-    "improved": [
-      "The round counter shows the current round, starting from 1, and − can't go below it (on the lock screen too).",
-      "Villain filters: Reset goes back to where you started (your boxes, in New Game).",
-      "Villainous Italia games show only their date, since the sheet has no time."
-    ],
-    "fixed": [
-      "A game started by mistake and paused within the first minute no longer saves a duration and one round."
+  "2026-10-12": {
+    "title": "Δ Wins, and charts by period and table size",
+    "items": [
+      "Δ Wins: how far each villain's wins are from what equal chances give, on the villains' Leaderboard and the charts.",
+      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians, and Matchups: who beats whom, villain against villain or box against box.",
+      "Solo: a clear warning on your last round, and the Phantom's die keeps its roll."
     ]
   },
   "2026-10-05": {
-    "title": "A smoother New Game, text size and Install",
-    "new": [
-      "Text size in Settings: Small or Large.",
-      "Install on the home page adds DiVilytics to your home screen (or shows the steps, on iPhone and Mac).",
-      "Game Log: With these finds the games that had every villain you pick at the table."
-    ],
-    "improved": [
-      "New Game keeps one game at a time: a game in progress is there when you come back, ready to resume.",
-      "The form and the draw pool are kept while you edit, and the draw pool starts from your boxes.",
-      "One draw button that fills the empty rows or redraws them all, disabled when the draw pool is too small.",
-      "If the lock-screen controls need a tap after you come back, a full-screen \"Tap to continue\" asks for it.",
-      "Every pop-up closes by dragging it down, or with Esc on a computer.",
-      "Back links return to the page you came from.",
-      "New Game gets its own ⚔️ icon."
+    "title": "Solo, XP, guides and a smoother New Game",
+    "items": [
+      "Solo, an unofficial variant for one player against a Phantom player, with its own rankings; and XP, earned from claimed games and achievements.",
+      "All time, Year and Month on the Leaderboard, the Game Log and player pages; a guide for every villain; Villain Movers; and this page.",
+      "New Game keeps your game in progress and your draw pool; whoever recorded a game can fix or delete it; text size, Install, keyboard shortcuts and the settings under your avatar."
     ]
   },
-  "2026-10-04": {
-    "title": "DiVilytics in Italian, villain guides and Settings",
-    "new": [
-      "DiVilytics in Italian, with the F.A.Q., card names, card texts, objectives and guides as printed in the Italian edition.",
-      "Villain guides: the objective and how the villain plays, with links to its cards.",
-      "Settings (⚙️ in the top bar): theme and language.",
-      "F.A.Q.: the official rules summarized, and what Introduction to Evil changes."
-    ],
-    "improved": [
-      "New Game has simpler lineup controls: one draw button and Random order."
+  "2026-09-28": {
+    "title": "DiVilytics in Italian, Tutorial and F.A.Q.",
+    "items": [
+      "DiVilytics in Italian, with cards, objectives and guides as printed in the Italian edition.",
+      "A Tutorial, the F.A.Q. with the official rules summarized, and every villain's decks card by card."
     ]
   },
-  "2026-10-03": {
-    "title": "Tutorial, F.A.Q. and villain decks",
-    "new": [
-      "Tutorial: from your first game to finding your stats.",
-      "F.A.Q.: the rules clarifications of the Villainous Italia F.A.Q., general and villain by villain, with a search box.",
-      "Villain pages show the Villain and Fate decks card by card; tap a card for its text.",
-      "Rivalries add Faced most, next to Beaten most and Lost to most."
-    ],
-    "improved": [
-      "Characters are now called Villains.",
-      "Game cards list the players in play order, with their seat numbers.",
-      "Games over time shows the last 12 months; drag to see earlier ones.",
-      "A player's Max streak turns gold while they're on their best streak.",
-      "Rivalries count only opponents faced in at least 5 games.",
-      "Box names show their release year."
-    ]
-  },
-  "2026-08-06": {
+  "2026-08-03": {
     "title": "Introduction to Evil and Darkness Brewing",
-    "new": [
-      "Introduction to Evil: its four reworked villains are villains of their own ([I2E]), with their own stats.",
-      "Darkness Brewing: its reprinted villains are listed under it too, and you can mark it among your boxes.",
+    "items": [
+      "Introduction to Evil's reworked villains with stats of their own, and Darkness Brewing among your boxes.",
       "Download all your games as a CSV from your Account."
-    ],
-    "improved": [
-      "The % Wins ranking only includes entries with at least 5 games, so one lucky win can't top it."
-    ],
-    "fixed": [
-      "My boxes now works villain by villain for reprinted villains: one still counts if you own any of its boxes."
     ]
   },
-  "2026-07-21": {
+  "2026-07-20": {
     "title": "Three new villains",
-    "new": [
-      "Ernesto de la Cruz and Prince Hans (Success at Any Cost), and the Sanderson Sisters (Come, We Fly!)."
-    ],
-    "improved": [
-      "The Leaderboard shows 30 rows at a time, with Load more."
+    "items": [
+      "Ernesto de la Cruz, Prince Hans and the Sanderson Sisters."
     ]
   },
-  "2026-06-24": {
+  "2026-06-22": {
     "title": "Charts and the Players page",
-    "new": [
-      "Charts: games over time and by weekday, players per game, game length and rounds, win rate by pace, by box and against popularity, box popularity, play-order advantage and more.",
-      "Players: search for any player and open their profile, or share yours with a QR code.",
-      "Villains: group them by box or by pace."
+    "items": [
+      "Charts: a dozen ways to explore every recorded game.",
+      "Players: search for any player, or share your profile with a QR code."
     ]
   },
-  "2026-06-18": {
-    "title": "Rivalries and friends",
-    "new": [
-      "Villain pages show each villain's rivalries: the villains it beats most and loses to most.",
-      "Player pages show who they play with most."
-    ]
-  },
-  "2026-06-16": {
-    "title": "New Account page, villain filters and more achievements",
-    "new": [
-      "A new Account page: change your nickname, pick your avatar, share your profile.",
-      "New Game's Draw pool: leave villains out of the random draw, or limit it to your boxes.",
-      "Game Log: filter the games by villain.",
-      "Villains: a monthly report with the top and bottom villains of the month.",
-      "The Leaderboard shows your position at the bottom when you're further down.",
-      "New achievements: games played, locations, every table size and every seat, every pace, players played with and beaten, longest win streak.",
-      "Acknowledgments on the home page."
-    ],
-    "improved": [
-      "The Game Log loads more games as you go, with Load more."
-    ]
-  },
-  "2026-06-07": {
-    "title": "Build your own avatar",
-    "new": [
-      "Build your own avatar: body, face, eyes, hair and more over a background color, or pick one of the images.",
-      "Places you've already used are suggested when you type a location, in New Game and when editing a game."
+  "2026-06-15": {
+    "title": "New Account page, rivalries and more achievements",
+    "items": [
+      "A new Account page, villain filters in New Game and the Game Log, and many new achievements.",
+      "Villain pages show their rivalries, and player pages who they play with most."
     ]
   },
   "2026-06-01": {
-    "title": "A new way to claim your villain",
-    "new": [
-      "Scanning a game's QR code opens its claim page: claim the villain you played, or release it if you picked the wrong one.",
-      "Players of a game can edit its location, duration and rounds, and show its QR code again."
-    ],
-    "fixed": [
-      "Location suggestions."
+    "title": "Claim your villain, and build your avatar",
+    "items": [
+      "Scanning a game's QR code opens its page: claim your villain, or fix the game's details.",
+      "Build your own avatar, and places you've used are suggested as you type a location."
     ]
   },
-  "2026-05-17": {
-    "title": "Sign in with Google",
-    "new": [
-      "Sign in with Google as well as Discord, from a new sign-in page.",
-      "Link both to the same profile from your Account (you need to keep at least one)."
+  "2026-05-11": {
+    "title": "My boxes, achievements and Google",
+    "items": [
+      "Mark the boxes you own, and earn bronze, silver and gold achievements for every villain.",
+      "Sign in with Google as well as Discord, and choose your player icon."
     ]
   },
-  "2026-05-14": {
-    "title": "My boxes and achievements",
-    "new": [
-      "Mark the boxes you own on your Account; New Game can limit the random draw to their villains.",
-      "Achievements: bronze, silver and gold for every villain, for games played and won (1, 5 and 10), on your Account and on player pages.",
-      "Choose your player icon.",
-      "Shuffle order randomizes the play order."
-    ],
-    "improved": [
-      "The counter says rounds instead of turns: a round ends when every player has had their turn."
+  "2026-05-04": {
+    "title": "A new name, New Game and the Game Log",
+    "items": [
+      "DVS becomes DiVilytics, and villain pages show their rules clarifications.",
+      "Recording a game gets its own page, New Game, with the random draw, and the game history becomes the Game Log."
     ]
   },
-  "2026-05-10": {
-    "title": "New Game and Game Log",
-    "new": [
-      "Recording a game has its own page, New Game, and the game history becomes the Game Log.",
-      "The random draw moved into New Game: draw every villain or only the empty rows, and draw by pace (Pace+ adds the neighboring colors).",
-      "A game in progress can be resumed or discarded."
-    ]
-  },
-  "2026-05-07": {
-    "title": "A new name and the rules clarifications",
-    "new": [
-      "The site is now called DiVilytics (it started as DVS, Disney Villainous Stats).",
-      "Each villain's page shows the rules clarifications (F.A.Q.) for that villain."
-    ],
-    "improved": [
-      "Filtered game history pages through every result."
-    ]
-  },
-  "2026-04-23": {
+  "2026-04-20": {
     "title": "DVS goes online",
-    "new": [
-      "Record your games: pick the villains or draw them at random, randomize the play order, and time the game with a counter that keeps working with the screen locked.",
-      "Save the game and share its QR code, so the other players can link their profiles to the villains they played.",
-      "Game history, a leaderboard of villains and players, and a page for every villain and every player with win rates and stats.",
-      "Sign in with Discord and choose a unique nickname.",
-      "Dark, light or automatic theme."
+    "items": [
+      "Record your games with a timer, and share a QR code so every player can claim their villain.",
+      "Game history, leaderboards, and a page for every villain and every player."
     ]
   }
 }

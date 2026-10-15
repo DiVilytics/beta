@@ -72,7 +72,7 @@ async function _initChangelogCard() {
   const log    = await loadChangelog();
   const latest = Object.keys(log).sort().pop();
   if (!latest) return;
-  document.getElementById('changelogDesc').textContent = t('Last update: {date}', { date: fmtDayLong(latest) });
+  document.getElementById('changelogDesc').textContent = t('Last update: week of {date}', { date: fmtDayLong(latest) });
   const seen = changelogSeen();
   document.getElementById('changelogDot').classList.toggle('hidden', !!seen && !changelogUnseen(latest, log[latest], seen));
 }

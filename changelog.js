@@ -1,22 +1,16 @@
 // What's new: the release notes (asset/data/changelog.json, via loadChangelog),
-// newest first, each entry a date, a title and up to three groups: New,
-// Improved, Fixed. Entries added (or extended) since the last visit are tinted
-// purple; opening the page then marks everything as seen, which also clears the
-// dot on the home page's card (index.js).
-
-const CL_GROUPS = [['new', 'New'], ['improved', 'Improved'], ['fixed', 'Fixed']];
+// newest first, one entry a week (keyed by its Monday), a title and up to three
+// short points (`items`): what changed that week, in a few words. Entries
+// added (or extended) since the last visit are tinted purple; opening the page
+// then marks everything as seen, which also clears the dot on the home page's
+// card (index.js).
 
 function _entryHTML(day, entry, unseen) {
-  const groups = CL_GROUPS.filter(([key]) => entry[key]?.length).map(([key, label]) => `
-    <div class="cl-group">
-      <div class="cl-group-lbl">${t(label)}</div>
-      <ul class="cl-list">${entry[key].map(item => `<li>${_esc(item)}</li>`).join('')}</ul>
-    </div>`).join('');
   return `
     <article class="cl-entry${unseen ? ' cl-unseen' : ''}">
-      <div class="cl-date">${_esc(fmtDayLong(day))}</div>
+      <div class="cl-date">${_esc(t('Week of {date}', { date: fmtDayLong(day) }))}</div>
       <h3 class="cl-title">${_esc(entry.title || '')}</h3>
-      ${groups}
+      <ul class="cl-list">${(entry.items || []).map(item => `<li>${_esc(item)}</li>`).join('')}</ul>
     </article>`;
 }
 

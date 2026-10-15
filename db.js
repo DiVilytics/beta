@@ -189,12 +189,18 @@ async function loadChangelog() {
   return _changelog;
 }
 
-const _changelogItems = e => ['new', 'improved', 'fixed'].reduce((n, k) => n + (e[k]?.length || 0), 0);
+// An entry's fingerprint: any change to its title or points changes it.
+function _changelogHash(e) {
+  let h = 0;
+  for (const ch of JSON.stringify([e.title, e.items])) h = (h * 31 + ch.charCodeAt(0)) | 0;
+  return (h >>> 0).toString(36);
+}
 
-// The stamp of a log's newest entry, the value stored once it's been seen.
+// The stamp of a log's newest entry (a week, keyed by its Monday), the value
+// stored once it's been seen: the week and its fingerprint.
 function changelogStamp(log) {
   const day = Object.keys(log).sort().pop();
-  return day ? `${day}#${_changelogItems(log[day])}` : null;
+  return day ? `${day}#${_changelogHash(log[day])}` : null;
 }
 
 // The stamp seen last ('' = never; an old bare date counts as fully seen).
@@ -202,13 +208,13 @@ function changelogSeen() {
   try { return localStorage.getItem(CHANGELOG_SEEN_KEY) || ''; } catch (_) { return ''; }
 }
 
-// Whether an entry is newer than `seen`: a later day, or the seen day with more
-// items. Nothing counts as new before a first visit, so a newcomer's page isn't
-// all purple.
+// Whether an entry is newer than `seen`: a later week, or the seen week
+// changed since (a point added or reworded). Nothing counts as new before a
+// first visit, so a newcomer's page isn't all purple.
 function changelogUnseen(day, entry, seen) {
   if (!seen) return false;
-  const [seenDay, seenCount] = seen.split('#');
-  return day > seenDay || (day === seenDay && seenCount != null && _changelogItems(entry) > +seenCount);
+  const [seenDay, seenHash] = seen.split('#');
+  return day > seenDay || (day === seenDay && seenHash != null && _changelogHash(entry) !== seenHash);
 }
 
 let _objectives = null;
