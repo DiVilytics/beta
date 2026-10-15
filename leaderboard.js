@@ -413,7 +413,7 @@ function render({ rows, summary }) {
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'chance' ? `<p class="results-hint">${t('0 is what chance alone would score; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
+    ${mode === 'chance' ? `<p class="results-hint">${t('0 is the score you would get by picking the winners at random; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
