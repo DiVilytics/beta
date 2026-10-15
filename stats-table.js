@@ -48,7 +48,7 @@ function statValueDisplay(r, mode) {
 function _headLabel(key) {
   const full = t(key), short = t(`${key} (short)`);
   return short === `${key} (short)` || short === full ? full
-    : `<span class="lbl-full">${full}</span><span class="lbl-short">${short}</span>`;
+    : `<span class="stat-lbl-full">${full}</span><span class="stat-lbl-short">${short}</span>`;
 }
 function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
@@ -69,10 +69,14 @@ function statGamesWidth(rows, mode) {
 }
 
 // `xp: true` adds XP first (the players' Leaderboard).
+// Each label also has a short form ('% Wins:short' in i18n: "% Vitt."), shown
+// only where a row is too tight for the full ones (.seg-short on a parent: the
+// villain page with its All / Solo menu); without one, the full label.
+const _statShortLabel = key => { const s = t(key + ':short'); return s.endsWith(':short') ? t(key) : s; };
 function statModeSegHTML(mode, fn, { xp = false } = {}) {
-  const btn = (m, label) =>
-    `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')">${label}</button>`;
-  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', t('XP')) : ''}${btn('pct', t('% Wins'))}${btn('count', t('# Wins'))}${btn('games', t('# Games'))}</div></div>`;
+  const btn = (m, key) =>
+    `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')"><span class="stat-lbl-full">${t(key)}</span><span class="stat-lbl-short">${_statShortLabel(key)}</span></button>`;
+  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {

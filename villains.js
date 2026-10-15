@@ -421,7 +421,28 @@ function render() {
       ${rows.map(r => rowHTML(r.label, r.key)).join('')}
     </div>
     ${_adversariesSectionHTML()}`}`;
+  _fitModeRow();
 }
+
+// Too tight for the switch's full labels and the whole All / Solo menu (a
+// narrow phone, Italian, Large text): the switch takes its short labels
+// (% Vitt.), and the menu is cut short only if even that isn't enough.
+function _fitModeRow() {
+  const row = document.querySelector('.cs-mode-row');
+  const sel = row?.querySelector('select');
+  if (!sel) return;
+  row.classList.remove('seg-short');
+  // A menu doesn't report a cut label: compare it with an unconstrained copy
+  // holding only the option shown (a menu is as wide as its longest option).
+  const copy = sel.cloneNode(false);
+  copy.appendChild(sel.options[sel.selectedIndex].cloneNode(true));
+  copy.style.cssText = 'position:absolute;visibility:hidden;width:auto;min-width:0';
+  sel.parentNode.appendChild(copy);
+  const natural = copy.getBoundingClientRect().width;
+  copy.remove();
+  if (sel.getBoundingClientRect().width < natural - 1) row.classList.add('seg-short');
+}
+window.addEventListener('resize', _fitModeRow);
 
 // "Rivalries": the opponents this character has beaten most / lost to most,
 // from the character_adversary_stats RPC. Top-5 per column (a character can
