@@ -353,7 +353,7 @@ function openXpTable() {
         ${row(t('Won'),  'xp-won',  c => 2 * c - 1)}
       </tbody>
     </table>
-    <p class="modal-hint">${t('Plus 1 XP for each achievement.')}</p>`;
+    <p class="modal-hint">${t('Moreover, each achievement gives 1 XP.')}</p>`;
   openOverlay('xpOverlay');
 }
 
