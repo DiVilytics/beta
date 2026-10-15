@@ -376,12 +376,12 @@ function render() {
       </div>`;
   };
 
-  // All / Solo, a menu drawn as a pill (the period filter's), flush right on
-  // the switch's row; dashed on Solo, as Solo is everywhere. On a phone too
-  // narrow for both, it moves under the switch, still on the right.
+  // All / Solo, New Game's menu (its player count), flush right on the
+  // switch's row; dashed on Solo, as Solo is everywhere. On a narrow phone its
+  // label gives way first (…), the row stays one.
   const soloMenu = `
-      <span class="period-pill-wrap">
-        <select class="period-pill on${soloOn ? ' pill-solo' : ''}" aria-label="${_esc(t('Solo'))}" onchange="csSetSolo(this.value === 'solo'); this.blur()">
+      <span class="count-select-wrap cs-solo-menu">
+        <select class="players-count-select${soloOn ? ' solo' : ''}" aria-label="${_esc(t('Solo'))}" onchange="csSetSolo(this.value === 'solo'); this.blur()">
           <option value="all"${soloOn ? '' : ' selected'}>${_esc(t('All'))}</option>
           <option value="solo"${soloOn ? ' selected' : ''}>${_esc(t('Solo'))}</option>
         </select>
