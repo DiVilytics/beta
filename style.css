@@ -2588,7 +2588,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
    never mistaken for the official game. The Solo pill (size-filter.js, the
    villain page), solo game cards, the FAQ's solo section and its entries. */
 .pill-solo, .pill-solo.on { border-style: dashed; }
-/* A villain page: All | Solo above the numbers, like the size filter. */
+/* A villain page: the All / Solo menu above the numbers. */
 .cs-solo-pills { margin-bottom: 12px; }
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
