@@ -2452,7 +2452,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 /* Your game, on top of Tables: your table, villain (mover and portrait), turn. */
 .tn-you { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .tn-you-villain { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.tn-you-villain .mover { zoom: 0.32; margin-left: auto; }   /* on the right, as on the villain page */
+.tn-you-villain .mover { margin-left: auto; }   /* on the right, the villain page's size (.cs-mover) */
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
