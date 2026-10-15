@@ -328,8 +328,9 @@ function _tnYourGameHTML(mine) {
   return `
     <div class="claim-game-info tn-you">
       <div class="claim-date">${head} | ${t('Table {n}', { n: tb.table_no })}</div>
-      <div class="tn-you-villain">${moverImgHTML(seat.character)}${charImgHTML(seat.character)}
+      <div class="tn-you-villain">${charImgHTML(seat.character)}
         <div class="claim-who"><div class="claim-name">${villainNameHTML(seat.character)}</div><div class="claim-nick">${line}</div></div>
+        ${moverImgHTML(seat.character)}
       </div>
       ${action ? `<div class="tn-you-actions">${action}</div>` : ''}
     </div>`;
