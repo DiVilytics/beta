@@ -237,15 +237,17 @@ function _addChance(rows, bySize) {
 
 // How Δ Wins is computed (How it's computed ›, under the explanation).
 function openChanceInfo() {
-  const frac = (top, bottom) => `<span class="math-frac"><span>${top}</span><span>${bottom}</span></span>`;
-  const sqrt = x => `√${x}`;
-  const sum  = x => `<span class="math-sum"><span>N</span><span>Σ</span><span>g=1</span></span>${x}`;
-  const kg   = 'k<sub>g</sub>';
+  // The formulas in MathML, the browser's own math typesetting.
+  const math = x => `<math display="block" displaystyle="true" class="math-block">${x}</math>`;
+  const frac = (top, bottom) => `<mfrac>${top}${bottom}</mfrac>`;
+  const kg   = '<msub><mi>k</mi><mi>g</mi></msub>';
+  const inv  = frac('<mn>1</mn>', kg);
+  const sum  = x => `<munderover><mo largeop="true" movablelimits="false">∑</mo><mrow><mi>g</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>${x}`;
   document.getElementById('chanceBody').innerHTML = `
     <p class="modal-hint">${t('Δ Wins compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
-    <div class="math-block">Δ = ${frac('W − E', sqrt('V'))}</div>
-    <div class="math-block">E = ${sum(frac('1', kg))}</div>
-    <div class="math-block">V = ${sum(`${frac('1', kg)} (1 − ${frac('1', kg)})`)}</div>
+    ${math(`<mi mathvariant="normal">Δ</mi><mo>=</mo>${frac('<mrow><mi>W</mi><mo>−</mo><mi>E</mi></mrow>', '<msqrt><mi>V</mi></msqrt>')}`)}
+    ${math(`<mi>E</mi><mo>=</mo>${sum(inv)}`)}
+    ${math(`<mi>V</mi><mo>=</mo>${sum(`${inv}<mrow><mo stretchy="true">(</mo><mn>1</mn><mo>−</mo>${inv}<mo stretchy="true">)</mo></mrow>`)}`)}
     <p class="modal-hint">${t('<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: the wins expected by chance, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.')}</p>
     <p class="modal-hint">${t('W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
     <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
