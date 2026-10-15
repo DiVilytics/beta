@@ -1440,6 +1440,9 @@ select:disabled {
    390px up); with Large text on the narrowest phones it scrolls instead. */
 .stat-mode-seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .stat-mode-seg .seg-btn { padding: 0 clamp(4px, calc((100vw - 290px * var(--ts)) / 7), 14px); }
+/* Every option equally wide (the widest one's width), so a short one (XP)
+   isn't a sliver. */
+.stat-mode-seg { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
 
 .summary {
   display: grid;
