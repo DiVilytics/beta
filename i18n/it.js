@@ -620,7 +620,7 @@ window.I18N.it = {
     "Tap <span class=\"tut-ico\">⚙️</span> in the top bar to choose the theme (<em>Auto</em> follows your device, or <em>Light</em> and <em>Dark</em>), the text size (<em>Small</em> or <em>Large</em>) and the language (English or Italiano).<br><br>On a computer, press <strong>?</strong> to see the keyboard shortcuts: a key for every page and setting.": "Tocca <span class=\"tut-ico\">⚙️</span> nella barra in alto per scegliere il tema (<em>Auto</em> segue il dispositivo, oppure <em>Chiaro</em> e <em>Scuro</em>), la dimensione del testo (<em>Piccolo</em> o <em>Grande</em>) e la lingua (English o Italiano).<br><br>Da computer, premi <strong>?</strong> per vedere le scorciatoie da tastiera: un tasto per ogni pagina e impostazione.",
     // Solo, the unofficial variant (solo.js)
     "Solo": "Solitario",
-    "Solo variant, unofficial: one villain against the game, {easy}, {medium} or {hard} turns to reach the Objective (Easy, Medium, Hard). Counted only under Solo, never with the other games.": "Variante in solitario, non ufficiale: un cattivo contro il gioco, {easy}, {medium} o {hard} turni per raggiungere l'Obiettivo (Facile, Media, Difficile). Le sue partite contano solo in Solitario, mai insieme alle altre.",
+    "Unofficial variant for one player, counted on its own.": "Variante non ufficiale per un giocatore, contata a parte.",
     "Solo rules": "Regole del solitario",
     "Couldn't load the solo games": "Impossibile caricare le partite in solitario",
     "No solo games yet": "Ancora nessuna partita in solitario",
@@ -628,7 +628,7 @@ window.I18N.it = {
     "{nick} hasn't recorded any solo games.": "{nick} non ha ancora partite in solitario.",
     "Choose your villain.": "Scegli il tuo cattivo.",
     "A solo game on {level} ends by round {n}.": "Una partita in solitario a difficoltà {level} finisce entro il round {n}.",
-    "The counter shows the current round: alone, every turn is a round. At the end of each of your turns tap +, and the die rolls for the Phantom: Fated or Safe. + after your last round ends the game, lost. Reached your Objective? Tap Pause game, mark 👑 and save.": "Il contatore mostra il round in corso: da soli ogni turno è un round. Alla fine di ogni tuo turno tocca +, e il dado tira per il fantasma: Fato o Al sicuro. + dopo il tuo ultimo round chiude la partita, persa. Hai raggiunto l'Obiettivo? Tocca Pausa partita, segna 👑 e salva.",
+    "Tap + after each of your turns: the die rolls for the Phantom. Objective reached? Pause, mark 👑 and save. <a href=\"faq.html?topic=solo\">Solo rules ›</a>": "Tocca + dopo ogni tuo turno: il dado tira per il Fantasma. Obiettivo raggiunto? Pausa, segna 👑 e salva. <a href=\"faq.html?topic=solo\">Regole del solitario ›</a>",
     "This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.": "Questa è una partita di un torneo: i suoi cattivi vanno ai giocatori che rivendicano il proprio nome nel torneo, con il suo QR code.",
     "A solo game's difficulty, villain and result can't be changed.": "Difficoltà, cattivo e risultato di una partita in solitario non si possono cambiare.",
     "A solo game is always its creator's.": "Una partita in solitario è sempre di chi l'ha registrata.",

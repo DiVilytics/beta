@@ -134,6 +134,5 @@ const soloWonIds = players => new Set(players.filter(p => p.is_winner).map(p => 
 
 // What Solo is, wherever it's picked (the filters, New Game).
 function soloHintHTML() {
-  const [e, m, h] = SOLO_LEVEL_IDS.map(id => SOLO_LEVELS[id].turns);
-  return `<p class="results-hint solo-hint">${t('Solo variant, unofficial: one villain against the game, {easy}, {medium} or {hard} turns to reach the Objective (Easy, Medium, Hard). Counted only under Solo, never with the other games.', { easy: e, medium: m, hard: h })} <a href="${SOLO_FAQ_HREF}">${t('Solo rules')} ›</a></p>`;
+  return `<p class="results-hint solo-hint">${t('Unofficial variant for one player, counted on its own.')} <a href="${SOLO_FAQ_HREF}">${t('Solo rules')} ›</a></p>`;
 }
