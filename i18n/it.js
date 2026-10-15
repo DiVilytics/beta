@@ -256,7 +256,7 @@ window.I18N.it = {
     "Lost": "Persa",
     "Won": "Vinta",
     "Players who claimed, you included": "Giocatori che hanno rivendicato, te compreso",
-    "Plus 1 XP for each achievement.": "Più 1 XP per ogni traguardo.",
+    "Moreover, each achievement gives 1 XP.": "Inoltre, ogni traguardo dà 1 XP.",
     "# Wins": "N. Vittorie",
     "# Games": "N. Partite",
     "% Wins": "% Vittorie",
