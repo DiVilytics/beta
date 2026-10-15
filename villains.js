@@ -376,18 +376,18 @@ function render() {
       </div>`;
   };
 
-  // All / Solo, a menu drawn as a pill (the period filter's), above the numbers;
-  // dashed on Solo, as Solo is everywhere.
-  root.innerHTML = `
-    <div class="pill-group period-row cs-solo-pills">
+  // All / Solo, a menu drawn as a pill (the period filter's), flush right on
+  // the switch's row; dashed on Solo, as Solo is everywhere. On a phone too
+  // narrow for both, it moves under the switch, still on the right.
+  const soloMenu = `
       <span class="period-pill-wrap">
         <select class="period-pill on${soloOn ? ' pill-solo' : ''}" aria-label="${_esc(t('Solo'))}" onchange="csSetSolo(this.value === 'solo'); this.blur()">
           <option value="all"${soloOn ? '' : ' selected'}>${_esc(t('All'))}</option>
           <option value="solo"${soloOn ? ' selected' : ''}>${_esc(t('Solo'))}</option>
         </select>
         <span class="chevron" aria-hidden="true">▼</span>
-      </span>
-    </div>
+      </span>`;
+  root.innerHTML = `
     <div class="summary">
       ${statBoxesHTML([
         { val: v(sel.games), lbl: t('Games') },
@@ -397,7 +397,10 @@ function render() {
         { val: v(sel.wins), lbl: t('Wins') },
       ])}
     </div>
-    ${statModeSegHTML(csMode, 'csSetMode')}
+    <div class="cs-mode-row">
+      ${statModeSegHTML(csMode, 'csSetMode')}
+      ${soloMenu}
+    </div>
     ${!csLoading && shown.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
     ${soloOn ? `
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
