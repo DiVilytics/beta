@@ -380,7 +380,7 @@ function renderGlobalDetailHTML(key, global) {
       <p class="modal-hint">${t("Only players who've claimed their villain in a game count.")}</p>`;
   }
   if (key === 'tables') {
-    return _setCompletionDetailHTML(`👥 ${t('Table sizes')}`,
+    return _setCompletionDetailHTML(`👥 ${t('Number of players')}`,
       [2, 3, 4, 5, 6].map(s => ({ label: t('{n} players', { n: s }), played: global.tableSizes[s].played, won: global.tableSizes[s].won })),
       t('Played every size (2–6p)'), t('Won every size (2–6p)'));
   }
