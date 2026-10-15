@@ -275,9 +275,9 @@ function csSelectRow(key) {
   render();
 }
 
-// All | Solo, as in the size filter: Solo shows the solo table (from the level
-// with this villain's most solo games) in place of the official one and the
-// rivalries; All (or Solo again) goes back to Overall.
+// All / Solo (the menu above the numbers): Solo shows the solo table (from the
+// level with this villain's most solo games) in place of the official one and
+// the rivalries; All goes back to Overall.
 function csSetSolo(on) {
   if (on === SOLO_LEVEL_IDS.includes(csRow)) return;
   csRow = on ? SOLO_LEVEL_IDS.reduce((a, id) => _soloStats(id).games > _soloStats(a).games ? id : a, SOLO_LEVEL_IDS[0]) : 'all';
@@ -376,11 +376,17 @@ function render() {
       </div>`;
   };
 
-  // All | Solo on its own row above the numbers, as the size filter elsewhere.
+  // All / Solo, a menu drawn as a pill (the period filter's), above the numbers;
+  // dashed on Solo, as Solo is everywhere.
   root.innerHTML = `
-    <div class="pill-group cs-solo-pills">
-      <button class="pill${soloOn ? '' : ' on'}" type="button" onclick="csSetSolo(false)" aria-pressed="${!soloOn}">${t('All')}</button>
-      <button class="pill pill-solo${soloOn ? ' on' : ''}" type="button" onclick="csSetSolo(!${soloOn})" aria-pressed="${soloOn}">${t('Solo')}</button>
+    <div class="pill-group period-row cs-solo-pills">
+      <span class="period-pill-wrap">
+        <select class="period-pill on${soloOn ? ' pill-solo' : ''}" aria-label="${_esc(t('Solo'))}" onchange="csSetSolo(this.value === 'solo'); this.blur()">
+          <option value="all"${soloOn ? '' : ' selected'}>${_esc(t('All'))}</option>
+          <option value="solo"${soloOn ? ' selected' : ''}>${_esc(t('Solo'))}</option>
+        </select>
+        <span class="chevron" aria-hidden="true">▼</span>
+      </span>
     </div>
     <div class="summary">
       ${statBoxesHTML([
