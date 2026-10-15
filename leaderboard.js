@@ -250,7 +250,7 @@ function openChanceInfo() {
     <p class="modal-hint">${t('W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
     <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
     <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.58.')}</p>
-    <p class="modal-hint">${t('With a table size picked, only its games count. Solo has no Δ Wins: the Phantom isn\'t a player with the same chance.')}</p>`;
+    <p class="modal-hint">${t('With a number of players picked, only its games count. Solo has no Δ Wins: the Phantom isn\'t a player with the same chance.')}</p>`;
   openOverlay('chanceOverlay');
 }
 
@@ -411,7 +411,7 @@ function render({ rows, summary }) {
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'chance' ? `<p class="results-hint">${t('How far a villain\'s wins are from what equal chances would give, in standard deviations: 0 is exactly as expected, above 0 more wins, below 0 fewer. Every game counts at its table size: a win at 6 players is worth more than one at 2.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
+    ${mode === 'chance' ? `<p class="results-hint">${t('How far a villain\'s wins are from what equal chances would give, in standard deviations: 0 is exactly as expected, above 0 more wins, below 0 fewer. Every game counts by its number of players: a win at 6 players is worth more than one at 2.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,

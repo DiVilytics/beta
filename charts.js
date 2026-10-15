@@ -270,8 +270,8 @@ const CHARTS = [
     sizes: false,
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Δ Wins of each seat in play order (seat 1 plays first) per table size: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
-      pct:    "Win rate of each seat in play order (seat 1 plays first) per table size. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
+      chance: "Δ Wins of each seat in play order (seat 1 plays first) by number of players: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
+      pct:    "Win rate of each seat in play order (seat 1 plays first) by number of players. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
     },
     render({ games, mode }) {
       // Only games with a recorded play order (every seat its own position) and
@@ -362,7 +362,7 @@ const CHARTS = [
   {
     id: 'tablesize', icon: '👥', label: 'Number of players',
     sizes: false,
-    desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact number of games and its percentage of all the games played.',
+    desc: 'Share of recorded games by number of players, from 2 to 6. Tap a slice for its exact number of games and its percentage of all the games played.',
     render({ games }) {
       const total = games.length || 1;
       const segs = TABLE_SIZES.map(n => {
