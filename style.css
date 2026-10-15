@@ -2444,6 +2444,9 @@ select:disabled {
    never mistaken for the official game. The Solo pill (size-filter.js, the
    villain page), solo game cards, the FAQ's solo section and its entries. */
 .pill-solo, .pill-solo.on { border-style: dashed; }
+/* A villain page: the ranking switch, and the Solo pill on the right. */
+.cs-mode-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.cs-mode-row > .pill { flex-shrink: 0; margin-top: 2px; }
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
 /* New Game: Solo picked in the players menu. */

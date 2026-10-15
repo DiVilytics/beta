@@ -275,6 +275,14 @@ function csSelectRow(key) {
   render();
 }
 
+// The Solo pill: the solo table (from the level with this villain's most solo
+// games) in place of the official one and the rivalries; again, back to Overall.
+function csToggleSolo() {
+  if (SOLO_LEVEL_IDS.includes(csRow)) csRow = 'all';
+  else csRow = SOLO_LEVEL_IDS.reduce((a, id) => _soloStats(id).games > _soloStats(a).games ? id : a, SOLO_LEVEL_IDS[0]);
+  render();
+}
+
 // A solo level's numbers: { games, wins, dur, turns }, the rounds those of
 // the games won (a lost one runs to its last round).
 function _soloStats(level) {
@@ -339,6 +347,11 @@ function render() {
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
 
+  // One table at a time: the official one, or with the Solo pill the solo one
+  // (then without the rivalries, which are official games only).
+  const soloOn = isSolo(csRow);
+  const shown  = soloOn ? SOLO_LEVEL_IDS : rows.map(r => r.key);
+
   // The boxes on top: the selected row's numbers.
   const sel  = stats(csRow);
   const avgs = isSolo(csRow) ? solo[csRow] : (csAvg[csRow] || {});
@@ -372,16 +385,12 @@ function render() {
         { val: v(sel.wins), lbl: t('Wins') },
       ])}
     </div>
-    ${statModeSegHTML(csMode, 'csSetMode')}
-    ${!csLoading && keys.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
-    <div class="lb-table cs-table" style="${widths}">
-      <div class="lb-head">
-        <span>${t('Players')}</span>
-        <span></span>
-        <span class="text-right">${statValueLabel(csMode)}</span>
-      </div>
-      ${rows.map(r => rowHTML(r.label, r.key)).join('')}
+    <div class="cs-mode-row">
+      ${statModeSegHTML(csMode, 'csSetMode')}
+      <button class="pill pill-solo${soloOn ? ' on' : ''}" type="button" onclick="csToggleSolo()" aria-pressed="${soloOn}">${t('Solo')}</button>
     </div>
+    ${!csLoading && shown.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
+    ${soloOn ? `
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
       <div class="lb-head">
         <span>${t('Solo')}</span>
@@ -390,8 +399,16 @@ function render() {
       </div>
       ${SOLO_LEVEL_IDS.map(id => rowHTML(soloLevelName(id), id)).join('')}
     </div>
-    ${isSolo(csRow) ? soloHintHTML() : ''}
-    ${_adversariesSectionHTML()}`;
+    ${soloHintHTML()}` : `
+    <div class="lb-table cs-table mb-1-25" style="${widths}">
+      <div class="lb-head">
+        <span>${t('Players')}</span>
+        <span></span>
+        <span class="text-right">${statValueLabel(csMode)}</span>
+      </div>
+      ${rows.map(r => rowHTML(r.label, r.key)).join('')}
+    </div>
+    ${_adversariesSectionHTML()}`}`;
 }
 
 // "Rivalries": the opponents this character has beaten most / lost to most,
