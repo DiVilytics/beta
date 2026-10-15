@@ -392,7 +392,7 @@ function renderGlobalDetailHTML(key, global) {
   }
   if (key === 'positions') {
     const ord = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
-    return _setCompletionDetailHTML(`🪑 ${t('Starting position')}`,
+    return _setCompletionDetailHTML(`🪑 ${t('Play order')}`,
       SEAT_KEYS.map(i => ({ label: t(`${ord[i]} seat`), played: global.positions[i].played, won: global.positions[i].won })),
       t('Played from every seat (1st–6th)'), t('Won from every seat (1st–6th)'));
   }

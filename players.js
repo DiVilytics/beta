@@ -485,23 +485,9 @@ function render() {
 
 let _pfScrollToId = null;
 
-// The list of games: on All, the solo games too (dashed, with the same period
-// and location), in date order; the numbers above stay the official games'.
-function _pfListData(keepIds) {
-  const data = _pfData();
-  if (size.value() !== 'all') return { games: data.games.filter(g => keepIds.has(g.id)), players: data.players };
-  const soloIds = pfFilteredGameIds(pfSolo);
-  const at = g => g.played_at ? new Date(g.played_at).getTime() : -Infinity;
-  return {
-    games: [...data.games.filter(g => keepIds.has(g.id)), ...pfSolo.games.filter(g => soloIds.has(g.id))]
-      .sort((a, b) => at(b) - at(a)),
-    players: [...data.players, ...pfSolo.players],
-  };
-}
-
 function _renderGamesList(keepIds = pfFilteredGameIds()) {
-  const data = _pfListData(keepIds);
-  let games = data.games;
+  const data = _pfData();
+  let games = data.games.filter(g => keepIds.has(g.id));
 
   if (pfWinsOnly) {
     const winGameIds = new Set(

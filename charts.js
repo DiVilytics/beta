@@ -116,10 +116,10 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
   const items = boxes
     ? Object.keys(boxInfo).filter(b => chars.some(c => c.box === b && played.has(c.name))).sort((a, b) => boxOrder(a) - boxOrder(b))
-        .map(b => ({ key: b, name: b, group: b }))
+        .map(b => ({ key: b, name: b, group: b, href: `villains.html?box=${boxAnchorId(b)}` }))
     : chars.filter(c => played.has(c.name))
         .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0))
-        .map(c => ({ key: c.name, name: villainName(c.name), group: c.box }));
+        .map(c => ({ key: c.name, name: villainName(c.name), group: c.box, href: `villains.html?vil=${encodeURIComponent(c.name)}` }));
   if (items.length < 2) return Charts.barsV([]);
   // A box's short name: the initials of its words, small words aside (WTIA, DB).
   const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
@@ -136,10 +136,12 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
       const n = together[r.key + '|' + c.key] || 0;
       const w = wins[r.key + '|' + c.key] || 0, l = wins[c.key + '|' + r.key] || 0;
       const name = `${r.name} vs ${c.name}`;
+      // The caption links both: the row's page, " vs ", the column's.
+      const links = ` data-name="${_esc(r.name)}" data-href="${_esc(r.href)}" data-box="${_esc(c.name)}" data-boxhref="${_esc(c.href)}" data-join=" vs "`;
       const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-      if (n < MIN_GAMES_FOR_PCT || !(w + l)) return `<td class="vs-few ch-hit${cls}" data-name="${_esc(name)}" data-meta="${_esc(meta)}"></td>`;
+      if (n < MIN_GAMES_FOR_PCT || !(w + l)) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
       const v = cell({ pct: w / (w + l), w, l });
-      return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}" data-name="${_esc(name)}" data-meta="${_esc(`${v.meta} | ${meta}`)}">${v.label}</td>`;
+      return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}"${links} data-meta="${_esc(`${v.meta} | ${meta}`)}" title="${_esc(name)}">${v.label}</td>`;
     }).join('');
     return `<tr${newGroup(ri) ? ' class="vs-box"' : ''}><th class="vs-head vs-side" title="${_esc(r.name)}">${label(r)}</th>${cells}</tr>`;
   }).join('');
@@ -236,7 +238,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'pace', icon: '🎨', label: 'By pace',
+    id: 'pace', icon: '🌈', label: 'By pace',
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
     desc: {
       chance: "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.",
@@ -746,7 +748,9 @@ async function init() {
       part(hit.getAttribute('data-box'), hit.getAttribute('data-boxhref')),   // scatter's secondary box link
       part(hit.getAttribute('data-meta'), null),
     ].filter(Boolean);
-    nodes.forEach((n, i) => { if (i) cap.append(' | '); cap.append(n); });
+    // Matchups join their two names with " vs " (data-join); the rest with " | ".
+    const join = hit.getAttribute('data-join');
+    nodes.forEach((n, i) => { if (i) cap.append(i === 1 && join ? join : ' | '); cap.append(n); });
   });
   // A language switch brings back the chart being shown, its mode and the
   // filters (lang.js).
