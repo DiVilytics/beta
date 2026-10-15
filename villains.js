@@ -275,11 +275,12 @@ function csSelectRow(key) {
   render();
 }
 
-// The Solo pill: the solo table (from the level with this villain's most solo
-// games) in place of the official one and the rivalries; again, back to Overall.
-function csToggleSolo() {
-  if (SOLO_LEVEL_IDS.includes(csRow)) csRow = 'all';
-  else csRow = SOLO_LEVEL_IDS.reduce((a, id) => _soloStats(id).games > _soloStats(a).games ? id : a, SOLO_LEVEL_IDS[0]);
+// All | Solo, as in the size filter: Solo shows the solo table (from the level
+// with this villain's most solo games) in place of the official one and the
+// rivalries; All (or Solo again) goes back to Overall.
+function csSetSolo(on) {
+  if (on === SOLO_LEVEL_IDS.includes(csRow)) return;
+  csRow = on ? SOLO_LEVEL_IDS.reduce((a, id) => _soloStats(id).games > _soloStats(a).games ? id : a, SOLO_LEVEL_IDS[0]) : 'all';
   render();
 }
 
@@ -375,7 +376,12 @@ function render() {
       </div>`;
   };
 
+  // All | Solo on its own row above the numbers, as the size filter elsewhere.
   root.innerHTML = `
+    <div class="pill-group cs-solo-pills">
+      <button class="pill${soloOn ? '' : ' on'}" type="button" onclick="csSetSolo(false)" aria-pressed="${!soloOn}">${t('All')}</button>
+      <button class="pill pill-solo${soloOn ? ' on' : ''}" type="button" onclick="csSetSolo(!${soloOn})" aria-pressed="${soloOn}">${t('Solo')}</button>
+    </div>
     <div class="summary">
       ${statBoxesHTML([
         { val: v(sel.games), lbl: t('Games') },
@@ -385,10 +391,7 @@ function render() {
         { val: v(sel.wins), lbl: t('Wins') },
       ])}
     </div>
-    <div class="cs-mode-row">
-      ${statModeSegHTML(csMode, 'csSetMode')}
-      <button class="pill pill-solo${soloOn ? ' on' : ''}" type="button" onclick="csToggleSolo()" aria-pressed="${soloOn}">${t('Solo')}</button>
-    </div>
+    ${statModeSegHTML(csMode, 'csSetMode')}
     ${!csLoading && shown.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
     ${soloOn ? `
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
