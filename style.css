@@ -2604,7 +2604,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 #soloHintNg .solo-hint { margin: 10px 0 0; }
 .claim-rows.solo .claim-row { border-style: dashed; border-color: var(--s4); }
 #claimRoot .solo-hint { text-align: center; }
-.solo-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
+.solo-hint a, .live-hint a { color: var(--accent); text-decoration: none; white-space: nowrap; }
 /* Solo's difficulty levels (solo.js): a level shows its color (green, yellow,
    red) only where it's the one in effect: picked (New Game's switch, the
    filters' Difficulty menu, the villain page's Solo table) or a game's own
