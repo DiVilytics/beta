@@ -326,7 +326,7 @@ const CHARTS = [
     },
   },
   {
-    id: 'tablesize', icon: '👥', label: 'Table sizes',
+    id: 'tablesize', icon: '👥', label: 'Number of players',
     sizes: false,
     desc: 'Share of recorded games by table size, from 2 to 6 players. Tap a slice for its exact number of games and its percentage of all the games played.',
     render({ games }) {

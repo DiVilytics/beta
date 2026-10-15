@@ -498,6 +498,7 @@ window.I18N.it = {
     "Eyes": "Occhi",
     "Eyebrows": "Sopracciglia",
     "Hair": "Capelli",
+    "Number of players": "Numero di giocatori",
     "Wins vs games": "Vittorie vs partite",
     "Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.": "Ogni cattivo per partite giocate (x) e percentuale di vittorie (y); gli assi si adattano ai dati. In alto a sinistra: forte ma scelto di rado; in basso a destra: popolare ma debole. Tocca un punto per aprirlo.",
     "By pace": "Per velocità",
