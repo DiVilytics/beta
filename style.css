@@ -366,6 +366,8 @@ a.chip {
 /* The XP table (leaderboard.js): one game's XP by claims, lost in purple, won
    in gold. */
 /* Fixed layout: the labels' column set, the six claims' columns all equal. */
+/* Formulas in the pop-ups (MathML, leaderboard.js), in a math font. */
+.math-block { margin: 12px 0; font-family: 'Noto Sans Math', 'STIX Two Math', 'Cambria Math', math; font-size: calc(17px * var(--ts)); color: var(--text); }
 .xp-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
 .xp-table .xp-label-col { width: 64px; }
 .xp-table th, .xp-table td { padding: 8px 2px; text-align: center; border-bottom: 1px solid var(--border); font-size: calc(13px * var(--ts)); white-space: nowrap; }
@@ -3263,3 +3265,4 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .lbl-full  { display: none; }
   .lbl-short { display: inline; }
 }
+

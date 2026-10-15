@@ -338,6 +338,9 @@ function openXpTable() {
   const row = (label, cls, xp) =>
     `<tr><th>${label}</th>${claims.map(c => `<td class="${cls}">${xp(c)}</td>`).join('')}</tr>`;
   document.getElementById('xpBody').innerHTML = `
+    <p class="modal-hint">${t('Every game where you claimed your villain gives you')}</p>
+    <math display="block" displaystyle="true" class="math-block"><mi>XP</mi><mo>=</mo><mi>C</mi><mo>+</mo><mrow><mo>(</mo><mi>C</mi><mo>−</mo><mn>1</mn><mo>)</mo></mrow><mi>W</mi></math>
+    <p class="modal-hint">${t('<b>C</b>: the players who claimed their villain, you included. <b>W</b>: 1 if you won, 0 if you lost. Claiming alone gives 1 either way; each other player who claims adds 1, and a win doubles what they add.')}</p>
     <p class="modal-hint">${t('The XP of one game, by how many players claimed their villain, you included.')}</p>
     <table class="xp-table">
       <colgroup><col class="xp-label-col"><col span="${claims.length}"></colgroup>
@@ -414,7 +417,7 @@ function render({ rows, summary }) {
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
     ${mode === 'chance' ? `<p class="results-hint">${t('0 is the score you would get by picking the winners at random; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
-    ${mode === 'xp' ? `<p class="results-hint">${t('For every game where you claimed your villain: 1 XP for each player who claimed theirs, you included, and if you won, 1 more for each of the others. Plus 1 for each achievement.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
+    ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain, more if others claimed theirs and if you won, plus achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
       headLabel:   isChar ? t('Villain') : t('Player'),
