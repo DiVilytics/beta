@@ -1574,8 +1574,6 @@ select:disabled {
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
 /* Δ Wins's formulas (leaderboard.js, How it's computed). */
-/* Δ Wins' formulas (MathML, leaderboard.js). */
-.math-block { margin: 12px 0; font-family: 'Noto Sans Math', 'STIX Two Math', 'Cambria Math', math; font-size: calc(17px * var(--ts)); color: var(--text); }
 /* Δ Wins: from the middle, right above 0, left below it (stats-table.js). */
 .bar-diverge { position: relative; }
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
