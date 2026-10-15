@@ -527,7 +527,7 @@ window.I18N.it = {
     "Eyes": "Occhi",
     "Eyebrows": "Sopracciglia",
     "Hair": "Capelli",
-    "Wins vs games": "Vittorie e partite",
+    "Wins vs games": "Vittorie vs partite",
     "Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.": "Ogni cattivo per partite giocate (x) e Δ Vittorie (y): quanto le sue vittorie si scostano da quelle di chance uguali. 0 è come atteso; oltre le linee tratteggiate a ±2 il caso da solo arriva di rado.",
     "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.": "Le Δ Vittorie di ogni velocità, sommando tutti i cattivi di quel colore: quanto le loro vittorie si scostano da quelle di chance uguali (0: come atteso). Tocca una barra per partite e cattivi.",
     "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.": "Le Δ Vittorie di ogni scatola, sommando i suoi cattivi: quanto le loro vittorie si scostano da quelle di chance uguali (0: come atteso), dalla più forte. Tocca una barra per le sue partite.",
