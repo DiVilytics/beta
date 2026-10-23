@@ -376,7 +376,7 @@ window.I18N.it = {
     "Scan this to open DiVilytics, or copy the link to share it anywhere.": "Inquadra il codice per aprire DiVilytics, oppure copia il link per condividerlo dove vuoi.",
     "DiVilytics | Claim Villain": "DiVilytics | Rivendica cattivo",
     "Claim your villain": "Rivendica il tuo cattivo",
-    "← Back": "← Indietro",
+    "Game": "Partita",
     "Share with players": "Condividi con i giocatori",
     "Other players can scan this to claim their villain in this game.": "Gli altri giocatori possono inquadrarlo per rivendicare il proprio cattivo in questa partita.",
     "Edit Game": "Modifica partita",

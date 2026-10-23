@@ -129,9 +129,9 @@ function _menuHTML() {
     <p class="faq-credit">${t('Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.', { link: '<a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>' })}</p>`;
 }
 
-// Back to the page you came from (a villain's "Rules F.A.Q." link, the topic
-// menu…), or the topic menu when the page was opened cold.
-const _BACK_HTML = `<a class="back-link" href="faq.html" onclick="goBack('faq.html'); return false;">${t('← Back')}</a>`;
+// A topic's ← link: back to the page you came from (the topic menu, a
+// villain's Rules F.A.Q. link, a Solo rules link…), else up to the topic menu (ui.js).
+const _backHTML = () => backLinkHTML({ parent: { href: 'faq.html', label: 'F.A.Q.' } });
 
 function _groupsHTML(groups, solo = false) {
   return groups.map(g => `
@@ -143,12 +143,12 @@ function _groupsHTML(groups, solo = false) {
 }
 
 function _generalHTML() {
-  return _BACK_HTML + _groupsHTML(faqData.general);
+  return _backHTML() + _groupsHTML(faqData.general);
 }
 
 function _rulebookHTML(id) {
   const rb = _rulebooks()[id];
-  return `${_BACK_HTML}
+  return `${_backHTML()}
     <h2 class="faq-rulebook-title">${_esc(rb.title)}</h2>
     ${rb.intro ? `<p class="faq-rulebook-intro">${_esc(rb.intro)}</p>` : ''}
     ${_groupsHTML(rb.groups)}`;
@@ -162,7 +162,7 @@ function _soloCreditHTML() {
 
 function _soloHTML() {
   const sv = faqData.solo;
-  return `${_BACK_HTML}
+  return `${_backHTML()}
     <h2 class="faq-rulebook-title">${_esc(sv.title)}</h2>
     <p class="faq-rulebook-intro">${_esc(sv.intro)}</p>
     ${_groupsHTML(sv.groups, true)}
@@ -177,7 +177,7 @@ function _soloResultsHTML(q) {
     .map(g => ({ title: g.title, items: g.items.filter(it => _matches(it, `${faqData.solo.title} ${g.title}`, terms)) }))
     .filter(g => g.items.length);
   const total = groups.reduce((n, g) => n + g.items.length, 0);
-  const head  = `${_BACK_HTML}<h2 class="faq-rulebook-title">${_esc(faqData.solo.title)}</h2>`;
+  const head  = `${_backHTML()}<h2 class="faq-rulebook-title">${_esc(faqData.solo.title)}</h2>`;
   if (!total) return head + emptyStateHTML('🔍', t('No results'), t('Nothing in the solo rules matches “{query}”.', { query: _esc(q.trim()) }));
   return `${head}<p class="faq-count">${tn(total, '{n} result', '{n} results')}</p>` + groups.map(g => `
     <div class="faq-group">
@@ -187,7 +187,7 @@ function _soloResultsHTML(q) {
 }
 
 function _villainHTML(v) {
-  return `${_BACK_HTML}
+  return `${_backHTML()}
     <div class="pf-identity faq-identity">
       <img class="char-portrait identity-portrait" src="${charImgSrc(v)}" alt="" onerror="this.src='asset/players/default.svg'">
       <span class="pf-name-block">
@@ -235,7 +235,7 @@ function render() {
   else if (faqTopic === FAQ_SOLO)    root.innerHTML = _soloHTML();
   else if (_rulebooks()[faqTopic])   root.innerHTML = _rulebookHTML(faqTopic);
   else if (faqTopic)              root.innerHTML = _villainHTML(faqTopic);
-  else root.innerHTML = _BACK_HTML + emptyStateHTML('⚠️', t('Topic not found'), t('“{topic}” isn\'t a topic of the F.A.Q.', { topic: _esc(new URLSearchParams(location.search).get('topic') || '') }));
+  else root.innerHTML = _backHTML() + emptyStateHTML('⚠️', t('Topic not found'), t('“{topic}” isn\'t a topic of the F.A.Q.', { topic: _esc(new URLSearchParams(location.search).get('topic') || '') }));
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────

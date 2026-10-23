@@ -46,6 +46,7 @@ function lineupEditable(user) {
 async function init() {
   setActiveNav('');
   await initAuth(() => render());
+  setBackLink('claimBack', _claimBack());
   attachLocationAutocomplete('editLocation', 'editLocationDropdown');
 
   const params = new URLSearchParams(location.search);
@@ -175,13 +176,9 @@ function _playedAsHTML(seat, solo) {
 
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
-// Where Back leads: the Game Log right after saving a game; otherwise wherever
-// we came from (e.g. the player profile), the profile page when the claim page
-// was opened cold (e.g. via a shared QR).
-function claimGoBack() {
-  if (claimJustSaved) location.href = 'game-log.html';
-  else goBack('players.html');
-}
+// The ← link: back to the player page you opened the game from, else up to
+// the Game Log (opened from a QR code, or right after saving it). ui.js.
+const _claimBack = () => ({ parent: { href: 'game-log.html', label: t('Game Log') }, from: ['players.html'] });
 
 function shareGame() {
   if (!claimGame) return;
@@ -429,12 +426,8 @@ function deleteGame() {
 async function _doDeleteGame() {
   const { error } = await db.from('games').delete().eq('id', claimGame.id);
   if (error) { _showClaimRowError(error.message); return; }
-  // A fresh load of where we came from, so the game isn't shown there anymore.
-  let back = claimJustSaved ? 'game-log.html' : 'players.html';
-  try {
-    if (!claimJustSaved && document.referrer && new URL(document.referrer).origin === location.origin) back = document.referrer;
-  } catch (_) {}
-  location.replace(back);
+  // A fresh load of where the ← link goes, so the game isn't shown there anymore.
+  location.replace(backLinkTarget(_claimBack()).href);
 }
 
 // Surface a claim/release failure as a banner at the top of the page.

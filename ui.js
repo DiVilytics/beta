@@ -338,14 +338,62 @@ function layoutSeparatedRows(host, items, maxW = host.getBoundingClientRect().wi
   return true;
 }
 
-// "← Back" links: return to the previous page when it was one of ours (the
-// leaderboard row, game card or FAQ link you came from), else open `fallback`
-// (a link opened cold, e.g. from a QR code or another site).
-function goBack(fallback) {
-  let ours = false;
-  try { ours = !!document.referrer && new URL(document.referrer).origin === location.origin && document.referrer !== location.href; } catch (_) {}
-  if (ours && history.length > 1) history.back();
-  else location.href = fallback;
+// ── BACK LINKS ────────────────────────────────────────────────────────────────
+// A page's ← link names where it goes. Back to the page you came from when
+// that page lists this one (`from`: its file names; null, any page of ours),
+// with the browser's back, so its scroll and filters come back; otherwise up
+// to the page's `parent` ({ href, label }): opened from a QR code, another
+// site, or a page of its own (a villain's guide), never round in a loop.
+
+// The name a page of ours goes by in a back link; null for one with none (a form).
+function _pageName(url) {
+  const p = url.searchParams;
+  switch (url.pathname.split('/').pop() || 'index.html') {
+    case 'index.html':       return t('Home');
+    case 'new-game.html':    return t('New Game');
+    case 'game-log.html':    return t('Game Log');
+    case 'leaderboard.html': return t('Leaderboard');
+    case 'charts.html':      return t('Charts');
+    case 'villains.html':    return p.get('vil') ? villainName(p.get('vil')) : t('Villains');
+    case 'players.html':     return p.get('nick') || getCurrentProfile()?.nickname || t('Player');
+    case 'claim.html':       return t('Game');
+    case 'faq.html':         return 'F.A.Q.';
+    default:                 return null;
+  }
+}
+
+// Where the link goes: { href, label, back } (back: the browser's back).
+function backLinkTarget({ parent, from = null }) {
+  let ref = null;
+  try { if (document.referrer) ref = new URL(document.referrer); } catch (_) {}
+  const dir  = u => u.pathname.replace(/[^/]*$/, '');   // the release and the beta apart
+  const file = u => u.pathname.split('/').pop() || 'index.html';
+  if (ref && ref.origin === location.origin && dir(ref) === dir(location) && history.length > 1
+      && (file(ref) !== file(location) || ref.search !== location.search)) {
+    // The parent itself (its query included): its own name.
+    const up = new URL(parent.href, location.href);
+    if (file(ref) === file(up) && [...up.searchParams].every(([k, v]) => ref.searchParams.get(k) === v)) return { href: ref.href, label: parent.label, back: true };
+    const name = !from || from.includes(file(ref)) ? _pageName(ref) : null;
+    if (name) return { href: ref.href, label: name, back: true };
+  }
+  return { href: parent.href, label: parent.label, back: false };
+}
+
+// Points a page's ← link (an element, or its id) where it goes, and shows it.
+function setBackLink(target, opts) {
+  const el = _resolveEl(target);
+  if (!el) return;
+  const { href, label, back } = backLinkTarget(opts);
+  el.href = href;
+  el.textContent = `← ${label}`;
+  el.onclick = back ? e => { e.preventDefault(); history.back(); } : null;
+  setVisible(el, true);
+}
+
+// The same link as HTML, for a page drawn as a string (the F.A.Q.).
+function backLinkHTML(opts) {
+  const { href, label, back } = backLinkTarget(opts);
+  return `<a class="back-link" href="${_esc(href)}"${back ? ' onclick="history.back(); return false;"' : ''}>← ${_esc(label)}</a>`;
 }
 
 // ── DRAG TO CLOSE ─────────────────────────────────────────────────────────────
