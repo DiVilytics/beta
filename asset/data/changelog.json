@@ -1,7 +1,8 @@
 {
   "2026-10-19": {
-    "title": "Total XP on player pages",
+    "title": "Tap the winner, and total XP",
     "items": [
+      "New Game: when a villain wins, tap their mover; the game stops with the winner marked, ready to save.",
       "Every player page shows the player's total XP, the same as on the Leaderboard."
     ]
   },

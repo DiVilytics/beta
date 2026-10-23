@@ -422,9 +422,20 @@ a.pace-dot:hover { transform: scale(1.3); }
    so they compare as on the table. */
 .mover { display: block; flex: none; }
 .cs-mover { height: 40px; width: auto; }
-.live-movers { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 8px; margin-top: 14px; }
-/* One scale for all: six of the widest still fit a phone's line. */
+.live-movers { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 4px; margin-top: 14px; }
+/* One scale for all: six of the widest, in their boxes (.live-mover), still
+   fit a 320px phone's line (240px of movers). */
 .live-movers .mover { zoom: 0.32; }
+/* A live game's movers are buttons: tapped when their villain wins (New Game),
+   or wins or drops out (a tournament table). In the accent so they read as
+   buttons; every box as tall as the tallest, the mover at its bottom. */
+.live-mover {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px;
+  padding: 4px 1px 3px; border: 1px solid transparent; border-radius: var(--r); background: none;
+  font-family: inherit; color: var(--text); cursor: pointer;
+}
+button.live-mover:not(:disabled) { border-color: var(--accent); background: var(--accent-d); }
+.live-mover:disabled { cursor: default; }
 
 /* ── LIVE GAME PANEL ──────────────────────────────────────────────── */
 .live-status {
@@ -2482,12 +2493,14 @@ select:disabled {
 .solo-level-seg .seg-btn { padding: 0 4px; }
 #soloLevelNg:not(.hidden) + .players-legend { margin-left: 4px; }
 .solo-level-rule { font-size: calc(10px * var(--ts)); line-height: 1.35; color: var(--muted); white-space: nowrap; }
-/* New Game, after + on the last round: the game stopped, lost. */
-.solo-end-note {
-  border: 1px dashed var(--s4); border-radius: var(--r);
+/* New Game, the game ended from the live panel: won (a mover tapped) or, in
+   Solo, lost (+ on the last round); dashed in Solo. */
+.live-end-note {
+  border: 1px solid var(--s4); border-radius: var(--r);
   padding: 10px 14px; margin-bottom: 16px;
   text-align: center; font-size: calc(13px * var(--ts)); color: var(--text);
 }
+.live-end-note.solo { border-style: dashed; }
 /* The villain page's table (villains.js): a row shows its numbers in the boxes
    on top when tapped; the selected one is marked. Solo sits under it, dashed. */
 .cs-row { cursor: pointer; }

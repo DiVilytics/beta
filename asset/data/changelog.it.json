@@ -1,7 +1,8 @@
 {
   "2026-10-19": {
-    "title": "XP totali nelle pagine dei giocatori",
+    "title": "Tocca il vincitore, e XP totali",
     "items": [
+      "Nuova partita: quando un cattivo vince, tocca la sua pedina; la partita si ferma con il vincitore segnato, pronta da salvare.",
       "Ogni pagina giocatore mostra gli XP totali del giocatore, gli stessi della Classifica."
     ]
   },
