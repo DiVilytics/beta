@@ -56,8 +56,11 @@
   <div id="liveContent" class="hidden">
     <div class="live-status" data-i18n>Game in progress</div>
     <div class="live-info" id="liveInfo"></div>
-    <!-- The movers at the table, in play order (new-game.js). -->
+    <!-- The movers at the table, in play order (new-game.js): tap the winner's
+         to end the game; the hint right under them. -->
     <div class="live-movers" id="liveMovers"></div>
+    <p class="live-hint" id="liveHint" data-i18n>When a villain wins, tap their mover: the game stops, with the winner and the duration filled in. A round ends when every player has had their turn: tap + when the first player is up again.</p>
+    <p class="live-hint hidden" id="liveHintSolo" data-i18n>Tap + after each of your turns: the die rolls for the Phantom. Objective reached? Tap your mover. <a href="faq.html?topic=solo">Solo rules ›</a></p>
     <div class="live-time" id="liveTime">00:00</div>
     <div class="live-turns">
       <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
@@ -68,14 +71,13 @@
     <!-- Solo: the last round, said plainly (new-game.js). -->
     <p class="solo-last hidden" id="liveLast" role="status"></p>
     <div class="live-die hidden" id="liveDie" aria-live="polite"></div>
-    <p class="live-hint" id="liveHint" data-i18n>The counter shows the current round. A round ends when every player has had their turn: tap + when the first player is up again. When you're done, tap Pause game: the duration is filled in automatically, and the rounds too if you used the counter.</p>
-    <p class="live-hint hidden" id="liveHintSolo" data-i18n>Tap + after each of your turns: the die rolls for the Phantom. Objective reached? Pause, mark 👑 and save. <a href="faq.html?topic=solo">Solo rules ›</a></p>
   </div>
 
   <!-- FORM CONTENT, hidden while a live game is running -->
   <div id="formContent">
-    <!-- Solo: + after the last round ended the game (new-game.js). -->
-    <p class="solo-end-note hidden" id="soloEndNote" role="status"></p>
+    <!-- The game ended from the live panel: won (a mover tapped) or, in Solo,
+         lost (+ after the last round). new-game.js. -->
+    <p class="live-end-note hidden" id="liveEndNote" role="status"></p>
     <div class="form-row">
       <div class="field">
         <label data-i18n>Date &amp; Time</label>

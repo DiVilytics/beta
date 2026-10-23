@@ -99,8 +99,8 @@ function _tnRenderLive() {
   const placeOf = new Map(results.map(r => [r.position, r]));
   document.getElementById('liveMovers').innerHTML = tnGame.seats.map(s => {
     const r = placeOf.get(s.position);
-    if (r) return `<span class="tg-mover placed${r.dropped ? ' dropped' : ''}" title="${_esc(s.name)}">${moverImgHTML(s.character)}<span class="tg-mover-place">${r.dropped ? '🏳️ ' : ''}${fmtPlace(r.place)}</span><span class="tg-mover-name">${_esc(s.name)}</span></span>`;
-    return `<button class="tg-mover" type="button" onclick="tnTapPlaying(${s.position})" title="${_esc(s.name)}"${left.length > 1 ? '' : ' disabled'}>${moverImgHTML(s.character)}<span class="tg-mover-name">${_esc(s.name)}</span></button>`;
+    if (r) return `<span class="live-mover placed${r.dropped ? ' dropped' : ''}" title="${_esc(s.name)}">${moverImgHTML(s.character)}<span class="tg-mover-place">${r.dropped ? '🏳️ ' : ''}${fmtPlace(r.place)}</span><span class="tg-mover-name">${_esc(s.name)}</span></span>`;
+    return `<button class="live-mover" type="button" onclick="tnTapPlaying(${s.position})" title="${_esc(s.name)}"${left.length > 1 ? '' : ' disabled'}>${moverImgHTML(s.character)}<span class="tg-mover-name">${_esc(s.name)}</span></button>`;
   }).join('');
 
   const seat = pos => tnGame.seats.find(s => s.position === pos);

@@ -1,10 +1,10 @@
 {
   "2026-10-19": {
-    "title": "Organizzatori, Δ Vittorie nelle pagine dei cattivi e XP totali",
+    "title": "Organizzatori, Δ Vittorie nelle pagine dei cattivi e tocca il vincitore",
     "items": [
       "Tornei: quanti organizzatori vuoi, aggiunti con il QR organizzatori; i tuoi tornei in corso vengono prima, con uno stato più chiaro e il risultato finale.",
-      "Δ Vittorie in ogni pagina dei cattivi, per ogni numero di giocatori.",
-      "Ogni pagina giocatore mostra gli XP totali del giocatore, gli stessi della Classifica."
+      "Δ Vittorie in ogni pagina dei cattivi, per ogni numero di giocatori; e ogni pagina giocatore mostra gli XP totali del giocatore.",
+      "Nuova partita: quando un cattivo vince, tocca la sua pedina; la partita si ferma con il vincitore segnato, pronta da salvare."
     ]
   },
   "2026-10-12": {

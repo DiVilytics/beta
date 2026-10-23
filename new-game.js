@@ -363,6 +363,7 @@ function toggleMe(id) {
 
 function toggleWin(id) {
   for (const s of orderSlots) s.isWinner = (s.id === id ? !s.isWinner : false);
+  setVisible('liveEndNote', false);   // it said who won
   renderOrderSlots();
   _saveLiveState();
 }
@@ -726,11 +727,12 @@ function _initDrag() {
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
 
 // The line under "Game in progress": player count and, when set, the location;
-// then the villains' movers in play order. Drawn on start and on resume (the
-// form fields are hidden while live).
+// then the villains' movers in play order, each a button to tap when its
+// villain wins. Drawn on start and on resume (the form fields are hidden while live).
 function _renderLiveInfo() {
   const movers = document.getElementById('liveMovers');
-  if (movers) movers.innerHTML = orderSlots.filter(s => s.char).map(s => moverImgHTML(s.char)).join('');
+  if (movers) movers.innerHTML = orderSlots.filter(s => s.char).map(s =>
+    `<button class="live-mover" type="button" onclick="tapLiveMover(${s.id})" title="${_esc(villainName(s.char))}">${moverImgHTML(s.char)}</button>`).join('');
   const infoEl   = document.getElementById('liveInfo');
   const location = document.getElementById('fLocation').value.trim();
   if (infoEl) infoEl.innerHTML = [
@@ -843,17 +845,45 @@ function _animateDie() {
 // Solo: + after the last round. The game stops as if paused, lost (no 👑), its
 // rounds the level's; the note says so, and Resume game takes it back.
 function _endSoloLost() {
-  orderSlots[0].isWinner = false;
-  _turnBumped    = true;   // the duration and the rounds go in, however short the game
-  _roundsCounted = true;
+  _endLive(null, t('Round {n} is over: the game is lost. Save it, or tap Resume game if + was a mistake.', { n: _soloTurns() }));
+}
+
+// A mover tapped: did its villain win (in Solo: objective reached)? Yes ends
+// the game there, with 👑 on its row.
+function tapLiveMover(id) {
+  const slot = orderSlots.find(s => s.id === id);
+  if (!slot || !liveGame.isRunning) return;
+  const villain = villainName(slot.char);
+  openConfirmSheet({
+    id:           'liveWinSheet',
+    title:        soloMode ? t('Objective reached?') : t('{villain} won?', { villain }),
+    bodyHTML:     `<p class="confirm-text">${soloMode
+      ? t('The game ends here, won: the timer stops and the game is ready to save.')
+      : t('The game ends here: the timer stops and the game is ready to save, with 👑 on {villain}.', { villain: `<strong class="text-emph">${villainNameInline(slot.char)}</strong>` })}</p>`,
+    confirmLabel: `👑 ${t('Yes, end the game')}`,
+    onConfirm:    () => _endLive(id, soloMode
+      ? t('Objective reached: the game is won. Save it, or tap Resume game if it was a mistake.')
+      : t('{villain} won: save the game, or tap Resume game if it was a mistake.', { villain })),
+  });
+}
+
+// The game ended from the live panel, won by a row (its id) or lost (null):
+// it stops as if paused, the duration and the rounds go in however short the
+// game (the rounds only if the counter was used, but always in Solo), 👑 on
+// the winner, and a note above the form says so; Resume game takes it back.
+function _endLive(winnerId, note) {
+  for (const s of orderSlots) s.isWinner = s.id === winnerId;
+  _turnBumped = true;
+  if (soloMode) _roundsCounted = true;
   stopLive();
   renderOrderSlots();
   _saveLiveState();
-  const note = document.getElementById('soloEndNote');
-  if (note) {
-    note.textContent = t('Round {n} is over: the game is lost. Save it, or tap Resume game if + was a mistake.', { n: _soloTurns() });
-    setVisible('soloEndNote', true);
-  }
+  const el = document.getElementById('liveEndNote');
+  if (!el) return;
+  el.textContent = note;
+  el.classList.toggle('solo', soloMode);
+  setVisible(el, true);
+  window.scrollTo(0, 0);
 }
 
 // The lock screen's two lines (new-game-audio.js): the round and, in Solo, the
@@ -893,7 +923,7 @@ function startLive() {
   liveGame.markStarted(Date.now() - durOffset);
 
   if (!resuming) { _setDateToNow(); _soloRolls = {}; }
-  setVisible('soloEndNote', false);
+  setVisible('liveEndNote', false);
 
   // The counter shows the current round: a new game starts at 1, a resumed one
   // carries on from its rounds (and rounds set before the start count).
@@ -1024,7 +1054,7 @@ function _doDiscard() {
   soloLevel  = SOLO_DEFAULT_LEVEL;
   _soloRolls = {};
   _roundsCounted = false;
-  setVisible('soloEndNote', false);
+  setVisible('liveEndNote', false);
   addOrderSlot();
   addOrderSlot();
 
