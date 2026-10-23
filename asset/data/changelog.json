@@ -1,4 +1,10 @@
 {
+  "2026-10-19": {
+    "title": "Total XP on player pages",
+    "items": [
+      "Every player page shows the player's total XP, the same as on the Leaderboard."
+    ]
+  },
   "2026-10-12": {
     "title": "Charts by period and number of players",
     "items": [

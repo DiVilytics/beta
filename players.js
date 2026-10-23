@@ -9,6 +9,8 @@ let pfAllChars  = [];
 let pfAch       = new Map();
 let pfBoxInfo   = {};
 let pfGlobal    = null;
+let pfXp        = null;   // their XP, all time (the Leaderboard's), once the games are in
+let pfProfile   = undefined;   // the profile the identity was last drawn with
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
@@ -96,15 +98,19 @@ async function init() {
   }
 }
 
-// Avatar, nickname, "Since" and Share. Called first without the profile: an
-// empty circle holds the avatar's place and a blank line the date's, so nothing
-// moves when they arrive. A name without a profile gets the default avatar and
-// keeps the blank line.
+// Avatar, nickname, "Since" with their total XP, and Share. Called first
+// without the profile: an empty circle holds the avatar's place and a blank
+// line the date's, so nothing moves when they arrive. A name without a profile
+// gets the default avatar and keeps the blank line (its XP, once known).
 function _renderIdentity(profile) {
+  pfProfile = profile;
   const avatar = profile === undefined
     ? '<span class="player-avatar-lg pf-avatar-ph"></span>'
     : avatarHTML(resolveAvatar(profile), { cls: 'player-avatar-lg', extraClass: 'zoomable', id: 'pfAvatar', lightbox: true });
-  const since = profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : '&nbsp;';
+  const since = [
+    profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : null,
+    pfXp ? `<span class="pf-xp">${t('{n} XP', { n: pfXp })}</span>` : null,
+  ].filter(Boolean).join(' | ') || '&nbsp;';
   document.getElementById('pfIdentity').innerHTML =
     `<div class="pf-identity-row">
       <span class="pf-identity">${avatar}<span class="pf-name-block"><span class="pf-nick">${_esc(pfNick)}</span><span class="pf-since">${since}</span></span></span>
@@ -147,6 +153,13 @@ async function load() {
   pfSolo    = gamesOfVariant(all, 'solo');
   pfAch     = computeCharacterAchievements(players.filter(p => p.nickname === pfNick));
   pfGlobal  = computeGlobalAchievements(games, players, p => p.nickname === pfNick, pfAllChars);
+  // Total XP, all time whatever the filters, as on the Leaderboard: every
+  // official game with their villain claimed, plus their achievements.
+  const claims = {};
+  for (const p of players) if (p.nickname) claims[p.game_id] = (claims[p.game_id] || 0) + 1;
+  pfXp = players.filter(p => p.nickname === pfNick).reduce((sum, p) => sum + gameXp(claims[p.game_id], p.is_winner), 0)
+       + achievementXp(pfAch, pfAllChars, pfBoxInfo, pfGlobal);
+  _renderIdentity(pfProfile);
   pfFriends = await _loadFriends();
   pfLoaded  = true;
   // Oldest first: the games come newest first, undated ones last.

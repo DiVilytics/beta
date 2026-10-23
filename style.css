@@ -355,6 +355,7 @@ a.chip {
 .pf-name-block { display: flex; flex-direction: column; gap: 1px; }
 .pf-nick { font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
 .pf-since { font-size: calc(12px * var(--ts)); font-weight: 400; color: var(--dim); letter-spacing: 0; }
+.pf-xp { font-weight: 600; color: var(--muted); }   /* their total XP, after "Since" */
 .pf-since-link { color: inherit; text-decoration: none; cursor: pointer; }
 
 /* Under the villain's name: "Pace: ● | Villain guide ›". */

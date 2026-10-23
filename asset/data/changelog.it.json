@@ -1,4 +1,10 @@
 {
+  "2026-10-19": {
+    "title": "XP totali nelle pagine dei giocatori",
+    "items": [
+      "Ogni pagina giocatore mostra gli XP totali del giocatore, gli stessi della Classifica."
+    ]
+  },
   "2026-10-12": {
     "title": "Grafici per periodo e numero di giocatori",
     "items": [
