@@ -2591,10 +2591,12 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .cs-mode-row > .controls { flex-shrink: 0; }
 .cs-mode-row > .cs-solo-menu { margin-left: auto; flex: 0 1 auto; min-width: 0; position: relative; display: inline-flex; align-items: center; }
 .cs-solo-menu .players-count-select { width: 100%; min-width: 0; text-overflow: ellipsis; }
-/* The switch's short labels (% Vitt.), only when the row is too tight (villains.js). */
+/* Only when the row is too tight (villains.js): the switch's short labels
+   (% Vitt.; in English the same ones) and the least padding. */
 .stat-lbl-short { display: none; }
 .seg-short .stat-lbl-full { display: none; }
 .seg-short .stat-lbl-short { display: inline; }
+.seg-short .stat-mode-seg .seg-btn { padding: 0 4px; }
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
 /* New Game: Solo picked in the players menu. */

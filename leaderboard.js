@@ -235,27 +235,6 @@ function _addChance(rows, bySize) {
   return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r.character] }));
 }
 
-// How Δ Wins is computed (How it's computed ›, under the explanation).
-function openChanceInfo() {
-  // The formulas in MathML, the browser's own math typesetting.
-  const math = x => `<math display="block" displaystyle="true" class="math-block">${x}</math>`;
-  const frac = (top, bottom) => `<mfrac>${top}${bottom}</mfrac>`;
-  const kg   = '<msub><mi>k</mi><mi>g</mi></msub>';
-  const inv  = frac('<mn>1</mn>', kg);
-  const sum  = x => `<munderover><mo largeop="true" movablelimits="false">∑</mo><mrow><mi>g</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>${x}`;
-  document.getElementById('chanceBody').innerHTML = `
-    <p class="modal-hint">${t('Δ Wins compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
-    ${math(`<mi mathvariant="normal">Δ</mi><mo>=</mo>${frac('<mrow><mi>W</mi><mo>−</mo><mi>E</mi></mrow>', '<msqrt><mi>V</mi></msqrt>')}`)}
-    ${math(`<mi>E</mi><mo>=</mo>${sum(inv)}`)}
-    ${math(`<mi>V</mi><mo>=</mo>${sum(`${inv}<mrow><mo stretchy="true">(</mo><mn>1</mn><mo>−</mo>${inv}<mo stretchy="true">)</mo></mrow>`)}`)}
-    <p class="modal-hint">${t('<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: the wins expected by chance, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.')}</p>
-    <p class="modal-hint">${t('W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
-    <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
-    <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.58.')}</p>
-    <p class="modal-hint">${t('Every game counts by its number of players: a win at 6 players is worth more than one at 2. With a number of players picked, only its games count.')}</p>`;
-  openOverlay('chanceOverlay');
-}
-
 // ── XP ────────────────────────────────────────────────────────────────────────
 // Every official game a player claimed a villain in earns them C + (C - 1) * W
 // XP, C the players who claimed one in it (them included), W 1 if they won: a
@@ -416,7 +395,7 @@ function render({ rows, summary }) {
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'chance' ? `<p class="results-hint">${t('0 is the score you would get by picking the winners at random; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>` : ''}
+    ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain, more if others claimed theirs and if you won, plus achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,

@@ -24,8 +24,8 @@ const MIN_GAMES_FOR_PCT = 5;
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
 // the part from achievements, shown in parentheses instead of the games; and
-// 'chance', the villains' Leaderboard only: rows carry `exp` and `vari`, see
-// chanceDelta)
+// 'chance', the villains' Leaderboard and a villain's page: rows carry `exp`
+// and `vari`, see chanceDelta)
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
 // the formatted value; statCellHTML → the table cell, "40% (12)" / "5 (12)" with
 // the games played in parentheses (two right-aligned sub-columns, so the digits
@@ -84,7 +84,7 @@ function statGamesWidth(rows, mode) {
 }
 
 // `xp: true` adds XP first (the players' Leaderboard), `chance: true` Δ Wins
-// first (the villains'). Each label also has a short form ('% Wins:short' in
+// first (the villains' Leaderboard, a villain's page). Each label also has a short form ('% Wins:short' in
 // i18n: "% Vitt."), shown only where a row is too tight for the full ones
 // (.seg-short on a parent: the villain page with its All / Solo menu); without
 // one, the full label.
@@ -130,6 +130,52 @@ function chanceBarHTML(r, maxAbs, gold) {
   const v = chanceDelta(r) ?? 0;
   const w = Math.min(50, Math.round(Math.abs(v) / (maxAbs || 1) * 50));
   return `<div class="bar-bg bar-diverge"><div class="bar-fill${v < 0 ? ' neg' : gold ? ' gold' : ''}" style="${v < 0 ? 'right' : 'left'}:50%;width:${w}%"></div></div>`;
+}
+
+// Under a Δ Wins table: what the numbers mean, and How it's computed ›,
+// which opens the math; note, at its end: what the page's table counts.
+let _chanceNote = '';
+function chanceHintHTML(note = '') {
+  _chanceNote = note;
+  return `<p class="results-hint">${t('0 is the score you would get by picking the winners at random; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>`;
+}
+
+// How Δ Wins is computed: a sheet made the first time it opens.
+function openChanceInfo() {
+  if (!document.getElementById('chanceOverlay')) {
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.id = 'chanceOverlay';
+    overlay.innerHTML = `
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h3>${t('Δ Wins')}</h3>
+          <button class="sheet-close" type="button" aria-label="${t('Close')}">×</button>
+        </div>
+        <div class="sheet-body" id="chanceBody"></div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay('chanceOverlay'); });
+    overlay.querySelector('.sheet-close').addEventListener('click', () => closeOverlay('chanceOverlay'));
+  }
+  // The formulas in MathML, the browser's own math typesetting.
+  const math = x => `<math display="block" displaystyle="true" class="math-block">${x}</math>`;
+  const frac = (top, bottom) => `<mfrac>${top}${bottom}</mfrac>`;
+  const kg   = '<msub><mi>k</mi><mi>g</mi></msub>';
+  const inv  = frac('<mn>1</mn>', kg);
+  const sum  = x => `<munderover><mo largeop="true" movablelimits="false">∑</mo><mrow><mi>g</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>${x}`;
+  document.getElementById('chanceBody').innerHTML = `
+    <p class="modal-hint">${t('Δ Wins compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
+    ${math(`<mi mathvariant="normal">Δ</mi><mo>=</mo>${frac('<mrow><mi>W</mi><mo>−</mo><mi>E</mi></mrow>', '<msqrt><mi>V</mi></msqrt>')}`)}
+    ${math(`<mi>E</mi><mo>=</mo>${sum(inv)}`)}
+    ${math(`<mi>V</mi><mo>=</mo>${sum(`${inv}<mrow><mo stretchy="true">(</mo><mn>1</mn><mo>−</mo>${inv}<mo stretchy="true">)</mo></mrow>`)}`)}
+    <p class="modal-hint">${t('<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: the wins expected by chance, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.')}</p>
+    <p class="modal-hint">${t('W − E is how many wins more (or fewer) than expected; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
+    <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
+    <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.58.')}</p>
+    <p class="modal-hint">${t('Every game counts by its number of players: a win at 6 players is worth more than one at 2.')}${_chanceNote ? ` ${_chanceNote}` : ''}</p>`;
+  openOverlay('chanceOverlay');
 }
 
 // Anchor id for a character's box group on the characters roster page.

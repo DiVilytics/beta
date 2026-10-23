@@ -1,7 +1,7 @@
 // ── STATE ─────────────────────────────────────────────────────────────────────
 // Static character data (objectives, FAQ) is loaded from JSON via db.js.
 
-let csMode    = 'pct';   // 'pct' | 'count' | 'games'
+let csMode    = 'chance';   // 'chance' (Δ Wins, as on the villains' Leaderboard) | 'pct' | 'count' | 'games'
 let csChar    = null;      // character record from DB
 let csBuckets = null;      // computed stats per player count
 let csAdversaries = [];    // head-to-head rows from the character_adversary_stats RPC
@@ -237,22 +237,23 @@ async function _renderCharIdentity() {
     `<div class="pf-identity"><img class="char-portrait identity-portrait zoomable" src="${charImgSrc(csChar.name)}" alt="" onerror="this.src='asset/players/default.svg'" onclick="showAvatarLightbox(this.src, 'asset/players/default.svg')"><span class="pf-name-block"><span class="pf-nick">${villainNameInline(csChar.name)}</span>${csChar.box ? `<a class="pf-since pf-since-link" href="villains.html?box=${boxAnchorId(csChar.box)}" title="${_esc(t('View {box} villains', { box: csChar.box }))}">${_boxLabelHTML(csChar.box)}</a>` : ''}</span>${moverImgHTML(csChar.name, 'cs-mover')}</div><p class="char-meta">${t('Pace')}: ${paceDot}${guideLink}</p>`;
 }
 
+// Each row's games and wins, and for Δ Wins (chanceDelta, stats-table.js) the
+// wins expected by chance and their variance: games / k and games / k (1 - 1/k)
+// at k players, Overall their sums.
 function _foldBuckets(buckets) {
-  const out = {
-    all: { games: 0, wins: 0 },
-    2:   { games: 0, wins: 0 },
-    3:   { games: 0, wins: 0 },
-    4:   { games: 0, wins: 0 },
-    5:   { games: 0, wins: 0 },
-    6:   { games: 0, wins: 0 },
-  };
+  const zero = () => ({ games: 0, wins: 0, exp: 0, vari: 0 });
+  const out = { all: zero(), 2: zero(), 3: zero(), 4: zero(), 5: zero(), 6: zero() };
   for (const b of buckets) {
     const n = b.player_count;
     const g = Number(b.games);
     const w = Number(b.wins);
     out.all.games += g;
     out.all.wins  += w;
-    if (n >= 2 && n <= 6) out[n] = { games: g, wins: w };
+    if (n >= 2 && n <= 6) {
+      out[n] = { games: g, wins: w, exp: g / n, vari: g / n * (1 - 1 / n) };
+      out.all.exp  += out[n].exp;
+      out.all.vari += out[n].vari;
+    }
   }
   return out;
 }
@@ -335,23 +336,27 @@ function render() {
   const isSolo = key => key in solo;
   const stats  = key => isSolo(key) ? solo[key] : csBuckets[key];
   const keys   = [...rows.map(r => r.key), ...SOLO_LEVEL_IDS];
-  // The bars scale to the largest official row, as everywhere; the solo rows
-  // have none (they're not measured against the official games).
-  const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), csMode))) || 1;
+  // One table at a time: the official one, or with Solo the solo one (then
+  // without the rivalries, which are official games only). Solo has no Δ Wins
+  // (the Phantom isn't a player with the same chance): % Wins in its place, as
+  // on the Leaderboard, and Δ Wins again back on All.
+  const soloOn = isSolo(csRow);
+  const shown  = soloOn ? SOLO_LEVEL_IDS : rows.map(r => r.key);
+  const mode   = soloOn && csMode === 'chance' ? 'pct' : csMode;
+  // The bars scale to the largest official row, as everywhere (Δ Wins's from
+  // the middle, to the largest distance from 0); the solo rows have none
+  // (they're not measured against the official games).
+  const maxVal = Math.max(...rows.map(r => statValue(stats(r.key), mode))) || 1;
+  const maxAbs = Math.max(...rows.map(r => Math.abs(statValue(stats(r.key), mode)))) || 1;
   // In % Wins, a row with fewer than MIN_GAMES_FOR_PCT games is grayed out, as
   // on the Leaderboard (stats-table.js).
-  const few = b => csMode === 'pct' && b.games < MIN_GAMES_FOR_PCT;   // none at all, too
+  const few = b => mode === 'pct' && b.games < MIN_GAMES_FOR_PCT;   // none at all, too
   // Gold, as in the rankings, for the best table size (ties share it): not
   // Overall, their total, which would always lead the counts, nor a grayed row.
-  const sizeVals = rows.filter(r => r.key !== 'all' && stats(r.key).games && !few(stats(r.key))).map(r => statValue(stats(r.key), csMode));
+  const sizeVals = rows.filter(r => r.key !== 'all' && stats(r.key).games && !few(stats(r.key))).map(r => statValue(stats(r.key), mode));
   const best     = sizeVals.length ? Math.max(...sizeVals) : 0;
   // Both tables size their games column alike, so their columns line up.
   const widths = statGamesWidth(keys.map(stats));
-
-  // One table at a time: the official one, or with the Solo pill the solo one
-  // (then without the rivalries, which are official games only).
-  const soloOn = isSolo(csRow);
-  const shown  = soloOn ? SOLO_LEVEL_IDS : rows.map(r => r.key);
 
   // The boxes on top: the selected row's numbers.
   const sel  = stats(csRow);
@@ -359,10 +364,10 @@ function render() {
   const v = val => csLoading ? '-' : val;
   const rowHTML = (label, key) => {
     const b       = stats(key);
-    const barW    = b.games ? statBarWidth(b, csMode, maxVal) : 0;
-    const dispVal = b.games ? statCellHTML(b, csMode) : '-';
-    const gold    = typeof key === 'number' && b.games && !few(b) && best > 0 && statValue(b, csMode) === best;
-    const bar     = isSolo(key) ? '' : `
+    const barW    = b.games ? statBarWidth(b, mode, maxVal) : 0;
+    const dispVal = b.games ? statCellHTML(b, mode) : '-';
+    const gold    = typeof key === 'number' && b.games && !few(b) && best > 0 && statValue(b, mode) === best;
+    const bar     = isSolo(key) ? '' : mode === 'chance' ? (b.games ? chanceBarHTML(b, maxAbs, gold) : '<div class="bar-bg bar-diverge"></div>') : `
           <div class="bar-bg">
             <div class="bar-fill${gold ? ' gold' : ''}" style="width:${barW}%"></div>
           </div>`;
@@ -398,16 +403,17 @@ function render() {
       ])}
     </div>
     <div class="cs-mode-row">
-      ${statModeSegHTML(csMode, 'csSetMode')}
+      ${statModeSegHTML(mode, 'csSetMode', { chance: !soloOn })}
       ${soloMenu}
     </div>
+    ${mode === 'chance' ? chanceHintHTML(t('Each row of the table counts only its own games; Overall counts them all.')) : ''}
     ${!csLoading && shown.some(k => few(stats(k))) ? `<p class="results-hint">${t('Grayed out: fewer than {n} games.', { n: MIN_GAMES_FOR_PCT })}</p>` : ''}
     ${soloOn ? `
     <div class="lb-table cs-table cs-solo-table mb-1-25" style="${widths}">
       <div class="lb-head">
         <span>${t('Solo')}</span>
         <span></span>
-        <span class="text-right">${statValueLabel(csMode)}</span>
+        <span class="text-right">${statValueLabel(mode)}</span>
       </div>
       ${SOLO_LEVEL_IDS.map(id => rowHTML(soloLevelName(id), id)).join('')}
     </div>
@@ -416,7 +422,7 @@ function render() {
       <div class="lb-head">
         <span>${t('Players')}</span>
         <span></span>
-        <span class="text-right">${statValueLabel(csMode)}</span>
+        <span class="text-right">${statValueLabel(mode)}</span>
       </div>
       ${rows.map(r => rowHTML(r.label, r.key)).join('')}
     </div>
