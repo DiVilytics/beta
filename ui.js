@@ -370,9 +370,9 @@ function backLinkTarget({ parent, from = null }) {
   const file = u => u.pathname.split('/').pop() || 'index.html';
   if (ref && ref.origin === location.origin && dir(ref) === dir(location) && history.length > 1
       && (file(ref) !== file(location) || ref.search !== location.search)) {
-    // The parent itself (its query included): its own name.
+    // The parent itself (the same query): its own name.
     const up = new URL(parent.href, location.href);
-    if (file(ref) === file(up) && [...up.searchParams].every(([k, v]) => ref.searchParams.get(k) === v)) return { href: ref.href, label: parent.label, back: true };
+    if (file(ref) === file(up) && ref.search === up.search) return { href: ref.href, label: parent.label, back: true };
     const name = !from || from.includes(file(ref)) ? _pageName(ref) : null;
     if (name) return { href: ref.href, label: name, back: true };
   }
