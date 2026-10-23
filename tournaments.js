@@ -303,7 +303,8 @@ function tnRenderTournament() {
 
   const actions = [
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
-    `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
+    // Share QR, for the players, is the one to find: the others are ghost buttons.
+    `<button class="btn btn-primary btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShareOrganizers()">${t('Organizer QR')}</button>` : '',
   ].join('');
 

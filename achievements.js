@@ -310,6 +310,11 @@ function achievementXp(charAch, chars, boxInfo, global) {
        + countGlobalAchievements(global).earned;
 }
 
+// One official game's XP, for a player who claimed their villain in it:
+// C + (C - 1) * W, C the players who claimed theirs (them included), W 1 if
+// they won (the Leaderboard's XP and a player page's total).
+const gameXp = (claims, won) => claims + (claims - 1) * (won ? 1 : 0);
+
 function renderGlobalStripHTML(global, onlyEarned = false, onClickFn = '_showGlobalDetail') {
   const tile = (key, badge, playCount, playTiers, winCount, winTiers) => {
     const earned  = _tierIndex(playCount, playTiers) >= 0 || _tierIndex(winCount, winTiers) >= 0;

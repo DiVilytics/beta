@@ -278,7 +278,7 @@ function _loadXpLedger() {
         const ach = achAfter - achBefore;
         achBefore = achAfter;
         const c = claims(p.game_id);
-        return { at: gameById[p.game_id]?.played_at || null, size: seats[p.game_id].length, xp: c + (c - 1) * (p.is_winner ? 1 : 0) + ach, ach };
+        return { at: gameById[p.game_id]?.played_at || null, size: seats[p.game_id].length, xp: gameXp(c, p.is_winner) + ach, ach };
       });
     }
     return ledger;
