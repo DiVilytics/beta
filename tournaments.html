@@ -196,11 +196,12 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3 data-i18n>Share with players</h3>
+      <h3 id="qrTitle"></h3>
       <button class="sheet-close" onclick="closeOverlay('qrOverlay')">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint" data-i18n>Players scan this to follow the tournament and claim their name.</p>
+      <!-- The players' QR code or the organizers' (tournaments.js). -->
+      <p class="modal-hint" id="qrHint"></p>
       <div class="qr-wrap">
         <div id="qrCode"></div>
       </div>

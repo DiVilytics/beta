@@ -3,11 +3,11 @@
 // ?new: the New tournament form. ?t=<id>: one tournament, with its settings,
 // its players by name and, once started, the current stage's tables.
 //
-// The organizer types the players' names (New tournament, Edit tournament until
-// the first game starts). A signed-in player claims their name with That's me
-// (and with it every seat of theirs in the tournament's games), at any time.
-// Start draws every stage's
-// villains and stage 1's tables. The rules (pairing, scoring, villain draw)
+// The organizers (whoever created it, and whoever joined with the organizers'
+// QR code, all alike) type the players' names (New tournament, Edit tournament
+// until the first game starts). A signed-in player claims their name with
+// That's me (and with it every seat of theirs in the tournament's games), at
+// any time. Start draws every stage's villains and stage 1's tables. The rules (pairing, scoring, villain draw)
 // live in tournament-rules.js; the database (DiVilytics-Sync, the tournaments
 // migration) keeps the facts, checks every write and answers with the codes in
 // TN_ERRORS. While a tournament is open and not finished, the page reloads it
@@ -20,6 +20,7 @@ let tnMineIds  = new Set();   // the ones you play in (a name claimed, not withd
 let tnTour     = null;        // the open tournament (a tournaments row)
 let tnPlayers  = [];          // its players (tournament_players rows)
 let tnTables   = [];          // its tables, each with .seats in play order
+let tnOrganizers = [];        // its organizers' user ids, the longest-standing first
 let tnProfiles = new Map();   // user id → profile (organizers, claimed names, recorders)
 let tnPool     = null;        // the form's draw pool (pace-filter.js)
 let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
@@ -45,13 +46,12 @@ async function init() {
   if (params.has('new')) return tnOpenForm(null);
   const id = params.get('t');
   if (id) {
-    // A link with the claim code (the QR code): kept on this phone, out of the address.
-    if (params.get('c')) {
-      _tnSaveCode(id, params.get('c'));
-      const url = new URL(location.href);
-      url.searchParams.delete('c');
-      history.replaceState(null, '', url);
-    }
+    // A link with the claim code (the QR code), or the organizers' code (their
+    // QR code): kept on this phone, out of the address.
+    const url = new URL(location.href);
+    if (params.get('c')) { _tnSaveCode(id, params.get('c')); url.searchParams.delete('c'); }
+    if (params.get('o')) { _tnSaveInvite(id, params.get('o')); url.searchParams.delete('o'); }
+    history.replaceState(null, '', url);
     _tnSetBack();
     return tnLoad(id);
   }
@@ -82,7 +82,7 @@ function _tnAuthChanged() {
 
 // The claim code: names are claimed only with it, as a game is only from its
 // QR code. It comes with the tournament's link or QR code (?c=), kept on this
-// phone; the organizer and whoever claimed a name can read it (and so share
+// phone; the organizers and whoever claimed a name can read it (and so share
 // it), the others only have it from a link.
 const _tnCodeKey = id => `divilytics_tn_code_${id}${STORAGE_SCOPE}`;
 function _tnSaveCode(id, code) { try { localStorage.setItem(_tnCodeKey(id), code); } catch (_) {} }
@@ -93,23 +93,40 @@ function _tnCode() {
 // Signing in from here: the code rides along in the return address, so it
 // comes back even if sign-in ends in another browser.
 onBeforeSignIn(() => {
-  const code = _tnCode();
-  if (!code) return;
+  const code = _tnCode(), invite = _tnInvite();
+  if (!code && !invite) return;
   const url = new URL(location.href);
-  url.searchParams.set('c', code);
+  if (code)   url.searchParams.set('c', code);
+  if (invite) url.searchParams.set('o', invite);
   history.replaceState(null, '', url);
 });
 
+// The organizers: whoever created the tournament and whoever joined with the
+// organizers' code (their QR code, which only organizers can read and share).
+// They are all alike: each can do everything, add organizers and remove any
+// of them, themselves included, as long as one is left.
+const _tnIsOrg = user => !!user && tnOrganizers.includes(user.id);
+
+// The organizers' code from their QR code: an invitation, kept on this phone
+// until it's used (Become an organizer) or you already are one.
+const _tnInviteKey = id => `divilytics_tn_org_${id}${STORAGE_SCOPE}`;
+function _tnSaveInvite(id, code) { try { localStorage.setItem(_tnInviteKey(id), code); } catch (_) {} }
+function _tnInvite() {
+  if (!tnTour) return null;
+  try { return localStorage.getItem(_tnInviteKey(tnTour.id)); } catch (_) { return null; }
+}
+function _tnDropInvite() { try { localStorage.removeItem(_tnInviteKey(tnTour.id)); } catch (_) {} }
+
 async function _tnFetchCode() {
   const user = getCurrentUser();
-  if (_tnCode() || !user || (user.id !== tnTour.organizer && !tnPlayers.some(p => p.user_id === user.id))) return;
+  if (_tnCode() || !user || (!_tnIsOrg(user) && !tnPlayers.some(p => p.user_id === user.id))) return;
   const { data } = await db.from('tournament_claim_codes').select('code').eq('tournament_id', tnTour.id).maybeSingle();
   if (data?.code) _tnSaveCode(tnTour.id, data.code);
 }
 
 
 // A player's name as shown everywhere: the nickname of whoever claimed it,
-// else the name the organizer typed.
+// else the name an organizer typed.
 function tnPlayerName(p) {
   if (!p) return '';
   return (p.user_id && tnProfiles.get(p.user_id)?.nickname) || p.name;
@@ -149,16 +166,23 @@ async function tnLoadList() {
   const root = document.getElementById('tnRoot');
   const user = getCurrentUser();
   const [{ data, error }, mine] = await Promise.all([
-    db.from('tournaments').select('*, tournament_players(count)').order('created_at', { ascending: false }),
+    db.from('tournaments').select('*, tournament_players(count), tournament_organizers(user_id, added_at)').order('created_at', { ascending: false }),
     user ? db.from('tournament_players').select('tournament_id').eq('user_id', user.id).is('withdrawn_after', null) : { data: [] },
   ]);
   root.className = '';
   if (error) { root.innerHTML = loadErrorHTML(t("Couldn't load the tournaments"), error); return; }
   tnList = data || [];
   tnMineIds = new Set((mine.data || []).map(r => r.tournament_id));
-  await _tnLoadProfiles(tnList.map(x => x.organizer));
+  await _tnLoadProfiles(tnList.flatMap(_tnCardOrganizers));
   tnRenderList();
 }
+
+// A listed tournament's organizers (from tournament_organizers), the longest-standing first.
+const _tnCardOrganizers = tour => (tour.tournament_organizers || [])
+  .slice().sort((a, b) => a.added_at.localeCompare(b.added_at)).map(o => o.user_id);
+// Their nicknames as a card shows them: "Ikron and Norrell".
+const _tnOrganizerNames = ids => new Intl.ListFormat(LOCALE, { type: 'conjunction' })
+  .format(ids.map(id => tnProfiles.get(id)?.nickname).filter(Boolean));
 
 // Your tournaments in progress (you play in them or organize them) on top,
 // then the others, newest first.
@@ -170,10 +194,10 @@ function tnRenderList() {
     return;
   }
   const me    = getCurrentUser()?.id;
-  const isYou = tour => tournamentState(tour) === 'running' && (tnMineIds.has(tour.id) || (!!me && tour.organizer === me));
+  const isYou = tour => tournamentState(tour) === 'running' && (tnMineIds.has(tour.id) || (!!me && _tnCardOrganizers(tour).includes(me)));
   const yours  = tnList.filter(isYou);
   const others = tnList.filter(tour => !isYou(tour));
-  const cards  = list => list.length ? `<div class="tn-list">${list.map(tour => tournamentCardHTML(tour, { organizer: tnProfiles.get(tour.organizer)?.nickname })).join('')}</div>` : '';
+  const cards  = list => list.length ? `<div class="tn-list">${list.map(tour => tournamentCardHTML(tour, { organizer: _tnOrganizerNames(_tnCardOrganizers(tour)) })).join('')}</div>` : '';
   root.innerHTML = `
     <div class="list-header">
       <div class="results-hint">${tn(tnList.length, '{n} tournament', '{n} tournaments')}</div>
@@ -198,12 +222,13 @@ function tnNew() {
 // redraw only when something changed.
 async function tnLoad(id, { quiet = false } = {}) {
   const root = document.getElementById('tnRoot');
-  const [tourRes, playersRes, tablesRes] = await Promise.all([
+  const [tourRes, playersRes, tablesRes, orgsRes] = await Promise.all([
     db.from('tournaments').select('*').eq('id', id).maybeSingle(),
     db.from('tournament_players').select('*').eq('tournament_id', id).order('joined_at'),
     db.from('tournament_tables').select('*, tournament_seats(*)').eq('tournament_id', id).order('stage').order('table_no'),
+    db.from('tournament_organizers').select('user_id').eq('tournament_id', id).order('added_at'),
   ]);
-  const error = tourRes.error || playersRes.error || tablesRes.error;
+  const error = tourRes.error || playersRes.error || tablesRes.error || orgsRes.error;
   if (quiet && (error || !tourRes.data)) { _tnSchedulePoll(); return; }
   root.className = '';
   // A malformed id (22P02: not a uuid) is a wrong link, like a missing tournament.
@@ -216,11 +241,13 @@ async function tnLoad(id, { quiet = false } = {}) {
   tnTour    = tourRes.data;
   tnPlayers = playersRes.data || [];
   tnTables  = (tablesRes.data || []).map(tb => ({ ...tb, seats: (tb.tournament_seats || []).sort((a, b) => a.position - b.position) }));
-  await _tnLoadProfiles([tnTour.organizer, ...tnPlayers.map(p => p.user_id), ...tnTables.map(tb => tb.recorder)]);
+  tnOrganizers = (orgsRes.data || []).map(o => o.user_id);
+  await _tnLoadProfiles([...tnOrganizers, ...tnPlayers.map(p => p.user_id), ...tnTables.map(tb => tb.recorder)]);
+  if (_tnIsOrg(getCurrentUser())) _tnDropInvite();   // already one of them
   _tnSortPlayers();
   await _tnFetchCode();
   _tnSchedulePoll();
-  const snap = JSON.stringify([tnTour, tnPlayers, tnTables]);
+  const snap = JSON.stringify([tnTour, tnPlayers, tnTables, tnOrganizers]);
   if (quiet && snap === tnSnapshot) return;
   tnSnapshot = snap;
   if (!_tnFormOpen()) tnRenderTournament();
@@ -251,7 +278,7 @@ function tnRenderTournament() {
   const root = document.getElementById('tnRoot');
   root.className = '';
   const user  = getCurrentUser();
-  const isOrg = !!user && user.id === tnTour.organizer;
+  const isOrg = _tnIsOrg(user);
   const lobby = tnTour.current_stage === 0;
   const mine  = user ? tnPlayers.find(p => p.user_id === user.id) : null;
 
@@ -261,7 +288,7 @@ function tnRenderTournament() {
   // On top the tournament (name, date, organizer, status); under it, after a
   // gap, Options (folded until tapped: one per row), with ⓘ for Tournament options.
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
-  const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
+  const organizer = tn(tnOrganizers.length, 'Organizer: {names}', 'Organizers: {names}', { names: _esc(_tnOrganizerNames(tnOrganizers) || '-') });
   const options = [
     opt('Table size', tnTour.table_size),
     opt('Tables', t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name)),
@@ -277,6 +304,7 @@ function tnRenderTournament() {
   const actions = [
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
     `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
+    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShareOrganizers()">${t('Organizer QR')}</button>` : '',
   ].join('');
 
   const ctx  = { user, isOrg, lobby, mine };
@@ -295,13 +323,15 @@ function tnRenderTournament() {
       <div class="tn-options${tnOptionsOpen ? '' : ' hidden'}">${options}</div>
     </div>
     <div class="claim-share-row">${actions}</div>
+    ${_tnInviteHTML(user, isOrg)}
     ${_tnOverHTML(mine)}
     ${lobby ? '' : _tnViewSegHTML()}
     ${lobby || tnView === 'players' ? `
       ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
       ${!user ? `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`
-        : !mine && !isOrg && !_tnCode() && tnPlayers.some(p => !p.user_id) ? `<p class="tn-hint">${t('To claim your name, scan the tournament\'s QR code from the organizer, or open its link.')}</p>` : ''}`
+        : !mine && !isOrg && !_tnCode() && tnPlayers.some(p => !p.user_id) ? `<p class="tn-hint">${t('To claim your name, scan the tournament\'s QR code from an organizer, or open its link.')}</p>` : ''}
+      ${_tnOrganizersHTML(user, isOrg)}`
       : tnView === 'standings' ? _tnStandingsHTML(mine) : _tnTablesHTML(mine)}
     ${isOrg ? `<div class="claim-delete-row">
       <button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button>
@@ -312,7 +342,7 @@ function tnRenderTournament() {
 // A player, in New tournament's row: their number, the avatar of whoever
 // claimed the name (or the default), the name (the nickname once claimed),
 // whether it's claimed or withdrawn, and That's me / Release (and, once
-// started, the organizer's Withdraw / Bring back). Players are added, renamed
+// started, an organizer's Withdraw / Bring back). Players are added, renamed
 // and removed in Edit tournament, not here.
 function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
   const prof   = p.user_id ? tnProfiles.get(p.user_id) : null;
@@ -341,6 +371,42 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
       <div class="order-slot-info"><span class="order-slot-name">${_esc(tnPlayerName(p))}</span>${status ? `<span class="tn-row-status">${status}</span>` : ''}</div>
       ${actions ? `<div class="order-slot-actions">${actions}</div>` : ''}
     </div>`;
+}
+
+// Opened with the organizers' QR code and not one of them yet: the invitation,
+// with Become an organizer (Sign in first, when signed out).
+function _tnInviteHTML(user, isOrg) {
+  if (!_tnInvite() || isOrg) return '';
+  return `
+    <div class="claim-game-info tn-you">
+      <div class="claim-date">${t('Organize this tournament')}</div>
+      <div class="claim-meta">${t('This QR code makes you one of its organizers: you can do everything they do, playing included.')}</div>
+      <div class="tn-you-actions">${user
+        ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnJoinOrganizers()">${t('Become an organizer')}</button>`
+        : `<button class="btn btn-primary btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button>`}</div>
+    </div>`;
+}
+
+// The organizers, under the players: avatar and nickname; to an organizer,
+// Remove for each of the others and Step down for themselves (while another
+// is left), and how to add one.
+function _tnOrganizersHTML(user, isOrg) {
+  const rows = tnOrganizers.map(id => {
+    const prof = tnProfiles.get(id);
+    const self = user?.id === id;
+    const action = isOrg && tnOrganizers.length > 1
+      ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnRemoveOrganizer('${id}')">${self ? t('Step down') : t('Remove')}</button>` : '';
+    return `
+      <div class="order-slot tn-player-row${self ? ' mine' : ''}">
+        ${prof ? avatarHTML(resolveAvatar(prof), { cls: 'order-slot-portrait' }) : '<img class="order-slot-portrait" src="asset/players/default.svg" alt="">'}
+        <div class="order-slot-info"><span class="order-slot-name">${_esc(prof?.nickname || '-')}</span></div>
+        ${action ? `<div class="order-slot-actions">${action}</div>` : ''}
+      </div>`;
+  }).join('');
+  return `
+    <div class="section-label">${t('Organizers')}</div>
+    <div class="tn-player-rows">${rows}</div>
+    ${isOrg ? `<p class="tn-hint">${t('To add an organizer, share the Organizer QR: whoever scans it, signed in, becomes one.')}</p>` : ''}`;
 }
 
 // Options, folded at first: tapping the title opens them (kept open through the reloads).
@@ -411,7 +477,7 @@ function _tnStageHTML(mine) {
 // Undo draw (while none of its games is saved; a bye isn't a game).
 function _tnNextStageHTML(tables) {
   const user = getCurrentUser();
-  if (!user || user.id !== tnTour.organizer) return '';
+  if (!_tnIsOrg(user)) return '';
   const canUndo = !tables.some(tb => tb.game_id);
   const open  = !tnTour.finished_at;
   const more  = open && tnTour.current_stage < tnTour.stages;
@@ -531,17 +597,56 @@ function _tnTableHTML(tb, myId) {
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
 
-// The QR code: with the claim code when you have it (the organizer, a player
+// The QR code: with the claim code when you have it (an organizer, a player
 // with a name), so whoever scans it can claim theirs.
 function tnShare() {
   const code = _tnCode();
-  showQRModal(new URL(`tournaments.html?t=${tnTour.id}${code ? `&c=${encodeURIComponent(code)}` : ''}`, location.href).href, 'qrCode', 'qrOverlay');
+  _tnQR(t('Share with players'), t('Players scan this to follow the tournament and claim their name.'), code ? `&c=${encodeURIComponent(code)}` : '');
+}
+
+// The organizers' QR code: whoever scans it, signed in, can become one.
+async function tnShareOrganizers() {
+  const { data, error } = await db.from('tournament_organizer_codes').select('code').eq('tournament_id', tnTour.id).maybeSingle();
+  if (error || !data?.code) return _tnShowError(error ? _tnErrorMsg(error) : t('Only an organizer can do this.'));
+  _tnQR(t('Share with organizers'), t('Whoever scans this, signed in, can become an organizer, with everything you can do. Share it only with people you trust.'), `&o=${encodeURIComponent(data.code)}`);
+}
+
+function _tnQR(title, hint, query) {
+  document.getElementById('qrTitle').textContent = title;
+  document.getElementById('qrHint').textContent = hint;
+  showQRModal(new URL(`tournaments.html?t=${tnTour.id}${query}`, location.href).href, 'qrCode', 'qrOverlay');
 }
 
 // After an action: the tournament as it is now, and the error if it failed.
 async function _tnAfter(error) {
   await tnLoad(tnTour.id);
   if (error) _tnShowError(_tnErrorMsg(error));
+}
+
+async function tnJoinOrganizers() {
+  if (!getCurrentProfile()) return _openNicknameModal();
+  const { error } = await db.rpc('join_tournament_organizers', { target: tnTour.id, organizer_code: _tnInvite() });
+  if (!error || error.message === 'wrong_organizer_code') _tnDropInvite();   // used, or no good
+  await _tnAfter(error);
+}
+
+// Remove an organizer, or step down (yourself); one has to be left.
+function tnRemoveOrganizer(userId) {
+  const self = userId === getCurrentUser()?.id;
+  const name = `<strong class="text-emph">${_esc(tnProfiles.get(userId)?.nickname || '-')}</strong>`;
+  openConfirmSheet({
+    id:           'tnRemoveOrgSheet',
+    title:        self ? t('Step down as organizer?') : t('Remove this organizer?'),
+    bodyHTML:     `<p class="confirm-text">${self
+      ? t('You can no longer run the tournament; the other organizers go on. To come back, you need the Organizer QR from one of them.')
+      : t('{name} can no longer run the tournament. To come back, they need the Organizer QR again.', { name })}</p>`,
+    confirmLabel: self ? t('Step down') : t('Remove'),
+    danger:       true,
+    onConfirm:    async () => {
+      const { error } = await db.rpc('remove_tournament_organizer', { target: tnTour.id, who: userId });
+      await _tnAfter(error);
+    },
+  });
 }
 
 async function tnClaim(playerId) {
@@ -869,7 +974,7 @@ function tnCustomFill(fill) {
 // form opens it at the start, each option's ⓘ at its own section.
 const TN_HELP = [
   ['date', 'Date', [
-    'The day of the tournament, shown on its page and in the lists. It can be a day to come: create the tournament in advance and share it. The organizer can change it at any time, like the name. The games keep the day and time they were actually played.',
+    'The day of the tournament, shown on its page and in the lists. It can be a day to come: create the tournament in advance and share it. The organizers can change it at any time, like the name. The games keep the day and time they were actually played.',
   ]],
   ['size', 'Table size', [
     'No table has more players than this. With Balanced tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
@@ -926,14 +1031,18 @@ const TN_HELP = [
     'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
-    'The organizer types the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: the organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
-    'The organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
+    'The organizers type the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: an organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
+    'An organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
     'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
   ]],
+  ['organizers', 'Organizers', [
+    'Whoever creates the tournament is its first organizer. An organizer adds others with Organizer QR: whoever scans it, signed in, and taps Become an organizer is one too. There can be as many as you like, and they are all alike: each can do everything, from editing, starting and drawing the stages to entering and fixing results, withdrawing players and deleting the tournament, and can add or remove organizers.',
+    'An organizer can play too: they claim their name with That\'s me, without the claim code. An organizer can remove any other, or step down; one is always left. If an organizer deletes their account, the others go on with the tournament.',
+  ]],
   ['changes', 'After the start', [
     'Until the first game starts (a bye isn\'t a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
-    'The organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it.',
+    'An organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it.',
   ]],
 ];
 
@@ -1239,18 +1348,18 @@ async function _tnSaveSetup({ settings, players = null, villains = null, tables 
 
 // ── RECORDING A TABLE ─────────────────────────────────────────────────────────
 // Who can record a table, its card's buttons, and Start game: the phone takes
-// the table (take_tournament_table: the organizer, or a player at it who
+// the table (take_tournament_table: an organizer, or a player at it who
 // claimed their name; one at a time) and the game runs on its own page,
 // tournament-game.html (tournament-game.js), on New Game's engine. One game in
 // progress per phone, New Game's or a table's.
 
 const _tnSavedGame = () => liveGame.loadSaved();
 
-// Who can record a table: the organizer, or a player at it who claimed their name.
+// Who can record a table: an organizer, or a player at it who claimed their name.
 function _tnCanRecord(tb) {
   const user = getCurrentUser();
   if (!user || tb.saved_at || tb.seats.length < 2) return false;
-  if (user.id === tnTour.organizer) return true;
+  if (_tnIsOrg(user)) return true;
   const mine = tnPlayers.find(p => p.user_id === user.id);
   return !!mine && tb.seats.some(s => s.player_id === mine.id);
 }
@@ -1262,7 +1371,7 @@ function _tnCanRecord(tb) {
 function _tnTableActionHTML(tb) {
   if (tb.saved_at) {
     if (!tb.game_id) return '';
-    const isOrg = getCurrentUser()?.id === tnTour.organizer;
+    const isOrg = _tnIsOrg(getCurrentUser());
     return `<a class="btn btn-ghost btn-sm" href="claim.html?game=${tb.game_id}">${t('Open game')}</a>`
       + (isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Edit result')}</button>` : '');
   }
@@ -1270,7 +1379,7 @@ function _tnTableActionHTML(tb) {
   if (saved?.tournament?.tableId === tb.id) return `<a class="btn btn-primary btn-sm" href="tournament-game.html?table=${tb.id}">${t('Resume game')}</a>`;
   if (!_tnCanRecord(tb)) return '';
   const user = getCurrentUser();
-  const isOrg = user.id === tnTour.organizer;
+  const isOrg = _tnIsOrg(user);
   // The organizer can also type a table's result without playing it on a phone.
   const enter = isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Enter result')}</button>` : '';
   if (!tb.recorder || tb.recorder === user.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Start game')}</button>${enter}`;
@@ -1469,7 +1578,7 @@ function tnEditTable(tableId) {
         if (dur > 0)   results[0].minutes = dur;
         if (turns > 0) results[0].round   = turns;
       }
-      // A new result: the organizer saves it without taking the table (a phone
+      // A new result: an organizer saves it without taking the table (a phone
       // with the game open can't save it after); this phone's game of it, if
       // any, is over.
       const error = entering

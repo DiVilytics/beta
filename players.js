@@ -198,25 +198,27 @@ async function _loadTournaments() {
   try {
     const prof = await fetchProfile({ nickname: pfNick }, 'id');
     if (!prof) return none;
-    const sel = '*, tournament_players(count)';
     const [org, played] = await Promise.all([
-      db.from('tournaments').select(sel).eq('organizer', prof.id),
+      db.from('tournament_organizers').select('tournament_id').eq('user_id', prof.id),
       db.from('tournament_players').select('id, tournament_id').eq('user_id', prof.id),
     ]);
     const myPlayer  = new Map((played.data || []).map(r => [r.tournament_id, r.id]));
-    const organized = org.data || [];
-    const otherIds  = [...myPlayer.keys()].filter(id => !organized.some(x => x.id === id));
-    const others    = otherIds.length ? (await db.from('tournaments').select(sel).in('id', otherIds)).data || [] : [];
-    const orgIds    = [...new Set(others.map(x => x.organizer))];
-    const nicks     = new Map();
+    const organized = new Set((org.data || []).map(r => r.tournament_id));
+    const ids       = [...new Set([...organized, ...myPlayer.keys()])];
+    const tours     = ids.length ? (await db.from('tournaments').select('*, tournament_players(count), tournament_organizers(user_id, added_at)').in('id', ids)).data || [] : [];
+    // The organizers of the ones they only played, by nickname, the longest-standing first.
+    const orgsOf = x => (x.tournament_organizers || []).slice().sort((a, b) => a.added_at.localeCompare(b.added_at)).map(o => o.user_id);
+    const orgIds = [...new Set(tours.filter(x => !organized.has(x.id)).flatMap(orgsOf))];
+    const nicks  = new Map();
     if (orgIds.length) {
       const { data } = await db.from('profiles').select('id, nickname').in('id', orgIds);
       for (const p of data || []) nicks.set(p.id, p.nickname);
     }
+    const names = x => new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(orgsOf(x).map(id => nicks.get(id)).filter(Boolean));
 
     // Final places: the finished tournaments they played, ranked from their tables.
     const ranks    = new Map();
-    const finished = [...organized, ...others].filter(x => x.finished_at && myPlayer.has(x.id));
+    const finished = tours.filter(x => x.finished_at && myPlayer.has(x.id));
     if (finished.length) {
       const rows = await _fetchInChunks(finished.map(x => x.id), chunk => db.from('tournament_tables')
         .select('tournament_id, stage, saved_at, tournament_seats(player_id, position, place, dropped)').in('tournament_id', chunk));
@@ -228,10 +230,8 @@ async function _loadTournaments() {
     }
     const medals = [1, 2, 3].map(n => [...ranks.values()].filter(r => r === n).length);
 
-    const list = [
-      ...organized.map(x => ({ tour: x, isOrganizer: true })),
-      ...others.map(x => ({ tour: x, organizer: nicks.get(x.organizer) })),
-    ].map(x => ({ ...x, rank: ranks.get(x.tour.id) || null }))
+    const list = tours.map(x => organized.has(x.id) ? { tour: x, isOrganizer: true } : { tour: x, organizer: names(x) })
+     .map(x => ({ ...x, rank: ranks.get(x.tour.id) || null }))
      .sort((a, b) => b.tour.created_at.localeCompare(a.tour.created_at));
     return { list, medals, played: myPlayer.size };
   } catch (_) {

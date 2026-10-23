@@ -312,7 +312,7 @@ const TOURNAMENT_PLAY_ORDERS = {
 // ── Database answers ─────────────────────────────────────────────────────────
 // The tournament functions' error codes, shown by both tournament pages.
 const TN_ERRORS = {
-  not_organizer:          'Only the organizer can do this.',
+  not_organizer:          'Only an organizer can do this.',
   already_started:        'The tournament has already started.',
   too_few_players:        'A tournament needs at least 2 players.',
   invalid_pool:           'The draw pool needs at least as many villains as there are players.',
@@ -325,19 +325,22 @@ const TN_ERRORS = {
   not_running:            "The tournament isn't running.",
   stage_not_done:         'Every table of this stage has to be saved first.',
   table_not_saved:        'Only a saved table can be edited.',
-  not_at_table:           'Only the players at this table who claimed their name, or the organizer, can record it.',
+  not_at_table:           'Only the players at this table who claimed their name, or an organizer, can record it.',
   table_taken:            'Another phone is already recording this table.',
   not_recorder:           'Another phone records this table now.',
   table_saved:            'This table has already been saved.',
-  result_entered:         'The organizer has already entered this table\'s result: discard the game on this phone.',
+  result_entered:         'An organizer has already entered this table\'s result: discard the game on this phone.',
   invalid_results:        'Every villain needs a place before saving.',
   stage_has_games:        'A game of this stage is already saved: its draw can no longer be undone.',
-  wrong_code:             'This link can\'t claim names: scan the tournament\'s QR code from the organizer.',
+  wrong_code:             'This link can\'t claim names: scan the tournament\'s QR code from an organizer.',
   no_table:               'This table no longer exists: its stage was drawn again, or the tournament was deleted. Discard the game on this phone.',
   saved_from_phone:       'This table was just saved from the phone recording it.',
   tournament_locked:      'A game has started: only the name and the date can change.',
   needs_redraw:           'The players change only with stage 1 drawn again.',
   invalid_players:        'Every player needs a name.',
+  last_organizer:         'A tournament needs at least one organizer.',
+  wrong_organizer_code:   'This QR code can\'t make you an organizer any more: ask an organizer for the Organizer QR again.',
+  no_tournament:          'This tournament no longer exists.',
 };
 function _tnErrorMsg(error) {
   if (error?.code === '23505') return t('There is already a player with this name.');

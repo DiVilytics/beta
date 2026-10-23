@@ -25,7 +25,7 @@ async function init() {
     loadCharacters(),
     loadBoxInfo(),
     db.from('profile_boxes').select('box').eq('user_id', user.id),
-    db.from('tournaments').select('id', { count: 'exact', head: true }).eq('organizer', user.id),
+    db.from('tournament_organizers').select('tournament_id', { count: 'exact', head: true }).eq('user_id', user.id),
   ]);
   _acctOrganized = organizedRes.count || 0;
   _acctChars      = chars;
@@ -294,7 +294,9 @@ async function exportMyTournaments() {
   const btn = document.getElementById('exportTournamentsBtn');
   btn.disabled    = true;
   try {
-    const { data: tours, error } = await db.from('tournaments').select('*').eq('organizer', user.id).order('created_at');
+    const { data: orgRows, error: orgError } = await db.from('tournament_organizers').select('tournament_id').eq('user_id', user.id);
+    if (orgError) throw orgError;
+    const { data: tours, error } = await db.from('tournaments').select('*').in('id', orgRows.map(r => r.tournament_id)).order('created_at');
     if (error) throw error;
     const ids = tours.map(x => x.id);
     const [players, tables] = await Promise.all([
