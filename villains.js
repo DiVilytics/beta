@@ -32,9 +32,9 @@ async function init() {
   setActiveNav('villains.html');
   const params   = new URLSearchParams(location.search);
   const charName = (params.get('vil') || '').trim();
-  // Detail view: show the way back to the roster right away, before any data loads.
-  if (charName) document.getElementById('csBack').classList.remove('hidden');
   await initAuth();
+  // Detail view: the way back shows before any data loads (to its box once known).
+  if (charName) _setVillainBack();
 
   // A language switch brings back the grouping and the switches (lang.js).
   const saved = takeViewState();
@@ -150,11 +150,23 @@ function _showCsEmpty(html) {
   el.innerHTML = html;
 }
 
+// A villain page's ← link: back to the page that listed it (the roster, the
+// Leaderboard, Charts, a player, a game, another villain's rivalries…), else up
+// to the roster, at the villain's box once known (ui.js). Not to its guide in
+// the F.A.Q., a page of its own.
+function _setVillainBack() {
+  setBackLink('csBack', {
+    parent: { href: csChar?.box ? `villains.html?box=${boxAnchorId(csChar.box)}` : 'villains.html', label: t('Villains') },
+    from:   ['villains.html', 'leaderboard.html', 'charts.html', 'players.html', 'game-log.html', 'claim.html', 'tournaments.html'],
+  });
+}
+
 async function renderDetailPage(charName) {
   document.title = `DiVilytics | ${villainName(charName)}`;
 
   [csAllChars, csBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
   csChar     = csAllChars.find(c => c.name === charName);
+  _setVillainBack();
 
   if (!csChar) {
     _showCsEmpty(emptyStateHTML('⚠️', t('Villain not found'), t('“{name}” isn\'t a villain on DiVilytics.', { name: _esc(charName) })));
