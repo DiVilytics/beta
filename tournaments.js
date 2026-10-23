@@ -16,6 +16,7 @@
 let tnChars    = [];
 let tnBoxInfo  = {};
 let tnList     = null;        // the list view's tournaments
+let tnMineIds  = new Set();   // the ones you play in (a name claimed, not withdrawn)
 let tnTour     = null;        // the open tournament (a tournaments row)
 let tnPlayers  = [];          // its players (tournament_players rows)
 let tnTables   = [];          // its tables, each with .seats in play order
@@ -59,7 +60,7 @@ async function init() {
 
 function _tnAuthChanged() {
   if (!_tnFormOpen() && tnTour) tnRenderTournament();
-  else if (!_tnFormOpen() && tnList) tnRenderList();
+  else if (!_tnFormOpen() && tnList) tnLoadList();   // yours on top change with who's signed in
   if (_tnFormOpen() && tnPool) tnPool.loadOwnedBoxes().then(() => tnPool.updatePaceUI());
 }
 
@@ -132,16 +133,21 @@ function _tnShowError(msg) {
 
 async function tnLoadList() {
   const root = document.getElementById('tnRoot');
-  const { data, error } = await db.from('tournaments')
-    .select('*, tournament_players(count)')
-    .order('created_at', { ascending: false });
+  const user = getCurrentUser();
+  const [{ data, error }, mine] = await Promise.all([
+    db.from('tournaments').select('*, tournament_players(count)').order('created_at', { ascending: false }),
+    user ? db.from('tournament_players').select('tournament_id').eq('user_id', user.id).is('withdrawn_after', null) : { data: [] },
+  ]);
   root.className = '';
   if (error) { root.innerHTML = loadErrorHTML(t("Couldn't load the tournaments"), error); return; }
   tnList = data || [];
+  tnMineIds = new Set((mine.data || []).map(r => r.tournament_id));
   await _tnLoadProfiles(tnList.map(x => x.organizer));
   tnRenderList();
 }
 
+// Your tournaments in progress (you play in them or organize them) on top,
+// then the others, newest first.
 function tnRenderList() {
   const root = document.getElementById('tnRoot');
   const newBtn = `<button class="btn btn-primary btn-sm" type="button" onclick="tnNew()">${t('+ New tournament')}</button>`;
@@ -149,12 +155,21 @@ function tnRenderList() {
     root.innerHTML = emptyStateHTML('🏟️', t('No tournaments yet'), t('Add the players, and DiVilytics draws the tables and the villains of every stage.'), newBtn);
     return;
   }
+  const me    = getCurrentUser()?.id;
+  const isYou = tour => tournamentState(tour) === 'running' && (tnMineIds.has(tour.id) || (!!me && tour.organizer === me));
+  const yours  = tnList.filter(isYou);
+  const others = tnList.filter(tour => !isYou(tour));
+  const cards  = list => list.length ? `<div class="tn-list">${list.map(tour => tournamentCardHTML(tour, { organizer: tnProfiles.get(tour.organizer)?.nickname })).join('')}</div>` : '';
   root.innerHTML = `
     <div class="list-header">
       <div class="results-hint">${tn(tnList.length, '{n} tournament', '{n} tournaments')}</div>
       ${newBtn}
     </div>
-    <div class="tn-list">${tnList.map(tour => tournamentCardHTML(tour, { organizer: tnProfiles.get(tour.organizer)?.nickname })).join('')}</div>`;
+    ${yours.length ? `
+      <div class="section-label">${tn(yours.length, 'Your tournament in progress', 'Your tournaments in progress')}</div>
+      ${cards(yours)}
+      ${others.length ? `<div class="section-label">${t('Other tournaments')}</div>` : ''}` : ''}
+    ${cards(others)}`;
 }
 
 
@@ -230,7 +245,7 @@ function tnRenderTournament() {
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
   // Each option with its name, as the form calls it.
   // On top the tournament (name, date, organizer, status); under it, after a
-  // gap, its options one per row, with ⓘ for Tournament options.
+  // gap, Options (folded until tapped: one per row), with ⓘ for Tournament options.
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const organizer = t('Organizer: {name}', { name: _esc(tnProfiles.get(tnTour.organizer)?.nickname || '-') });
   const options = [
@@ -243,7 +258,7 @@ function tnRenderTournament() {
     opt('Bye', t((TOURNAMENT_BYES[tnTour.bye] || TOURNAMENT_BYES.last).name)),
     opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
   ].join('');
-  const status = [tournamentStatus(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
+  const status = [tournamentStatusHTML(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
   const actions = [
     isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
@@ -259,10 +274,14 @@ function tnRenderTournament() {
       <div class="claim-meta">${fmtTournamentDate(tnTour)}</div>
       <div class="claim-meta">${organizer}</div>
       <div class="claim-meta">${status}</div>
-      <div class="claim-meta tn-options-title"><strong>${t('Options')}</strong> <button class="tn-info" type="button" onclick="tnHelp()" title="${_esc(t('Tournament options'))}">ⓘ</button></div>
-      ${options}
+      <div class="claim-meta tn-options-title">
+        <button class="tn-options-toggle" type="button" onclick="tnToggleOptions()" aria-expanded="${tnOptionsOpen}"><strong>${t('Options')}</strong> <span class="chevron${tnOptionsOpen ? ' open' : ''}">▼</span></button>
+        <button class="tn-info" type="button" onclick="tnHelp()" title="${_esc(t('Tournament options'))}">ⓘ</button>
+      </div>
+      <div class="tn-options${tnOptionsOpen ? '' : ' hidden'}">${options}</div>
     </div>
     <div class="claim-share-row">${actions}</div>
+    ${_tnOverHTML(mine)}
     ${lobby ? '' : _tnViewSegHTML()}
     ${lobby || tnView === 'players' ? `
       ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
@@ -307,6 +326,30 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
       ${avatar}
       <div class="order-slot-info"><span class="order-slot-name">${_esc(tnPlayerName(p))}</span>${status ? `<span class="tn-row-status">${status}</span>` : ''}</div>
       ${actions ? `<div class="order-slot-actions">${actions}</div>` : ''}
+    </div>`;
+}
+
+// Options, folded at first: tapping the title opens them (kept open through the reloads).
+let tnOptionsOpen = false;
+function tnToggleOptions() {
+  tnOptionsOpen = !tnOptionsOpen;
+  tnRenderTournament();
+}
+
+// A finished tournament, above the tabs, highlighted like your game: that it's
+// over, who won and, for a player in it, their final place and points.
+function _tnOverHTML(mine) {
+  if (!tnTour.finished_at) return '';
+  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
+  const byId = new Map(tnPlayers.map(p => [p.id, p]));
+  const winners = rows.filter(r => r.rank === 1).map(r => `<strong class="text-emph">${_esc(tnPlayerName(byId.get(r.player_id)))}</strong>`);
+  const me = mine ? rows.find(r => r.player_id === mine.id) : null;
+  const medal = me && me.rank <= 3 ? `${TOURNAMENT_MEDALS[me.rank - 1]} ` : '';
+  return `
+    <div class="claim-game-info tn-you">
+      <div class="claim-date">🏁 ${t('Tournament over')}</div>
+      ${winners.length ? `<div class="claim-meta">${tn(winners.length, 'Winner: {names}', 'Winners: {names}', { names: new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(winners) })}</div>` : ''}
+      ${me ? `<div class="claim-meta tn-over-you">${medal}${t('You finished {place}', { place: fmtPlace(me.rank) })} | ${_tnPointsLabel(me.points)}</div>` : ''}
     </div>`;
 }
 

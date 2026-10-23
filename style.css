@@ -2431,6 +2431,19 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .tn-list, .tn-tables { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-card .card-top { margin-bottom: 4px; }
+/* A tournament's status (tournamentStatusHTML): running in the accent with the
+   live game's pulsing dot, its card with the accent border; finished with 🏁. */
+.tn-status.running { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.tn-status.running::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red); margin-right: 5px; vertical-align: middle;
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+.tn-card.running { border-color: var(--accent); }
+/* Options on a tournament's page: folded until their title is tapped. */
+.tn-options-toggle { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: none; background: none; font: inherit; color: inherit; cursor: pointer; }
+/* A finished tournament's box: your place, in the text color. */
+.tn-over-you { color: var(--text); font-weight: 600; margin-top: 2px; }
 .tn-card-meta { font-size: calc(12px * var(--ts)); color: var(--muted); }
 .tn-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .tn-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
@@ -2491,11 +2504,21 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 #tnLive .section-label { margin-top: 18px; }
 /* New Game's movers row: the ones still in the game are tapped to place them,
    the placed ones fade with their place. */
+.tg-movers { align-items: stretch; }   /* every box as tall as the tallest, the movers at the bottom */
 .tg-mover {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 0; border: none; background: none; font-family: inherit; color: var(--text); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px;
+  padding: 6px 6px 4px; border: 1px solid transparent; border-radius: var(--r); background: none;
+  font-family: inherit; color: var(--text); cursor: pointer;
 }
+/* Still in the game: a button in the accent, so it reads as one to tap. */
+button.tg-mover:not(:disabled) { border-color: var(--accent); background: var(--accent-d); }
 .tg-mover:disabled { cursor: default; }
+/* A free place in the ranking tapped: the movers to tap bounce. */
+.tg-movers.nudge button.tg-mover:not(:disabled) { animation: tgNudge 0.5s ease-in-out 2; }
+@keyframes tgNudge {
+  0%, 100% { transform: none; }
+  40%      { transform: translateY(-6px); }
+}
 .tg-mover-name { font-size: calc(10px * var(--ts)); color: var(--muted); max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tg-mover.placed .mover { opacity: 0.3; }
 .tg-mover-place { font-size: calc(11px * var(--ts)); font-weight: 700; color: var(--muted); }
@@ -2509,7 +2532,8 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   font-family: inherit; color: var(--text);
   background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
 }
-.tn-slot.empty { display: flex; border-style: dashed; background: none; }
+.tn-slot.empty { display: flex; gap: 10px; border-style: dashed; background: none; cursor: pointer; }
+.tn-slot-msg { font-size: calc(11px * var(--ts)); color: var(--accent); }
 .tn-slot-place { grid-row: 1 / span 3; font-size: calc(13px * var(--ts)); font-weight: 700; color: var(--muted); }
 .tn-slot .char-portrait { grid-row: 1 / span 3; justify-self: center; width: 32px; height: 32px; }
 .tn-slot .tn-mover-villain { grid-column: 3; }
@@ -2524,7 +2548,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-place-choices .btn { width: 100%; justify-content: center; }
 
 @media (hover: hover) {
-  a.tn-card:hover { border-color: var(--s4); }
+  a.tn-card:not(.running):hover { border-color: var(--s4); }
 }
 
 /* ── CHARACTER STATS PAGE ─────────────────────────────────────────── */

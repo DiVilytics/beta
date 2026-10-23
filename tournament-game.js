@@ -104,9 +104,10 @@ function _tnRenderLive() {
   const seat = pos => tnGame.seats.find(s => s.position === pos);
   const byPlace = new Map(results.map(r => [r.place, r]));
   const lastAction = tnGame.actions[tnGame.actions.length - 1];
+  // A place still free: tapping it points to the movers (the places are given there).
   document.getElementById('tnRanking').innerHTML = tnGame.seats.map((_, i) => {
     const place = i + 1, r = byPlace.get(place);
-    if (!r) return `<div class="tn-slot empty"><span class="tn-slot-place">${fmtPlace(place)}</span></div>`;
+    if (!r) return `<button class="tn-slot empty" type="button" onclick="tnTapFreeSlot(this)"><span class="tn-slot-place">${fmtPlace(place)}</span><span class="tn-slot-msg"></span></button>`;
     const s = seat(r.position);
     const undo = !r.auto && !r.withdrawn && r === lastAction;
     const when = [r.minutes != null ? (fmtDuration(r.minutes) || '0m') : null, r.round != null && tnGame.roundsCounted ? t('Round {n}', { n: r.round }) : null].filter(Boolean).join(' | ');
@@ -136,6 +137,23 @@ function tnTapPlaying(position) {
   won.onclick = () => _tnPlace(position, false);
   dropped.onclick = () => _tnPlace(position, true);
   openOverlay('tnPlaceSheet');
+}
+
+// A free place tapped: it says to tap a mover, and the movers still in the
+// game bounce, for a moment.
+let tnNudgeTimer = null;
+function tnTapFreeSlot(slot) {
+  if (_tnPlaces().done) return;
+  slot.querySelector('.tn-slot-msg').textContent = `↑ ${t('Tap the mover of the villain who wins or drops out.')}`;
+  const movers = document.getElementById('liveMovers');
+  movers.classList.remove('nudge');
+  void movers.offsetWidth;   // restarts the bounce
+  movers.classList.add('nudge');
+  clearTimeout(tnNudgeTimer);
+  tnNudgeTimer = setTimeout(() => {
+    movers.classList.remove('nudge');
+    document.querySelectorAll('#tnRanking .tn-slot-msg').forEach(el => { el.textContent = ''; });
+  }, 3000);
 }
 
 function _tnPlace(position, dropped) {

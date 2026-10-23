@@ -56,8 +56,10 @@
     <div class="err" id="tnLiveErr"></div>
     <div class="live-status" id="tnLiveStatus" data-i18n>Game in progress</div>
     <div class="live-info" id="liveInfo"></div>
-    <!-- New Game's movers, in play order: tap one still in the game to place it. -->
+    <!-- New Game's movers, in play order: tap one still in the game to place
+         it (the hint right under them, until the game is over). -->
     <div class="live-movers tg-movers" id="liveMovers"></div>
+    <p class="live-hint" id="tnLiveHint" data-i18n>Tap a villain's mover when they win or drop out. To undo, tap the last one in the ranking.</p>
     <div class="live-time" id="liveTime">00:00</div>
     <div class="live-turns">
       <button class="live-btn" id="liveMinusBtn" type="button" onclick="bumpTurn(-1)" disabled>−</button>
@@ -66,7 +68,6 @@
     </div>
     <div class="section-label" data-i18n>Ranking</div>
     <div class="tn-ranking" id="tnRanking"></div>
-    <p class="live-hint" id="tnLiveHint" data-i18n>Tap a villain's mover when they win (the next place from the top) or drop out (the next place from the bottom). Tap the last one placed to undo it. With one villain left, the game ends.</p>
     <!-- The lock screen's album line (new-game-audio.js reads it). -->
     <input type="hidden" id="fLocation">
     <div class="new-game-footer">

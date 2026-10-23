@@ -82,7 +82,8 @@ function _tournamentMarkHTML(tour) {
 // ── TOURNAMENT CARD ───────────────────────────────────────────────────────────
 // A tournament in a list (tournaments.html, a player page): its name and
 // status, then who organized it (or "Organizer" on the organizer's own page),
-// its players, its date and, on a player page, their final place. tour: a tournaments row with tournament_players(count).
+// its players, its date and, on a player page, their final place. A running
+// one has the accent border. tour: a tournaments row with tournament_players(count).
 
 // 1st, 2nd, 3rd… (1º, 2º… in Italian), and the top three's medals.
 function fmtPlace(n) {
@@ -104,6 +105,16 @@ function tournamentStatus(tour) {
   return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
 }
 
+// 'lobby' (not started), 'running' or 'finished'.
+const tournamentState = tour => tour.finished_at ? 'finished' : tour.current_stage ? 'running' : 'lobby';
+
+// The status as cards and the tournament's page show it: running with the
+// live game's pulsing dot, finished with 🏁.
+function tournamentStatusHTML(tour) {
+  const state = tournamentState(tour);
+  return `<span class="tn-status ${state}">${state === 'finished' ? '🏁 ' : ''}${tournamentStatus(tour)}</span>`;
+}
+
 // rank: a player page's final place in it (a medal for the top three).
 function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank = null } = {}) {
   const n = tour.tournament_players?.[0]?.count ?? 0;
@@ -114,11 +125,11 @@ function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank 
     rank ? (rank <= 3 ? TOURNAMENT_MEDALS[rank - 1] : fmtPlace(rank)) : null,
   ].filter(Boolean).join(' | ');
   return `
-    <a class="game-card tn-card" href="tournaments.html?t=${tour.id}">
+    <a class="game-card tn-card ${tournamentState(tour)}" href="tournaments.html?t=${tour.id}">
       <div class="card-body">
         <div class="card-top">
           <div class="card-date">${_esc(tour.name)}</div>
-          <div class="card-meta">${tournamentStatus(tour)}</div>
+          <div class="card-meta">${tournamentStatusHTML(tour)}</div>
         </div>
         <div class="tn-card-meta">${meta}</div>
       </div>
