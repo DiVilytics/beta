@@ -301,12 +301,14 @@ function tnRenderTournament() {
   ].join('');
   const status = [tournamentStatusHTML(tnTour), tn(tnPlayers.length, '{n} player', '{n} players')].join(' | ');
 
-  const actions = [
-    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>` : '',
-    // Share QR, for the players, is the one to find: the others are ghost buttons.
-    `<button class="btn btn-primary btn-sm" type="button" onclick="tnShare()">${t('Share QR')}</button>`,
-    isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnShareOrganizers()">${t('Organizer QR')}</button>` : '',
-  ].join('');
+  // The organizers' buttons on one row; under them Share QR, for the players,
+  // the one to find: larger and purple.
+  const actions = `
+    ${isOrg ? `<div class="claim-share-row tn-org-actions">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenForm(tnTour)">${t('Edit tournament')}</button>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="tnShareOrganizers()">${t('Organizer QR')}</button>
+    </div>` : ''}
+    <div class="claim-share-row"><button class="btn btn-primary tn-share-btn" type="button" onclick="tnShare()">${t('Share QR')}</button></div>`;
 
   const ctx  = { user, isOrg, lobby, mine };
   const rows = tnPlayers.map((p, i) => _tnPlayerRowHTML(p, i, ctx)).join('');
@@ -323,7 +325,7 @@ function tnRenderTournament() {
       </div>
       <div class="tn-options${tnOptionsOpen ? '' : ' hidden'}">${options}</div>
     </div>
-    <div class="claim-share-row">${actions}</div>
+    ${actions}
     ${_tnInviteHTML(user, isOrg)}
     ${_tnOverHTML(mine)}
     ${lobby ? '' : _tnViewSegHTML()}

@@ -2441,6 +2441,9 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   animation: livePulse 1.2s ease-in-out infinite;
 }
 .tn-card.running { border-color: var(--accent); }
+/* A tournament's buttons: the organizers' on one row, Share QR under them, larger. */
+.claim-share-row.tn-org-actions { margin-bottom: 8px; }
+.tn-share-btn { min-width: 200px; justify-content: center; }
 /* Options on a tournament's page: folded until their title is tapped. */
 .tn-options-toggle { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: none; background: none; font: inherit; color: inherit; cursor: pointer; }
 /* A finished tournament's box: your place, in the text color. */
