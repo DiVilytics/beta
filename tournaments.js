@@ -52,11 +52,25 @@ async function init() {
       url.searchParams.delete('c');
       history.replaceState(null, '', url);
     }
-    setVisible('tnBack', true);
+    _tnSetBack();
     return tnLoad(id);
   }
   tnLoadList();
 }
+
+// The ← link (ui.js): a tournament (or New tournament) goes back to the list
+// or the player page it was opened from, else up to the list. Edit
+// tournament's goes back to its tournament, as Cancel does.
+function _tnSetBack() {
+  setBackLink('tnBack', { parent: { href: 'tournaments.html', label: t('Tournaments') }, from: ['tournaments.html', 'players.html'] });
+}
+
+// Back to a tournament, from a table's game or another page (the browser's
+// back can show it as it was): reloaded quietly.
+window.addEventListener('pageshow', e => {
+  if (e.persisted && tnTour && !_tnFormOpen()) tnLoad(tnTour.id, { quiet: true });
+  else if (e.persisted && tnList) tnLoadList();
+});
 
 function _tnAuthChanged() {
   if (!_tnFormOpen() && tnTour) tnRenderTournament();
@@ -609,8 +623,16 @@ async function tnOpenForm(tour) {
   if (!getCurrentUser() && !tour) return goToSignIn();
   clearTimeout(tnPollTimer);
   setVisible('tnRoot', false);
-  setVisible('tnBack', true);
   setVisible('tnForm', true);
+  if (tour) {
+    const back = document.getElementById('tnBack');
+    back.href = `tournaments.html?t=${tour.id}`;
+    back.textContent = `← ${tour.name}`;
+    back.onclick = e => { e.preventDefault(); tnCloseForm(); };
+    setVisible(back, true);
+  } else {
+    _tnSetBack();
+  }
   // New tournament only: an open tournament has its ⓘ next to Options.
   setVisible('tnIntroHelp', !tour);
   document.getElementById('tnFormSave').textContent = tour ? t('Save Changes') : t('Create tournament');
@@ -774,7 +796,8 @@ for (const ev of ['input', 'change']) document.getElementById('tnForm')?.addEven
 document.getElementById('tnForm')?.addEventListener('click', () => setTimeout(_tnSaveDraft));
 
 function tnCloseForm() {
-  if (!tnFormFor) return goBack('tournaments.html');
+  if (!tnFormFor) return void (location.href = 'tournaments.html');
+  _tnSetBack();
   setVisible('tnForm', false);
   setVisible('tnRoot', true);
   tnRenderTournament();
@@ -1121,6 +1144,7 @@ async function tnSaveForm() {
     if (!error && date !== tnFormFor.event_date) error = (await db.rpc('set_tournament_date', { target: tnFormFor.id, new_date: date })).error;
     btn.disabled = false;
     if (error) return showError('tnFormErr', _tnErrorMsg(error));
+    _tnSetBack();
     setVisible('tnForm', false);
     setVisible('tnRoot', true);
     return tnLoad(tnFormFor.id);
@@ -1207,6 +1231,7 @@ async function _tnSaveSetup({ settings, players = null, villains = null, tables 
   if (!error && plan && (plan.release || plan.claim)) error = await _tnApplyPlayers(tnFormFor.id, { removed: [], renamed: [], added: [], release: plan.release, claim: plan.claim });
   btn.disabled = false;
   if (error) return showError('tnFormErr', _tnErrorMsg(error));
+  _tnSetBack();
   setVisible('tnForm', false);
   setVisible('tnRoot', true);
   await tnLoad(tnFormFor.id);

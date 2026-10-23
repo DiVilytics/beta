@@ -27,7 +27,8 @@ async function init() {
   const root  = document.getElementById('tgRoot');
   root.className = '';
   if (!saved?.tournament || saved.tournament.tableId !== table) {
-    // Not this phone's game: back to the tournament (or the tournaments).
+    // Not this phone's game: back to the tournaments.
+    setBackLink('tgBack', { parent: { href: 'tournaments.html', label: t('Tournaments') }, from: [] });
     root.innerHTML = emptyStateHTML('🏟️', t("This game isn't running on this phone"),
       t('Start it from its table on the tournament page.'),
       `<a class="btn btn-primary btn-sm" href="tournaments.html">${t('All tournaments')}</a>`);
@@ -37,7 +38,8 @@ async function init() {
   tnGame = saved.tournament;
   liveGame.restoreFrom(saved);
   if (liveGame.turns < 1) liveGame.setTurns(1);
-  document.getElementById('tgBack').href = `tournaments.html?t=${tnGame.tourId}`;
+  // ← its tournament (ui.js; the browser's back when it came from there).
+  setBackLink('tgBack', { parent: { href: `tournaments.html?t=${tnGame.tourId}`, label: tnGame.tourName }, from: [] });
   document.getElementById('fLocation').value = tnGame.tourName;
   setVisible('tnLive', true);
   if (liveGame.isRunning) liveTimerId = setInterval(tickLive, 1000);

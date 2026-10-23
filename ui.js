@@ -358,6 +358,7 @@ function _pageName(url) {
     case 'players.html':     return p.get('nick') || getCurrentProfile()?.nickname || t('Player');
     case 'claim.html':       return t('Game');
     case 'faq.html':         return 'F.A.Q.';
+    case 'tournaments.html': return p.get('t') ? t('Tournament') : p.has('new') ? null : t('Tournaments');
     default:                 return null;
   }
 }

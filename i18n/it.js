@@ -873,7 +873,7 @@ window.I18N.it = {
     "Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit tournament, and Start draws everything again.": "I suoi tavoli vengono annullati, comprese le partite in corso, e il torneo torna a prima dell'inizio: impostazioni e giocatori si cambiano in Modifica torneo, e Inizia sorteggia tutto di nuovo.",
     "Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.": "I suoi tavoli vengono annullati, comprese le partite in corso, e il torneo torna alla fase {n}: puoi riammettere giocatori, poi sorteggiare di nuovo.",
     "DiVilytics | Tournament game": "DiVilytics | Partita di torneo",
-    "← Tournament": "← Torneo",
+    "Tournament": "Torneo",
     "This game isn't running on this phone": "Questa partita non è in corso su questo telefono",
     "Start it from its table on the tournament page.": "Avviala dal suo tavolo nella pagina del torneo.",
     "Tap a villain's mover when they win or drop out. To undo, tap the last one in the ranking.": "Tocca la pedina di un cattivo quando vince o abbandona. Per annullare, tocca l'ultimo in classifica.",

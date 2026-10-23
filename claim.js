@@ -75,6 +75,7 @@ async function init() {
 
   await attachTournaments([game]);   // a tournament's game: changed only from its tournament
   claimGame    = game;
+  if (game.tournament) setBackLink('claimBack', _claimBack());
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
   // Nothing to claim in a solo game: the page is just the game's.
   if (claimIsSolo()) document.getElementById('claimTitle').textContent = t('Solo game');
@@ -178,8 +179,12 @@ function _playedAsHTML(seat, solo) {
 // ── NAV / SHARE ───────────────────────────────────────────────────────────────
 
 // The ← link: back to the player page you opened the game from, else up to
-// the Game Log (opened from a QR code, or right after saving it). ui.js.
-const _claimBack = () => ({ parent: { href: 'game-log.html', label: t('Game Log') }, from: ['players.html'] });
+// the Game Log (opened from a QR code, or right after saving it), or for a
+// tournament's game to its tournament. ui.js.
+const _claimBack = () => ({
+  parent: claimGame?.tournament ? { href: `tournaments.html?t=${claimGame.tournament.id}`, label: claimGame.tournament.name } : { href: 'game-log.html', label: t('Game Log') },
+  from:   ['players.html'],
+});
 
 function shareGame() {
   if (!claimGame) return;
