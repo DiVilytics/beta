@@ -2140,7 +2140,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 /* The villain's portrait close to its position number. */
 .order-slot .row-num { margin-right: 3px; }
 /* New Game: one name on two lines (Large text) makes every row as tall. */
-#orderSlots { display: grid; grid-auto-rows: 1fr; }
+#orderSlots { display: grid; grid-auto-rows: 1fr; grid-template-columns: minmax(0, 1fr); }   /* a long word never widens the rows */
 .order-slot {
   display: flex;
   align-items: center;
@@ -2222,7 +2222,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .order-slot-empty { color: var(--dim); font-weight: 400; font-style: italic; }
 /* A long name (Ernesto de la Cruz, Large text) goes on two lines before it's
    cut short, its tag ([I2E]) flowing after it like a word. */
-.order-slot-name { line-height: 1.15; }
+.order-slot-name { line-height: 1.15; min-width: 0; }
 .order-slot-name .vn, .order-slot-name .order-slot-empty { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .order-slot-name .vn-name { display: inline; white-space: normal; }
 /* While a row draws (the names flick by), one line, so the row doesn't jump. */
