@@ -406,6 +406,7 @@ function drawSlot(id) {
   const nameEl     = slotEl?.querySelector('.order-slot-name');
   if (!portraitEl) return;
 
+  _holdRowHeight(true);
   slotEl.classList.add('spinning');
 
   let ticks = 0;
@@ -437,7 +438,7 @@ function drawSlot(id) {
 
       // Once the whole draw has settled, re-render once to refresh the selects
       // and re-enable the buttons (nothing is spinning by then, so no flash).
-      if (Object.keys(slotTimers).length === 0 && !_drawsPending) renderOrderSlots();
+      if (Object.keys(slotTimers).length === 0 && !_drawsPending) { _holdRowHeight(false); renderOrderSlots(); }
       else _updateActionBtns();
     }
   }, 50);
@@ -478,13 +479,25 @@ function drawAll() {
   // the render below keeps the button's label ("Redraw all" stays, even though
   // every row is empty for a moment).
   _drawsPending = targets.length;
+  _holdRowHeight(true);   // before the rows empty: an empty row is shorter
   renderOrderSlots();
   targets.forEach((s, i) => setTimeout(() => {
     _drawsPending--;
     drawSlot(s.id);
     // A row that couldn't draw starts no spin: make sure the draw still settles.
-    if (!_drawsPending && !Object.keys(slotTimers).length) renderOrderSlots();
+    if (!_drawsPending && !Object.keys(slotTimers).length) { _holdRowHeight(false); renderOrderSlots(); }
   }, i * 60));
+}
+
+// While villains are drawn, the rows keep the height they had (the names
+// flicking by take one line, style.css): they fit the result once, at the end.
+function _holdRowHeight(on) {
+  const list = document.getElementById('orderSlots');
+  if (!list) return;
+  if (!on) { list.style.gridAutoRows = ''; return; }
+  if (list.style.gridAutoRows) return;   // already held: this draw's starting height
+  const h = Math.max(0, ...[...list.querySelectorAll('.order-slot')].map(r => r.offsetHeight));
+  if (h) list.style.gridAutoRows = `minmax(${h}px, 1fr)`;
 }
 
 function shuffleOrder() {
@@ -551,6 +564,7 @@ function shuffleOrder() {
 }
 
 function renderOrderSlots() {
+  if (!Object.keys(slotTimers).length && !_drawsPending) _holdRowHeight(false);   // no draw running (one cut short included)
   const container = document.getElementById('orderSlots');
 
   // Only a row with a villain can be the winner: a row that lost its villain

@@ -2225,6 +2225,8 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .order-slot-name { line-height: 1.15; }
 .order-slot-name .vn, .order-slot-name .order-slot-empty { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .order-slot-name .vn-name { display: inline; white-space: normal; }
+/* While a row draws (the names flick by), one line, so the row doesn't jump. */
+.order-slot.spinning .order-slot-name .vn { -webkit-line-clamp: 1; line-clamp: 1; }
 .order-slot-name .vn-tag { margin-left: 0.2em; }
 /* The site's ▼ (.chevron: size, color), after the villain's name. */
 .order-slot-chevron {
