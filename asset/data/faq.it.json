@@ -21,8 +21,8 @@
               "text": "Ogni giocatore ha due mazzi. Dal tuo Mazzo Cattivo (dorso colorato) peschi e giochi carte nella parte bassa della tua Plancia per raggiungere l'Obiettivo. Dal tuo Mazzo Fato (dorso bianco) pescano i tuoi avversari, che ne giocano le carte nella parte alta della tua Plancia per rallentarti."
             },
             {
-              "term": "Guida del Cattivo e carta di riferimento",
-              "text": "La Guida del Cattivo spiega il tuo Obiettivo e le regole speciali del tuo Cattivo. La carta di riferimento riassume come vince ogni Cattivo, così puoi capire quando un avversario si sta avvicinando alla vittoria, e sul retro spiega i simboli delle azioni."
+              "term": "Guida al Cattivo e carta di riferimento",
+              "text": "La Guida al Cattivo spiega il tuo Obiettivo e le regole speciali del tuo Cattivo. La carta di riferimento riassume come vince ogni Cattivo, così puoi capire quando un avversario si sta avvicinando alla vittoria, e sul retro spiega i simboli delle azioni."
             }
           ]
         },
@@ -31,7 +31,7 @@
           "items": [
             {
               "term": "Il tuo materiale",
-              "text": "Ogni giocatore sceglie un Cattivo e prende la sua Plancia, la Pedina, il Mazzo Cattivo, il Mazzo Fato e la Guida del Cattivo, più una carta di riferimento. Metti la Plancia davanti a te e la Pedina sul Luogo più a sinistra."
+              "text": "Ogni giocatore sceglie un Cattivo e prende la sua Plancia, la Pedina, il Mazzo Cattivo, il Mazzo Fato e la Guida al Cattivo, più una carta di riferimento. Metti la Plancia davanti a te e la Pedina sul Luogo più a sinistra."
             },
             {
               "term": "Segnalini Lucchetto",
@@ -208,7 +208,7 @@
           "items": [
             {
               "term": "Potere iniziale",
-              "text": "Ogni giocatore inizia con 2 gettoni Potere, qualunque sia il suo posto nell'ordine di turno."
+              "text": "Ogni giocatore inizia con 2 Gettoni Potere, qualunque sia il suo posto nell'ordine di turno."
             },
             {
               "term": "Pedina Cattivo",
@@ -290,8 +290,8 @@
         "title": "La variante",
         "items": [
           { "term": "Come funziona", "text": "Giochi un Cattivo contro un giocatore fantasma, un avversario immaginario per cui scegli tu. Dopo ogni tuo turno, un tiro di dado decide se ti fa subire il Fato." },
-          { "term": "Vincere e perdere", "text": "Hai 20 turni, oppure 25 a Facile e 15 a Difficile (vedi Difficoltà). Se raggiungi il tuo Obiettivo entro la fine del tuo ultimo turno vinci, altrimenti perdi. Da soli ogni turno è un round." },
-          { "term": "Cosa serve", "text": "Il tuo Cattivo come in una partita normale, un dado a 10 facce (va bene anche un'app) e un modo per contare i turni, per esempio un dado a 20 facce o i segnalini Potere." }
+          { "term": "Vincere e perdere", "text": "Hai 20 turni, oppure 25 a Facile e 15 a Difficile (vedi Difficoltà). Se raggiungi il tuo Obiettivo entro la fine del tuo ultimo turno vinci, altrimenti perdi. In solitario ogni turno è un round." },
+          { "term": "Cosa serve", "text": "Il tuo Cattivo come in una partita normale, un dado a 10 facce (va bene anche un'app) e un modo per contare i turni, per esempio un dado a 20 facce o i Gettoni Potere." }
         ]
       },
       {

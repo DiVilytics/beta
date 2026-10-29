@@ -11,16 +11,16 @@
     "title": "Tornei, Δ Vittorie e nuovi grafici",
     "items": [
       "Tornei: crealo con i suoi giocatori e le sue opzioni, e DiVilytics sorteggia tavoli e cattivi di ogni fase e tiene la classifica; i giocatori rivendicano il proprio nome con il suo codice QR, e un telefono registra la partita di ogni tavolo.",
-      "Δ Vittorie: quanto le vittorie di ogni cattivo si scostano da quelle di chance uguali, nella classifica dei cattivi e nei grafici.",
-      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi; e il Solo ti avvisa all'ultimo round."
+      "Δ Vittorie: quanto le vittorie di ogni cattivo si scostano da quelle attese con pari probabilità, nella classifica dei cattivi e nei grafici.",
+      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi; e il Solitario ti avvisa all'ultimo round."
     ]
   },
   "2026-10-05": {
-    "title": "Solo, XP, guide e una Nuova partita più fluida",
+    "title": "Solitario, XP, guide e una Nuova partita più fluida",
     "items": [
-      "Solo, una variante non ufficiale per un giocatore contro un giocatore Fantasma, con classifiche proprie; e gli XP, guadagnati con le partite rivendicate e i traguardi.",
+      "Il Solitario, una variante non ufficiale per un giocatore contro un giocatore Fantasma, con classifiche proprie; e gli XP, guadagnati con le partite rivendicate e i traguardi.",
       "Sempre, Anno e Mese in Classifica, nel Registro e nelle pagine dei giocatori; una guida per ogni cattivo; le pedine; e questa pagina.",
-      "Nuova partita conserva la partita in corso e il mazzo dei sorteggi; chi ha registrato una partita può correggerla o eliminarla; dimensione del testo, Installa, scorciatoie da tastiera e le impostazioni sotto il tuo avatar."
+      "Nuova partita conserva la partita in corso e la riserva cattivi; chi ha registrato una partita può correggerla o eliminarla; dimensione del testo, Installa, scorciatoie da tastiera e le impostazioni sotto il tuo avatar."
     ]
   },
   "2026-09-28": {
