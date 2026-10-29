@@ -545,6 +545,11 @@ function _attachLinePan(svg) {
   }, { passive: false });
 }
 
+// The scatter on show re-sizes its dots when the window or the Text size changes
+// (setTextSize fires a resize).
+let _zoomApply = null;
+window.addEventListener('resize', () => _zoomApply?.());
+
 // Pinch / wheel / drag zoom for the scatter. Only the plot interior zooms: the
 // dots ride a transformed group clipped to the plot rect, while the axes, grid
 // and tick labels stay put. The window is tracked in plot-local space [0,PW] x
@@ -565,10 +570,11 @@ function _attachZoom(svg) {
   const xsuf = pan.dataset.xsuf || '', ysuf = pan.dataset.ysuf || '';
   const xticks = svg.querySelectorAll('.ch-xtick'), yticks = svg.querySelectorAll('.ch-ytick');
   const dots = pan.querySelectorAll('.ch-dot');
-  // The default view's dots are 20px across on screen, whatever the chart's
-  // width: r in chart units is 10px scaled by the chart's 440 units over its width.
-  const DOT_PX = 20;
-  const r0 = () => DOT_PX / 2 * FW / (svg.getBoundingClientRect().width || FW);
+  // The default view's dots follow the text size, whatever the chart's width:
+  // 16px across times --ts (20px with Large text on the beta). r in chart units
+  // is half that scaled by the chart's 440 units over its width.
+  const dotPx = () => 16 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ts')) || 1);
+  const r0 = () => dotPx() / 2 * FW / (svg.getBoundingClientRect().width || FW);
   const badgeTxt = svg.querySelector('.ch-zoom-badge-txt');
 
   let vbx = 0, vby = 0, vbw = PW, vbh = PH;   // visible window in plot-local space
@@ -663,6 +669,7 @@ function _attachZoom(svg) {
   svg.addEventListener('pointercancel', end);
 
   apply();   // initial transform, dot size and tick labels
+  _zoomApply = () => { if (svg.isConnected) apply(); };
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────────
