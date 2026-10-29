@@ -599,17 +599,18 @@ function _attachZoom(svg) {
   const xsuf = pan.dataset.xsuf || '', ysuf = pan.dataset.ysuf || '';
   const xticks = svg.querySelectorAll('.ch-xtick'), yticks = svg.querySelectorAll('.ch-ytick');
   const dots = pan.querySelectorAll('.ch-dot');
+  const r0 = +(dots[0]?.getAttribute('r') || 8);   // the default view's radius (larger on a phone, chart-lib.js)
   const badgeTxt = svg.querySelector('.ch-zoom-badge-txt');
 
   let vbx = 0, vby = 0, vbw = PW, vbh = PH;   // visible window in plot-local space
   const apply = () => {
     const s = PW / vbw;
     pan.setAttribute('transform', `translate(${(L - s * (L + vbx)).toFixed(2)} ${(T - s * (T + vby)).toFixed(2)}) scale(${s.toFixed(4)})`);
-    // Dots grow with zoom: 8px on screen at the default view up to 2x (16px) at
-    // max zoom. r is in pre-transform units, so divide the target screen size by
-    // the group scale s. (The selection ring stays constant via non-scaling-stroke.)
+    // Dots grow with zoom: their default size up to 2x at max zoom. r is in
+    // pre-transform units, so divide the target size by the group scale s.
+    // (The selection ring stays constant via non-scaling-stroke.)
     const grow = 1 + (s - 1) / (MAX - 1);   // 1 at default, 2 at MAX
-    const r = (8 * grow / s).toFixed(2);
+    const r = (r0 * grow / s).toFixed(2);
     dots.forEach(d => d.setAttribute('r', r));
     for (let i = 0; i <= 4; i++) {
       const dx = xlo + (vbx + i / 4 * vbw) / PW * (xhi - xlo);
