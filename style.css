@@ -232,7 +232,14 @@ nav {
 .nav-links a.has-live-game::after   { background: var(--red);  animation: livePulse 1.2s ease-in-out infinite; }
 .nav-links a.has-paused-game::after { background: var(--gold); }
 
-.nav-links a.active { color: var(--text); background: var(--s2); }
+/* The page you're on: a pane of glass on the glass bar, a faint fill of the
+   text color, a hairline edge and a light catch along the top. */
+.nav-links a.active {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 14%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
 
 /* Nav avatar (signed-in indicator) */
 .nav-avatar-link {
@@ -3239,7 +3246,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 
 /* ── HOVER STATES (pointer devices only) ─────────────────────────── */
 @media (hover: hover) {
-  .nav-links a:hover                        { color: var(--text); background: var(--s2); }
+  .nav-links a:hover                        { color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
   .nav-brand:hover                          { opacity: 0.65; }
   .nav-avatar:hover                         { opacity: 0.75; }
   .nav-avatar-btn:hover .nav-avatar-guest   { opacity: 0.7; }
