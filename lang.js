@@ -138,7 +138,9 @@ function villainNameHTML(name) {
   const m = /^(.*?)\s*(\[[^\]]+\])$/.exec(name);
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   if (!m) return `<span class="vn"><span class="vn-name">${esc(villainName(name))}</span></span>`;
-  return `<span class="vn"><span class="vn-name">${esc(villainName(m[1]))}</span><span class="vn-tag">${esc(m[2])}</span></span>`;
+  // The space between the two: ignored where .vn is a flex row, a line break
+  // where the name flows as text (New Game's rows, two lines at most).
+  return `<span class="vn"><span class="vn-name">${esc(villainName(m[1]))}</span> <span class="vn-tag">${esc(m[2])}</span></span>`;
 }
 
 // Inline version for names that never get cut: "Capitan Uncino [I2E]" with the
