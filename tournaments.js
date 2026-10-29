@@ -1385,7 +1385,7 @@ function _tnTableActionHTML(tb) {
   const isOrg = _tnIsOrg(user);
   // The organizer can also type a table's result without playing it on a phone.
   const enter = isOrg ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditTable('${tb.id}')">${t('Enter result')}</button>` : '';
-  if (!tb.recorder || tb.recorder === user.id) return `<button class="btn btn-primary btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Start game')}</button>${enter}`;
+  if (!tb.recorder || tb.recorder === user.id) return `${enter}<button class="btn btn-primary btn-sm" type="button" onclick="tnStartTable('${tb.id}')">${t('Start game')}</button>`;
   return enter;
 }
 

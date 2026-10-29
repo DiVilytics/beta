@@ -824,7 +824,7 @@ main {
 }
 /* Large text: a little less room around the titles, so "Lost to most" fits a
    small phone's column. */
-:root[data-text="large"] .cs-adv-title { padding: 8px 6px; letter-spacing: 0.02em; }
+:root[data-text="large"] .cs-adv .cs-adv-title { padding: 8px 6px; letter-spacing: 0.02em; }
 .cs-adv-row {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 10px; text-decoration: none; color: var(--text);
@@ -851,6 +851,12 @@ main {
 .cs-deck { display: flex; gap: 12px; align-items: flex-start; }
 .cs-deck-stack { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }   /* gap = DECK_STACK_GAP in villains.js */
 .cs-deck-col { border-top: 3px solid var(--deck-c); }
+/* Large text on a phone: one column, the boxes in order (villains.js). */
+@media (max-width: 480px) {
+  :root[data-text="large"] .cs-deck { flex-direction: column; align-items: stretch; }
+  :root[data-text="large"] .cs-deck-stack { flex: none; }
+  :root[data-text="large"] .cs-deck-stack:empty { display: none; }
+}
 .cs-deck-col .cs-adv-title { padding: 10px 14px 8px; font-size: calc(12px * var(--ts)); letter-spacing: 0.06em; }
 /* The card type written in its color (no dot); the count after it stays grey. */
 .cs-deck-type { color: var(--deck-c); }
@@ -2547,7 +2553,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   0%, 100% { transform: none; }
   40%      { transform: translateY(-6px); }
 }
-.tg-mover-name { font-size: calc(10px * var(--ts)); color: var(--muted); max-width: 72px; padding: 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-mover-name { font-size: calc(10px * var(--ts)); color: var(--muted); max-width: min(72px, 100%); box-sizing: border-box; padding: 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .live-mover.placed .mover { opacity: 0.3; }
 .tg-mover-place { font-size: calc(11px * var(--ts)); font-weight: 700; color: var(--muted); }
 #tnLive .tn-ranking { margin-top: 6px; }
@@ -3303,7 +3309,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); }
   .home-faq-list { grid-template-columns: 1fr; }
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
-  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr 92px; }
+  .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr calc(90px * var(--ts)); }   /* the numbers grow with the text, the bar gives way */
   .form-row input { font-size: calc(13px * var(--ts)); }
   .form-row input[type="datetime-local"] { font-size: calc(13px * min(var(--ts), 1.125)); }   /* as above */
   /* Tighter box picker: lets 3 columns fit instead of 2, keeping cover art

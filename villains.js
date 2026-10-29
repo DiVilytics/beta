@@ -708,13 +708,16 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false, 
 // even as possible. A deck has at most a handful of types, so every split is
 // tried (the first box always on the left) and the one with the shortest
 // taller column wins; each column keeps the boxes in display order. Heights are
-// the rendered ones, so wrapped names count.
+// the rendered ones, so wrapped names count. With Large text on a phone the
+// deck is one column.
 const DECK_STACK_GAP = 12;   // matches .cs-deck-stack gap
 function _balanceDecks(root) {
   if (!root) return;
   for (const deck of root.querySelectorAll('.cs-deck')) {
     const [left, right] = deck.querySelectorAll(':scope > .cs-deck-stack');
     const boxes = [...deck.querySelectorAll('.cs-deck-col')].sort((a, b) => a.dataset.i - b.dataset.i);
+    // One column (Large text on a phone, style.css): every box on the left, in order.
+    if (getComputedStyle(deck).flexDirection === 'column') { boxes.forEach(b => left.appendChild(b)); continue; }
     const heights = boxes.map(b => b.offsetHeight + DECK_STACK_GAP);   // same width in either stack
     let best = null;
     for (let mask = 0; mask < (1 << boxes.length); mask += 2) {      // bit i set = box i on the right
