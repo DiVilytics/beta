@@ -3329,8 +3329,17 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .chart-card-desc { min-height: 7.3em; }
 }
 
+/* Phones: the nav's icons share the room between the logo and the avatar,
+   each up to 40px wide, so they're as big as the screen allows and never
+   overlap (they don't follow the text size). */
+@media (max-width: 480px) {
+  .nav-right { flex: 1; min-width: 0; justify-content: flex-end; margin-left: 12px; }
+  .nav-links { flex: 1; min-width: 0; justify-content: flex-end; }
+  .nav-links a { flex: 1 1 0; min-width: 0; max-width: 40px; height: 38px; padding: 0; justify-content: center; font-size: 17px; }
+  .nav-avatar { width: 32px; height: 32px; }
+}
+
 @media (max-width: 360px) {
-  .nav-links a { padding: 4px 6px; font-size: 12px; }
   .draw-mode-row                  { gap: 4px; }
   .filter-bulk-row .pace-colors   { gap: 2px; }
   .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 0 6px; font-size: calc(11px * var(--ts)); }
