@@ -53,7 +53,7 @@
 
 :root {
   --bg: #000000;
-  --nav-bg: rgba(0, 0, 0, 0.94);
+  --nav-bg: rgba(0, 0, 0, 0.78);
   --s1: #111;
   --s2: #1a1a1a;
   --s3: #222;
@@ -87,7 +87,7 @@
 
 [data-theme="light"] {
   --bg: #ffffff;
-  --nav-bg: rgba(255, 255, 255, 0.94);
+  --nav-bg: rgba(255, 255, 255, 0.78);
   --s1: #f8f8f8;
   --s2: #f0f0f0;
   --s3: #e8e8e8;
@@ -174,8 +174,9 @@ nav {
   height: 54px;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  /* See-through glass: the page shows through, blurred. */
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
 .nav-brand {
@@ -191,8 +192,8 @@ nav {
 /* The beta (lang.js IS_BETA, only under /beta/): the menu bar tinted purple,
    the accent at a light alpha over each theme's own bar, the logo on a clear
    background (theme.js). */
-:root[data-beta]                    { --nav-bg: rgba(27, 23, 54, 0.94); }
-:root[data-beta][data-theme="light"] { --nav-bg: rgba(226, 222, 250, 0.94); }
+:root[data-beta]                    { --nav-bg: rgba(27, 23, 54, 0.78); }
+:root[data-beta][data-theme="light"] { --nav-bg: rgba(226, 222, 250, 0.78); }
 :root[data-beta] nav { border-bottom-color: rgba(124, 106, 247, 0.35); }
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
