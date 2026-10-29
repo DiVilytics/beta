@@ -444,8 +444,8 @@ function render() {
 
 // Too tight for the switch's full labels and the whole All / Solo menu (a
 // narrow phone, Italian, Large text): the switch takes its short labels
-// (% Vitt.), and if even that isn't enough the menu goes on its own line (the
-// switch, alone on its row, keeps its full labels).
+// (% Vitt.), each option only as wide as its label; only if even that isn't
+// enough (a phone narrower than an iPhone SE) the menu goes on its own line.
 function _fitModeRow() {
   const row = document.querySelector('.cs-mode-row');
   const sel = row?.querySelector('select');
@@ -461,7 +461,7 @@ function _fitModeRow() {
   copy.remove();
   const cut = () => sel.getBoundingClientRect().width < natural - 1;
   if (cut()) row.classList.add('seg-short');
-  if (cut()) { row.classList.remove('seg-short'); row.classList.add('wrap'); }
+  if (cut()) row.classList.add('wrap');
 }
 window.addEventListener('resize', _fitModeRow);
 
