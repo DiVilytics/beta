@@ -199,10 +199,10 @@ const Charts = (() => {
     // its color is invisible) without changing how the dot looks; .ch-dot's
     // non-scaling-stroke keeps that padding a constant screen size at every
     // zoom level, same as the dot radius itself.
-    // On a phone the chart shrinks to the screen: bigger dots, and more room
-    // around them, so a finger hits them.
+    // r is a first guess: the page sets the dots to 20px across on screen
+    // (charts.js _attachZoom). On a phone, more room around them for a finger.
     const phone = window.matchMedia('(max-width: 480px)').matches;
-    const dotR = phone ? 11 : 8, dotPad = phone ? 20 : 16;
+    const dotR = 11, dotPad = phone ? 20 : 16;
     const dots = points.map(p => {
       const boxAttr = p.box ? ` data-box="${_esc(p.box)}" data-boxhref="${_esc(p.boxHref || '')}"` : '';
       return `<circle${hit(p.label, p.meta, p.href, 'ch-dot')}${boxAttr} cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="${dotR}" fill="${p.color || 'var(--accent)'}" fill-opacity="0.85" stroke="transparent" stroke-width="${dotPad}"><title>${titleText(p.label, p.meta)}</title></circle>`;

@@ -565,7 +565,10 @@ function _attachZoom(svg) {
   const xsuf = pan.dataset.xsuf || '', ysuf = pan.dataset.ysuf || '';
   const xticks = svg.querySelectorAll('.ch-xtick'), yticks = svg.querySelectorAll('.ch-ytick');
   const dots = pan.querySelectorAll('.ch-dot');
-  const r0 = +(dots[0]?.getAttribute('r') || 8);   // the default view's radius (larger on a phone, chart-lib.js)
+  // The default view's dots are 20px across on screen, whatever the chart's
+  // width: r in chart units is 10px scaled by the chart's 440 units over its width.
+  const DOT_PX = 20;
+  const r0 = () => DOT_PX / 2 * FW / (svg.getBoundingClientRect().width || FW);
   const badgeTxt = svg.querySelector('.ch-zoom-badge-txt');
 
   let vbx = 0, vby = 0, vbw = PW, vbh = PH;   // visible window in plot-local space
@@ -576,7 +579,7 @@ function _attachZoom(svg) {
     // pre-transform units, so divide the target size by the group scale s.
     // (The selection ring stays constant via non-scaling-stroke.)
     const grow = 1 + (s - 1) / (MAX - 1);   // 1 at default, 2 at MAX
-    const r = (r0 * grow / s).toFixed(2);
+    const r = (r0() * grow / s).toFixed(2);
     dots.forEach(d => d.setAttribute('r', r));
     for (let i = 0; i <= 4; i++) {
       const dx = xlo + (vbx + i / 4 * vbw) / PW * (xhi - xlo);
