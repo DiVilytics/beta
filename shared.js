@@ -386,9 +386,9 @@ const _KBD_SETTINGS = [
   ['[',  'Light theme', () => setTheme('light')],
   [']',  'Dark theme',  () => setTheme('dark')],
   ['\\', 'Auto theme',  () => setTheme('auto')],
-  [';',  'Small text',  () => setTextSize('small')],
-  [',',  'Medium text', () => setTextSize('medium')],
-  ["'",  'Large text',  () => setTextSize('large')],
+  ['-',  'Small text',  () => setTextSize('small')],
+  ['0',  'Medium text', () => setTextSize('medium')],
+  ['=',  'Large text',  () => setTextSize('large')],
   ['1',  'English',     () => setLang('en')],
   ['2',  'Italiano',    () => setLang('it')],
 ];
