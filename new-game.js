@@ -76,8 +76,9 @@ async function init() {
     for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
   }
   _checkResume();   // a game in progress shows right away, not after an empty form
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _initButtonLines, { once: true });
-  else _initButtonLines();
+  const lines = () => _initButtonLines(['#lineupBtns', '#footerDefault']);   // ui.js
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', lines, { once: true });
+  else lines();
 
   // Re-render slots whenever auth state changes so the Me-locked indicator
   // updates in-place after sign-in / sign-out.
@@ -405,6 +406,7 @@ function drawSlot(id) {
   const nameEl     = slotEl?.querySelector('.order-slot-name');
   if (!portraitEl) return;
 
+  _holdRowHeight(true);
   slotEl.classList.add('spinning');
 
   let ticks = 0;
@@ -436,7 +438,7 @@ function drawSlot(id) {
 
       // Once the whole draw has settled, re-render once to refresh the selects
       // and re-enable the buttons (nothing is spinning by then, so no flash).
-      if (Object.keys(slotTimers).length === 0 && !_drawsPending) renderOrderSlots();
+      if (Object.keys(slotTimers).length === 0 && !_drawsPending) { _holdRowHeight(false); renderOrderSlots(); }
       else _updateActionBtns();
     }
   }, 50);
@@ -477,13 +479,25 @@ function drawAll() {
   // the render below keeps the button's label ("Redraw all" stays, even though
   // every row is empty for a moment).
   _drawsPending = targets.length;
+  _holdRowHeight(true);   // before the rows empty: an empty row is shorter
   renderOrderSlots();
   targets.forEach((s, i) => setTimeout(() => {
     _drawsPending--;
     drawSlot(s.id);
     // A row that couldn't draw starts no spin: make sure the draw still settles.
-    if (!_drawsPending && !Object.keys(slotTimers).length) renderOrderSlots();
+    if (!_drawsPending && !Object.keys(slotTimers).length) { _holdRowHeight(false); renderOrderSlots(); }
   }, i * 60));
+}
+
+// While villains are drawn, the rows keep the height they had (the names
+// flicking by take one line, style.css): they fit the result once, at the end.
+function _holdRowHeight(on) {
+  const list = document.getElementById('orderSlots');
+  if (!list) return;
+  if (!on) { list.style.gridAutoRows = ''; return; }
+  if (list.style.gridAutoRows) return;   // already held: this draw's starting height
+  const h = Math.max(0, ...[...list.querySelectorAll('.order-slot')].map(r => r.offsetHeight));
+  if (h) list.style.gridAutoRows = `minmax(${h}px, 1fr)`;
 }
 
 function shuffleOrder() {
@@ -550,6 +564,7 @@ function shuffleOrder() {
 }
 
 function renderOrderSlots() {
+  if (!Object.keys(slotTimers).length && !_drawsPending) _holdRowHeight(false);   // no draw running (one cut short included)
   const container = document.getElementById('orderSlots');
 
   // Only a row with a villain can be the winner: a row that lost its villain
@@ -595,66 +610,6 @@ function renderOrderSlots() {
   _syncSoloUI();
   _updateActionBtns();
   _updateDiscardBtn();
-}
-
-// ── BUTTON LINES ──────────────────────────────────────────────────────────────
-// Each button row (Random order + Draw, and Discard + Start + Save) is either all
-// on one line or all on two: when any label doesn't fit on one line, every
-// button in the row breaks its label in two, at the space nearest the middle.
-// Re-run on resize (screen or Text size) and whenever a label changes.
-const _LINE_ROWS = ['#lineupBtns', '#footerDefault'];
-
-function _splitLabel(label) {
-  const words = label.split(' ');
-  if (words.length < 2) return _esc(label);
-  let best = 1, bestLen = Infinity;
-  for (let i = 1; i < words.length; i++) {
-    const len = Math.max(words.slice(0, i).join(' ').length, words.slice(i).join(' ').length);
-    if (len < bestLen) { best = i; bestLen = len; }
-  }
-  return `${_esc(words.slice(0, best).join(' '))}<br>${_esc(words.slice(best).join(' '))}`;
-}
-
-// The label a button shows: the one we last wrote, unless other code has since
-// set its text directly (e.g. Start game → Resume game).
-function _btnLabel(b) {
-  return b.innerHTML === b.dataset.html ? b.dataset.label : b.textContent.trim();
-}
-
-function _setBtnLabel(b, label) {
-  if (_btnLabel(b) === label) return;
-  b.textContent = label;
-  _balanceButtonLines();
-}
-
-function _balanceButtonLines() {
-  // Not before DOMContentLoaded: the static labels are only translated then
-  // (applyI18n), and splitting them first would hide them from the dictionary.
-  if (document.readyState === 'loading') return;
-  for (const sel of _LINE_ROWS) {
-    const row = document.querySelector(sel);
-    if (!row || !row.offsetParent) continue;   // hidden (live game): next time
-    const btns = [...row.querySelectorAll('.btn')].filter(b => b.offsetParent);
-    const labels = btns.map(_btnLabel);
-    btns.forEach((b, i) => { b.textContent = labels[i]; });
-    const two = btns.some(b => b.scrollWidth > b.clientWidth + 1);
-    btns.forEach((b, i) => {
-      if (two) b.innerHTML = _splitLabel(labels[i]);
-      b.dataset.label = labels[i];
-      b.dataset.html  = b.innerHTML;
-    });
-  }
-}
-
-function _initButtonLines() {
-  const run = () => _balanceButtonLines();
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(run);
-    _LINE_ROWS.forEach(sel => { const el = document.querySelector(sel); if (el) ro.observe(el); });
-  }
-  window.addEventListener('resize', run);   // the Text size setting fires one too
-  document.fonts?.ready.then(run);
-  run();
 }
 
 function _updateActionBtns() {

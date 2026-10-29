@@ -438,12 +438,13 @@ function render() {
 
 // Too tight for the switch's full labels and the whole All / Solo menu (a
 // narrow phone, Italian, Large text): the switch takes its short labels
-// (% Vitt.), and the menu is cut short only if even that isn't enough.
+// (% Vitt.), each option only as wide as its label; only if even that isn't
+// enough (a phone narrower than an iPhone SE) the menu goes on its own line.
 function _fitModeRow() {
   const row = document.querySelector('.cs-mode-row');
   const sel = row?.querySelector('select');
   if (!sel) return;
-  row.classList.remove('seg-short');
+  row.classList.remove('seg-short', 'wrap');
   // A menu doesn't report a cut label: compare it with an unconstrained copy
   // holding only the option shown (a menu is as wide as its longest option).
   const copy = sel.cloneNode(false);
@@ -452,7 +453,9 @@ function _fitModeRow() {
   sel.parentNode.appendChild(copy);
   const natural = copy.getBoundingClientRect().width;
   copy.remove();
-  if (sel.getBoundingClientRect().width < natural - 1) row.classList.add('seg-short');
+  const cut = () => sel.getBoundingClientRect().width < natural - 1;
+  if (cut()) row.classList.add('seg-short');
+  if (cut()) row.classList.add('wrap');
 }
 window.addEventListener('resize', _fitModeRow);
 
@@ -566,8 +569,9 @@ function _shortStat(v) {
 
 function _cardMetaHTML(c) {
   const parts = [];
-  if (c.cost     != null) parts.push(`${t('Cost')} ${_esc(_shortStat(c.cost))}`);
-  if (c.strength != null) parts.push(`${t('Strength')} ${_esc(_shortStat(c.strength))}`);
+  // Each part stays whole: a narrow column breaks the line at the "|".
+  if (c.cost     != null) parts.push(`<span class="cs-deck-stat">${t('Cost')} ${_esc(_shortStat(c.cost))}</span>`);
+  if (c.strength != null) parts.push(`<span class="cs-deck-stat">${t('Strength')} ${_esc(_shortStat(c.strength))}</span>`);
   return parts.length ? `<span class="cs-deck-meta">${parts.join(' | ')}</span>` : '';
 }
 
@@ -698,13 +702,16 @@ function _deckHTML(title, cards, { note = '', unit = 'card', keepOrder = false, 
 // even as possible. A deck has at most a handful of types, so every split is
 // tried (the first box always on the left) and the one with the shortest
 // taller column wins; each column keeps the boxes in display order. Heights are
-// the rendered ones, so wrapped names count.
+// the rendered ones, so wrapped names count. With Large text on a phone the
+// deck is one column.
 const DECK_STACK_GAP = 12;   // matches .cs-deck-stack gap
 function _balanceDecks(root) {
   if (!root) return;
   for (const deck of root.querySelectorAll('.cs-deck')) {
     const [left, right] = deck.querySelectorAll(':scope > .cs-deck-stack');
     const boxes = [...deck.querySelectorAll('.cs-deck-col')].sort((a, b) => a.dataset.i - b.dataset.i);
+    // One column (Large text on a phone, style.css): every box on the left, in order.
+    if (getComputedStyle(deck).flexDirection === 'column') { boxes.forEach(b => left.appendChild(b)); continue; }
     const heights = boxes.map(b => b.offsetHeight + DECK_STACK_GAP);   // same width in either stack
     let best = null;
     for (let mask = 0; mask < (1 << boxes.length); mask += 2) {      // bit i set = box i on the right
