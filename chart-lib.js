@@ -204,7 +204,7 @@ const Charts = (() => {
     // its color is invisible) without changing how the dot looks; .ch-dot's
     // non-scaling-stroke keeps that padding a constant screen size at every
     // zoom level, same as the dot radius itself.
-    // r is a first guess: the page sets the dots to 20px across on screen
+    // r is a first guess: the page sizes the dots on screen by the text size
     // (charts.js _attachZoom). On a phone, more room around them for a finger.
     const phone = window.matchMedia('(max-width: 480px)').matches;
     const dotR = 11, dotPad = phone ? 20 : 16;
