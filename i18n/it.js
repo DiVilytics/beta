@@ -98,7 +98,7 @@ window.I18N.it = {
     "Source: {source}": "Fonte: {source}",
     "General": "Generale",
     "Core rules and cards that work the same way across villains ({n} entries)": "Regole base e carte che funzionano allo stesso modo per tutti i cattivi ({n} voci)",
-    "Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.": "Tradotto dalle F.A.Q. di {link} (versione 6.0, settembre 2026). Ogni voce indica la sua fonte: il regolamento, il testo della carta, la Guida al Cattivo, un autore o un playtester.",
+    "Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.": "Dalle F.A.Q. di {link} (versione 6.0, settembre 2026). Ogni voce indica la sua fonte: il regolamento, il testo della carta, la Guida al Cattivo, un autore o un playtester.",
     "View stats": "Vedi statistiche",
     "No results": "Nessun risultato",
     "Nothing in the FAQ matches “{query}”.": "Nessuna voce delle F.A.Q. corrisponde a “{query}”.",
