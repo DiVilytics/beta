@@ -542,7 +542,7 @@ function shuffleOrder() {
       const nameEl   = el.querySelector('.order-slot-name');
       const numEl    = el.querySelector('.row-num');
       if (portrait) portrait.src = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-      if (nameEl)   nameEl.innerHTML = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
+      if (nameEl)   nameEl.innerHTML = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Pick villain')}</span>`;
       if (numEl)    numEl.textContent = origPos.get(s.id) + '.';
     });
   }, FRAME_MS);
@@ -565,7 +565,7 @@ function renderOrderSlots() {
     const taken     = new Set(orderSlots.filter(o => o.id !== s.id && o.char).map(o => o.char));
     const available = chars.filter(c => !taken.has(c.name));
     const src       = s.char ? charImgSrc(s.char) : 'asset/players/default.svg';
-    const nameTxt   = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Select villain')}</span>`;
+    const nameTxt   = s.char ? villainNameHTML(s.char) : `<span class="order-slot-empty">${t('Pick villain')}</span>`;
     const meTitle   = isAuthed ? t('My villain') : t('Sign in to mark your villain');
     return `
       <div class="order-slot" data-id="${s.id}">
@@ -827,15 +827,16 @@ function _endLive(winnerId, note) {
   window.scrollTo(0, 0);
 }
 
-// The lock screen's two lines (new-game-audio.js): the round and, in Solo, the
-// Phantom's last roll.
+// The lock screen's two lines (new-game-audio.js): the round, and the location
+// with "Game in progress" (in Solo, the Phantom's last roll once there is one).
 function liveMediaLines() {
-  const round = t('Round {n}', { n: liveGame.turns });
-  const roll  = soloMode ? _soloRolls[liveGame.turns] : null;
-  if (!soloMode) return { title: round, artist: t('Update Timer and Rounds') };
+  const round  = t('Round {n}', { n: liveGame.turns });
+  const status = [document.getElementById('fLocation')?.value.trim(), t('Game in progress')].filter(Boolean).join(' | ');
+  const roll   = soloMode ? _soloRolls[liveGame.turns] : null;
+  if (!soloMode) return { title: round, artist: status };
   return {
     title:  `${round}/${_soloTurns()}${liveNextAllowed() ? '' : ` | ${t('Last round')}`}`,
-    artist: roll == null ? t('Update Timer and Rounds') : `🎲 ${roll} | ${roll <= SOLO_LEVELS[soloLevel].fate ? t('Fated') : t('Safe')}`,
+    artist: roll == null ? status : `🎲 ${roll} | ${roll <= SOLO_LEVELS[soloLevel].fate ? t('Fated') : t('Safe')}`,
   };
 }
 

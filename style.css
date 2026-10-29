@@ -143,9 +143,6 @@
 /* Live-game-edit confirm strong text */
 .text-emph { color: var(--text); }
 
-/* 404 page back-to-home spacer */
-.home-back-link { margin-top: 16px; }
-
 button, a, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
@@ -2132,6 +2129,10 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
 #tnFormRows input.order-slot-input[type="text"] { height: 30px; min-height: 0; }
 .order-slot-input::placeholder { color: var(--dim); font-weight: 400; font-style: italic; }
+/* The villain's portrait close to its position number. */
+.order-slot .row-num { margin-right: 3px; }
+/* New Game: one name on two lines (Large text) makes every row as tall. */
+#orderSlots { display: grid; grid-auto-rows: 1fr; }
 .order-slot {
   display: flex;
   align-items: center;
@@ -3030,6 +3031,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */
 .back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--accent); text-decoration: none; }
+.home-tagline + .back-link { margin-top: 14px; }   /* 404 */
 .faq-general-link { margin-bottom: 32px; }
 .faq-rulebook-link { margin-bottom: 10px; }
 .faq-rulebook-title { margin: 0 0 6px; font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }

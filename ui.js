@@ -62,7 +62,7 @@ function groupByBox(chars, boxInfo, includeExtra = false) {
 
 function charSelectHTML(chars, selected = '', boxInfo) {
   const byBox = groupByBox(chars, boxInfo);
-  let html = `<option value="">${t('Select villain')}</option>`;
+  let html = `<option value="">${t('Pick villain')}</option>`;
   for (const [box, cs] of Object.entries(byBox)) {
     html += `<optgroup label="${box}">`;
     for (const c of cs) {
