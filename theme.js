@@ -54,8 +54,8 @@ if ((localStorage.getItem('theme') || 'auto') === 'auto') {
 
 function _updateThemeIcons() {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  // The beta's bar is tinted: its logo has a clear background (style.css).
-  const asset = `asset/logos/logo${IS_BETA ? '-beta' : ''}-${isLight ? 'w' : 'b'}.svg`;
+  // The bar is see-through (style.css): the logo has a clear background.
+  const asset = `asset/logos/logo-clear-${isLight ? 'w' : 'b'}.svg`;
   const navImg = document.querySelector('.nav-brand img');
   if (navImg) navImg.src = asset;
   _updateFavicon();
