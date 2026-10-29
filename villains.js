@@ -444,12 +444,13 @@ function render() {
 
 // Too tight for the switch's full labels and the whole All / Solo menu (a
 // narrow phone, Italian, Large text): the switch takes its short labels
-// (% Vitt.), and the menu is cut short only if even that isn't enough.
+// (% Vitt.), and if even that isn't enough the menu goes on its own line (the
+// switch, alone on its row, keeps its full labels).
 function _fitModeRow() {
   const row = document.querySelector('.cs-mode-row');
   const sel = row?.querySelector('select');
   if (!sel) return;
-  row.classList.remove('seg-short');
+  row.classList.remove('seg-short', 'wrap');
   // A menu doesn't report a cut label: compare it with an unconstrained copy
   // holding only the option shown (a menu is as wide as its longest option).
   const copy = sel.cloneNode(false);
@@ -458,7 +459,9 @@ function _fitModeRow() {
   sel.parentNode.appendChild(copy);
   const natural = copy.getBoundingClientRect().width;
   copy.remove();
-  if (sel.getBoundingClientRect().width < natural - 1) row.classList.add('seg-short');
+  const cut = () => sel.getBoundingClientRect().width < natural - 1;
+  if (cut()) row.classList.add('seg-short');
+  if (cut()) { row.classList.remove('seg-short'); row.classList.add('wrap'); }
 }
 window.addEventListener('resize', _fitModeRow);
 
@@ -572,8 +575,9 @@ function _shortStat(v) {
 
 function _cardMetaHTML(c) {
   const parts = [];
-  if (c.cost     != null) parts.push(`${t('Cost')} ${_esc(_shortStat(c.cost))}`);
-  if (c.strength != null) parts.push(`${t('Strength')} ${_esc(_shortStat(c.strength))}`);
+  // Each part stays whole: a narrow column breaks the line at the "|".
+  if (c.cost     != null) parts.push(`<span class="cs-deck-stat">${t('Cost')} ${_esc(_shortStat(c.cost))}</span>`);
+  if (c.strength != null) parts.push(`<span class="cs-deck-stat">${t('Strength')} ${_esc(_shortStat(c.strength))}</span>`);
   return parts.length ? `<span class="cs-deck-meta">${parts.join(' | ')}</span>` : '';
 }
 

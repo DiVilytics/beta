@@ -397,6 +397,69 @@ function backLinkHTML(opts) {
   return `<a class="back-link" href="${_esc(href)}"${back ? ' onclick="history.back(); return false;"' : ''}>← ${_esc(label)}</a>`;
 }
 
+// ── BUTTON LINES ──────────────────────────────────────────────────────────────
+// A row of buttons sharing its width (New Game's Random order + Draw and
+// Discard + Start + Save, a tournament game's Discard + Pause + Save) is either
+// all on one line or all on two: when any label doesn't fit on one line, every
+// button in the row breaks its label in two, at the space nearest the middle.
+// Re-run on resize (screen or Text size) and whenever a label changes
+// (_setBtnLabel).
+let _lineRows = [];
+
+function _splitLabel(label) {
+  const words = label.split(' ');
+  if (words.length < 2) return _esc(label);
+  let best = 1, bestLen = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const len = Math.max(words.slice(0, i).join(' ').length, words.slice(i).join(' ').length);
+    if (len < bestLen) { best = i; bestLen = len; }
+  }
+  return `${_esc(words.slice(0, best).join(' '))}<br>${_esc(words.slice(best).join(' '))}`;
+}
+
+// The label a button shows: the one we last wrote, unless other code has since
+// set its text directly (e.g. Start game → Resume game).
+function _btnLabel(b) {
+  return b.innerHTML === b.dataset.html ? b.dataset.label : b.textContent.trim();
+}
+
+function _setBtnLabel(b, label) {
+  if (_btnLabel(b) === label) return;
+  b.textContent = label;
+  _balanceButtonLines();
+}
+
+function _balanceButtonLines() {
+  // Not before DOMContentLoaded: the static labels are only translated then
+  // (applyI18n), and splitting them first would hide them from the dictionary.
+  if (document.readyState === 'loading') return;
+  for (const sel of _lineRows) {
+    const row = document.querySelector(sel);
+    if (!row || !row.offsetParent) continue;   // hidden (live game): next time
+    const btns = [...row.querySelectorAll('.btn')].filter(b => b.offsetParent);
+    const labels = btns.map(_btnLabel);
+    btns.forEach((b, i) => { b.textContent = labels[i]; });
+    const two = btns.some(b => b.scrollWidth > b.clientWidth + 1);
+    btns.forEach((b, i) => {
+      if (two) b.innerHTML = _splitLabel(labels[i]);
+      b.dataset.label = labels[i];
+      b.dataset.html  = b.innerHTML;
+    });
+  }
+}
+
+function _initButtonLines(rows) {
+  _lineRows = rows;
+  const run = () => _balanceButtonLines();
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(run);
+    rows.forEach(sel => { const el = document.querySelector(sel); if (el) ro.observe(el); });
+  }
+  window.addEventListener('resize', run);   // the Text size setting fires one too
+  document.fonts?.ready.then(run);
+  run();
+}
+
 // ── DRAG TO CLOSE ─────────────────────────────────────────────────────────────
 // Every bottom sheet can be dragged down by its handle or header: let go far
 // enough down (or flick it) and it closes the same way its × does, running that

@@ -45,6 +45,7 @@ async function init() {
   if (liveGame.isRunning) liveTimerId = setInterval(tickLive, 1000);
   tnSaveTimer = setInterval(_tnPersist, 30000);
   _tnRenderLive();
+  _initButtonLines(['#tgFooter']);   // ui.js: Discard, Pause, Save on one line or all on two
   // Once every script is in: new-game-audio.js (lock-screen controls) loads after this one.
   const start = () => { if (liveGame.isRunning) liveGame.emit('start'); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
@@ -122,7 +123,7 @@ function _tnRenderLive() {
       </${undo ? 'button' : 'div'}>`;
   }).join('');
 
-  document.getElementById('tnPauseBtn').textContent = liveGame.isRunning ? t('Pause game') : t('Resume game');
+  _setBtnLabel(document.getElementById('tnPauseBtn'), liveGame.isRunning ? t('Pause game') : t('Resume game'));
   document.getElementById('tnPauseBtn').disabled = done;
   document.getElementById('tnSaveBtn').disabled = !done;
   setVisible('tnLiveHint', !done);
@@ -238,7 +239,7 @@ async function tnSaveGame() {
     played_at:    new Date(tnGame.startedAt).toISOString(),
     results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round: tnGame.roundsCounted ? round : null, dropped })),
   });
-  btn.textContent = t('Save game');
+  _setBtnLabel(btn, t('Save game'));
   // Saved already by this phone (a save sent twice, the answer lost): done.
   if (error && error.message !== 'table_saved') { btn.disabled = false; return showError('tnLiveErr', _tnErrorMsg(error)); }
   _tnLeave();
