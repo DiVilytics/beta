@@ -419,7 +419,9 @@ a.pace-dot:hover { transform: scale(1.3); }
    so they compare as on the table. */
 .mover { display: block; flex: none; }
 .cs-mover { height: 40px; width: auto; }
-.live-movers { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 4px; margin-top: 14px; }
+/* Every box as wide as the widest and as tall as the tallest: equal columns
+   of a grid as wide as its content, shrinking together on a narrow phone. */
+.live-movers { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; width: fit-content; max-width: 100%; margin: 14px auto 0; }
 /* One scale for all: six of the widest, in their boxes (.live-mover), still
    fit a 320px phone's line (240px of movers). */
 .live-movers .mover { zoom: 0.32; }
@@ -429,7 +431,7 @@ a.pace-dot:hover { transform: scale(1.3); }
 .live-mover {
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px;
   padding: 4px 1px 3px; border: 1px solid transparent; border-radius: var(--r); background: none;
-  font-family: inherit; color: var(--text); cursor: pointer;
+  font-family: inherit; color: var(--text); cursor: pointer; min-width: 0;
 }
 button.live-mover:not(:disabled) { border-color: var(--accent); background: var(--accent-d); }
 .live-mover:disabled { cursor: default; }
