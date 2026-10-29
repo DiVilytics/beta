@@ -320,7 +320,7 @@ function _settingsPanel() {
     </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Text size')}</span>
-      <div class="seg">${btn('data-text-opt', 'small', `<span class="settings-ico ts-a">A</span>${t('Small')}`)}${btn('data-text-opt', 'large', `<span class="settings-ico ts-a">A</span>${t('Large')}`)}</div>
+      <div class="seg">${btn('data-text-opt', 'small', `<span class="settings-ico ts-a">A</span>${t('Small')}`)}${btn('data-text-opt', 'medium', `<span class="settings-ico ts-a">A</span>${t('Medium')}`)}${btn('data-text-opt', 'large', `<span class="settings-ico ts-a">A</span>${t('Large')}`)}</div>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Language')}</span>
@@ -341,20 +341,21 @@ function _settingsPanel() {
   return panel;
 }
 
-// Text size: Small (default) or Large, kept in localStorage like the theme. The
-// scale is CSS (--ts); a 'resize' event re-runs the layouts that measure text
-// (the New Game legend, the game cards' details line).
+// Text size: Small, Medium (default) or Large, kept in localStorage like the
+// theme. The scale is CSS (--ts); a 'resize' event re-runs the layouts that
+// measure text (the New Game legend, the game cards' details line, the buttons'
+// lines, the scatter's dots).
 function setTextSize(size) {
-  const large = size === 'large';
-  if (large) document.documentElement.dataset.text = 'large';
-  else       delete document.documentElement.dataset.text;
-  try { localStorage.setItem('textSize', large ? 'large' : 'small'); } catch (_) {}
+  if (size !== 'small' && size !== 'large') size = 'medium';
+  if (size === 'medium') delete document.documentElement.dataset.text;
+  else document.documentElement.dataset.text = size;
+  try { localStorage.setItem('textSize', size); } catch (_) {}
   _updateTextSizeBtns();
   window.dispatchEvent(new Event('resize'));
 }
 
 function _updateTextSizeBtns(panel = document.getElementById('settingsPanel')) {
-  const cur = document.documentElement.dataset.text === 'large' ? 'large' : 'small';
+  const cur = document.documentElement.dataset.text || 'medium';
   panel?.querySelectorAll('[data-text-opt]').forEach(b => b.classList.toggle('on', b.dataset.textOpt === cur));
 }
 
@@ -417,6 +418,7 @@ const _KBD_SETTINGS = [
   [']',  'Dark theme',  () => setTheme('dark')],
   ['\\', 'Auto theme',  () => setTheme('auto')],
   [';',  'Small text',  () => setTextSize('small')],
+  [',',  'Medium text', () => setTextSize('medium')],
   ["'",  'Large text',  () => setTextSize('large')],
   ['1',  'English',     () => setLang('en')],
   ['2',  'Italiano',    () => setLang('it')],

@@ -23,10 +23,10 @@ const LOCALE = LANG === 'it' ? 'it-IT' : 'en-US';
 
 document.documentElement.lang = LANG;
 
-// Text size (Settings: Small / Large), applied here because this is the one
-// script every page loads in <head>, so the page never paints at the wrong size.
-// setTextSize() lives in shared.js.
-try { if (localStorage.getItem('textSize') === 'large') document.documentElement.dataset.text = 'large'; } catch (_) {}
+// Text size (Settings: Small / Medium / Large; Medium, the default, sets
+// nothing), applied here because this is the one script every page loads in
+// <head>, so the page never paints at the wrong size. setTextSize() lives in shared.js.
+try { const ts = localStorage.getItem('textSize'); if (ts === 'small' || ts === 'large') document.documentElement.dataset.text = ts; } catch (_) {}
 
 // The beta: divilytics.github.io/beta/, the next version, tried out before it
 // replaces this one. Its menu bar is purple (style.css, theme.js), set here so
