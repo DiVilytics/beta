@@ -53,7 +53,7 @@
 
 :root {
   --bg: #000000;
-  --nav-bg: rgba(0, 0, 0, 0.78);
+  --nav-bg: color-mix(in srgb, var(--bg) 40%, transparent);   /* as Tap to continue */
   --s1: #111;
   --s2: #1a1a1a;
   --s3: #222;
@@ -87,7 +87,7 @@
 
 [data-theme="light"] {
   --bg: #ffffff;
-  --nav-bg: rgba(255, 255, 255, 0.78);
+  --nav-bg: color-mix(in srgb, var(--bg) 40%, transparent);
   --s1: #f8f8f8;
   --s2: #f0f0f0;
   --s3: #e8e8e8;
@@ -174,9 +174,10 @@ nav {
   height: 54px;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
-  /* See-through glass: the page shows through, blurred. */
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* See-through glass, as Tap to continue (.tap-resume): the page shows
+     through, blurred, lightly tinted with its background. */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .nav-brand {
@@ -192,8 +193,8 @@ nav {
 /* The beta (lang.js IS_BETA, only under /beta/): the menu bar tinted purple,
    the accent at a light alpha over each theme's own bar, the logo on a clear
    background (theme.js). */
-:root[data-beta]                    { --nav-bg: rgba(27, 23, 54, 0.78); }
-:root[data-beta][data-theme="light"] { --nav-bg: rgba(226, 222, 250, 0.78); }
+:root[data-beta]                    { --nav-bg: rgba(27, 23, 54, 0.4); }
+:root[data-beta][data-theme="light"] { --nav-bg: rgba(226, 222, 250, 0.4); }
 :root[data-beta] nav { border-bottom-color: rgba(124, 106, 247, 0.35); }
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
@@ -226,7 +227,7 @@ nav {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  border: 2px solid var(--nav-bg);
+  border: 2px solid var(--bg);   /* the nav is see-through: a solid ring keeps the dot apart from its icon */
 }
 .nav-links a.has-live-game::after   { background: var(--red);  animation: livePulse 1.2s ease-in-out infinite; }
 .nav-links a.has-paused-game::after { background: var(--gold); }
