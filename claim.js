@@ -347,7 +347,7 @@ function _renderLineup() {
         <span class="row-num">${i + 1}.</span>
         <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
         <div class="order-slot-info">
-          <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Select villain')}">
+          <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Pick villain')}">
             ${charSelectHTML(available, s.character, lineupBoxes)}
           </select>
           <div class="order-slot-name">${villainNameHTML(s.character)}</div>

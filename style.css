@@ -142,9 +142,6 @@
 /* Live-game-edit confirm strong text */
 .text-emph { color: var(--text); }
 
-/* 404 page back-to-home spacer */
-.home-back-link { margin-top: 16px; }
-
 button, a, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
@@ -2090,6 +2087,8 @@ select:disabled {
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
 #orderSlots { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+/* The villain's portrait close to its position number. */
+.order-slot .row-num { margin-right: 3px; }
 .order-slot {
   display: flex;
   align-items: center;
@@ -2846,6 +2845,7 @@ select:disabled {
 /* ── FAQ PAGE ──────────────────────────────────────────────────────── */
 /* "← All …" link back to a page's overview (FAQ topics, villain detail). */
 .back-link { display: block; width: fit-content; margin-bottom: 14px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--accent); text-decoration: none; }
+.home-tagline + .back-link { margin-top: 14px; }   /* 404 */
 .faq-general-link { margin-bottom: 32px; }
 .faq-rulebook-link { margin-bottom: 10px; }
 .faq-rulebook-title { margin: 0 0 6px; font-size: calc(20px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
