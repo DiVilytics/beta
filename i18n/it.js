@@ -201,6 +201,7 @@ window.I18N.it = {
     "Draw": "Pesca",
     "Remove": "Rimuovi",
     "A game needs at least 2 players": "Una partita richiede almeno 2 giocatori",
+    "The game has started: its players are set": "La partita è iniziata: i giocatori sono fissati",
     "Winner": "Vincitore",
     "Pick a villain first": "Prima scegli un cattivo",
     "Pick at least 2 villains first": "Prima scegli almeno 2 cattivi",
