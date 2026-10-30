@@ -539,7 +539,7 @@ function _injectNicknameModal() {
           <div class="err" id="nickErr"></div>
           <div class="field">
             <label>${t('Nickname')}</label>
-            <input type="text" id="nickInput" maxlength="30" placeholder="${t('e.g. emilio')}" autocomplete="off">
+            <input type="text" id="nickInput" maxlength="30" placeholder="${t('Nickname')}" autocomplete="off">
           </div>
         </div>
         <div class="sheet-footer">
