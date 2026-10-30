@@ -28,9 +28,8 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 // the counter isn't one round long). Kept with the game in progress.
 let _roundsCounted  = false;
 // The game got going: paused after a minute or more, or with + or − used (the
-// test by which stopLive fills in the duration and rounds). Its players are
-// set: + Add player is gone, ❌ and the player count are off. Kept with the
-// game in progress.
+// test by which stopLive fills in the duration and rounds). Its lineup changes
+// only after a yes (_confirmLineup). Kept with the game in progress.
 let _underway       = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
@@ -280,15 +279,36 @@ function _onLegendResize() {
 
 // ── SLOT MANAGEMENT ──────────────────────────────────────────────────────────
 
+// A game underway (_underway): what would change its lineup asks first. An
+// accidental + Add player, say, leaves a row without a villain, and the game
+// can't resume until it's filled or removed. Filling or removing an empty row
+// doesn't ask.
+function _confirmLineup(title, confirmLabel, apply) {
+  if (!_underway) return apply();
+  openConfirmSheet({
+    id:       'lineupChangeSheet',
+    title,
+    bodyHTML: `<p class="confirm-text">${t('The game has started: its players, villains and order usually stay the same.')}</p>`,
+    confirmLabel,
+    onConfirm: apply,
+  });
+}
+
 function addOrderSlot(char = '', isMe = false, isWinner = false) {
-  if (orderSlots.length >= 6 || _underway) return;
-  orderSlots.push({ id: orderNextId++, char, isMe, isWinner });
-  renderOrderSlots();
-  _saveLiveState();
+  if (orderSlots.length >= 6) return;
+  _confirmLineup(t('Add a player?'), t('Add'), () => {
+    orderSlots.push({ id: orderNextId++, char, isMe, isWinner });
+    renderOrderSlots();
+    _saveLiveState();
+  });
 }
 
 function setPlayerCount(n) {
-  if (_underway) { _syncPlayerCount(); return; }
+  _syncPlayerCount();   // the menu keeps the count until the change is made
+  _confirmLineup(n === 'solo' ? t('Change to Solo?') : t('Change to {n} players?', { n }), t('Change'), () => _setPlayerCount(n));
+}
+
+function _setPlayerCount(n) {
   if (n === 'solo') { _setSolo(true); return; }
   if (soloMode) _setSolo(false);
   n = Math.max(2, Math.min(6, parseInt(n) || 2));
@@ -351,11 +371,16 @@ function setSoloLevel(id) {
 }
 
 function removeOrderSlot(id) {
-  if (orderSlots.length <= 2 || _underway) return;
-  if (slotTimers[id]) { clearInterval(slotTimers[id]); delete slotTimers[id]; }
-  orderSlots = orderSlots.filter(s => s.id !== id);
-  renderOrderSlots();
-  _saveLiveState();
+  const slot = orderSlots.find(s => s.id === id);
+  if (!slot || orderSlots.length <= 2) return;
+  const remove = () => {
+    if (slotTimers[id]) { clearInterval(slotTimers[id]); delete slotTimers[id]; }
+    orderSlots = orderSlots.filter(s => s.id !== id);
+    renderOrderSlots();
+    _saveLiveState();
+  };
+  if (!slot.char) return remove();
+  _confirmLineup(t('Remove {villain}?', { villain: villainName(slot.char) }), t('Remove'), remove);
 }
 
 function toggleMe(id) {
@@ -395,6 +420,14 @@ function _cancelShuffle() {
   clearInterval(_shuffleTimer);
   _shuffleTimer = null;
   renderOrderSlots();
+}
+
+// The row's 🎲: over a villain, in a game underway, it asks first.
+function tapDrawSlot(id) {
+  const slot = orderSlots.find(s => s.id === id);
+  if (!slot) return;
+  if (!slot.char) return drawSlot(id);
+  _confirmLineup(t('Draw another villain in place of {villain}?', { villain: villainName(slot.char) }), t('Draw'), () => drawSlot(id));
 }
 
 function drawSlot(id) {
@@ -475,6 +508,13 @@ function _canDrawAll() {
 
 function drawAll() {
   if (!_canDrawAll()) return;
+  // Only the empty rows: nothing to ask.
+  if (_drawMode() === 'rest' || !orderSlots.some(s => s.char)) return _drawAll();
+  _confirmLineup(t('Draw the villains again?'), t('Draw'), _drawAll);
+}
+
+function _drawAll() {
+  if (!_canDrawAll()) return;
   _cancelShuffle();
   for (const id of Object.keys(slotTimers)) { clearInterval(slotTimers[id]); }
   slotTimers = {};
@@ -507,6 +547,10 @@ function _holdRowHeight(on) {
 }
 
 function shuffleOrder() {
+  _confirmLineup(t('Shuffle the order?'), t('Shuffle'), _shuffleOrder);
+}
+
+function _shuffleOrder() {
   // Stop any in-flight animations.
   if (_shuffleTimer) { clearInterval(_shuffleTimer); _shuffleTimer = null; }
   for (const id of Object.keys(slotTimers)) { clearInterval(slotTimers[id]); }
@@ -601,9 +645,9 @@ function renderOrderSlots() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          <button class="pf-btn rand" onclick="tapDrawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           ${soloMode ? '' : `
-          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${_underway ? `title="${t('The game has started: its players are set')}" disabled` : orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
+          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
@@ -919,15 +963,11 @@ function liveMediaLines() {
   };
 }
 
-// + Add player and the player count menu: the players can't change once the
-// game is underway.
+// + Add player and the player count menu.
 function _syncPlayerCount() {
-  setVisible('orderAddBtn', !soloMode && !_underway && orderSlots.length < 6);
+  setVisible('orderAddBtn', !soloMode && orderSlots.length < 6);
   const pcSel = document.getElementById('playerCountSel');
-  if (!pcSel) return;
-  pcSel.disabled = _underway;
-  pcSel.title    = _underway ? t('The game has started: its players are set') : '';
-  pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
+  if (pcSel) pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
 }
 
 function showErr(msg) {
@@ -987,7 +1027,6 @@ function stopLive() {
   // rounds only when the counter was used (_roundsCounted).
   if (ms >= 60000 || _turnBumped) {
     _underway = true;
-    renderOrderSlots();   // ❌, + Add player and the player count
     document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
     if (_roundsCounted) document.getElementById('fTurns').value = liveGame.turns;
   }
