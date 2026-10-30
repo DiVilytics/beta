@@ -522,8 +522,8 @@ function tnDrawFinal() {
   // bye; nobody left, the standings as they are.
   const body = players.length > 1
     ? `${t('The top {n} of the standings play one last table, and its ranking decides the tournament\'s top places: {names}.', { n: players.length, names: `<strong class="text-emph">${new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(names)}</strong>` })} ${t('It can be undone until it is saved.')}`
-    : players.length ? t('Only {name} is still playing: they win the final, like a bye, and the tournament ends.', { name: `<strong class="text-emph">${names[0]}</strong>` })
-    : t('Nobody is still playing: there is no final, and the tournament ends on the standings as they are.');
+    : players.length ? t('Only {name} is still playing: they win the final and the tournament ends.', { name: `<strong class="text-emph">${names[0]}</strong>` })
+    : t('Nobody is still playing: there is no final and the tournament ends on the standings as they are.');
   openConfirmSheet({
     id:           'tnFinalSheet',
     title:        players.length > 1 ? t('Draw the final?') : t('End the tournament?'),
