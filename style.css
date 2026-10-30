@@ -191,6 +191,8 @@ nav {
   align-items: center;
 }
 .nav-brand img { height: 28px; width: auto; display: block; }
+/* The light logo from the first paint (theme.js also sets it, later). */
+:root[data-theme="light"] .nav-brand img { content: url(asset/logos/logo-clear-w.svg); }
 /* The beta (lang.js IS_BETA, only under /beta/): the menu bar tinted purple,
    the accent at a light alpha over each theme's own bar, the logo on a clear
    background (theme.js). */
@@ -200,6 +202,10 @@ nav {
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
 .nav-auth  { display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }
+/* Until shared.js fills it, at the end of the page, #navAuth keeps the room of
+   its ⚙️ and avatar, so the icons beside it don't jump on every page. */
+.nav-auth:empty::before { content: ''; width: 28px; height: 30px; }   /* ⚙️ (.nav-icon-btn) */
+.nav-auth:empty::after  { content: ''; width: 28px; height: 28px; }   /* .nav-avatar */
 
 .nav-links { display: flex; gap: 2px; }
 
@@ -310,8 +316,9 @@ nav {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 28px;   /* whatever the ⚙️'s width on the device (.nav-auth:empty) */
   height: 30px;
-  padding: 0 6px;
+  padding: 0;
   border-radius: var(--rs);
   cursor: pointer;
   color: var(--muted);

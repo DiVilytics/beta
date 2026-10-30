@@ -28,6 +28,14 @@ document.documentElement.lang = LANG;
 // <head>, so the page never paints at the wrong size. setTextSize() lives in shared.js.
 try { const ts = localStorage.getItem('textSize'); if (ts === 'small' || ts === 'large') document.documentElement.dataset.text = ts; } catch (_) {}
 
+// The theme too (theme.js, at the end of the page, does the rest): light, dark,
+// or, on 'auto' or a first visit, the device's.
+try {
+  const th = localStorage.getItem('theme');
+  if (th === 'light' || (th !== 'dark' && !matchMedia('(prefers-color-scheme: dark)').matches))
+    document.documentElement.setAttribute('data-theme', 'light');
+} catch (_) {}
+
 // The beta: divilytics.github.io/beta/, the next version, tried out before it
 // replaces this one. Its menu bar is purple (style.css, theme.js), set here so
 // it never paints otherwise, and its storage keys are its own (config.js). A

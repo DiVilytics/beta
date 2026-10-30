@@ -1,22 +1,9 @@
 // ── THEME ─────────────────────────────────────────────────────────────────────
-// Light / dark / auto theme: applied before first paint, persisted in
+// Light / dark / auto theme: applied before first paint (lang.js), persisted in
 // localStorage, and reflected into the nav logo, favicon and mobile address-bar
 // color. `_updateThemeBtn` / `_updateThemeIcons` are called by shared.js when it
 // (re)paints the nav, so theme.js must load before shared.js. The theme is
 // chosen in the nav's settings panel (shared.js) via `setTheme`.
-
-(function () {
-  const saved = localStorage.getItem('theme');
-  if (saved === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-  } else if (saved === 'dark') {
-    // forced dark: no attribute needed
-  } else {
-    // 'auto' or unset (first visit): follow the device preference
-    if (!window.matchMedia('(prefers-color-scheme: dark)').matches)
-      document.documentElement.setAttribute('data-theme', 'light');
-  }
-})();
 
 let _autoMql = null;
 
