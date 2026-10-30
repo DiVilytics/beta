@@ -27,6 +27,10 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 // set before it started. Otherwise Pause leaves them empty (a game timed without
 // the counter isn't one round long). Kept with the game in progress.
 let _roundsCounted  = false;
+// The game got going: paused after a minute or more, or with + or − used (see
+// stopLive). Its players are set, so it takes no new ones (+ Add player and the
+// counts above its own are gone). Kept with the game in progress.
+let _underway       = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
@@ -276,7 +280,7 @@ function _onLegendResize() {
 // ── SLOT MANAGEMENT ──────────────────────────────────────────────────────────
 
 function addOrderSlot(char = '', isMe = false, isWinner = false) {
-  if (orderSlots.length >= 6) return;
+  if (orderSlots.length >= 6 || _underway) return;
   orderSlots.push({ id: orderNextId++, char, isMe, isWinner });
   renderOrderSlots();
   _saveLiveState();
@@ -284,6 +288,7 @@ function addOrderSlot(char = '', isMe = false, isWinner = false) {
 
 function setPlayerCount(n) {
   if (n === 'solo') { _setSolo(true); return; }
+  if (_underway && (soloMode || parseInt(n) > orderSlots.length)) { _syncPlayerCount(); return; }
   if (soloMode) _setSolo(false);
   n = Math.max(2, Math.min(6, parseInt(n) || 2));
   while (orderSlots.length < n) orderSlots.push({ id: orderNextId++, char: '', isMe: false, isWinner: false });
@@ -604,9 +609,7 @@ function renderOrderSlots() {
       </div>`;
   }).join('');
 
-  setVisible('orderAddBtn', !soloMode && orderSlots.length < 6);
-  const pcSel = document.getElementById('playerCountSel');
-  if (pcSel) pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
+  _syncPlayerCount();
   _syncSoloUI();
   _updateActionBtns();
   _updateDiscardBtn();
@@ -854,6 +857,17 @@ function liveMediaLines() {
   };
 }
 
+// + Add player and the player count menu: no new players once the game is
+// underway (only fewer, or Solo).
+function _syncPlayerCount() {
+  setVisible('orderAddBtn', !soloMode && !_underway && orderSlots.length < 6);
+  const pcSel = document.getElementById('playerCountSel');
+  if (!pcSel) return;
+  for (const o of pcSel.options)
+    o.disabled = _underway && o.value !== 'solo' && (soloMode || parseInt(o.value) > orderSlots.length);
+  pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
+}
+
 function showErr(msg) {
   showError('err', msg);
 }
@@ -910,6 +924,8 @@ function stopLive() {
   // and "1 round". The exact time is kept, so Resume carries on from it. The
   // rounds only when the counter was used (_roundsCounted).
   if (ms >= 60000 || _turnBumped) {
+    _underway = true;
+    _syncPlayerCount();
     document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
     if (_roundsCounted) document.getElementById('fTurns').value = liveGame.turns;
   }
@@ -932,6 +948,7 @@ function _saveLiveState() {
     soloLevel,
     soloRolls: _soloRolls,
     roundsCounted: _roundsCounted,
+    underway:  _underway,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
@@ -943,6 +960,7 @@ function _saveLiveState() {
 
 function _clearLiveState() {
   liveGame.clear();
+  _underway = false;
   if (_saveIntervalId) { clearInterval(_saveIntervalId); _saveIntervalId = null; }
   _updateDiscardBtn();
   updateLiveGameNavBadge();
@@ -1068,6 +1086,8 @@ function _checkResume() {
   _soloRolls = state.soloRolls || {};
   // Games saved before the flag: the counter was used if it moved past 1.
   _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
+  // Games saved before the flag: paused with a minute or more, or past round 1.
+  _underway = state.underway ?? (state.fDurExactMs >= 60000 || state.liveTurns > 1);
   renderOrderSlots();
 
   if (state.liveStart) {
