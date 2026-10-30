@@ -266,7 +266,6 @@ window.I18N.it = {
     "Choose your nickname": "Scegli il tuo nickname",
     "This nickname identifies you on game records and the leaderboard. You can change it later from your Account page.": "Il nickname ti identifica nelle partite e in classifica. Potrai cambiarlo in seguito dalla pagina Account.",
     "Nickname": "Nickname",
-    "e.g. emilio": "es. emilio",
     "Save Nickname": "Salva nickname",
     "Change your nickname": "Cambia il tuo nickname",
     "Your nickname will be updated on all past and future game records.": "Il nickname verrà aggiornato in tutte le partite passate e future.",
