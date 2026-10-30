@@ -466,7 +466,7 @@ function _betaSectionHTML() {
     <div class="section-label">${t('Beta')}</div>
     <p class="acct-note">${joined && IS_BETA
       ? t("You're on the beta: on this browser, DiVilytics always opens here.")
-      : t('Try new features before everyone else, on a version still being finished. Your account and your games are the same on both.')}</p>
+      : t('Try new features before everyone else. Your account and your games are the same on both.')}</p>
     <button class="btn btn-ghost" onclick="setBeta(${!joined})">${joined ? t('Leave the beta') : t('Join the beta')}</button>`;
 }
 
