@@ -27,9 +27,10 @@ let _turnBumped     = false;       // + or − used since the last start (see st
 // set before it started. Otherwise Pause leaves them empty (a game timed without
 // the counter isn't one round long). Kept with the game in progress.
 let _roundsCounted  = false;
-// The game got going: paused after a minute or more, or with + or − used (see
-// stopLive). Its players are set, so it takes no new ones (+ Add player and the
-// counts above its own are gone). Kept with the game in progress.
+// The game got going: paused after a minute or more, or with + or − used (the
+// test by which stopLive fills in the duration and rounds). Its players are
+// set: + Add player is gone, ❌ and the player count are off. Kept with the
+// game in progress.
 let _underway       = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
@@ -287,8 +288,8 @@ function addOrderSlot(char = '', isMe = false, isWinner = false) {
 }
 
 function setPlayerCount(n) {
+  if (_underway) { _syncPlayerCount(); return; }
   if (n === 'solo') { _setSolo(true); return; }
-  if (_underway && (soloMode || parseInt(n) > orderSlots.length)) { _syncPlayerCount(); return; }
   if (soloMode) _setSolo(false);
   n = Math.max(2, Math.min(6, parseInt(n) || 2));
   while (orderSlots.length < n) orderSlots.push({ id: orderNextId++, char: '', isMe: false, isWinner: false });
@@ -350,7 +351,7 @@ function setSoloLevel(id) {
 }
 
 function removeOrderSlot(id) {
-  if (orderSlots.length <= 2) return;
+  if (orderSlots.length <= 2 || _underway) return;
   if (slotTimers[id]) { clearInterval(slotTimers[id]); delete slotTimers[id]; }
   orderSlots = orderSlots.filter(s => s.id !== id);
   renderOrderSlots();
@@ -602,7 +603,7 @@ function renderOrderSlots() {
         <div class="order-slot-actions">
           <button class="pf-btn rand" onclick="drawSlot(${s.id})" title="${t('Draw')}">🎲</button>
           ${soloMode ? '' : `
-          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
+          <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${_underway ? `title="${t('The game has started: its players are set')}" disabled` : orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
           <button class="pf-btn win${s.isWinner ? ' on' : ''}" onclick="toggleWin(${s.id})" ${s.char ? `title="${t('Winner')}"` : `title="${t('Pick a villain first')}" disabled`}>👑</button>
         </div>
@@ -918,14 +919,14 @@ function liveMediaLines() {
   };
 }
 
-// + Add player and the player count menu: no new players once the game is
-// underway (only fewer, or Solo).
+// + Add player and the player count menu: the players can't change once the
+// game is underway.
 function _syncPlayerCount() {
   setVisible('orderAddBtn', !soloMode && !_underway && orderSlots.length < 6);
   const pcSel = document.getElementById('playerCountSel');
   if (!pcSel) return;
-  for (const o of pcSel.options)
-    o.disabled = _underway && o.value !== 'solo' && (soloMode || parseInt(o.value) > orderSlots.length);
+  pcSel.disabled = _underway;
+  pcSel.title    = _underway ? t('The game has started: its players are set') : '';
   pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
 }
 
@@ -986,7 +987,7 @@ function stopLive() {
   // rounds only when the counter was used (_roundsCounted).
   if (ms >= 60000 || _turnBumped) {
     _underway = true;
-    _syncPlayerCount();
+    renderOrderSlots();   // ❌, + Add player and the player count
     document.getElementById('fDur').value = Math.max(1, Math.round(ms / 60000));
     if (_roundsCounted) document.getElementById('fTurns').value = liveGame.turns;
   }
