@@ -124,6 +124,38 @@ async function fetchGamesWithPlayers(ids, opts = {}) {
   return opts.variant === 'any' ? { games, players } : gamesOfVariant({ games, players }, opts.variant ?? null);
 }
 
+// ── EVERY OFFICIAL GAME ───────────────────────────────────────────────────────
+// Every official game with its seats, { id, played_at, at (ms, null when
+// undated), duration_minutes, num_turns, source, seats: [{ character, user_id,
+// position, is_winner }] }: the Charts page, and the Leaderboard's Matchups.
+// Fetched in parallel pages (past PostgREST's 1000-row cap), once per visit; a
+// failed load is retried next time.
+let _officialGames = null;
+function loadOfficialGames() {
+  return _officialGames ||= (async () => {
+    const sel = 'id, played_at, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
+    const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
+    if (error) throw error;
+    const PAGE = 1000;
+    const pages = await Promise.all(Array.from({ length: Math.ceil((count || 0) / PAGE) + 1 }, (_, i) =>
+      db.from('games').select(sel).is('variant', null).order('id').range(i * PAGE, i * PAGE + PAGE - 1)));
+    const failed = pages.find(r => r.error);
+    if (failed) throw failed.error;
+    return pages.flatMap(r => r.data || []).map(({ game_players, ...g }) => ({
+      ...g, seats: game_players || [], at: g.played_at ? Date.parse(g.played_at) : null,
+    }));
+  })().catch(e => { _officialGames = null; throw e; });
+}
+
+// Those of a period ({ from_ts, to_ts }, period-filter.js; none: all time) and
+// a table size (2-6, or 'all').
+function gamesIn(all, { from_ts, to_ts } = {}, n = 'all') {
+  const from = from_ts && Date.parse(from_ts), to = to_ts && Date.parse(to_ts);
+  return all.filter(g =>
+    (!from || (g.at != null && g.at >= from && g.at < to)) &&
+    (n === 'all' || g.seats.length === n));
+}
+
 // The games of one variant (null: official, 'solo') out of { games, players },
 // with their players.
 function gamesOfVariant({ games, players }, variant = null) {

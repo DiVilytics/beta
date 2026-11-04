@@ -83,6 +83,18 @@
   </div>
 </div>
 
+<!-- A villain's matchups (leaderboard.js openMatchups). -->
+<div class="overlay" id="muOverlay" onclick="if(event.target===this) closeOverlay('muOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="muTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('muOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="muBody"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="db.js"></script>

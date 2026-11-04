@@ -1627,6 +1627,15 @@ select:disabled {
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
 .bar-diverge .bar-fill { position: absolute; top: 0; }
 .bar-fill.neg { background: var(--red); }
+/* Matchups (stats-table.js): winning | even | losing, in the bar's colors; the
+   numbers are a button that opens the villain's opponents (leaderboard.js). */
+.mu-win  { color: var(--accent); }
+.mu-even { color: var(--muted); }
+.mu-lose { color: var(--red); }
+.row-val-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: inherit; cursor: pointer; width: 100%; }
+.mu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(52px * var(--ts)), 1fr)); gap: 10px 6px; }
+.mu-opp { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--text); font-size: calc(12px * var(--ts)); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mu-opp .char-portrait { width: calc(32px * var(--ts)); height: calc(32px * var(--ts)); }
 
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */

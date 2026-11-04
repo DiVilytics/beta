@@ -5,7 +5,7 @@ let lbCharBoxMap    = {};
 let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
-let lbMode   = 'chance';       // 'pct' | 'count' | 'games', or 'chance' (villains only) or 'xp' (players only)
+let lbMode   = 'chance';       // 'pct' | 'count' | 'games', or 'chance' / 'matchups' (villains only) or 'xp' (players only)
 
 // Each tab keeps its own ranking: villains open on Δ Wins, players on XP.
 const _lbModeByTab = { characters: 'chance', players: 'xp' };
@@ -95,7 +95,7 @@ function _applyTab(t) {
 function setMode(m) {
   lbMode = m;
   const cached = _lbCache[_lbKey()];
-  if (cached) render(cached);
+  if (cached) _show(cached, ++_lbLoadToken);
 }
 
 function lbLoadMore() {
@@ -140,7 +140,21 @@ async function loadAndRender() {
   // Also clears the dimming an older, overtaken fetch left on.
   summary.className = 'summary';
   lb.className = '';
-  render(_lbCache[key]);
+  _show(_lbCache[key], token);
+}
+
+// Draws the board, Matchups' games first when it shows them and they aren't
+// in yet (only the latest request draws).
+async function _show(data, token) {
+  const lb = document.getElementById('lb');
+  if (_showsMatchups() && !data.mu) {
+    lb.classList.add('lb-loading');
+    const ok = await _addMatchups(data);
+    if (token !== _lbLoadToken) return;
+    lb.className = '';
+    if (!ok) { lb.innerHTML = loadErrorHTML(t("Couldn't load the leaderboard")); return; }
+  }
+  render(data);
 }
 
 async function _fetchAllTime() {
@@ -233,6 +247,52 @@ function _addChance(rows, bySize) {
     o.vari += n / k * (1 - 1 / k);
   }
   return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r.character] }));
+}
+
+// ── MATCHUPS ──────────────────────────────────────────────────────────────────
+// Villains only: each villain against every other villain, its matchups by
+// matchupClass (stats-table.js): winning, even, losing, too few, from the
+// games of the table size and period picked, read as the Matchups chart reads
+// them. Every game is loaded once (loadOfficialGames, db.js), the first time
+// the mode shows; each filter's matchups then once. data.mu: { villain:
+// { win, even, lose, few: [{ name, n, w, l }] } }; false if the games couldn't load.
+const _showsMatchups = () => lbTab === 'characters' && lbMode === 'matchups' && !size.isSolo();
+
+async function _addMatchups(data) {
+  let all;
+  try { all = await loadOfficialGames(); } catch (_) { return false; }
+  const rec = pairRecords(gamesIn(all, period.range(), size.value()));
+  data.mu = {};
+  for (const a of lbChars) {
+    const m = data.mu[a.name] = { win: [], even: [], lose: [], few: [] };
+    for (const b of lbChars) {
+      if (b.name === a.name) continue;
+      const r = pairRecord(rec, a.name, b.name);
+      m[matchupClass(r)].push({ name: b.name, ...r });
+    }
+  }
+  return true;
+}
+
+// A villain's matchups (its row's numbers, tapped): its opponents in the four
+// groups, the clearest first, each with its record (its wins - theirs).
+let _lbMu = {};
+function openMatchups(name) {
+  const m = _lbMu[name];
+  if (!m) return;
+  const order = list => list.slice().sort((a, b) => pairDelta(b.w, b.l) - pairDelta(a.w, a.l) || b.n - a.n);
+  const group = (key, label, list) => `
+    <div class="section-label"><span class="mu-${key}">${label}</span> (${list.length})</div>
+    ${list.length ? `<div class="mu-grid">${order(list).map(o => `
+      <a class="mu-opp" href="villains.html?vil=${encodeURIComponent(o.name)}" title="${_esc(`${villainName(o.name)}: ${t('{a} won {w}, {b} won {l}', { a: villainName(name), w: o.w, b: villainName(o.name), l: o.l })} | ${tn(o.n, '{n} game together', '{n} games together')}`)}">
+        ${charImgHTML(o.name)}<span>${o.w}–${o.l}</span>
+      </a>`).join('')}</div>` : '<p class="results-hint">-</p>'}`;
+  document.getElementById('muTitle').textContent = villainName(name);
+  document.getElementById('muBody').innerHTML =
+    `<p class="modal-hint">${t('Its wins – theirs, in the games one of the two won.')}</p>` +
+    group('win',  t('Winning'), m.win) + group('even', t('Even'), m.even) +
+    group('lose', t('Losing'),  m.lose) + group('few', t('Too few games'), m.few);
+  openOverlay('muOverlay');
 }
 
 // ── XP ────────────────────────────────────────────────────────────────────────
@@ -338,7 +398,8 @@ function openXpTable() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
-function render({ rows, summary }) {
+function render(data) {
+  let { rows, summary } = data;
   const { games, avg_duration, avg_turns } = summary;
   const avgDur   = avg_duration != null ? Math.round(avg_duration) : null;
   const avgTurns = avg_turns    != null ? Math.round(avg_turns)    : null;
@@ -352,7 +413,7 @@ function render({ rows, summary }) {
   // Solo: what it is, above its own ranking (which has no XP: % Wins instead).
   const solo     = size.isSolo();
   const soloHint = solo ? soloHintHTML() : '';
-  const mode     = solo && (lbMode === 'xp' || lbMode === 'chance') ? 'pct' : lbMode;
+  const mode     = solo && (lbMode === 'xp' || lbMode === 'chance' || lbMode === 'matchups') ? 'pct' : lbMode;
 
   // No games at all (every table size, or on Solo every level, all time): the
   // card, as in the Game log, not a ranking of empty rows, on both tabs.
@@ -378,7 +439,13 @@ function render({ rows, summary }) {
   // rank everyone, a low count there isn't misleading the same way.
   // Δ Wins ranks every villain with games (few games can't swing it far):
   // those without, under "No games".
-  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : mode === 'chance' ? 1 : 0;   // stats-table.js
+  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : mode === 'chance' || mode === 'matchups' ? 1 : 0;   // stats-table.js
+  // Matchups: each villain's counts (the lists stay for its sheet).
+  if (mode === 'matchups' && data.mu) {
+    _lbMu = data.mu;
+    const count = m => m && { win: m.win.length, even: m.even.length, lose: m.lose.length, few: m.few.length };
+    rows = rows.map(r => ({ ...r, mu: count(data.mu[r.character]) }));
+  }
   // Registered players who never played have no % at all: only in the counts.
   // Villains are all listed, those without games under the divider ("-").
   if (mode === 'pct' && lbTab === 'players') rows = rows.filter(r => r.games > 0);
@@ -393,9 +460,11 @@ function render({ rows, summary }) {
 
   document.getElementById('lb').innerHTML = `
     ${soloHint}
-    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo })}
+    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo, matchups: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
+    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other, in the games one of the two won: winning when it clearly beats them (their Δ Wins above +2), losing when clearly beaten (below −2), even in between, too few under 5 games together. Ranked by winning minus losing; tap the numbers for the opponents.')}</p>
+      <p class="results-hint">${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} (${t('Too few')})</p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain and for the achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
@@ -405,6 +474,7 @@ function render({ rows, summary }) {
       limit,
       selfKey,
       minGames,
+      valAction:   mode === 'matchups' ? 'openMatchups' : undefined,
       getKey:      r   => isChar ? r.character : r.nickname,
       getHref:     key => isChar
         ? `villains.html?vil=${encodeURIComponent(key)}`

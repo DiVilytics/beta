@@ -23,9 +23,10 @@ const MIN_GAMES_FOR_PCT = 5;
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
-// the part from achievements, shown in parentheses instead of the games; and
+// the part from achievements, shown in parentheses instead of the games;
 // 'chance', the villains' Leaderboard and a villain's page: rows carry `exp`
-// and `vari`, see chanceDelta)
+// and `vari`, see chanceDelta; and 'matchups', the villains' Leaderboard: rows
+// carry `mu`, { win, even, lose, few } opponents, see MATCHUPS)
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
 // the formatted value; statCellHTML → the table cell, "40% (12)" / "5 (12)" with
 // the games played in parentheses (two right-aligned sub-columns, so the digits
@@ -45,7 +46,46 @@ function chanceDelta(r) {
 const fmtChance = v => v == null ? '-'
   : v.toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' });
 
+// ── MATCHUPS ──────────────────────────────────────────────────────────────────
+// Who beats whom, as the Matchups chart (charts.js) and the Leaderboard read it.
+// pairRecords: for each ordered pair of sides that met in `games` (villains, or
+// with keyOf boxes), the games together and the first's wins over the second;
+// a game a third side won counts for neither, one side twice at a table (two
+// villains of a box) is no pair. pairRecord reads one: { n, w, l }.
+function pairRecords(games, keyOf = s => s.character) {
+  const together = {}, wins = {};
+  for (const g of games) {
+    const sides = [...new Set(g.seats.map(keyOf))].filter(Boolean);
+    const winner = g.seats.find(s => s.is_winner);
+    const won = winner ? keyOf(winner) : null;
+    for (const a of sides) for (const b of sides) {
+      if (a === b) continue;
+      const k = a + '|' + b;
+      together[k] = (together[k] || 0) + 1;
+      if (won === a) wins[k] = (wins[k] || 0) + 1;
+    }
+  }
+  return { together, wins };
+}
+function pairRecord({ together, wins }, a, b) {
+  return { n: together[a + '|' + b] || 0, w: wins[a + '|' + b] || 0, l: wins[b + '|' + a] || 0 };
+}
+// Δ Wins between the two: even odds over the games one of them won.
+const pairDelta = (w, l) => chanceDelta({ wins: w, exp: (w + l) / 2, vari: (w + l) / 4 });
+// A matchup: 'few' under MIN_GAMES_FOR_PCT games together (or none either of
+// the two won), else 'win' or 'lose' past ±MATCHUP_CLEAR of Δ Wins (clearly
+// more than luck, about 1 in 20 by chance alone), 'even' between.
+const MATCHUP_CLEAR = 2;
+function matchupClass({ n, w, l }) {
+  if (n < MIN_GAMES_FOR_PCT || !(w + l)) return 'few';
+  const d = pairDelta(w, l);
+  return d > MATCHUP_CLEAR ? 'win' : d < -MATCHUP_CLEAR ? 'lose' : 'even';
+}
+// Ranked by winning minus losing matchups.
+const _muNet = r => r.mu ? r.mu.win - r.mu.lose : 0;
+
 function statValue(r, mode) {
+  if (mode === 'matchups') return _muNet(r);
   if (mode === 'chance') return chanceDelta(r) ?? 0;
   if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
@@ -53,6 +93,7 @@ function statValue(r, mode) {
   return r.games ? r.wins / r.games : 0;
 }
 function statValueDisplay(r, mode) {
+  if (mode === 'matchups') return muCountsHTML(r.mu);
   if (mode === 'chance') return fmtChance(chanceDelta(r));
   if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
@@ -70,12 +111,17 @@ function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
   if (mode === 'xp') return `${_headLabel('XP')} <span class="lb-head-sub">(${_headLabel('Achievements')})</span>`;
   if (mode === 'chance') return `${_headLabel('Δ Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
+  if (mode === 'matchups') return `${_headLabel('Matchups')} <span class="lb-head-sub">(${_headLabel('Too few')})</span>`;
   return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
 }
-// The number in parentheses: the games, or for XP the XP from achievements.
-const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
+// The number in parentheses: the games, for XP the XP from achievements, for
+// Matchups the opponents with too few games.
+const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : mode === 'matchups' ? (r.mu?.few ?? 0) : r.games;
+// Winning | even | losing matchups, each in its color (the bar's: the accent,
+// gray, red).
+const muCountsHTML = mu => `<span class="mu-win">${mu?.win ?? 0}</span> | <span class="mu-even">${mu?.even ?? 0}</span> | <span class="mu-lose">${mu?.lose ?? 0}</span>`;
 function statCellHTML(r, mode) {
-  if ((mode === 'pct' || mode === 'chance') && !r.games) return '-';   // no games, no win rate
+  if ((mode === 'pct' || mode === 'chance' || mode === 'matchups') && !r.games) return '-';   // no games, no win rate
   const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
   return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${_statSub(r, mode)})</span>`}</span>`;
 }
@@ -86,19 +132,21 @@ function statGamesWidth(rows, mode) {
 }
 
 // `xp: true` adds XP first (the players' Leaderboard), `chance: true` Δ Wins
-// first (the villains' Leaderboard, a villain's page). Each label also has a short form ('% Wins:short' in
+// first (the villains' Leaderboard, a villain's page), `matchups: true`
+// Matchups after it (the villains' Leaderboard). Each label also has a short form ('% Wins:short' in
 // i18n: "% Vitt."), shown only where a row is too tight for the full ones
 // (.seg-short on a parent: the villain page with its All / Solo menu); without
 // one, the full label.
 const _statShortLabel = key => { const s = t(key + ':short'); return s.endsWith(':short') ? t(key) : s; };
-function statModeSegHTML(mode, fn, { xp = false, chance = false } = {}) {
+function statModeSegHTML(mode, fn, { xp = false, chance = false, matchups = false } = {}) {
   const btn = (m, key) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')"><span class="stat-lbl-full">${t(key)}</span><span class="stat-lbl-short">${_statShortLabel(key)}</span></button>`;
-  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
+  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
 }
 
 function sortStatRows(rows, mode) {
   const sorted = [...rows];
+  if (mode === 'matchups') return sorted.sort((a, b) => _muNet(b) - _muNet(a) || (b.mu?.win ?? 0) - (a.mu?.win ?? 0) || b.games - a.games);
   if (mode === 'chance') return sorted.sort((a, b) => (chanceDelta(b) ?? -Infinity) - (chanceDelta(a) ?? -Infinity) || b.games - a.games);
   if (mode === 'xp')    return sorted.sort((a, b) => (b.xp || 0) - (a.xp || 0) || b.wins - a.wins || b.games - a.games);
   if (mode === 'count') return sorted.sort((a, b) => b.wins - a.wins || b.games - a.games);
@@ -127,9 +175,12 @@ function statBarWidth(r, mode, maxVal) {
 }
 
 // Δ Wins's bar starts from the middle (0, as expected by chance): to the
-// right above it, to the left below it, scaled to the largest distance.
+// right above it, to the left below it, scaled to the largest distance. So
+// does Matchups' (winning minus losing), divergeBarHTML from its value.
 function chanceBarHTML(r, maxAbs, gold) {
-  const v = chanceDelta(r) ?? 0;
+  return divergeBarHTML(chanceDelta(r) ?? 0, maxAbs, gold);
+}
+function divergeBarHTML(v, maxAbs, gold) {
   const w = Math.min(50, Math.round(Math.abs(v) / (maxAbs || 1) * 50));
   return `<div class="bar-bg bar-diverge"><div class="bar-fill${v < 0 ? ' neg' : gold ? ' gold' : ''}" style="${v < 0 ? 'right' : 'left'}:50%;width:${w}%"></div></div>`;
 }
@@ -190,7 +241,7 @@ function boxAnchorId(box) {
 // different shape and is built inline in villains.js).
 //
 // Required opts:
-//   mode          : 'pct' | 'count' | 'games' | 'xp'
+//   mode          : 'pct' | 'count' | 'games' | 'xp' | 'chance' | 'matchups'
 //   headLabel     : column header for the identity column ("Character" | "Player")
 //   getKey(r)     : returns the row's key (villain name or nickname)
 //   getName(key)  : optional, the name shown for a key (villainName for villains)
@@ -203,13 +254,15 @@ function boxAnchorId(box) {
 //   selfKey       : highlight the row whose key matches; if that row falls beyond
 //                   `limit`, pin it at the bottom under a "Your position" divider
 //                   so the viewer always sees their standing for the current sort.
+//   valAction(key): optional, a global function's name: the value cell becomes
+//                   a button calling it with the row's key (Matchups' sheet).
 //   minGames      : optional; rows with fewer games aren't ranked: they follow
 //                   the others under a "Fewer than {n} games" divider, dimmed and
 //                   with no position (for % Wins, where 1-2 games can sit at 100%
 //                   by luck).
 function renderStatTableHTML(rows, opts) {
   const { mode, headLabel, getKey, getName = k => k, getNameHTML, getHref, getIdentity, getSub, getSubHref,
-          wrapClass = '', limit = Infinity, selfKey = null, minGames = 0 } = opts;
+          wrapClass = '', limit = Infinity, selfKey = null, minGames = 0, valAction } = opts;
   const all      = sortStatRows(rows, mode);
   const ranked   = all.filter(r => r.games >= minGames);
   const unranked = all.filter(r => r.games <  minGames);
@@ -244,11 +297,11 @@ function renderStatTableHTML(rows, opts) {
               : `<div class="row-sub">${_esc(sub)}</div>`) : ''}
           </div>
         </div>
-        <div class="row-val row-val-stack">
+        <${valAction ? `button type="button" class="row-val row-val-stack row-val-btn" data-key="${_esc(key)}" onclick="${valAction}(this.dataset.key)"` : 'div class="row-val row-val-stack"'}>
           ${dispVal}
-          ${mode === 'chance' ? chanceBarHTML(r, maxAbs, rank === 1)
+          ${mode === 'chance' || mode === 'matchups' ? divergeBarHTML(statValue(r, mode), maxAbs, rank === 1)
             : `<div class="bar-bg"><div class="bar-fill${rank === 1 ? ' gold' : ''}" style="width:${barW}%"></div></div>`}
-        </div>
+        </${valAction ? 'button' : 'div'}>
       </div>`;
   };
 

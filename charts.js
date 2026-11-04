@@ -12,36 +12,11 @@ const period = createPeriodFilter('chartPeriod', { onChange: () => _rerender() }
 
 // ── THE GAMES (one fetch, filtered per view) ───────────────────────────────────
 
-// Every official game with its seats, { id, played_at, at (ms, null when
-// undated), duration_minutes, num_turns, source, seats: [{ character, user_id,
-// position, is_winner }] }. Fetched in parallel pages (past PostgREST's
-// 1000-row cap), once per visit; a failed load is retried next time.
-let _allGames = null;
-function _loadGames() {
-  return _allGames ||= (async () => {
-    const sel = 'id, played_at, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
-    const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
-    if (error) throw error;
-    const PAGE = 1000;
-    const pages = await Promise.all(Array.from({ length: Math.ceil((count || 0) / PAGE) + 1 }, (_, i) =>
-      db.from('games').select(sel).is('variant', null).order('id').range(i * PAGE, i * PAGE + PAGE - 1)));
-    const failed = pages.find(r => r.error);
-    if (failed) throw failed.error;
-    return pages.flatMap(r => r.data || []).map(({ game_players, ...g }) => ({
-      ...g, seats: game_players || [], at: g.played_at ? Date.parse(g.played_at) : null,
-    }));
-  })().catch(e => { _allGames = null; throw e; });
-}
-
-// The games of the period picked, and of the table size picked unless the
-// chart is by table size itself.
+// Every official game with its seats (loadOfficialGames, db.js), those of the
+// period picked, and of the table size picked unless the chart is by table
+// size itself.
 function _filterGames(all, { sized = true } = {}) {
-  const { from_ts, to_ts } = period.range();
-  const from = from_ts && Date.parse(from_ts), to = to_ts && Date.parse(to_ts);
-  const n = sized ? size.value() : 'all';
-  return all.filter(g =>
-    (!from || (g.at != null && g.at >= from && g.at < to)) &&
-    (n === 'all' || g.seats.length === n));
+  return gamesIn(all, period.range(), sized ? size.value() : 'all');
 }
 
 // A game's [year, month (1-12), day] as it was played: in local time, or the
@@ -99,20 +74,9 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   const boxes = group === 'boxes';
   const boxOf = Object.fromEntries(chars.map(c => [c.name, c.box]));
   const boxOrder = b => boxInfo[b]?.order ?? 99;
-  // Per ordered pair: games together, and the row's wins over the column. Two
-  // villains of one box at a table are no box against box.
-  const together = {}, wins = {};
-  for (const g of games) {
-    const keyOf = s => boxes ? boxOf[s.character] : s.character;
-    const sides = [...new Set(g.seats.map(keyOf))].filter(Boolean);
-    const winner = g.seats.find(s => s.is_winner);
-    for (const a of sides) for (const b of sides) {
-      if (a === b) continue;
-      const k = a + '|' + b;
-      together[k] = (together[k] || 0) + 1;
-      if (winner && keyOf(winner) === a) wins[k] = (wins[k] || 0) + 1;
-    }
-  }
+  // Per ordered pair (pairRecords, stats-table.js, as the Leaderboard's
+  // Matchups): games together, and the row's wins over the column.
+  const rec = pairRecords(games, boxes ? s => boxOf[s.character] : s => s.character);
   const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
   const items = boxes
     ? Object.keys(boxInfo).filter(b => chars.some(c => c.box === b && played.has(c.name))).sort((a, b) => boxOrder(a) - boxOrder(b))
@@ -133,13 +97,12 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
     const cells = items.map((c, ci) => {
       const cls = newGroup(ci) ? ' vs-box' : '';
       if (r.key === c.key) return `<td class="vs-self${cls}"></td>`;
-      const n = together[r.key + '|' + c.key] || 0;
-      const w = wins[r.key + '|' + c.key] || 0, l = wins[c.key + '|' + r.key] || 0;
+      const { n, w, l } = pairRecord(rec, r.key, c.key);
       const name = `${r.name} vs ${c.name}`;
       // The caption links both: the row's page, " vs ", the column's.
       const links = ` data-name="${_esc(r.name)}" data-href="${_esc(r.href)}" data-box="${_esc(c.name)}" data-boxhref="${_esc(c.href)}" data-join=" vs "`;
       const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-      if (n < MIN_GAMES_FOR_PCT || !(w + l)) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
+      if (matchupClass({ n, w, l }) === 'few') return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
       const v = cell({ pct: w / (w + l), w, l });
       return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}"${links} data-meta="${_esc(`${v.meta} | ${meta}`)}" title="${_esc(name)}">${v.label}</td>`;
     }).join('');
@@ -194,8 +157,7 @@ const CHARTS = [
     render({ games, chars, boxInfo, group, mode }) {
       const chance = mode === 'chance';
       return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
-        // Δ Wins between the two: even odds over the games one of them won.
-        const d = chanceDelta({ wins: w, exp: (w + l) / 2, vari: (w + l) / 4 });
+        const d = pairDelta(w, l);
         return chance
           ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
           : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
@@ -509,9 +471,9 @@ async function _rerender() {
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
   const stage = document.getElementById('chartStage');
-  if (!_allGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
+  if (!_officialGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
   try {
-    const [all, chars, boxInfo] = await Promise.all([_loadGames(), loadCharacters(), loadBoxInfo()]);
+    const [all, chars, boxInfo] = await Promise.all([loadOfficialGames(), loadCharacters(), loadBoxInfo()]);
     if (token !== _renderToken) return;
     stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
     const z = stage.querySelector('.ch-zoomable');
