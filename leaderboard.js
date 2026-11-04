@@ -289,7 +289,7 @@ function openMatchups(name) {
       </a>`).join('')}</div>` : '<p class="results-hint">-</p>'}`;
   document.getElementById('muTitle').textContent = villainName(name);
   document.getElementById('muBody').innerHTML =
-    `<p class="modal-hint">${t('Under each opponent: wins of {villain} – wins of the opponent. Games won by another player don\'t count.', { villain: `<b>${_esc(villainName(name))}</b>` })}</p>` +
+    `<p class="modal-hint">${t('Under each opponent: wins of {villain} – wins of the opponent. Games won by a third villain don\'t count.', { villain: `<b>${_esc(villainName(name))}</b>` })}</p>` +
     group('win',  t('Winning'), m.win) + group('even', t('Even'), m.even) +
     group('lose', t('Losing'),  m.lose) + group('few', t('Too few games'), m.few);
   openOverlay('muOverlay');
