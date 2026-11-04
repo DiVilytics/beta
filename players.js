@@ -11,6 +11,7 @@ let pfBoxInfo   = {};
 let pfGlobal    = null;
 let pfXp        = null;   // their XP, all time (the Leaderboard's), once the games are in
 let pfProfile   = undefined;   // the profile the identity was last drawn with
+let pfOnFire    = false;  // on their max win streak (render): the avatar's ring is gold
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
 let pfTournaments = { list: [] };   // the tournaments they organized or played in, their medals (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
@@ -107,7 +108,7 @@ function _renderIdentity(profile) {
   pfProfile = profile;
   const avatar = profile === undefined
     ? '<span class="player-avatar-lg pf-avatar-ph"></span>'
-    : avatarHTML(resolveAvatar(profile), { cls: 'player-avatar-lg', extraClass: 'zoomable', id: 'pfAvatar', lightbox: true });
+    : avatarHTML(resolveAvatar(profile), { cls: 'player-avatar-lg', extraClass: `zoomable${pfOnFire ? ' on-fire' : ''}`, id: 'pfAvatar', lightbox: true });
   const since = [
     profile?.created_at ? t('Since {date}', { date: fmtDateShort(profile.created_at) }) : null,
     pfXp ? `<span class="pf-xp">${t('{n} XP', { n: pfXp })}</span>` : null,
@@ -411,6 +412,9 @@ function render() {
   const { to_ts } = period.range();
   const reachesToday = !to_ts || new Date(to_ts) > new Date();
   const onBestStreak = reachesToday && bestStreak > 0 && streakRun === bestStreak;
+  // On fire: the avatar's ring turns gold with the Max streak box.
+  pfOnFire = onBestStreak;
+  document.getElementById('pfAvatar')?.classList.toggle('on-fire', pfOnFire);
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
   // Solo: the rounds of the games won (a lost one runs to its last round).
