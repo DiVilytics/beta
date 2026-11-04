@@ -1627,8 +1627,10 @@ select:disabled {
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
 .bar-diverge .bar-fill { position: absolute; top: 0; }
 .bar-fill.neg { background: var(--red); }
-/* Matchups (stats-table.js): winning | even | losing, in the bar's colors; the
-   numbers are a button that opens the villain's opponents (leaderboard.js). */
+/* Matchups (stats-table.js): winning | even | losing, bold in the bar's colors
+   (in the table and its legend); the numbers are a button that opens the
+   villain's opponents (leaderboard.js). */
+.mu-win, .mu-even, .mu-lose { font-weight: 700; }
 .mu-win  { color: var(--accent); }
 .mu-even { color: var(--muted); }
 .mu-lose { color: var(--red); }
