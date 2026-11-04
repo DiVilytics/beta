@@ -197,7 +197,7 @@ const CHARTS = [
         // Δ Wins between the two: even odds over the games one of them won.
         const d = chanceDelta({ wins: w, exp: (w + l) / 2, vari: (w + l) / 4 });
         return chance
-          ? { heat: (d + 3) / 6, label: (d > 0 ? '+' : '') + d.toLocaleString(LOCALE, { maximumFractionDigits: 1 }), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
+          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
           : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
       } });
     },

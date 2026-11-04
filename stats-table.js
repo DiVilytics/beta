@@ -40,8 +40,10 @@ const MIN_GAMES_FOR_PCT = 5;
 function chanceDelta(r) {
   return r.vari > 0 ? (r.wins - r.exp) / Math.sqrt(r.vari) : null;
 }
+// One decimal, always shown (+2.0): a Δ moves by tenths with luck alone, so a
+// second one would claim a precision it doesn't have.
 const fmtChance = v => v == null ? '-'
-  : v.toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' });
+  : v.toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' });
 
 function statValue(r, mode) {
   if (mode === 'chance') return chanceDelta(r) ?? 0;
@@ -173,7 +175,7 @@ function openChanceInfo() {
     <p class="modal-hint">${t('<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: expected number of wins, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.')}</p>
     <p class="modal-hint">${t('W − E compares the number of wins with the number of wins one would get by picking a random winner; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
     <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
-    <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.58.')}</p>
+    <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.6.')}</p>
     <p class="modal-hint">${t('Every game counts by its number of players: a win at 6 players is worth more than one at 2.')}${_chanceNote ? ` ${_chanceNote}` : ''}</p>`;
   openOverlay('chanceOverlay');
 }
