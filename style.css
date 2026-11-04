@@ -1646,6 +1646,9 @@ select:disabled {
   object-fit: cover;
   flex-shrink: 0;
 }
+/* On fire (players.js): on their max win streak, the avatar ringed in the gold
+   of the Max streak box, as the nav rings yours in the accent. */
+.player-avatar-lg.on-fire { box-shadow: 0 0 0 2px var(--gold); }
 .zoomable { cursor: zoom-in; }
 
 /* ── AVATAR ZOOM LIGHTBOX ─────────────────────────────────────────── */
