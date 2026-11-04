@@ -2239,8 +2239,9 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 }
 .order-slot-empty { color: var(--dim); font-weight: 400; font-style: italic; }
 /* A long name (Ernesto de la Cruz, Large text) goes on two lines before it's
-   cut short, its tag ([I2E]) flowing after it like a word. */
-.order-slot-name { line-height: 1.15; min-width: 0; }
+   cut short, its tag ([I2E]) flowing after it like a word. Lines of 1.3: the
+   font's letters reach 1.27 em, and anything less cuts a g or a y's tail. */
+.order-slot-name { line-height: 1.3; min-width: 0; }
 .order-slot-name .vn, .order-slot-name .order-slot-empty { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .order-slot-name .vn-name { display: inline; white-space: normal; }
 /* While a row draws (the names flick by), one line, so the row doesn't jump. */
