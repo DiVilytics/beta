@@ -1580,7 +1580,7 @@ select:disabled {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-/* "Fewer than 5 games" divider (% Wins): the rows under it aren't ranked. */
+/* "Fewer than 10 games" divider (% Wins): the rows under it aren't ranked. */
 .lb-row-sep-muted { color: var(--muted); }
 .lb-row-unranked > :not(.rank-num) { opacity: 0.6; }
 
