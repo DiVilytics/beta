@@ -128,7 +128,7 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
       // The caption links both: the row's page, " vs ", the column's.
       const links = ` data-name="${_esc(r.name)}" data-href="${_esc(r.href)}" data-box="${_esc(c.name)}" data-boxhref="${_esc(c.href)}" data-join=" vs "`;
       const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-      if (n < MIN_GAMES_FOR_PCT || !(w + l)) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
+      if (n < MIN_GAMES_TOGETHER || !(w + l)) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
       const v = cell({ pct: w / (w + l), w, l });
       return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}"${links} data-meta="${_esc(`${v.meta} | ${meta}`)}" title="${_esc(name)}">${v.label}</td>`;
     }).join('');
