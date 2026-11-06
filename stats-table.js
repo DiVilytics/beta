@@ -81,8 +81,23 @@ function matchupClass({ n, w, l }) {
   const d = pairDelta(w, l);
   return d > MATCHUP_CLEAR ? 'win' : d < -MATCHUP_CLEAR ? 'lose' : 'even';
 }
-// Ranked by winning minus losing matchups.
-const _muNet = r => r.mu ? r.mu.win - r.mu.lose : 0;
+// Ranked by winning minus losing matchups; level, by more even ones (steady
+// beats swingy: 3 won and 3 lost is no better than 6 even, and more even is
+// more measured), then by the lean of those (`lean`: even ones above +1 minus
+// those below −1, a hint but no proof, so never in the score), then by games.
+// Ranked only with MIN_MATCHUPS complete (not too few): a newer villain waits
+// under a divider until its few matchups say something.
+const MIN_MATCHUPS  = 10;
+const MATCHUP_LEAN  = 1;
+const _muNet      = r => r.mu ? r.mu.win - r.mu.lose : 0;
+const _muComplete = r => r.mu ? r.mu.win + r.mu.even + r.mu.lose : 0;
+const _muKey      = r => [_muNet(r), r.mu?.even ?? 0, r.mu?.lean ?? 0];
+
+// Whether a row is ranked (renderStatTableHTML; the others follow a divider):
+// enough games, or in Matchups enough complete matchups.
+function statRanked(r, mode, minGames) {
+  return mode === 'matchups' ? _muComplete(r) >= MIN_MATCHUPS : r.games >= minGames;
+}
 
 function statValue(r, mode) {
   if (mode === 'matchups') return _muNet(r);
@@ -146,7 +161,10 @@ function statModeSegHTML(mode, fn, { xp = false, chance = false, matchups = fals
 
 function sortStatRows(rows, mode) {
   const sorted = [...rows];
-  if (mode === 'matchups') return sorted.sort((a, b) => _muNet(b) - _muNet(a) || (b.mu?.win ?? 0) - (a.mu?.win ?? 0) || b.games - a.games);
+  if (mode === 'matchups') return sorted.sort((a, b) => {
+    const ka = _muKey(a), kb = _muKey(b);
+    return kb[0] - ka[0] || kb[1] - ka[1] || kb[2] - ka[2] || b.games - a.games;
+  });
   if (mode === 'chance') return sorted.sort((a, b) => (chanceDelta(b) ?? -Infinity) - (chanceDelta(a) ?? -Infinity) || b.games - a.games);
   if (mode === 'xp')    return sorted.sort((a, b) => (b.xp || 0) - (a.xp || 0) || b.wins - a.wins || b.games - a.games);
   if (mode === 'count') return sorted.sort((a, b) => b.wins - a.wins || b.games - a.games);
@@ -160,7 +178,8 @@ function sortStatRows(rows, mode) {
 }
 
 function computeRanks(rows, mode) {
-  const primaryVal = r => statValue(r, mode);
+  // Matchups: a tie-break that orders two rows also ranks them apart.
+  const primaryVal = r => mode === 'matchups' ? _muKey(r).join('|') : statValue(r, mode);
   const ranks = [];
   for (let i = 0; i < rows.length; i++) {
     ranks.push(i === 0 || primaryVal(rows[i]) !== primaryVal(rows[i - 1]) ? i + 1 : ranks[i - 1]);
@@ -264,8 +283,8 @@ function renderStatTableHTML(rows, opts) {
   const { mode, headLabel, getKey, getName = k => k, getNameHTML, getHref, getIdentity, getSub, getSubHref,
           wrapClass = '', limit = Infinity, selfKey = null, minGames = 0, valAction } = opts;
   const all      = sortStatRows(rows, mode);
-  const ranked   = all.filter(r => r.games >= minGames);
-  const unranked = all.filter(r => r.games <  minGames);
+  const ranked   = all.filter(r =>  statRanked(r, mode, minGames));
+  const unranked = all.filter(r => !statRanked(r, mode, minGames));
   const sorted   = ranked.concat(unranked);
 
   // Bars scale to the ranked rows (an unranked 100% shouldn't shrink them all).
@@ -305,7 +324,7 @@ function renderStatTableHTML(rows, opts) {
       </div>`;
   };
 
-  const unrankedSep = `<div class="lb-row-sep lb-row-sep-muted">${minGames === 1 ? t('No games') : t('Fewer than {n} games', { n: minGames })}</div>`;
+  const unrankedSep = `<div class="lb-row-sep lb-row-sep-muted">${mode === 'matchups' ? t('Fewer than {n} matchups', { n: MIN_MATCHUPS }) : minGames === 1 ? t('No games') : t('Fewer than {n} games', { n: minGames })}</div>`;
   let body = sorted.slice(0, limit)
     .map((r, i) => (i === ranked.length ? unrankedSep : '') + rowHTML(r, i)).join('');
 

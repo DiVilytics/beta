@@ -443,14 +443,15 @@ function render(data) {
   // Matchups: each villain's counts (the lists stay for its sheet).
   if (mode === 'matchups' && data.mu) {
     _lbMu = data.mu;
-    const count = m => m && { win: m.win.length, even: m.even.length, lose: m.lose.length, few: m.few.length };
+    const lean  = m => m.even.filter(o => pairDelta(o.w, o.l) > MATCHUP_LEAN).length - m.even.filter(o => pairDelta(o.w, o.l) < -MATCHUP_LEAN).length;
+    const count = m => m && { win: m.win.length, even: m.even.length, lose: m.lose.length, few: m.few.length, lean: lean(m) };
     rows = rows.map(r => ({ ...r, mu: count(data.mu[r.character]) }));
   }
   // Registered players who never played have no % at all: only in the counts.
   // Villains are all listed, those without games under the divider ("-").
   if (mode === 'pct' && lbTab === 'players') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
-  const hasUnranked = rows.some(r => r.games < minGames);
+  const hasUnranked = rows.some(r => !statRanked(r, mode, minGames));
 
   const isChar  = lbTab === 'characters';
   // Only the Players tab has a "you" to highlight.
@@ -463,7 +464,8 @@ function render(data) {
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo, matchups: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
-    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other, in the games one of the two won: winning when it clearly beats them (their Δ Wins above +2), losing when clearly beaten (below −2), even in between, too few under 5 games together. Ranked by winning minus losing; tap the numbers for the opponents.')}</p>
+    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other, in the games one of the two won: winning when it clearly beats them (their Δ Wins above +2), losing when clearly beaten (below −2), even in between, too few under 5 games together. Ranked by winning minus losing, then by more even; tap the numbers for the opponents.')}</p>
+      ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}
       <p class="results-hint">${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} (${t('Too few')})</p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain and for the achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
