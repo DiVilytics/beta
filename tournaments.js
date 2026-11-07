@@ -477,7 +477,8 @@ function _tnStageHTML(mine) {
 }
 
 // The organizer's Draw stage (once every table of the stage is saved) and
-// Undo draw (while none of its games is saved; a bye isn't a game).
+// Undo draw (while none of its games is saved, a bye isn't a game: after,
+// it stays, off, the reason on hover).
 function _tnNextStageHTML(tables) {
   const user = getCurrentUser();
   if (!_tnIsOrg(user)) return '';
@@ -492,7 +493,7 @@ function _tnNextStageHTML(tables) {
     : final ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnDrawFinal()"${ready ? '' : ' disabled'}>${t('Draw the final')}</button>` : '';
   return `
     <div class="claim-share-row">
-      ${canUndo ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()">${t('Undo draw')}</button>` : ''}
+      <button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()"${canUndo ? '' : ` disabled title="${_esc(t('A game of this stage is saved: its draw stays.'))}"`}>${t('Undo draw')}</button>
       ${draw}
     </div>
     ${draw && !ready ? `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>` : ''}`;
