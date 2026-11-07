@@ -217,32 +217,39 @@ function chanceHintHTML(note = '') {
   return `<p class="results-hint">${t('0 is the score you would get by picking the winners at random; above 0 is better than chance, below 0 worse.')} <button class="char-guide-link" type="button" onclick="openChanceInfo()">${t('How it\'s computed')} ›</button></p>`;
 }
 
-// How Δ Wins is computed: a sheet made the first time it opens.
-function openChanceInfo() {
-  if (!document.getElementById('chanceOverlay')) {
+// A sheet explaining a ranking (How it's computed ›), made the first time it
+// opens: `id` the overlay's, its body `${id}Body`, filled by the caller.
+function infoSheet(id, title) {
+  if (!document.getElementById(id)) {
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
-    overlay.id = 'chanceOverlay';
+    overlay.id = id;
     overlay.innerHTML = `
       <div class="sheet">
         <div class="sheet-handle"></div>
         <div class="sheet-header">
-          <h3>${t('Δ Wins')}</h3>
+          <h3>${title}</h3>
           <button class="sheet-close" type="button" aria-label="${t('Close')}">×</button>
         </div>
-        <div class="sheet-body" id="chanceBody"></div>
+        <div class="sheet-body" id="${id}Body"></div>
       </div>`;
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay('chanceOverlay'); });
-    overlay.querySelector('.sheet-close').addEventListener('click', () => closeOverlay('chanceOverlay'));
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(id); });
+    overlay.querySelector('.sheet-close').addEventListener('click', () => closeOverlay(id));
   }
+  return document.getElementById(`${id}Body`);
+}
+
+// How Δ Wins is computed.
+function openChanceInfo() {
+  const body = infoSheet('chanceOverlay', t('Δ Wins'));
   // The formulas in MathML, the browser's own math typesetting.
   const math = x => `<math display="block" displaystyle="true" class="math-block">${x}</math>`;
   const frac = (top, bottom) => `<mfrac>${top}${bottom}</mfrac>`;
   const kg   = '<msub><mi>k</mi><mi>g</mi></msub>';
   const inv  = frac('<mn>1</mn>', kg);
   const sum  = x => `<munderover><mo largeop="true" movablelimits="false">∑</mo><mrow><mi>g</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>${x}`;
-  document.getElementById('chanceBody').innerHTML = `
+  body.innerHTML = `
     <p class="modal-hint">${t('Δ Wins compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
     ${math(`<mi mathvariant="normal">Δ</mi><mo>=</mo>${frac('<mrow><mi>W</mi><mo>−</mo><mi>E</mi></mrow>', '<msqrt><mi>V</mi></msqrt>')}`)}
     ${math(`<mi>E</mi><mo>=</mo>${sum(inv)}`)}

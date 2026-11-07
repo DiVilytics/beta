@@ -274,6 +274,18 @@ async function _addMatchups(data) {
   return true;
 }
 
+// How Matchups is computed (How it's computed ›, under the switch).
+function openMatchupsInfo() {
+  const body = infoSheet('muInfoOverlay', t('Matchups'));
+  const p = s => `<p class="modal-hint">${s}</p>`;
+  body.innerHTML =
+    p(t('Each villain against every other villain, in the games one of the two won (a game won by a third villain counts for neither).')) +
+    p(t('<b>Winning</b>: it clearly beats them, the pair\'s Δ Wins above +{d}, rare by chance alone (about 1 in 20). <b>Losing</b>: they clearly beat it, below −{d}. <b>Even</b>: in between, no clear winner yet. <b>Too few</b>: fewer than {n} games together.', { d: MATCHUP_CLEAR, n: MIN_GAMES_TOGETHER })) +
+    p(t('<b>Ranking</b>: winning minus losing matchups. Ties are broken by the number of even matchups, then by their quality: the even ones leaning to winning (Δ above +{lean}) minus those leaning to losing (below −{lean}), then by games.', { lean: MATCHUP_LEAN })) +
+    p(t('Ranked only with at least {n} matchups that aren\'t too few: a newer villain waits under the divider until it has the games.', { n: MIN_MATCHUPS }));
+  openOverlay('muInfoOverlay');
+}
+
 // A villain's matchups (its row's numbers, tapped): its opponents in the four
 // groups, the clearest first, each with its record (its wins - theirs).
 let _lbMu = {};
@@ -464,7 +476,7 @@ function render(data) {
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo, matchups: isChar && !solo })}
     ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
-    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other, in the games one of the two won: winning when it clearly beats them (their Δ Wins above +2), losing when clearly beaten (below −2), even in between, too few under 5 games together. Ranked by winning minus losing, then by more even; tap the numbers for the opponents.')}</p>
+    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
       ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}
       <p class="results-hint">${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} (${t('Too few')})</p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain and for the achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
