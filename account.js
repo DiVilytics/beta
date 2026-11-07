@@ -123,6 +123,7 @@ function _renderPage() {
         <button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()"${_acctOrganized ? '' : ` disabled title="${_esc(t("You haven't organized a tournament"))}"`}>${t('Download my tournaments')}</button>
         <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
+      <div id="myUploads"></div>
     </div>
 
     <div class="acct-section acct-danger">
@@ -132,6 +133,7 @@ function _renderPage() {
   `;
 
   _buildAvatarPicker();
+  renderMyUploads();   // games-csv.js
   avatarBuilder.configure({ getSavedAvatar: () => _acctAvatar, onPreview: _previewBuild });
   avatarBuilder.build('avatarPaneBuilder');
   _buildBoxPicker();

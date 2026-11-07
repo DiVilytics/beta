@@ -4,7 +4,9 @@
 // these columns in this order (GAMES_CSV_HEADER), values in English whatever
 // the page's language. An upload is checked whole before anything is written:
 // one wrong row and nothing goes in. Then a summary, and only on Upload are the
-// games added, recorded by you (created_by), as if saved in New Game.
+// games added, recorded by you (created_by), with source 'upload' and their
+// file (uploads, games.upload_id): Your uploads on the account page lists the
+// files, and deleting one takes its games with it.
 //   Game ID   groups a game's rows; any label for a new game (1, 2, 3...). One
 //             already in DiVilytics (its id, from a download) is skipped.
 //   Date      YYYY-MM-DD HH:MM, YYYY-MM-DD (the day without a time:
@@ -174,17 +176,19 @@ async function checkGamesCsv(text) {
   return { errors, games, skipped, seats, mine };
 }
 
-// Adds the checked games, 100 at a time. A failure takes back every game
-// added so far (their seats go with them), so a file goes in whole or not at all.
-async function uploadGames(games) {
+// Adds the checked games: the file's row first (uploads), then its games 100 at
+// a time. A failure deletes the file's row, which takes every game added so far
+// with it (and their seats), so a file goes in whole or not at all.
+async function uploadGames(games, fileName) {
   const user = getCurrentUser(), profile = getCurrentProfile();
-  const added = [];
+  const uploadId = crypto.randomUUID();
+  const { error: fileErr } = await db.from('uploads').insert({ id: uploadId, created_by: user.id, file_name: fileName.slice(0, 200) || 'games.csv', games: games.length });
+  if (fileErr) return { error: fileErr };
   try {
     for (let i = 0; i < games.length; i += 100) {
       const batch = games.slice(i, i + 100).map(x => ({ ...x, id: crypto.randomUUID() }));
-      const { error } = await db.from('games').insert(batch.map(x => ({ id: x.id, ...x.game, created_by: user.id, source: 'divilytics' })));
+      const { error } = await db.from('games').insert(batch.map(x => ({ id: x.id, ...x.game, created_by: user.id, source: 'upload', upload_id: uploadId })));
       if (error) throw error;
-      added.push(...batch.map(x => x.id));
       const { error: seatsErr } = await db.from('game_players').insert(batch.flatMap(x => x.seats.map(s => ({
         game_id: x.id, character: s.character, is_winner: s.is_winner, position: s.position,
         user_id: s.mine ? user.id : null, nickname: s.mine ? profile.nickname : null,
@@ -193,7 +197,7 @@ async function uploadGames(games) {
     }
     return { error: null };
   } catch (error) {
-    for (let i = 0; i < added.length; i += 100) await db.from('games').delete().in('id', added.slice(i, i + 100));
+    await db.from('uploads').delete().eq('id', uploadId);
     return { error };
   }
 }
@@ -277,7 +281,7 @@ async function pickGamesCsv(input) {
     res.games.length ? t('your villain in {n}', { n: res.mine }) : null,
     res.skipped.length ? tn(res.skipped.length, '{n} already in DiVilytics, skipped', '{n} already in DiVilytics, skipped') : null,
   ].filter(Boolean).join(' | ');
-  _gamesCsvChecked = res;
+  _gamesCsvChecked = { ...res, fileName: file.name };
   out.innerHTML = `<p class="modal-hint"><strong>${_esc(file.name)}</strong>: ${summary}.</p>
     ${res.games.length ? `<button class="btn btn-primary" id="uploadGamesBtn" type="button" onclick="confirmUploadGames()">${tn(res.games.length, 'Upload {n} game', 'Upload {n} games')}</button>` : ''}`;
 }
@@ -288,10 +292,50 @@ async function confirmUploadGames() {
   const btn = document.getElementById('uploadGamesBtn');
   btn.disabled = true;
   btn.textContent = t('Uploading…');
-  const { error } = await uploadGames(res.games);
+  const { error } = await uploadGames(res.games, res.fileName);
   const out = document.getElementById('uploadGamesResult');
   _gamesCsvChecked = null;
   out.innerHTML = error
     ? `<div class="err show">${t("Couldn't upload the games, nothing was added: {error}", { error: _esc(error.message || String(error)) })}</div>`
     : `<p class="modal-hint">${tn(res.games.length, '{n} game added.', '{n} games added.')} <a class="char-guide-link" href="players.html?nick=${encodeURIComponent(getCurrentProfile()?.nickname || '')}">${t('Open your page')} ›</a></p>`;
+  if (!error) renderMyUploads();
+}
+
+// ── YOUR UPLOADS (account page) ──────────────────────────────────────────────
+// Each file you uploaded, newest first: its name, games and day, and Delete,
+// which asks first (naming the players who have claimed a seat in its games
+// since, as Delete game does) and then deletes the file and its games.
+async function renderMyUploads() {
+  const el = document.getElementById('myUploads');
+  if (!el) return;
+  const { data, error } = await db.from('uploads').select('id, file_name, games, uploaded_at').order('uploaded_at', { ascending: false });
+  if (error || !data?.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="acct-uploads-title">${t('Your uploads')}</div>
+    ${data.map(u => `
+      <div class="acct-upload">
+        <span class="acct-upload-name">${_esc(u.file_name)}</span>
+        <span class="acct-upload-meta">${tn(u.games, '{n} game', '{n} games')} | ${fmtDateShort(u.uploaded_at)}</span>
+        <button class="btn btn-ghost btn-sm" type="button" data-id="${u.id}" data-name="${_esc(u.file_name)}" data-games="${u.games}" onclick="deleteUpload(this.dataset)">${t('Delete')}</button>
+      </div>`).join('')}`;
+}
+
+async function deleteUpload({ id, name, games }) {
+  const me = getCurrentUser();
+  // Who else has a seat in these games: the games leave their pages too.
+  const { data: seats } = await db.from('game_players').select('nickname, user_id, games!inner(upload_id)').eq('games.upload_id', id).not('user_id', 'is', null);
+  const others = [...new Set((seats || []).filter(s => s.user_id !== me?.id && s.nickname).map(s => s.nickname))];
+  openConfirmSheet({
+    id:           'deleteUploadOverlay',
+    title:        t('Delete {file}?', { file: name }),
+    bodyHTML:     `<p class="confirm-text">${tn(Number(games), 'Its game is deleted, from the Game Log and every page.', 'Its {n} games are deleted, from the Game Log and every page.')}
+                   ${others.length ? ` ${t('Also from the pages of {players}, who claimed a seat in them.', { players: `<strong class="text-emph">${others.map(_esc).join(', ')}</strong>` })}` : ''}</p>`,
+    confirmLabel: t('Delete'),
+    danger:       true,
+    onConfirm:    async () => {
+      const { error } = await db.from('uploads').delete().eq('id', id);
+      if (error) throw error;
+      renderMyUploads();
+    },
+  });
 }

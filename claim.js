@@ -150,7 +150,7 @@ function render() {
 
   root.innerHTML = `
     <div class="claim-game-info">
-      <div class="claim-date">${fmtGameDate(claimGame)}</div>
+      <div class="claim-date">${uploadMarkHTML(claimGame)}${fmtGameDate(claimGame)}</div>
       ${meta ? `<div class="claim-meta">${meta}</div>` : ''}
       ${claimGame.tournament ? `<div class="claim-meta"><a class="tn-game-link" href="tournaments.html?t=${claimGame.tournament.id}">🏟️ ${[_esc(claimGame.tournament.name), t('Stage {n}', { n: claimGame.tournament.stage }), t('Table {n}', { n: claimGame.tournament.tableNo })].join(' | ')}</a></div>` : ''}
     </div>

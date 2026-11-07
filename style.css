@@ -3176,6 +3176,11 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .csv-actions { margin-bottom: 12px; }
 .csv-actions label.btn { cursor: pointer; }
 .csv-errors { margin: 6px 0 0; padding-left: 18px; }
+/* Your uploads: a file a row, its name, games and day, and Delete. */
+.acct-uploads-title { margin: 14px 0 6px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.acct-upload { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
+.acct-upload-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-upload-meta { color: var(--muted); font-size: calc(12px * var(--ts)); white-space: nowrap; margin-left: auto; }
 
 /* ── SIGN-IN PAGE ─────────────────────────────────────────────────── */
 .signin-card {
