@@ -158,11 +158,13 @@ function fmtDateTime(iso) {
   );
 }
 
-// Sources that record the day a game was played but not the time: their
-// played_at is that day at 00:00 UTC, so the date is shown alone and read in
-// UTC (local time would move it to the day before west of UTC).
+// A game whose day is known but not its time (games.time_unknown: the beta's
+// No time and uploads, the date-only imports): its played_at is that day at
+// 00:00 UTC, so the date is shown alone and read in UTC (local time would move
+// it to the day before west of UTC). The source too, for a query that doesn't
+// fetch the column.
 const DATE_ONLY_SOURCES = new Set(['villainous-italia']);
-function isDateOnly(g) { return !!g && DATE_ONLY_SOURCES.has(g.source); }
+function isDateOnly(g) { return !!g && (g.time_unknown === true || DATE_ONLY_SOURCES.has(g.source)); }
 
 // A game's date as cards show it: date and time, the date alone for sources
 // without times, or "Date unknown".
