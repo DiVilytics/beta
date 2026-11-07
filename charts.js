@@ -128,7 +128,7 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
       // The caption links both: the row's page, " vs ", the column's.
       const links = ` data-name="${_esc(r.name)}" data-href="${_esc(r.href)}" data-box="${_esc(c.name)}" data-boxhref="${_esc(c.href)}" data-join=" vs "`;
       const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-      if (n < MIN_GAMES_TOGETHER || !(w + l)) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
+      if (w + l < MIN_PAIR_GAMES) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
       const v = cell({ pct: w / (w + l), w, l });
       return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}"${links} data-meta="${_esc(`${v.meta} | ${meta}`)}" title="${_esc(name)}">${v.label}</td>`;
     }).join('');
@@ -167,7 +167,7 @@ const CHARTS = [
   {
     id: 'versus', icon: '🆚', label: 'Matchups',
     groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
-    desc: "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.",
+    desc: "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
     render({ games, chars, boxInfo, group }) {
       return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct }) => ({ heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` }) });
     },

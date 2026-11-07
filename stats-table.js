@@ -21,9 +21,10 @@ function statBoxesHTML(boxes) {
 // isn't misleading the same way). Intentionally not user-configurable. 10:
 // players have few games (6 is the median), and 5 let 5 wins in 7 rank third.
 const MIN_GAMES_FOR_PCT = 10;
-// Two villains (or boxes) that met fewer times than this: their Matchups cell
-// (charts.js) is gray, too few to read.
-const MIN_GAMES_TOGETHER = 5;
+// Two villains (or boxes) with fewer games than this won by one of the two (the
+// games their record counts; one won by a third side doesn't): their Matchups
+// cell (charts.js) is gray, too few to read.
+const MIN_PAIR_GAMES = 5;
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
