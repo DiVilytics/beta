@@ -21,10 +21,11 @@ function statBoxesHTML(boxes) {
 // isn't misleading the same way). Intentionally not user-configurable. 10:
 // players have few games (6 is the median), and 5 let 5 wins in 7 rank third.
 const MIN_GAMES_FOR_PCT = 10;
-// Two villains (or boxes) that met fewer times than this: their Matchups cell
-// (charts.js) is gray, too few to read, and on the Leaderboard their matchup
-// is too few (matchupClass).
-const MIN_GAMES_TOGETHER = 5;
+// Two villains (or boxes) with fewer games than this won by one of the two (the
+// games their record counts; one won by a third side doesn't): their Matchups
+// cell (charts.js) is gray, too few to read, and on the Leaderboard their
+// matchup is too few (matchupClass).
+const MIN_PAIR_GAMES = 5;
 
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
@@ -77,12 +78,11 @@ function pairRecord({ together, wins }, a, b) {
 }
 // Δ Wins between the two: even odds over the games one of them won.
 const pairDelta = (w, l) => chanceDelta({ wins: w, exp: (w + l) / 2, vari: (w + l) / 4 });
-// A matchup: 'few' under MIN_GAMES_TOGETHER games together (or none either of
-// the two won), else 'win' or 'lose' past ±MATCHUP_CLEAR of Δ Wins (clearly
+// A matchup: 'few' under MIN_PAIR_GAMES games one of the two won, else 'win' or 'lose' past ±MATCHUP_CLEAR of Δ Wins (clearly
 // more than luck, about 1 in 20 by chance alone), 'even' between.
 const MATCHUP_CLEAR = 2;
 function matchupClass({ n, w, l }) {
-  if (n < MIN_GAMES_TOGETHER || !(w + l)) return 'few';
+  if (w + l < MIN_PAIR_GAMES) return 'few';
   const d = pairDelta(w, l);
   return d > MATCHUP_CLEAR ? 'win' : d < -MATCHUP_CLEAR ? 'lose' : 'even';
 }

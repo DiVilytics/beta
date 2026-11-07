@@ -280,7 +280,7 @@ function openMatchupsInfo() {
   const p = s => `<p class="modal-hint">${s}</p>`;
   body.innerHTML =
     p(t('Each villain against every other villain, in the games one of the two won (a game won by a third villain counts for neither).')) +
-    p(t('<b>Winning</b>: it clearly beats them, the pair\'s Δ Wins above +{d}, rare by chance alone (about 1 in 20). <b>Losing</b>: they clearly beat it, below −{d}. <b>Even</b>: in between, no clear winner yet. <b>Too few</b>: fewer than {n} games together.', { d: MATCHUP_CLEAR, n: MIN_GAMES_TOGETHER })) +
+    p(t('<b>Winning</b>: it clearly beats them, the pair\'s Δ Wins above +{d}, rare by chance alone (about 1 in 20). <b>Losing</b>: they clearly beat it, below −{d}. <b>Even</b>: in between, no clear winner yet. <b>Too few</b>: fewer than {n} games won by one of the two.', { d: MATCHUP_CLEAR, n: MIN_PAIR_GAMES })) +
     p(t('<b>Ranking</b>: winning minus losing matchups. Ties are broken by the number of even matchups, then by their quality: the even ones leaning to winning (Δ above +{lean}) minus those leaning to losing (below −{lean}), then by games.', { lean: MATCHUP_LEAN })) +
     p(t('Ranked only with at least {n} matchups that aren\'t too few: a newer villain waits under the divider until it has the games.', { n: MIN_MATCHUPS }));
   openOverlay('muInfoOverlay');

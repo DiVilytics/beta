@@ -151,8 +151,8 @@ const CHARTS = [
     groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
     modes: _CHANCE_PCT,
     desc: {
-      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games together.",
-      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games together. Scroll the grid.",
+      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
+      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
     },
     render({ games, chars, boxInfo, group, mode }) {
       const chance = mode === 'chance';
