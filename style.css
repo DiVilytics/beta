@@ -1243,6 +1243,10 @@ main {
   margin-bottom: 6px;
 }
 
+.field label .label-link {
+  float: right; padding: 0; border: none; background: none; cursor: pointer;
+  font: inherit; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--accent);
+}
 .optional {
   font-weight: 400;
   text-transform: none;
@@ -1302,7 +1306,9 @@ select {
 select option { background: #1a1a1a; }
 select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; font-size: calc(11px * var(--ts)); }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Side by side fields line up by their boxes: a label on two lines (a narrow
+   phone, New Game's Date & Time with No date) grows upward. */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
 
 .section-label {
   font-size: calc(11px * var(--ts));

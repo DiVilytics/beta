@@ -77,8 +77,9 @@ async function init() {
   renderOrderSlots();
   _initLegend();   // before the network awaits too: until it runs, the legend wraps 3 + 1
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
-    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
+    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); _syncDateToggle(); });
   }
+  _syncDateToggle();
   _checkResume();   // a game in progress shows right away, not after an empty form
   const lines = () => _initButtonLines(['#lineupBtns', '#footerDefault']);   // ui.js
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', lines, { once: true });
@@ -145,6 +146,7 @@ function _saveDraft() {
       solo:      soloMode,
       soloLevel,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
+      noDate:    !val('fDate'),
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
       fTurns:    val('fTurns'),
@@ -180,7 +182,8 @@ function _restoreDraftForm() {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
     soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
-    if (d.fDate) document.getElementById('fDate').value = d.fDate;
+    if (d.noDate)     document.getElementById('fDate').value = '';
+    else if (d.fDate) document.getElementById('fDate').value = d.fDate;
     document.getElementById('fLocation').value = d.fLocation || '';
     document.getElementById('fDur').value      = d.fDur      || '';
     document.getElementById('fTurns').value    = d.fTurns    || '';
@@ -193,6 +196,24 @@ function _setDateToNow() {
   now.setSeconds(0, 0);
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   document.getElementById('fDate').value = now.toISOString().slice(0, 16);
+  _syncDateToggle();
+}
+
+// The date is optional (a game remembered later, its day forgotten): it starts
+// at the current time, No date empties it, Today puts the current time back. A game without one is saved
+// with no date (played_at null), as the imported logs; a game started live
+// takes the start's.
+function toggleNoDate() {
+  const el = document.getElementById('fDate');
+  if (el.value) el.value = '';
+  else _setDateToNow();
+  _syncDateToggle();
+  _updateDiscardBtn();
+  _saveDraft();
+}
+function _syncDateToggle() {
+  const btn = document.getElementById('fDateToggle');
+  if (btn) btn.textContent = document.getElementById('fDate')?.value ? t('No date') : t('Today');
 }
 
 // ── EXCLUDE CONTROLS ─────────────────────────────────────────────────────────
@@ -919,7 +940,7 @@ function _validateLineup() {
   if (orderSlots.some(s => !s.char)) return t('Choose a villain for each player.');
   const names = orderSlots.map(s => s.char);
   if (new Set(names).size !== names.length) return t('Each player must use a different villain.');
-  if (!orderSlots.some(s => s.isMe)) return t('Mark your villain with 👤.');
+  // 👤 is optional: a game you recorded for others is still yours (your page lists it).
   return null;
 }
 
@@ -1158,8 +1179,7 @@ async function submitForm() {
   const place    = document.getElementById('fLocation').value.trim() || null;   // not `location`: that would hide window.location
   const btn      = document.getElementById('submitBtn');
 
-  if (!date) return showErr(t('Date and time is required.'));
-  if (new Date(date) > new Date()) return showErr(t('Date cannot be in the future.'));
+  if (date && new Date(date) > new Date()) return showErr(t('Date cannot be in the future.'));
 
   const user    = getCurrentUser();
   const profile = getCurrentProfile();
@@ -1186,7 +1206,7 @@ async function submitForm() {
   btn.disabled    = true;
 
   const gameData = {
-    played_at:        new Date(date).toISOString(),
+    played_at:        date ? new Date(date).toISOString() : null,   // no date: undated, as the imports
     duration_minutes: dur,
     num_turns:        turns,
     location:         place,

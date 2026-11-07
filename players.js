@@ -432,6 +432,28 @@ function render() {
   const friends  = solo ? '' : _friendsSectionHTML();
   const tours    = solo ? '' : _tournamentsSectionHTML();
 
+  // The Games list, under everything else.
+  const gamesSection = `
+    <div class="pf-games-header">
+      <span class="pf-games-title">${t('Games')}</span>
+      ${pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : ''}
+      <button class="pill${pfWinsOnly ? ' on' : ''}" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
+    </div>
+    <div class="games-list" id="pfGamesList"></div>`;
+
+  // Your own page, only games you recorded without claiming a villain (👤 is
+  // optional in New Game): no stats to show, but the games are yours to manage.
+  if (!nGames && !solo && games.length) {
+    root.innerHTML = `
+      <p class="results-hint">${t("You haven't claimed a villain in these games: they're here because you recorded them.")}</p>
+      ${friends}
+      ${achHTML}
+      ${tours}
+      ${gamesSection}`;
+    _renderGamesList(keepIds);
+    return;
+  }
+
   // No games: the sentence takes the place of the stats, the filters stay. A
   // player who never played has no achievements to show either.
   if (!nGames) {
@@ -489,12 +511,7 @@ function render() {
 
     ${tours}
 
-    <div class="pf-games-header">
-      <span class="pf-games-title">${t('Games')}</span>
-      ${pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : ''}
-      <button class="pill${pfWinsOnly ? ' on' : ''}" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
-    </div>
-    <div class="games-list" id="pfGamesList"></div>
+    ${gamesSection}
   `;
 
   _renderGamesList(keepIds);
