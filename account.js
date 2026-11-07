@@ -119,6 +119,7 @@ function _renderPage() {
       <div id="identitiesList" class="acct-identities">${_renderIdentitiesHTML()}</div>
       <div class="acct-actions">
         <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
+        <button class="btn btn-ghost" onclick="openUploadGames()">${t('Upload games')}</button>
         <button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()"${_acctOrganized ? '' : ` disabled title="${_esc(t("You haven't organized a tournament"))}"`}>${t('Download my tournaments')}</button>
         <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
@@ -209,10 +210,6 @@ async function _toggleBox(box) {
 
 // CSV field escaping (RFC 4180): quote and double up internal quotes only
 // when the value contains a comma, quote or newline.
-function _csvField(v) {
-  const s = String(v ?? '');
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 // Sortable "YYYY-MM-DD HH:MM" in local time, deliberately not the locale-
 // formatted `fmtDateTime` (ui.js): a spreadsheet sorts/parses this correctly
@@ -225,7 +222,7 @@ function _csvDateTime(iso) {
 }
 
 function _downloadCsv(rows, filename) {
-  const csv  = rows.map(r => r.map(_csvField).join(',')).join('\r\n');
+  const csv  = rows.map(r => r.map(csvField).join(',')).join('\r\n');
   const url  = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   const a    = document.createElement('a');
   a.href     = url;
@@ -254,8 +251,7 @@ async function exportMyData() {
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Difficulty'];
-    const rows = [header];
+    const rows = [GAMES_CSV_HEADER];   // the file Upload games reads back (games-csv.js)
     for (const g of games) {
       const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
       for (const p of sortGamePlayers(playersByGame[g.id] || [])) {
@@ -270,7 +266,7 @@ async function exportMyData() {
           p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
           g.variant === 'solo' ? 'yes' : 'no',
-          { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[g.solo_level] || '',   // a solo game's level (solo.js)
+          GAMES_CSV_LEVELS[g.solo_level] || '',   // a solo game's level (solo.js)
         ]);
       }
     }
