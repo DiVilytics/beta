@@ -164,6 +164,19 @@ function statModeSegHTML(mode, fn, { xp = false, chance = false, matchups = fals
   return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
 }
 
+// The line under the switch for % Wins, # Wins and # Games (Δ Wins, Matchups and
+// XP have their own): every mode has one, so switching moves the table less.
+// minGames: the % Wins minimum, when the table has one; picks: the rows are
+// every villain (the villains' Leaderboard), so their games are how often each
+// is picked.
+function statModeHintHTML(mode, { minGames = 0, picks = false } = {}) {
+  const text = mode === 'pct'   ? [t('The share of games won.'), minGames > 1 ? t('Ranked only with at least {n} games.', { n: minGames }) : ''].filter(Boolean).join(' ')
+             : mode === 'count' ? t('Games won: the most played rank high too.')
+             : mode === 'games' ? (picks ? t('How often each villain is picked.') : t('Games played.'))
+             : '';
+  return text ? `<p class="results-hint">${text}</p>` : '';
+}
+
 function sortStatRows(rows, mode) {
   const sorted = [...rows];
   if (mode === 'matchups') return sorted.sort((a, b) => {

@@ -474,7 +474,7 @@ function render(data) {
   document.getElementById('lb').innerHTML = `
     ${soloHint}
     ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo, matchups: isChar && !solo })}
-    ${mode === 'pct' && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
+    ${statModeHintHTML(mode, { minGames, picks: isChar })}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
     ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
       ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}

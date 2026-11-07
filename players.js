@@ -499,6 +499,7 @@ function render() {
     </div>
 
     ${statModeSegHTML(pfMode, 'pfSetMode')}
+    ${statModeHintHTML(pfMode)}
 
     ${renderStatTableHTML(charRows, {
       mode:        pfMode,
