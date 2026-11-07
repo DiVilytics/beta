@@ -36,9 +36,13 @@ const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[err
 // still be fixed).
 const claimIsSolo = () => claimGame?.variant === 'solo';
 
+// Edit villains and winner: shown to whoever recorded a standard game (not a
+// solo or tournament one), enabled until another player claims a villain.
+function lineupShown(user) {
+  return !!user && !!claimGame && !claimIsSolo() && !claimGame.tournament && claimGame.created_by === user.id;
+}
 function lineupEditable(user) {
-  return !!user && !!claimGame && !claimIsSolo() && !claimGame.tournament && claimGame.created_by === user.id
-    && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
+  return lineupShown(user) && claimPlayers.every(p => !p.user_id || p.user_id === user.id);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -156,7 +160,7 @@ function render() {
     </div>
     <div class="claim-share-row">
       ${role.isParticipant && !claimGame.tournament ? `<button class="btn btn-ghost btn-sm" onclick="editGameDetails()">${t('Edit details')}</button>` : ''}
-      ${lineupEditable(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()">${t('Edit villains and winner')}</button>` : ''}
+      ${lineupShown(user) ? `<button class="btn btn-ghost btn-sm" onclick="editLineup()"${lineupEditable(user) ? '' : ` disabled title="${_esc(t('Another player has claimed a villain: the lineup is set.'))}"`}>${t('Edit villains and winner')}</button>` : ''}
       ${solo ? '' : `<button class="btn btn-ghost btn-sm" onclick="shareGame()">${t('Share QR')}</button>`}
     </div>
     <div class="section-label">${solo ? t('Player') : t('Players')}</div>

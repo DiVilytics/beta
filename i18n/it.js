@@ -28,6 +28,7 @@ window.I18N.it = {
     "Its {n} games are deleted, from the Game Log and every page.": "Le sue {n} partite vengono eliminate, dal Registro e da ogni pagina.",
     "Also from the pages of {players}, who claimed a seat in them.": "Anche dalle pagine di {players}, che vi hanno rivendicato un posto.",
     "Uploaded from a file": "Caricata da un file",
+    "Another player has claimed a villain: the lineup is set.": "Un altro giocatore ha rivendicato un cattivo: la formazione è fissata.",
     "Add games from a CSV file in the format of <em>Download my data</em>: one row per player per game, these columns in this order. The file is checked first: if a row is wrong, nothing is uploaded.": "Aggiungi partite da un file CSV nel formato di <em>Scarica i miei dati</em>: una riga per ogni giocatore di ogni partita, queste colonne in quest'ordine. Il file viene prima controllato: se una riga è sbagliata, non viene caricato niente.",
     "Groups the rows of one game: any label for a new game (1, 2, 3...). A game already in DiVilytics (its ID from a download) is skipped.": "Raggruppa le righe di una partita: per una partita nuova va bene qualsiasi etichetta (1, 2, 3...). Una partita già presente in DiVilytics (il suo ID da un download) viene saltata.",
     "YYYY-MM-DD HH:MM, YYYY-MM-DD for the day without a time, or empty for no date. Not in the future.": "YYYY-MM-DD HH:MM, YYYY-MM-DD per il giorno senza ora, oppure vuota per nessuna data. Non nel futuro.",

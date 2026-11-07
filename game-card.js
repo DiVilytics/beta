@@ -65,7 +65,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
   return `
     <div class="card-body">
       <div class="card-top${rows ? ' card-top-wrap' : ''}">
-        <div class="card-date">${g.tournament ? _tournamentMarkHTML(g.tournament) : ''}${uploadMarkHTML(g)}${fmtGameDate(g)}</div>
+        <div class="card-date">${g.tournament ? _tournamentMarkHTML(g.tournament) : ''}${fmtGameDate(g)}</div>
         <div class="card-meta">${metaHTML}</div>
       </div>
       <div class="card-players${rows ? ' rows' : ''}">${chipsHTML}</div>
@@ -79,8 +79,8 @@ function _tournamentMarkHTML(tour) {
   return `<a class="tn-mark" href="tournaments.html?t=${tour.id}" title="${_esc(title)}">🏟️</a>`;
 }
 
-// 📥 before an uploaded game's date (Upload games, games-csv.js): it came from
-// a file, not from a table.
+// 📥 before an uploaded game's date on its page (claim.js; not in the lists of
+// games): it came from a file (Upload games, games-csv.js), not from a table.
 function uploadMarkHTML(g) {
   return g?.upload_id ? `<span class="tn-mark" title="${_esc(t('Uploaded from a file'))}">📥</span>` : '';
 }
