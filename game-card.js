@@ -79,12 +79,6 @@ function _tournamentMarkHTML(tour) {
   return `<a class="tn-mark" href="tournaments.html?t=${tour.id}" title="${_esc(title)}">🏟️</a>`;
 }
 
-// 📥 before an uploaded game's date on its page (claim.js; not in the lists of
-// games): it came from a file (Upload games, games-csv.js), not from a table.
-function uploadMarkHTML(g) {
-  return g?.upload_id ? `<span class="tn-mark" title="${_esc(t('Uploaded from a file'))}">📥</span>` : '';
-}
-
 // ── TOURNAMENT CARD ───────────────────────────────────────────────────────────
 // A tournament in a list (tournaments.html, a player page): its name and
 // status, then who organized it (or "Organizer" on the organizer's own page),
