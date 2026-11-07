@@ -31,6 +31,11 @@ let _roundsCounted  = false;
 // test by which stopLive fills in the duration and rounds). Its lineup changes
 // only after a yes (_confirmLineup). Kept with the game in progress.
 let _underway       = false;
+// The play order isn't known (No order, next to Villains and Players): the
+// rows go unnumbered (–), Random order is off, and the game is saved without
+// one (position null), as the imported logs. Kept with the draft and the game
+// in progress. Not in Solo (one seat).
+let orderUnknown    = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
@@ -145,6 +150,7 @@ function _saveDraft() {
       slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
       solo:      soloMode,
       soloLevel,
+      noOrder:   orderUnknown,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
       noDate:    !val('fDate'),
       fLocation: val('fLocation'),
@@ -181,6 +187,7 @@ function _restoreDraftForm() {
   if (d.slots && (d.slots.length >= 2 || (d.solo && d.slots.length === 1))) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
+    orderUnknown = !!d.noOrder;
     soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
     if (d.noDate)     document.getElementById('fDate').value = '';
     else if (d.fDate) document.getElementById('fDate').value = d.fDate;
@@ -189,6 +196,14 @@ function _restoreDraftForm() {
     document.getElementById('fTurns').value    = d.fTurns    || '';
   }
   return d;
+}
+
+// No order | In order (orderUnknown): the rows lose or get back their numbers.
+function toggleOrderUnknown() {
+  orderUnknown = !orderUnknown;
+  renderOrderSlots();
+  _saveLiveState();
+  _saveDraft();
 }
 
 function _setDateToNow() {
@@ -371,6 +386,7 @@ function _syncSoloUI() {
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
+  setVisible('orderToggle', !soloMode);
   setVisible('drawAllBtn', !soloMode);
   setVisible('lineupBtns', !soloMode);   // its half of the row goes to the level picker
   setVisible('liveHint', !soloMode);
@@ -655,7 +671,7 @@ function renderOrderSlots() {
     return `
       <div class="order-slot" data-id="${s.id}">
         <div class="drag-handle">
-          <span class="drag-dots">⠿</span><span class="row-num">${i + 1}.</span>
+          <span class="drag-dots">⠿</span><span class="row-num">${orderUnknown ? '–' : `${i + 1}.`}</span>
           <img class="order-slot-portrait" src="${src}" onerror="this.src='asset/players/default.svg'" alt="">
         </div>
         <div class="order-slot-info">
@@ -716,9 +732,11 @@ function _updateActionBtns() {
     btn.title    = can ? t('Draw') : t('No villains left in the draw pool');
   }
   if (shuffleBtn) {
-    shuffleBtn.disabled = animating || filled < 2;
-    shuffleBtn.title    = filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
+    shuffleBtn.disabled = animating || filled < 2 || orderUnknown;
+    shuffleBtn.title    = orderUnknown ? t('The play order is unknown') : filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
   }
+  const orderBtn = document.getElementById('orderToggle');
+  if (orderBtn) orderBtn.textContent = orderUnknown ? t('In order') : t('No order');
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
@@ -1009,6 +1027,7 @@ function _saveLiveState() {
     soloLevel,
     soloRolls: _soloRolls,
     roundsCounted: _roundsCounted,
+    noOrder:   orderUnknown,
     underway:  _underway,
     fDate:     document.getElementById('fDate')?.value     || '',
     fLocation: document.getElementById('fLocation')?.value || '',
@@ -1041,6 +1060,7 @@ function _isFormChanged() {
       || orderSlots.some(s => s.char || s.isMe || s.isWinner)
       || val('fDate') !== _freshDate
       || !!(val('fLocation') || val('fDur') || val('fTurns'))
+      || orderUnknown
       || !pace.isDefault();
 }
 
@@ -1089,6 +1109,7 @@ function _doDiscard() {
   soloLevel  = SOLO_DEFAULT_LEVEL;
   _soloRolls = {};
   _roundsCounted = false;
+  orderUnknown   = false;
   setVisible('liveEndNote', false);
   addOrderSlot();
   addOrderSlot();
@@ -1147,6 +1168,7 @@ function _checkResume() {
   _soloRolls = state.soloRolls || {};
   // Games saved before the flag: the counter was used if it moved past 1.
   _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
+  orderUnknown   = !!state.noOrder;
   // Games saved before the flag: paused with a minute or more, or past round 1.
   _underway = state.underway ?? (state.fDurExactMs >= 60000 || state.liveTurns > 1);
   renderOrderSlots();
@@ -1196,7 +1218,7 @@ async function submitForm() {
   const ps = soloMode
     ? [{ position: 0, character: orderSlots[0].char, is_winner: orderSlots[0].isWinner, user_id: user.id, nickname: profile.nickname }]
     : orderSlots.map((s, i) => ({
-        position:  i,
+        position:  orderUnknown ? null : i,
         character: s.char,
         is_winner: s.isWinner,
         user_id:   s.isMe ? user.id          : null,

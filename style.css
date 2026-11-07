@@ -1243,7 +1243,7 @@ main {
   margin-bottom: 6px;
 }
 
-.field label .label-link {
+.field label .label-link, .section-label .label-link {
   float: right; padding: 0; border: none; background: none; cursor: pointer;
   font: inherit; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--accent);
 }
