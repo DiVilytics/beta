@@ -188,6 +188,7 @@ window.I18N.it = {
     "Draw": "Pesca",
     "Remove": "Rimuovi",
     "A game needs at least 2 players": "Una partita richiede almeno 2 giocatori",
+    "A game has at most 6 players": "Una partita ha al massimo 6 giocatori",
     "The game has started: its players, villains and order usually stay the same.": "La partita è iniziata: di solito giocatori, cattivi e ordine restano gli stessi.",
     "Add a player?": "Aggiungere un giocatore?",
     "Add": "Aggiungi",

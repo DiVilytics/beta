@@ -1217,8 +1217,10 @@ main {
 }
 .sheet-footer-row .btn { flex: 1; }
 
+/* A disabled button keeps the pointer (no clicks reach it anyway), so its
+   title, the reason it's off, shows on hover; the hover looks skip it. */
 .btn:disabled,
-.pf-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.pf-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .confirm-text {
   font-size: calc(13px * var(--ts));
@@ -1433,7 +1435,7 @@ select:disabled {
   margin-top: 0;
   transition: all 0.15s;
 }
-.add-row-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+.add-row-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .err {
   background: var(--red-d);
@@ -3129,23 +3131,23 @@ select:disabled {
   .lb-row:hover                             { background: var(--s2); }
   .pf-identity:hover                        { opacity: 1; }
   .live-btn:hover:not(:disabled)            { background: var(--s3); border-color: var(--s4); }
-  .btn-primary:hover                        { opacity: 0.88; }
-  .btn-ghost:hover                          { color: var(--text); background: var(--s3); }
-  .btn-danger:hover                         { background: var(--red-d); border-color: rgba(224, 84, 84, 0.45); }
-  .btn-save:hover                           { opacity: 0.88; }
-  .btn-load-more:hover                      { background: var(--s2); color: var(--text); }
+  .btn-primary:hover:not(:disabled)                        { opacity: 0.88; }
+  .btn-ghost:hover:not(:disabled)                          { color: var(--text); background: var(--s3); }
+  .btn-danger:hover:not(:disabled)                         { background: var(--red-d); border-color: rgba(224, 84, 84, 0.45); }
+  .btn-save:hover:not(:disabled)                           { opacity: 0.88; }
+  .btn-load-more:hover:not(:disabled)                      { background: var(--s2); color: var(--text); }
   .signin-btn:hover                         { background: var(--s2); border-color: var(--s4); }
   .pill:hover                               { color: var(--text); border-color: var(--s4); }
   .filter-char-toggle:hover                 { background: var(--s2); color: var(--text); }
   .exclude-toggle:hover                     { background: var(--s2); color: var(--text); }
   .txt-btn:hover                            { color: var(--text); }
   .sheet-close:hover                        { color: var(--text); background: var(--s3); }
-  .pf-btn.rand:hover                        { background: var(--s4); border-color: var(--dim); color: var(--text); }
-  .btn.btn-lineup:hover                     { background: var(--s4); border-color: var(--dim); }
-  .pf-btn.me:hover                          { background: var(--accent-d); border-color: rgba(124, 106, 247, 0.35); color: var(--accent); }
-  .pf-btn.win:hover                         { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.35); color: var(--gold); }
-  .pf-btn.del:hover                         { color: var(--red); border-color: rgba(224, 84, 84, 0.35); background: var(--red-d); }
-  .add-row-btn:hover                        { color: var(--text); border-color: var(--accent); }
+  .pf-btn.rand:hover:not(:disabled)                        { background: var(--s4); border-color: var(--dim); color: var(--text); }
+  .btn.btn-lineup:hover:not(:disabled)                     { background: var(--s4); border-color: var(--dim); }
+  .pf-btn.me:hover:not(:disabled)                          { background: var(--accent-d); border-color: rgba(124, 106, 247, 0.35); color: var(--accent); }
+  .pf-btn.win:hover:not(:disabled)                         { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.35); color: var(--gold); }
+  .pf-btn.del:hover:not(:disabled)                         { color: var(--red); border-color: rgba(224, 84, 84, 0.35); background: var(--red-d); }
+  .add-row-btn:hover:not(:disabled)                        { color: var(--text); border-color: var(--accent); }
   .seg-btn:hover:not(.on)                   { color: var(--text); }
   .avatar-option:hover                      { opacity: 1; }
   .char-pill:hover                          { border-color: var(--accent); }
