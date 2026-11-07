@@ -158,11 +158,60 @@ function fmtDateTime(iso) {
   );
 }
 
-// Sources that record the day a game was played but not the time: their
-// played_at is that day at 00:00 UTC, so the date is shown alone and read in
-// UTC (local time would move it to the day before west of UTC).
+// A game whose day is known but not its time (games.time_unknown: New Game's
+// No time, an upload's YYYY-MM-DD, the date-only imports): its played_at is
+// that day at 00:00 UTC, so the date is shown alone and read in UTC (local
+// time would move it to the day before west of UTC). The source too, for a
+// query that doesn't fetch the column.
 const DATE_ONLY_SOURCES = new Set(['villainous-italia']);
-function isDateOnly(g) { return !!g && DATE_ONLY_SOURCES.has(g.source); }
+function isDateOnly(g) { return !!g && (g.time_unknown === true || DATE_ONLY_SOURCES.has(g.source)); }
+
+// ── A GAME'S DATE FIELD ──────────────────────────────────────────────────────
+// New Game's and Edit details' Date & Time: one field, and a link beside its
+// label that steps through three: the date and time (the current ones to start)
+// → No time (the day alone: the same field as a date) → No date (empty) →
+// Today (the current date and time again). dateFieldValue reads it for saving.
+function _localDateTimeValue(d = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+// 'full' (date and time), 'day' (the day alone) or 'none'.
+function dateFieldMode(el) { return !el.value ? 'none' : el.type === 'date' ? 'day' : 'full'; }
+// The field set to a mode; value: its 'YYYY-MM-DDTHH:MM' (full) or 'YYYY-MM-DD' (day).
+function setDateField(el, mode, value = '') {
+  el.type  = mode === 'day' ? 'date' : 'datetime-local';
+  el.value = mode === 'none' ? '' : value;
+}
+function setDateFieldNow(el) { setDateField(el, 'full', _localDateTimeValue()); }
+// The link's next step, then its label (the step after that).
+function cycleDateField(el) {
+  const mode = dateFieldMode(el);
+  if (mode === 'full')     setDateField(el, 'day', el.value.slice(0, 10));
+  else if (mode === 'day') setDateField(el, 'none');
+  else                     setDateFieldNow(el);
+}
+function dateFieldLinkLabel(el) {
+  return { full: t('No time'), day: t('No date'), none: t('Today') }[dateFieldMode(el)];
+}
+// A saved game's date into the field.
+function fillDateField(el, g) {
+  if (!g?.played_at) setDateField(el, 'none');
+  else if (isDateOnly(g)) setDateField(el, 'day', g.played_at.slice(0, 10));
+  else setDateField(el, 'full', _localDateTimeValue(new Date(g.played_at)));
+}
+// What to save: { played_at, time_unknown }, or { error } for a date in the
+// future. A day alone is that day at 00:00 UTC.
+function dateFieldValue(el) {
+  const mode = dateFieldMode(el);
+  if (mode === 'none') return { played_at: null, time_unknown: false };
+  if (mode === 'day') {
+    if (el.value > _localDateTimeValue().slice(0, 10)) return { error: t('Date cannot be in the future.') };
+    return { played_at: `${el.value}T00:00:00.000Z`, time_unknown: true };
+  }
+  const d = new Date(el.value);
+  if (d > new Date()) return { error: t('Date cannot be in the future.') };
+  return { played_at: d.toISOString(), time_unknown: false };
+}
 
 // A game's date as cards show it: date and time, the date alone for sources
 // without times, or "Date unknown".

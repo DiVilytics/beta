@@ -152,7 +152,7 @@ function _saveDraft() {
       soloLevel,
       noOrder:   orderUnknown,
       fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
-      noDate:    !val('fDate'),
+      fDateMode: dateFieldMode(document.getElementById('fDate')),
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
       fTurns:    val('fTurns'),
@@ -189,8 +189,10 @@ function _restoreDraftForm() {
     soloMode   = !!d.solo;
     orderUnknown = !!d.noOrder;
     soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
-    if (d.noDate)     document.getElementById('fDate').value = '';
-    else if (d.fDate) document.getElementById('fDate').value = d.fDate;
+    // The date as it was left, when it was changed: another date and time,
+    // the day alone, or none (drafts saved before the modes: noDate).
+    const mode = d.fDateMode || (d.noDate ? 'none' : 'full');
+    if (mode === 'none' || d.fDate) setDateField(document.getElementById('fDate'), mode, d.fDate);
     document.getElementById('fLocation').value = d.fLocation || '';
     document.getElementById('fDur').value      = d.fDur      || '';
     document.getElementById('fTurns').value    = d.fTurns    || '';
@@ -207,28 +209,23 @@ function toggleOrderUnknown() {
 }
 
 function _setDateToNow() {
-  const now = new Date();
-  now.setSeconds(0, 0);
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  document.getElementById('fDate').value = now.toISOString().slice(0, 16);
+  setDateFieldNow(document.getElementById('fDate'));   // ui.js
   _syncDateToggle();
 }
 
-// The date is optional (a game remembered later, its day forgotten): it starts
-// at the current time, No date empties it, Today puts the current time back. A game without one is saved
-// with no date (played_at null), as the imported logs; a game started live
+// The date is optional (a game remembered later): it starts at the current
+// date and time, and the link beside its label steps through No time (the day
+// alone), No date and Today (A GAME'S DATE FIELD, ui.js). A game started live
 // takes the start's.
 function toggleNoDate() {
-  const el = document.getElementById('fDate');
-  if (el.value) el.value = '';
-  else _setDateToNow();
+  cycleDateField(document.getElementById('fDate'));
   _syncDateToggle();
   _updateDiscardBtn();
   _saveDraft();
 }
 function _syncDateToggle() {
   const btn = document.getElementById('fDateToggle');
-  if (btn) btn.textContent = document.getElementById('fDate')?.value ? t('No date') : t('Today');
+  if (btn) btn.textContent = dateFieldLinkLabel(document.getElementById('fDate'));
 }
 
 // ── EXCLUDE CONTROLS ─────────────────────────────────────────────────────────
@@ -1030,6 +1027,7 @@ function _saveLiveState() {
     noOrder:   orderUnknown,
     underway:  _underway,
     fDate:     document.getElementById('fDate')?.value     || '',
+    fDateMode: dateFieldMode(document.getElementById('fDate')),
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
     fTurns:    document.getElementById('fTurns')?.value    || '',
@@ -1152,7 +1150,8 @@ function _checkResume() {
   document.getElementById('startBtn').textContent = t('Resume game');   // stays purple (btn-primary)
   clearError('err');
 
-  document.getElementById('fDate').value     = state.fDate     || '';
+  setDateField(document.getElementById('fDate'), state.fDateMode || (state.fDate ? 'full' : 'none'), state.fDate || '');
+  _syncDateToggle();
   document.getElementById('fLocation').value = state.fLocation || '';
   document.getElementById('fDur').value      = state.fDur      || '';
   document.getElementById('fTurns').value    = state.fTurns    || '';
@@ -1195,13 +1194,13 @@ function _checkResume() {
 async function submitForm() {
   clearError('err');
 
-  const date     = document.getElementById('fDate').value;
+  const date     = dateFieldValue(document.getElementById('fDate'));   // ui.js
   const dur      = parseInt(document.getElementById('fDur').value)   || null;
   const turns    = parseInt(document.getElementById('fTurns').value) || null;
   const place    = document.getElementById('fLocation').value.trim() || null;   // not `location`: that would hide window.location
   const btn      = document.getElementById('submitBtn');
 
-  if (date && new Date(date) > new Date()) return showErr(t('Date cannot be in the future.'));
+  if (date.error) return showErr(date.error);
 
   const user    = getCurrentUser();
   const profile = getCurrentProfile();
@@ -1228,7 +1227,8 @@ async function submitForm() {
   btn.disabled    = true;
 
   const gameData = {
-    played_at:        date ? new Date(date).toISOString() : null,   // no date: undated, as the imports
+    played_at:        date.played_at,      // null: undated, as the imports
+    time_unknown:     date.time_unknown,   // the day alone
     duration_minutes: dur,
     num_turns:        turns,
     location:         place,

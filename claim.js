@@ -199,6 +199,8 @@ const _maxTurns = () => claimIsSolo() ? SOLO_LEVELS[soloLevelOf(claimGame)].turn
 
 function editGameDetails() {
   if (!claimGame) return;
+  fillDateField(document.getElementById('editDate'), claimGame);   // ui.js
+  _syncEditDateLink();
   document.getElementById('editLocation').value = claimGame.location || '';
   document.getElementById('editDur').value      = claimGame.duration_minutes || '';
   document.getElementById('editTurns').value    = claimGame.num_turns || '';
@@ -214,26 +216,43 @@ function closeEditDetails() {
   closeOverlay('editDetailsOverlay');
 }
 
+// The date's link, as in New Game: No time → No date → Today (ui.js).
+function cycleEditDate() {
+  cycleDateField(document.getElementById('editDate'));
+  _syncEditDateLink();
+}
+function _syncEditDateLink() {
+  document.getElementById('editDateToggle').textContent = dateFieldLinkLabel(document.getElementById('editDate'));
+}
+
 async function saveGameDetails() {
   if (!claimGame) return;
 
   const dur      = parseInt(document.getElementById('editDur').value)   || null;
   const turns    = parseInt(document.getElementById('editTurns').value) || null;
   const location = document.getElementById('editLocation').value.trim() || null;
+  const date     = dateFieldValue(document.getElementById('editDate'));   // ui.js
+  const btn   = document.getElementById('editDetailsSaveBtn');
+  const errEl = document.getElementById('editDetailsErr');
+  if (date.error) { showError(errEl, date.error); return; }
 
+  // The date as the field shows it, to the minute: written only when it changed
+  // (a game timed live keeps its seconds).
+  const sameDate = (date.played_at ? Date.parse(date.played_at) : null) === (claimGame.played_at ? Math.floor(Date.parse(claimGame.played_at) / 60000) * 60000 : null)
+                && date.time_unknown === isDateOnly(claimGame);
   // Always write the current values (a cleared field is saved as null).
-  const patch = { duration_minutes: dur, num_turns: turns, location: location };
+  const patch = { duration_minutes: dur, num_turns: turns, location: location,
+                  ...(sameDate ? {} : { played_at: date.played_at, time_unknown: date.time_unknown }) };
 
   // No-op if nothing actually changed.
-  if (dur === (claimGame.duration_minutes || null) &&
+  if (sameDate &&
+      dur === (claimGame.duration_minutes || null) &&
       turns === (claimGame.num_turns || null) &&
       location === (claimGame.location || null)) {
     closeEditDetails();
     return;
   }
 
-  const btn   = document.getElementById('editDetailsSaveBtn');
-  const errEl = document.getElementById('editDetailsErr');
   if (claimIsSolo() && turns > _maxTurns()) {
     showError(errEl, t('A solo game on {level} ends by round {n}.', { level: soloLevelName(soloLevelOf(claimGame)), n: _maxTurns() }));
     return;
@@ -329,9 +348,20 @@ let lineupBoxes  = {};
 async function editLineup() {
   if (!lineupEditable(getCurrentUser())) return;
   [lineupChars, lineupBoxes] = await Promise.all([loadCharacters(), loadBoxInfo()]);
-  lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));
+  lineupDraft = claimPlayers.map(p => ({ id: p.id, character: p.character, is_winner: !!p.is_winner }));   // in play order
+  lineupNoOrder = claimPlayers.some(p => p.position == null);
   document.getElementById('lineupTitle').textContent = t('Edit villains and winner');
-  document.getElementById('lineupHint').textContent  = t('You can change the villains and the winner until another player claims a villain.');
+  document.getElementById('lineupHint').textContent  = t('You can change the villains, the winner and the play order (drag a row by its ⠿) until another player claims a villain.');
+  if (!_lineupDragReady) {
+    _lineupDragReady = true;
+    attachRowDrag(document.getElementById('lineupSlots'), {   // ui.js
+      rowSelector: '.order-slot',
+      onDrop: (from, to) => {
+        if (to !== from) lineupDraft.splice(to, 0, lineupDraft.splice(from, 1)[0]);
+        _renderLineup();
+      },
+    });
+  }
   clearError('lineupErr');
   const btn = document.getElementById('lineupSaveBtn');
   btn.disabled    = false;
@@ -344,14 +374,26 @@ function closeLineup() {
   closeOverlay('lineupOverlay');
 }
 
+// No order | In order, as in New Game: the rows go unnumbered (–), and the
+// game is saved without a play order; In order saves the rows as listed.
+let lineupNoOrder    = false;
+let _lineupDragReady = false;
+function toggleLineupOrder() {
+  lineupNoOrder = !lineupNoOrder;
+  _renderLineup();
+}
+
 function _renderLineup() {
+  document.getElementById('lineupOrderToggle').textContent = lineupNoOrder ? t('In order') : t('No order');
   document.getElementById('lineupSlots').innerHTML = lineupDraft.map((s, i) => {
     const taken     = new Set(lineupDraft.filter(o => o.id !== s.id).map(o => o.character));
     const available = lineupChars.filter(c => !taken.has(c.name));
     return `
       <div class="order-slot">
-        <span class="row-num">${i + 1}.</span>
-        <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
+        <div class="drag-handle">
+          <span class="drag-dots">⠿</span><span class="row-num">${lineupNoOrder ? '–' : `${i + 1}.`}</span>
+          <img class="order-slot-portrait" src="${charImgSrc(s.character)}" onerror="this.src='asset/players/default.svg'" alt="">
+        </div>
         <div class="order-slot-info">
           <select class="order-slot-select" onchange="setLineupVillain(${i}, this.value)" aria-label="${t('Pick villain')}">
             ${charSelectHTML(available, s.character, lineupBoxes)}
@@ -379,9 +421,11 @@ function setLineupWinner(i) {
 }
 
 async function saveLineup() {
-  const unchanged = lineupDraft.every(s => {
+  // The play order goes with the lineup: each seat's position, or none.
+  const lineup = lineupDraft.map((s, i) => ({ ...s, position: lineupNoOrder ? null : i }));
+  const unchanged = lineup.every(s => {
     const p = claimPlayers.find(x => x.id === s.id);
-    return p && p.character === s.character && !!p.is_winner === s.is_winner;
+    return p && p.character === s.character && !!p.is_winner === s.is_winner && (p.position ?? null) === s.position;
   });
   if (unchanged) { closeLineup(); return; }
 
@@ -389,7 +433,7 @@ async function saveLineup() {
   const errEl = document.getElementById('lineupErr');
   btn.disabled    = true;
 
-  const { error } = await db.rpc('edit_lineup', { target_game: claimGame.id, lineup: lineupDraft });
+  const { error } = await db.rpc('edit_lineup', { target_game: claimGame.id, lineup });
 
   if (error) {
     // Someone claimed meanwhile: nothing left to edit, show the page as it is.

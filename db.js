@@ -133,7 +133,7 @@ async function fetchGamesWithPlayers(ids, opts = {}) {
 let _officialGames = null;
 function loadOfficialGames() {
   return _officialGames ||= (async () => {
-    const sel = 'id, played_at, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
+    const sel = 'id, played_at, time_unknown, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
     const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
     if (error) throw error;
     const PAGE = 1000;

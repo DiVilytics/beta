@@ -7,8 +7,8 @@
 // games added, recorded by you (created_by), as if saved in New Game.
 //   Game ID   groups a game's rows; any label for a new game (1, 2, 3...). One
 //             already in DiVilytics (its id, from a download) is skipped.
-//   Date      YYYY-MM-DD HH:MM, YYYY-MM-DD (at 12:00) or empty (no date); not
-//             in the future.
+//   Date      YYYY-MM-DD HH:MM, YYYY-MM-DD (the day without a time:
+//             time_unknown) or empty (no date); not in the future.
 //   Player    your nickname on your villain (claims it) or empty: nobody else's.
 //   Seat      the play order, 1 to the players, or empty on every row.
 //   Winner    yes / no, one yes (Solo: yes is won, no is lost).
@@ -51,17 +51,20 @@ function parseCsv(text) {
   return rows.filter(r => r.cells.some(c => c.trim() !== ''));   // blank lines
 }
 
-// "YYYY-MM-DD HH:MM" (or with a T), "YYYY-MM-DD" at 12:00, in local time, as
-// New Game; '' is no date. Returns an ISO string, null for no date, or
-// undefined when it isn't a date.
+// "YYYY-MM-DD HH:MM" (or with a T) in local time, as New Game; "YYYY-MM-DD"
+// the day alone, as New Game's No time (00:00 UTC, time_unknown); '' no date.
+// Returns { played_at, time_unknown, future }, or undefined when it isn't a date.
 function _csvParseDate(s) {
-  if (!s) return null;
+  if (!s) return { played_at: null, time_unknown: false, future: false };
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?$/);
   if (!m) return undefined;
-  const [y, mo, d, h = 12, mi = 0] = m.slice(1).map(x => x === undefined ? undefined : Number(x));
+  const [y, mo, d, h, mi] = m.slice(1).map(x => x === undefined ? undefined : Number(x));
+  const day = new Date(Date.UTC(y, mo - 1, d));
+  if (day.getUTCFullYear() !== y || day.getUTCMonth() !== mo - 1 || day.getUTCDate() !== d) return undefined;
+  if (h === undefined) return { played_at: day.toISOString(), time_unknown: true, future: s > _localDateTimeValue().slice(0, 10) };
   const dt = new Date(y, mo - 1, d, h, mi);
-  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d || dt.getHours() !== h || dt.getMinutes() !== mi) return undefined;
-  return dt.toISOString();
+  if (dt.getHours() !== h || dt.getMinutes() !== mi) return undefined;
+  return { played_at: dt.toISOString(), time_unknown: false, future: dt > new Date() };
 }
 
 // Checks a whole file. Returns { errors: [line, message][], games (to add),
@@ -110,9 +113,9 @@ async function checkGamesCsv(text) {
     if (differ) { err(at, t('Game {id}: its rows have different values in {column}.', { id, column: differ })); continue; }
 
     const g = first.v;
-    const playedAt = _csvParseDate(g.Date);
-    if (playedAt === undefined) err(at, t('Game {id}: {value} is not a date (YYYY-MM-DD HH:MM or YYYY-MM-DD).', { id, value: g.Date }));
-    else if (playedAt && new Date(playedAt) > new Date()) err(at, t('Game {id}: the date is in the future.', { id }));
+    const when = _csvParseDate(g.Date);
+    if (when === undefined) err(at, t('Game {id}: {value} is not a date (YYYY-MM-DD HH:MM or YYYY-MM-DD).', { id, value: g.Date }));
+    else if (when.future) err(at, t('Game {id}: the date is in the future.', { id }));
     const whole = (h, max = Infinity) => {
       if (!g[h]) return null;
       const n = Number(g[h]);
@@ -158,7 +161,7 @@ async function checkGamesCsv(text) {
     }
 
     games.push({
-      game: { played_at: playedAt ?? null, duration_minutes: dur, num_turns: turns, location: g.Location || null,
+      game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, duration_minutes: dur, num_turns: turns, location: g.Location || null,
               ...(solo ? { variant: 'solo', solo_level: level } : {}) },
       // Solo: the one seat is yours, as in New Game.
       seats: ps.map(p => ({ character: p.character, is_winner: p.is_winner, mine: solo || p.isMe,
@@ -216,7 +219,7 @@ function openUploadGames() {
   const p = s => `<p class="modal-hint">${s}</p>`;
   const cols = [
     ['Game ID', t('Groups the rows of one game: any label for a new game (1, 2, 3...). A game already in DiVilytics (its ID from a download) is skipped.')],
-    ['Date', t('YYYY-MM-DD HH:MM, YYYY-MM-DD (taken at 12:00), or empty for no date. Not in the future.')],
+    ['Date', t('YYYY-MM-DD HH:MM, YYYY-MM-DD for the day without a time, or empty for no date. Not in the future.')],
     ['Location', t('Optional.')],
     ['Duration (min), Rounds', t('Optional, whole numbers.')],
     ['Player', t('Your nickname on your villain, which claims it; empty on the others (they claim theirs with the game\'s QR code).')],
