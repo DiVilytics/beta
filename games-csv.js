@@ -54,7 +54,7 @@ function parseCsv(text) {
 }
 
 // "YYYY-MM-DD HH:MM" (or with a T) in local time, as New Game; "YYYY-MM-DD"
-// the day alone, as New Game's No time (00:00 UTC, time_unknown); '' no date.
+// the day alone, as New Game's Unknown time (00:00 UTC, time_unknown); '' no date.
 // Returns { played_at, time_unknown, future }, or undefined when it isn't a date.
 function _csvParseDate(s) {
   if (!s) return { played_at: null, time_unknown: false, future: false };
