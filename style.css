@@ -2334,8 +2334,18 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .kbd-help-title   { margin-top: 14px; font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
 /* Two columns of about the same height: the pages and the game controls,
    then the settings and the rest; one column (in that order) on phones. */
-.kbd-help-groups  { margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 40px; text-align: left; }
-.kbd-help-col     { flex: 0 1 260px; min-width: 200px; }
+/* Two columns, Pages over During a game and Settings over Other, on a grid so
+   During a game and Other start on the same line; on a narrow screen, one
+   column in that order. */
+.kbd-help-groups  { margin-top: 24px; display: grid; grid-template-columns: repeat(2, minmax(200px, 260px)); grid-auto-flow: dense; justify-content: center; column-gap: 40px; text-align: left; }
+.kbd-help-col     { display: contents; }
+.kbd-help-col:first-child > .kbd-help-group { grid-column: 1; }
+.kbd-help-col:last-child  > .kbd-help-group { grid-column: 2; }
+@media (max-width: 559px) {
+  .kbd-help-groups { grid-template-columns: minmax(0, 260px); }
+  .kbd-help-col > .kbd-help-group { grid-column: 1; }
+  .kbd-help-col:last-child > .kbd-help-group { grid-column: 1; }
+}
 .kbd-help-group   { break-inside: avoid; padding-bottom: 20px; }
 .kbd-help-lbl     { margin-bottom: 8px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .kbd-help-row     { display: flex; align-items: center; gap: 10px; padding: 2px 0; font-size: calc(14px * var(--ts)); color: var(--text); }
