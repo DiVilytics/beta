@@ -1420,12 +1420,13 @@ select:disabled {
   background-color: var(--s3);
 }
 
-/* Solid: a dashed border is Solo's mark everywhere. */
+/* Solid: a dashed border is Solo's mark everywhere. Its corners as the rows'
+   above it (.order-slot). */
 .add-row-btn {
   width: 100%;
   background: transparent;
   border: 1px solid var(--s4);
-  border-radius: var(--rs);
+  border-radius: var(--r);
   color: var(--muted);
   font-family: inherit;
   font-size: calc(13px * var(--ts));
