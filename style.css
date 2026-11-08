@@ -1384,6 +1384,9 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 }
 .drag-handle:active { cursor: grabbing; }
 .drag-dots { font-size: calc(16px * var(--ts)); color: var(--muted); line-height: 1; }
+/* In a row (New Game, Edit villains and winner, a tournament's players), the
+   dots sit closer to its left edge. */
+.order-slot .drag-dots { margin-left: -4px; }
 /* Mid-draw / mid-shuffle the rows can't be dragged (new-game.js): ⠿ grays out. */
 #orderSlots.busy .drag-dots { color: var(--dim); opacity: 0.5; }
 #orderSlots.busy .drag-handle { cursor: not-allowed; }
@@ -2183,7 +2186,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 /* The villain's portrait close to its position number (one digit, 1 to 6:
    only as wide as it), so the name has the room: "Scegli cattivo" whole on a
    small phone at Large text. */
-.order-slot .row-num { width: auto; margin-right: 2px; }
+.order-slot .row-num { width: auto; margin-right: 2px; font-variant-numeric: tabular-nums; }
 /* New Game: one name on two lines (Large text) makes every row as tall. */
 #orderSlots { display: grid; grid-auto-rows: 1fr; grid-template-columns: minmax(0, 1fr); }   /* a long word never widens the rows */
 .order-slot {
