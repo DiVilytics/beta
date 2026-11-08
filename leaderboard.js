@@ -5,7 +5,7 @@ let lbCharBoxMap    = {};
 let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
-let lbMode   = 'chance';       // 'pct' | 'count' | 'games', or 'chance' / 'matchups' (villains only) or 'xp' (players only)
+let lbMode   = 'chance';       // 'pct' | 'count' | 'games' | 'chance', or 'matchups' (villains only) or 'xp' (players only)
 
 // Each tab keeps its own ranking: villains open on Δ Wins, players on XP.
 const _lbModeByTab = { characters: 'chance', players: 'xp' };
@@ -175,9 +175,9 @@ async function _fetchAllTime() {
     _fetchAllRows(buildRows),
     db.rpc('game_stats', lbFilter === 'all' ? {} : { player_count_filter: lbFilter }),
     _fetchXp(),
-    // Δ Wins needs each villain's games by table size: the rows themselves
-    // when a size is picked.
-    isChar && lbFilter === 'all' ? _fetchAllRows(() => db.from('character_stats_by_size').select('*')) : null,
+    // Δ Wins needs each row's games by table size: the rows themselves when a
+    // size is picked.
+    lbFilter === 'all' ? _fetchAllRows(() => db.from(isChar ? 'character_stats_by_size' : 'player_stats_by_size').select('*')) : null,
   ]);
   if (xp === null || bySize?.error) return null;
 
@@ -202,7 +202,7 @@ async function _fetchPeriod() {
   const lbFilter = size.value();
   const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
   // Δ Wins, every table size: each size's games apart.
-  const sizes = lbTab === 'characters' ? (lbFilter === 'all' ? CHANCE_SIZES : [lbFilter]) : [];
+  const sizes = lbFilter === 'all' ? CHANCE_SIZES : [lbFilter];
   const [stats, summary, xp, ...bySize] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
     db.rpc('period_game_stats', range),
@@ -211,7 +211,7 @@ async function _fetchPeriod() {
   ]);
   if (stats.error || summary.error || xp === null || bySize.some(b => b?.error)) return null;
   const nameKey = lbTab === 'characters' ? 'character' : 'nickname';
-  const sized = sizes.flatMap((k, i) => ((bySize[i] || stats).data || []).map(r => ({ character: r.name, player_count: k, games: r.games })));
+  const sized = sizes.flatMap((k, i) => ((bySize[i] || stats).data || []).map(r => ({ [nameKey]: r.name, player_count: k, games: r.games })));
   return {
     rows:    _addChance(_addXp((stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })), xp), sized),
     summary: (summary.data || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
@@ -231,22 +231,23 @@ async function _fetchSolo() {
 }
 
 // ── CHANCE Δ ──────────────────────────────────────────────────────────────────
-// Villains only: each villain's wins against what equal chances would give
-// (chanceDelta, stats-table.js). Its games by table size give E = Σ games / k
-// and V = Σ games / k (1 - 1/k); with one size picked, that size's alone.
+// Each villain's (or player's) wins against what equal chances would give
+// (chanceDelta, stats-table.js). Their games by table size give E = Σ games / k
+// and V = Σ games / k (1 - 1/k); with one size picked, that size's alone. A
+// player's games are those where they claimed their villain, as everywhere.
 const CHANCE_SIZES = [2, 3, 4, 5, 6];
 
 function _addChance(rows, bySize) {
-  if (lbTab !== 'characters') return rows;
+  const key = lbTab === 'characters' ? 'character' : 'nickname';
   const terms = {};
   for (const r of bySize) {
     const k = Number(r.player_count ?? size.value()), n = Number(r.games);
     if (!(k >= 2)) continue;
-    const o = terms[r.character] ||= { exp: 0, vari: 0 };
+    const o = terms[r[key]] ||= { exp: 0, vari: 0 };
     o.exp  += n / k;
     o.vari += n / k * (1 - 1 / k);
   }
-  return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r.character] }));
+  return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r[key]] }));
 }
 
 // ── MATCHUPS ──────────────────────────────────────────────────────────────────
@@ -450,8 +451,10 @@ function render(data) {
   // those rows follow the ranking under a divider, unranked. # Wins / # Games
   // rank everyone, a low count there isn't misleading the same way.
   // Δ Wins ranks every villain with games (few games can't swing it far):
-  // those without, under "No games".
-  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : mode === 'chance' || mode === 'matchups' ? 1 : 0;   // stats-table.js
+  // those without, under "No games". Players need the % Wins minimum there too:
+  // one win at a table of 5 is already +2.0, and most players have few games.
+  const minGames = mode === 'pct' || (mode === 'chance' && lbTab === 'players') ? MIN_GAMES_FOR_PCT
+                 : mode === 'chance' || mode === 'matchups' ? 1 : 0;   // stats-table.js
   // Matchups: each villain's counts (the lists stay for its sheet).
   if (mode === 'matchups' && data.mu) {
     _lbMu = data.mu;
@@ -459,9 +462,9 @@ function render(data) {
     const count = m => m && { win: m.win.length, even: m.even.length, lose: m.lose.length, few: m.few.length, lean: lean(m) };
     rows = rows.map(r => ({ ...r, mu: count(data.mu[r.character]) }));
   }
-  // Registered players who never played have no % at all: only in the counts.
-  // Villains are all listed, those without games under the divider ("-").
-  if (mode === 'pct' && lbTab === 'players') rows = rows.filter(r => r.games > 0);
+  // Registered players who never played have no % or Δ at all: only in the
+  // counts. Villains are all listed, those without games under the divider ("-").
+  if ((mode === 'pct' || mode === 'chance') && lbTab === 'players') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
   const hasUnranked = rows.some(r => !statRanked(r, mode, minGames));
 
@@ -473,9 +476,10 @@ function render(data) {
 
   document.getElementById('lb').innerHTML = `
     ${soloHint}
-    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: isChar && !solo, matchups: isChar && !solo })}
+    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: !solo, matchups: isChar && !solo })}
     ${statModeHintHTML(mode, { minGames, picks: isChar })}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
+    ${mode === 'chance' && !isChar && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
     ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
       ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}
       <p class="results-hint">${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} (${t('Too few')})</p>` : ''}

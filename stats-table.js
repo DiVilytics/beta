@@ -30,7 +30,7 @@ const MIN_PAIR_GAMES = 5;
 // ── STAT MODE: the pct | count | games metric shared by every win-rate surface ──
 // (plus 'xp', the players' Leaderboard only: rows then carry `xp` and `xpAch`,
 // the part from achievements, shown in parentheses instead of the games;
-// 'chance', the villains' Leaderboard and a villain's page: rows carry `exp`
+// 'chance', the Leaderboard and a villain's page: rows carry `exp`
 // and `vari`, see chanceDelta; and 'matchups', the villains' Leaderboard: rows
 // carry `mu`, { win, even, lose, few } opponents, see MATCHUPS)
 // statValue → the numeric metric (pct is a 0..1 fraction); statValueDisplay →
@@ -155,13 +155,13 @@ function statGamesWidth(rows, mode) {
 // first (the villains' Leaderboard, a villain's page), `matchups: true`
 // Matchups after it (the villains' Leaderboard). Each label also has a short form ('% Wins:short' in
 // i18n: "% Vitt."), shown only where a row is too tight for the full ones
-// (.seg-short on a parent: the villain page with its All / Solo menu, and the
-// villains' Leaderboard, whose Matchups makes five tabs); without one, the full label.
+// (.seg-short on a parent: the villain page with its All / Solo menu, and any
+// switch of five tabs, as on the Leaderboard); without one, the full label.
 const _statShortLabel = key => { const s = t(key + ':short'); return s.endsWith(':short') ? t(key) : s; };
 function statModeSegHTML(mode, fn, { xp = false, chance = false, matchups = false } = {}) {
   const btn = (m, key) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')"><span class="stat-lbl-full">${t(key)}</span><span class="stat-lbl-short">${_statShortLabel(key)}</span></button>`;
-  return `<div class="controls mb-1${matchups ? ' seg-short' : ''}"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
+  return `<div class="controls mb-1${xp + chance + matchups >= 2 ? ' seg-short' : ''}"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
 }
 
 // The line under the switch for % Wins, # Wins and # Games (Δ Wins, Matchups and
@@ -263,13 +263,13 @@ function openChanceInfo() {
   const inv  = frac('<mn>1</mn>', kg);
   const sum  = x => `<munderover><mo largeop="true" movablelimits="false">∑</mo><mrow><mi>g</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>${x}`;
   body.innerHTML = `
-    <p class="modal-hint">${t('Δ Wins compares a villain\'s wins with the wins it would have if everyone at the table had the same chance to win.')}</p>
+    <p class="modal-hint">${t('Δ Wins compares the wins of a villain or a player with the wins they would have if everyone at the table had the same chance to win.')}</p>
     ${math(`<mi mathvariant="normal">Δ</mi><mo>=</mo>${frac('<mrow><mi>W</mi><mo>−</mo><mi>E</mi></mrow>', '<msqrt><mi>V</mi></msqrt>')}`)}
     ${math(`<mi>E</mi><mo>=</mo>${sum(inv)}`)}
     ${math(`<mi>V</mi><mo>=</mo>${sum(`${inv}<mrow><mo stretchy="true">(</mo><mn>1</mn><mo>−</mo>${inv}<mo stretchy="true">)</mo></mrow>`)}`)}
     <p class="modal-hint">${t('<b>W</b>: its wins. <b>N</b>: its games. <b>k<sub>g</sub></b>: the players in game g. <b>E</b>: expected number of wins, 1/k<sub>g</sub> per game (a game of 4 expects a quarter of a win). <b>V</b>: their variance, how much the wins vary by chance alone.')}</p>
-    <p class="modal-hint">${t('W − E compares the number of wins with the number of wins one would get by picking a random winner; dividing by √V, the standard deviation, puts villains with many games and with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
-    <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 villains in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
+    <p class="modal-hint">${t('W − E compares the number of wins with the number of wins one would get by picking a random winner; dividing by √V, the standard deviation, puts those with many games and those with few on the same scale, so a lucky run in a few games doesn\'t stand out the way it does in % Wins.')}</p>
+    <p class="modal-hint">${t('<b>Reading it</b>: 0 is exactly as expected. Between −1 and +1 is ordinary luck: about 2 in 3 would land there by chance alone. Beyond ±2 is rare by chance alone, about 1 in 20.')}</p>
     <p class="modal-hint">${t('<b>For example</b>: 10 wins in 20 games at tables of 4. E = 20 × 1/4 = 5, V = 20 × 1/4 × 3/4 = 3.75, so Δ = (10 − 5) / √3.75 ≈ +2.6.')}</p>
     <p class="modal-hint">${t('Every game counts by its number of players: a win at 6 players is worth more than one at 2.')}${_chanceNote ? ` ${_chanceNote}` : ''}</p>`;
   openOverlay('chanceOverlay');
