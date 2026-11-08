@@ -416,9 +416,19 @@ function render() {
   const { to_ts } = period.range();
   const reachesToday = !to_ts || new Date(to_ts) > new Date();
   const onBestStreak = reachesToday && bestStreak > 0 && streakRun === bestStreak;
-  // On fire: the avatar's ring turns gold with the Max streak box.
+  // On fire: the avatar's ring turns gold with the Wins (streak) box.
   pfOnFire = onBestStreak;
   document.getElementById('pfAvatar')?.classList.toggle('on-fire', pfOnFire);
+
+  // Δ Wins (chanceDelta, stats-table.js): each game by its number of players,
+  // shown from the % Wins minimum, as on the Leaderboard. Not on Solo.
+  const seatsIn = {};
+  for (const p of data.players) seatsIn[p.game_id] = (seatsIn[p.game_id] || 0) + 1;
+  const chance = { wins, exp: 0, vari: 0 };
+  for (const p of mine) { const k = seatsIn[p.game_id]; if (k >= 2) { chance.exp += 1 / k; chance.vari += 1 / k * (1 - 1 / k); } }
+  const chanceBox = nGames >= MIN_GAMES_FOR_PCT
+    ? { chance: fmtChance(chanceDelta(chance)) }
+    : { chanceTitle: t('Shown from {n} games.', { n: MIN_GAMES_FOR_PCT }) };
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
   // Solo: the rounds of the games won (a lost one runs to its last round).
@@ -488,14 +498,7 @@ function render() {
   root.innerHTML = `
     ${soloHint}
     <div class="summary">
-      ${statBoxesHTML([
-        { val: nGames,       lbl: t('Games') },
-        { val: avgDur   != null ? Math.round(avgDur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
-        { val: winPct + '%', lbl: t('Win rate') },
-        { val: wins,         lbl: t('Wins') },
-        { val: bestStreak,   lbl: t('Max streak'), hot: onBestStreak, title: onBestStreak ? t('Currently on this streak') : '' },
-      ])}
+      ${summaryBoxesHTML({ games: nGames, wins, dur: avgDur, turns: avgTurns, solo, streak: bestStreak, hot: onBestStreak, ...chanceBox })}
     </div>
 
     ${statModeSegHTML(pfMode, 'pfSetMode')}

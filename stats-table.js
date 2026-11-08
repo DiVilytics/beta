@@ -8,6 +8,24 @@
 // Returns an HTML string of three `.stat-box` divs (no wrapping element).
 // A box may set `hot: true` (+ an optional `title` tooltip) to be highlighted,
 // for a stat that is currently sitting at its record.
+// The six boxes of a villain's or a player's page, two rows of three, the same
+// on both: Games | Wins | Win rate, then Δ Wins | Avg duration | Avg rounds.
+// streak (a player's): their max win streak, "16 (5)" in the Wins box, gold
+// while they're on it. chance: the Δ Wins value, '-' with `chanceTitle` on
+// hover when there's none (Solo; a player under the % Wins minimum).
+function summaryBoxesHTML({ games, wins, dur, turns, solo = false, streak = null, hot = false, chance = '-', chanceTitle = '' }) {
+  const winsVal = streak == null ? wins : `${wins} <span class="stat-val-sub">(${streak})</span>`;
+  return statBoxesHTML([
+    { val: games, lbl: t('Games') },
+    { val: winsVal, lbl: streak == null ? t('Wins') : t('Wins (streak)'), hot,
+      title: streak == null ? '' : [t('Max streak: {n}', { n: streak }), hot ? t('Currently on this streak') : ''].filter(Boolean).join(' | ') },
+    { val: typeof games === 'number' && games ? Math.round(wins / games * 100) + '%' : '-', lbl: t('Win rate') },
+    { val: solo ? '-' : chance, lbl: t('Δ Wins'), title: solo ? t('Not for solo games.') : chanceTitle },
+    { val: dur   != null ? Math.round(dur) + 'm' : '-', lbl: t('Avg duration') },
+    { val: turns != null ? Math.round(turns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
+  ]);
+}
+
 function statBoxesHTML(boxes) {
   return boxes.map(b =>
     `<div class="stat-box${b.hot ? ' hot' : ''}"${b.title ? ` title="${_esc(b.title)}"` : ''}><div class="stat-val">${b.val}</div><div class="stat-lbl">${b.lbl}</div></div>`

@@ -1516,6 +1516,8 @@ select:disabled {
 }
 .stat-val { font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
 .stat-lbl { font-size: calc(11px * var(--ts)); color: var(--muted); margin-top: 2px; }
+/* The second number of a box, "16 (5)": a player's max streak next to their wins. */
+.stat-val-sub { font-size: 0.6em; font-weight: 600; color: var(--muted); }
 /* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
 .stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
 .stat-box.hot .stat-val { color: var(--gold); }

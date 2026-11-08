@@ -373,7 +373,6 @@ function render() {
   // The boxes on top: the selected row's numbers.
   const sel  = stats(csRow);
   const avgs = isSolo(csRow) ? solo[csRow] : (csAvg[csRow] || {});
-  const v = val => csLoading ? '-' : val;
   const rowHTML = (label, key) => {
     const b       = stats(key);
     const barW    = b.games ? statBarWidth(b, mode, maxVal) : 0;
@@ -406,13 +405,9 @@ function render() {
       </span>`;
   root.innerHTML = `
     <div class="summary">
-      ${statBoxesHTML([
-        { val: v(sel.games), lbl: t('Games') },
-        { val: avgs.dur   != null ? Math.round(avgs.dur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgs.turns != null ? Math.round(avgs.turns)     : '-', lbl: isSolo(csRow) ? t('Avg rounds to win') : t('Avg rounds') },
-        { val: v(sel.games ? Math.round((sel.wins / sel.games) * 100) + '%' : '-'), lbl: t('Win rate') },
-        { val: v(sel.wins), lbl: t('Wins') },
-      ])}
+      ${csLoading
+        ? summaryBoxesHTML({ games: '-', wins: '-', solo: isSolo(csRow) })
+        : summaryBoxesHTML({ games: sel.games, wins: sel.wins, dur: avgs.dur, turns: avgs.turns, solo: isSolo(csRow), chance: fmtChance(chanceDelta(sel)) })}
     </div>
     <div class="cs-mode-row">
       ${statModeSegHTML(mode, 'csSetMode', { chance: !soloOn })}
