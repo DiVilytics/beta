@@ -412,7 +412,7 @@ const _KBD_PAGES = [
 ];
 // In the order of the settings panel: theme, text size, language.
 // The help list leaves a gap between theme, text size and language.
-const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : ";'".includes(k) ? 'text' : 'lang';
+const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : '-0='.includes(k) ? 'text' : 'lang';
 const _KBD_SETTINGS = [
   ['[',  'Light theme', () => setTheme('light')],
   [']',  'Dark theme',  () => setTheme('dark')],
@@ -420,8 +420,8 @@ const _KBD_SETTINGS = [
   ['-',  'Small text',  () => setTextSize('small')],
   ['0',  'Medium text', () => setTextSize('medium')],
   ['=',  'Large text',  () => setTextSize('large')],
-  ['1',  'English',     () => setLang('en')],
-  ['2',  'Italiano',    () => setLang('it')],
+  ['e',  'English',     () => setLang('en')],
+  ['i',  'Italiano',    () => setLang('it')],
 ];
 
 function _withShortcut(title, key) { return `${title} (${key.toUpperCase()})`; }
@@ -482,7 +482,7 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
           </div>
           <div class="kbd-help-col">
-          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label), true]), ..._KBD_SETTINGS.map(([k, label], i, all) => [k, t(label), i + 1 < all.length && _kbdSettingGroup(k) !== _kbdSettingGroup(all[i + 1][0])])])}
+          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label), true]), ..._KBD_SETTINGS.map(([k, label], i, all) => [k.toUpperCase(), t(label), i + 1 < all.length && _kbdSettingGroup(k) !== _kbdSettingGroup(all[i + 1][0])])])}
           ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
           </div>
         </div>
