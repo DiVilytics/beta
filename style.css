@@ -1311,6 +1311,8 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 /* Side by side fields line up by their boxes: a label on two lines (a narrow
    phone, New Game's Date & Time with No date) grows upward. */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+/* New Game's Play now: the date is the start's, so Location has the row. */
+.form-row.one-field { grid-template-columns: 1fr; }
 
 .section-label {
   font-size: calc(11px * var(--ts));

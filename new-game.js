@@ -36,11 +36,21 @@ let _underway       = false;
 // one (position null), as the imported logs. Kept with the draft and the game
 // in progress. Not in Solo (one seat).
 let orderUnknown    = false;
+// Past game (the switch on top) or Play now. Play now is a game about to be
+// played: no date field (the start sets it), no duration and rounds until it
+// has been played (the timer fills them, then they can be fixed), the order
+// always known, and Save only once it has started. Past game records an
+// earlier one: date (or the day alone, or none), duration and rounds typed in,
+// Unknown order, Save only; no timer and nothing to draw (no draw pool, no
+// 🎲, no Random order). Kept with the draft; a game in progress is Play now.
+let pastGame        = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
 const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
 const SOLO_LEGEND_ITEMS = [t('🎲 = draw'), t('👑 = winner')];   // Solo: the row's two buttons
+// Past game: no 🎲 on the rows.
+const _legendItems = () => (soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS).filter(s => !(pastGame && s === LEGEND_ITEMS[0]));
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -151,7 +161,8 @@ function _saveDraft() {
       solo:      soloMode,
       soloLevel,
       noOrder:   orderUnknown,
-      fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
+      past:      pastGame,
+      fDate:     pastGame && val('fDate') !== _freshDate ? val('fDate') : '',
       fDateMode: dateFieldMode(document.getElementById('fDate')),
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
@@ -188,16 +199,65 @@ function _restoreDraftForm() {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
     orderUnknown = !!d.noOrder;
+    // Drafts saved before the switch: a past game if its date, order,
+    // duration or rounds were set by hand.
+    pastGame   = d.past ?? !!(d.noOrder || d.fDate || (d.fDateMode && d.fDateMode !== 'full') || d.noDate || d.fDur || d.fTurns);
+    if (!pastGame) orderUnknown = false;
     soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
     // The date as it was left, when it was changed: another date and time,
     // the day alone, or none (drafts saved before the modes: noDate).
     const mode = d.fDateMode || (d.noDate ? 'none' : 'full');
-    if (mode === 'none' || d.fDate) setDateField(document.getElementById('fDate'), mode, d.fDate);
+    if (pastGame && (mode !== 'full' || d.fDate)) setDateField(document.getElementById('fDate'), mode, d.fDate);
     document.getElementById('fLocation').value = d.fLocation || '';
-    document.getElementById('fDur').value      = d.fDur      || '';
-    document.getElementById('fTurns').value    = d.fTurns    || '';
+    document.getElementById('fDur').value      = pastGame ? d.fDur   || '' : '';
+    document.getElementById('fTurns').value    = pastGame ? d.fTurns || '' : '';
   }
   return d;
+}
+
+// Play now | Past game. Not while a game is in progress (it's played now):
+// save it or discard it first. Back to Play now, what only a past game has
+// goes: the date, the duration and rounds, Unknown order.
+function setPastGame(on) {
+  if (on === pastGame || liveGame.hasSession) return;
+  pastGame = on;
+  _setDateToNow();
+  if (!on) {
+    orderUnknown = false;
+    document.getElementById('fDur').value   = '';
+    document.getElementById('fTurns').value = '';
+  } else {
+    _cancelShuffle();
+    if (document.getElementById('excludeBody')?.classList.contains('open')) toggleExclude();
+  }
+  clearError('err');
+  renderOrderSlots();
+  _layoutLegend();
+  _saveDraft();
+}
+
+// What Play now and Past game show (setPastGame): the switch, off while a game
+// is in progress; the date field and Unknown order (past only); the duration
+// and rounds (past, or a game played now once it has started); the draw pool,
+// the rows' 🎲 and Random order / Draw villains (now only); Start (now) and
+// Save (past, or once started).
+function _syncModeUI() {
+  const session = liveGame.hasSession;
+  for (const [id, on] of [['ngModePlay', !pastGame], ['ngModePast', pastGame]]) {
+    const b = document.getElementById(id);
+    if (!b) continue;
+    b.classList.toggle('on', on);
+    b.disabled = session && !on;
+    b.title    = session && !on ? t('A game is in progress: save it or discard it first.') : '';
+  }
+  setVisible('fDateField', pastGame);
+  document.getElementById('dateLocRow')?.classList.toggle('one-field', !pastGame);
+  setVisible('durRoundsRow', pastGame || session);
+  setVisible('orderToggle', pastGame && !soloMode);
+  setVisible('excludeToggle', !pastGame);
+  setVisible('lineupBtns', !pastGame && !soloMode);
+  setVisible('startBtn', !pastGame);
+  setVisible('submitBtn', pastGame || session);
 }
 
 // Unknown order | In order (orderUnknown): the rows lose or get back their numbers.
@@ -284,7 +344,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (host) layoutSeparatedRows(host, soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS);   // hidden (live game): keeps the current markup
+  if (host) layoutSeparatedRows(host, _legendItems());   // hidden (live game): keeps the current markup
 }
 
 // Lays out the legend now, again once the web font is in (a first pass may
@@ -383,9 +443,9 @@ function _syncSoloUI() {
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
-  setVisible('orderToggle', !soloMode);
+  setVisible('orderToggle', pastGame && !soloMode);
   setVisible('drawAllBtn', !soloMode);
-  setVisible('lineupBtns', !soloMode);   // its half of the row goes to the level picker
+  setVisible('lineupBtns', !pastGame && !soloMode);   // in Solo its half of the row goes to the level picker
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
@@ -679,7 +739,7 @@ function renderOrderSlots() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn rand" onclick="tapDrawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          ${pastGame ? '' : `<button class="pf-btn rand" onclick="tapDrawSlot(${s.id})" title="${t('Draw')}">🎲</button>`}
           ${soloMode ? '' : `
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
@@ -962,6 +1022,7 @@ function _validateLineup() {
 
 function startLive() {
   clearError('err');
+  if (pastGame) return;
   const err = _validateLineup();
   if (err) return showErr(err);
 
@@ -1057,7 +1118,7 @@ function _isFormChanged() {
   const val = id => document.getElementById(id)?.value || '';
   return orderSlots.length !== 2
       || orderSlots.some(s => s.char || s.isMe || s.isWinner)
-      || val('fDate') !== _freshDate
+      || pastGame   // its date, duration and rounds are its own
       || !!(val('fLocation') || val('fDur') || val('fTurns'))
       || orderUnknown
       || !pace.isDefault();
@@ -1066,6 +1127,7 @@ function _isFormChanged() {
 // Discard is always there; it's enabled as soon as anything changed, or while a
 // game session exists.
 function _updateDiscardBtn() {
+  _syncModeUI();           // the session may have just started or ended
   _balanceButtonLines();   // a footer label may just have changed (Start ↔ Resume)
   const btn = document.getElementById('discardBtn');
   if (btn) btn.disabled = !(liveGame.hasSession || _isFormChanged());
@@ -1109,6 +1171,7 @@ function _doDiscard() {
   _soloRolls = {};
   _roundsCounted = false;
   orderUnknown   = false;
+  pastGame       = false;
   setVisible('liveEndNote', false);
   addOrderSlot();
   addOrderSlot();
@@ -1148,6 +1211,7 @@ function _checkResume() {
     return;
   }
   liveGame.restoreFrom(state);
+  pastGame = false;
   document.getElementById('startBtn').textContent = t('Resume game');   // stays purple (btn-primary)
   clearError('err');
 
@@ -1202,6 +1266,7 @@ async function submitForm() {
   const btn      = document.getElementById('submitBtn');
 
   if (date.error) return showErr(date.error);
+  if (!pastGame && !liveGame.hasSession) return showErr(t('Start the game first, or pick Past game.'));
 
   const user    = getCurrentUser();
   const profile = getCurrentProfile();

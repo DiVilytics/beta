@@ -75,11 +75,20 @@
 
   <!-- FORM CONTENT, hidden while a live game is running -->
   <div id="formContent">
+    <!-- Play now (a game about to start: the timer sets its date, duration and
+         rounds, and the order is played) or Past game (an earlier one: typed
+         in, the date and the order may be unknown). new-game.js. -->
+    <div class="controls mb-1 ng-mode-row">
+      <div class="seg ng-mode-seg" id="ngModeSeg">
+        <button class="seg-btn on" id="ngModePlay" type="button" onclick="setPastGame(false)" data-i18n>Play now</button>
+        <button class="seg-btn" id="ngModePast" type="button" onclick="setPastGame(true)" data-i18n>Past game</button>
+      </div>
+    </div>
     <!-- The game ended from the live panel: won (a mover tapped) or, in Solo,
          lost (+ after the last round). new-game.js. -->
     <p class="live-end-note hidden" id="liveEndNote" role="status"></p>
-    <div class="form-row">
-      <div class="field">
+    <div class="form-row" id="dateLocRow">
+      <div class="field" id="fDateField">
         <label><span data-i18n>Date/Time</span> <button class="label-link" id="fDateToggle" type="button" onclick="toggleNoDate()"></button></label>
         <input type="datetime-local" id="fDate">
       </div>
@@ -91,7 +100,7 @@
         </div>
       </div>
     </div>
-    <div class="form-row">
+    <div class="form-row" id="durRoundsRow">
       <div class="field">
         <label data-i18n>Duration <span class="optional">(min)</span></label>
         <input type="number" id="fDur" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
@@ -104,7 +113,7 @@
 
     <div class="section-label"><span data-i18n>Villains and Players</span> <button class="label-link" id="orderToggle" type="button" onclick="toggleOrderUnknown()"></button></div>
     <div class="draw-mode-row">
-      <button class="exclude-toggle exclude-toggle-inline" type="button" onclick="toggleExclude()">
+      <button class="exclude-toggle exclude-toggle-inline" id="excludeToggle" type="button" onclick="toggleExclude()">
         <span class="exclude-toggle-label" data-i18n>Draw pool</span>
         <div class="toggle-right">
           <span class="badge" id="exBadge"></span>
