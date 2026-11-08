@@ -167,7 +167,7 @@ const DATE_ONLY_SOURCES = new Set(['villainous-italia']);
 function isDateOnly(g) { return !!g && (g.time_unknown === true || DATE_ONLY_SOURCES.has(g.source)); }
 
 // ── A GAME'S DATE FIELD ──────────────────────────────────────────────────────
-// New Game's and Edit details' Date & Time: one field, and a link beside its
+// New Game's and Edit details' Date/Time: one field, and a link beside its
 // label that steps through three: the date and time (the current ones to start)
 // → No time (the day alone: the same field as a date) → No date (empty) →
 // Today (the current date and time again). dateFieldValue reads it for saving.
