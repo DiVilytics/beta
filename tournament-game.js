@@ -237,6 +237,7 @@ async function tnSaveGame() {
   const { error } = await db.rpc('save_tournament_table', {
     target_table: tnGame.tableId,
     played_at:    new Date(tnGame.startedAt).toISOString(),
+    time_zone:    browserTimeZone(),
     results:      results.map(({ position, place, minutes, round, dropped }) => ({ position, place, minutes, round: tnGame.roundsCounted ? round : null, dropped })),
   });
   _setBtnLabel(btn, t('Save game'));

@@ -1295,6 +1295,7 @@ async function submitForm() {
   const gameData = {
     played_at:        date.played_at,      // null: undated, as the imports
     time_unknown:     date.time_unknown,   // the day alone
+    time_zone:        date.time_zone,      // where it's played (Charts)
     duration_minutes: dur,
     num_turns:        turns,
     location:         place,

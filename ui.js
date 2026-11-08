@@ -199,18 +199,25 @@ function fillDateField(el, g) {
   else if (isDateOnly(g)) setDateField(el, 'day', g.played_at.slice(0, 10));
   else setDateField(el, 'full', _localDateTimeValue(new Date(g.played_at)));
 }
-// What to save: { played_at, time_unknown }, or { error } for a date in the
-// future. A day alone is that day at 00:00 UTC.
+// The browser's time zone (Europe/Rome), saved with a dated game
+// (games.time_zone) so Charts reads it at the local time where it was played;
+// null when the browser doesn't say.
+function browserTimeZone() {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (_) { return null; }
+}
+
+// What to save: { played_at, time_unknown, time_zone }, or { error } for a date
+// in the future. A day alone is that day at 00:00 UTC.
 function dateFieldValue(el) {
   const mode = dateFieldMode(el);
-  if (mode === 'none') return { played_at: null, time_unknown: false };
+  if (mode === 'none') return { played_at: null, time_unknown: false, time_zone: null };
   if (mode === 'day') {
     if (el.value > _localDateTimeValue().slice(0, 10)) return { error: t('Date cannot be in the future.') };
-    return { played_at: `${el.value}T00:00:00.000Z`, time_unknown: true };
+    return { played_at: `${el.value}T00:00:00.000Z`, time_unknown: true, time_zone: browserTimeZone() };
   }
   const d = new Date(el.value);
   if (d > new Date()) return { error: t('Date cannot be in the future.') };
-  return { played_at: d.toISOString(), time_unknown: false };
+  return { played_at: d.toISOString(), time_unknown: false, time_zone: browserTimeZone() };
 }
 
 // A game's date as cards show it: date and time, the date alone for sources

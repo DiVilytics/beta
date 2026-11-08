@@ -1586,7 +1586,7 @@ function tnEditTable(tableId) {
       // with the game open can't save it after); this phone's game of it, if
       // any, is over.
       const error = entering
-        ? (await db.rpc('save_tournament_table', { target_table: tableId, played_at: new Date().toISOString(), results })).error
+        ? (await db.rpc('save_tournament_table', { target_table: tableId, played_at: new Date().toISOString(), results, time_zone: browserTimeZone() })).error
         : (await db.rpc('edit_tournament_table', { target_table: tableId, results })).error;
       // The recording phone saved it first: its result stands.
       if (error?.message === 'saved_from_phone') { await _tnAfter(error); return; }

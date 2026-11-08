@@ -163,7 +163,7 @@ async function checkGamesCsv(text) {
     }
 
     games.push({
-      game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, duration_minutes: dur, num_turns: turns, location: g.Location || null,
+      game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, time_zone: when?.played_at ? browserTimeZone() : null, duration_minutes: dur, num_turns: turns, location: g.Location || null,
               ...(solo ? { variant: 'solo', solo_level: level } : {}) },
       // Solo: the one seat is yours, as in New Game.
       seats: ps.map(p => ({ character: p.character, is_winner: p.is_winner, mine: solo || p.isMe,

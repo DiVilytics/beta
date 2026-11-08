@@ -111,6 +111,23 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   return `<div class="vs-wrap"><table class="vs-grid${boxes ? ' vs-boxes' : ''}"><thead><tr><th class="vs-corner"></th>${items.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+// A game's weekday (0 = Sunday) and hour (0-23) at the local time where it was
+// played (its time_zone), or null for a zone the browser doesn't know. One
+// formatter per zone.
+const _zoneFmt = {};
+function _localTime(g) {
+  const z = g.time_zone;
+  if (!(z in _zoneFmt)) {
+    try { _zoneFmt[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, weekday: 'short', hour: 'numeric', hourCycle: 'h23' }); }
+    catch (_) { _zoneFmt[z] = null; }
+  }
+  const f = _zoneFmt[z];
+  if (!f) return null;
+  const parts = f.formatToParts(new Date(g.at));
+  const get = type => parts.find(p => p.type === type)?.value;
+  return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24 };
+}
+
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
 // Each: { id, icon, label, desc (a string, or per mode { mode: string }),
 // modes?: [{ id, label }], sizes?: false, render(ctx) -> SVG/HTML string },
@@ -387,23 +404,45 @@ const CHARTS = [
     },
   },
   {
-    id: 'weekday', icon: '📅', label: 'Games by weekday',
-    desc: 'Games played on each weekday, by play date, Monday first. The weekday follows your time zone (or the recorded day, for games saved without a time).',
-    render({ games }) {
-      const counts = new Array(7).fill(0);   // 0 = Sunday
-      for (const g of games) {
-        if (g.at == null) continue;
-        const d = new Date(g.at);
-        counts[isDateOnly(g) ? d.getUTCDay() : d.getDay()]++;   // date-only: the recorded day
+    // id kept from Games by weekday (a saved view).
+    id: 'weekday', icon: '📅', label: 'When games are played',
+    modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'hour', label: 'Hour' }, { id: 'part', label: 'Part of day' }],
+    desc: {
+      weekday: 'Games played on each weekday, Monday first, at the local time where each was played. Only games saved with their time zone count.',
+      hour:    'Games by the hour they started, at the local time where each was played. Only games saved with their time and time zone count.',
+      part:    'Games by the part of the day they started: morning 6-12, afternoon 12-18, evening 18-24, night 0-6, local time. Only games saved with their time and time zone count.',
+    },
+    render({ games, mode }) {
+      // Only the games that know where they were played (games.time_zone); the
+      // hours also need a time (not a day alone).
+      const known = games.filter(g => g.at != null && g.time_zone && (mode === 'weekday' || !isDateOnly(g)));
+      if (!known.length) return `<div class="chart-note">${t('No games with a time zone yet: games saved from now on have one.')}</div>`;
+      const local = known.map(g => ({ g, p: _localTime(g) })).filter(x => x.p);
+      const total = local.length || 1;
+      const pct   = c => Math.round(c / total * 100);
+      const meta  = c => `${tn(c, '{n} game', '{n} games')} | ${pct(c)}%`;
+      if (mode === 'hour') {
+        const counts = new Array(24).fill(0);
+        for (const { p } of local) counts[p.hour]++;
+        const hh = h => `${String(h).padStart(2, '0')}:00`;
+        const data = counts.map((c, h) => ({ value: c, name: `${hh(h)}-${hh((h + 1) % 24)}`, meta: meta(c) }));
+        return Charts.barsV(data, { xTick: h => String(h), xEvery: 3, note: t('Evenings (18-24) {pct}%', { pct: pct(counts.slice(18).reduce((a, c) => a + c, 0)) }) });
       }
+      if (mode === 'part') {
+        // Morning 6-12, afternoon 12-18, evening 18-24, night 0-6.
+        const parts  = [['Morning', 6], ['Afternoon', 12], ['Evening', 18], ['Night', 0]];
+        const counts = parts.map(([, from]) => local.filter(({ p }) => p.hour >= from && p.hour < from + 6).length);
+        const data   = parts.map(([label], i) => ({ value: counts[i], name: t(label), meta: meta(counts[i]) }));
+        return Charts.barsV(data, { xTick: i => t(parts[i][0]), xEvery: 1 });
+      }
+      const counts = new Array(7).fill(0);   // 0 = Sunday
+      for (const { g, p } of local) counts[isDateOnly(g) ? new Date(g.at).getUTCDay() : p.day]++;   // date-only: the recorded day
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
       // Weekday names in the current language (5 Jan 2025 was a Sunday).
       const day    = (d, weekday) => new Date(2025, 0, 5 + d).toLocaleDateString(LOCALE, { weekday });
       const labels = order.map(d => day(d, 'short').replace('.', ''));
       const full   = order.map(d => { const s = day(d, 'long'); return s[0].toUpperCase() + s.slice(1); });
-      const total = counts.reduce((a, c) => a + c, 0) || 1;
-      const pct = c => Math.round(c / total * 100);
-      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${tn(counts[d], '{n} game', '{n} games')} | ${pct(counts[d])}%` }));
+      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: meta(counts[d]) }));
       return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1, note: t('Weekends {pct}%', { pct: pct(counts[6] + counts[0]) }) });
     },
   },

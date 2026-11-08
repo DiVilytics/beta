@@ -246,7 +246,7 @@ async function saveGameDetails() {
                 && date.time_unknown === isDateOnly(claimGame);
   // Always write the current values (a cleared field is saved as null).
   const patch = { duration_minutes: dur, num_turns: turns, location: location,
-                  ...(sameDate ? {} : { played_at: date.played_at, time_unknown: date.time_unknown }) };
+                  ...(sameDate ? {} : { played_at: date.played_at, time_unknown: date.time_unknown, time_zone: date.time_zone }) };
 
   // No-op if nothing actually changed.
   if (sameDate &&

@@ -126,14 +126,14 @@ async function fetchGamesWithPlayers(ids, opts = {}) {
 
 // ── EVERY OFFICIAL GAME ───────────────────────────────────────────────────────
 // Every official game with its seats, { id, played_at, at (ms, null when
-// undated), duration_minutes, num_turns, source, seats: [{ character, user_id,
+// undated), time_unknown, time_zone, duration_minutes, num_turns, source, seats: [{ character, user_id,
 // position, is_winner }] }: the Charts page, and the Leaderboard's Matchups.
 // Fetched in parallel pages (past PostgREST's 1000-row cap), once per visit; a
 // failed load is retried next time.
 let _officialGames = null;
 function loadOfficialGames() {
   return _officialGames ||= (async () => {
-    const sel = 'id, played_at, time_unknown, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
+    const sel = 'id, played_at, time_unknown, time_zone, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
     const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
     if (error) throw error;
     const PAGE = 1000;
