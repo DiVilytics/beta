@@ -1530,7 +1530,8 @@ select:disabled {
 .lb-head,
 .lb-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
+  /* The rank as wide as two digits, so the name has the room. */
+  grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
   padding: 8px 14px;
   align-items: center;
 }
@@ -1605,7 +1606,7 @@ select:disabled {
 .row-name .char-portrait { margin-right: 6px; }
 .row-sub  { display: block; font-size: calc(11px * var(--ts)); color: var(--dim); text-decoration: none; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.row-identity { display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; }
+.row-identity { display: flex; align-items: center; gap: 6px; overflow: hidden; min-width: 0; }
 .row-identity > div { overflow: hidden; min-width: 0; }
 .row-identity .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .row-identity .player-avatar { width: 28px; height: 28px; flex-shrink: 0; }
@@ -2179,14 +2180,16 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
 #tnFormRows input.order-slot-input[type="text"] { height: 30px; min-height: 0; }
 .order-slot-input::placeholder { color: var(--dim); font-weight: 400; font-style: italic; }
-/* The villain's portrait close to its position number. */
-.order-slot .row-num { margin-right: 3px; }
+/* The villain's portrait close to its position number (one digit, 1 to 6:
+   only as wide as it), so the name has the room: "Scegli cattivo" whole on a
+   small phone at Large text. */
+.order-slot .row-num { width: auto; margin-right: 2px; }
 /* New Game: one name on two lines (Large text) makes every row as tall. */
 #orderSlots { display: grid; grid-auto-rows: 1fr; grid-template-columns: minmax(0, 1fr); }   /* a long word never widens the rows */
 .order-slot {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: var(--s1);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -2225,7 +2228,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   overflow: hidden;
 }
 /* Hidden picker, overlays the info area; tap to open the dropdown */
@@ -2711,6 +2714,14 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .seg-short .stat-mode-seg .seg-btn { padding: 0 4px; }
 /* ...and each option only as wide as its label, so the menu keeps its place. */
 .seg-short .stat-mode-seg { grid-auto-columns: auto; }
+/* A phone narrower than 360px (iPhone SE, first model): five options don't
+   fit at full size (English has no short labels), nor a title with its switch
+   beside it, so the switches shrink. */
+@media (max-width: 359px) {
+  .seg-short .stat-mode-seg .seg-btn { padding: 0 2px; font-size: calc(11px * var(--ts)); }
+  /* The title's switch (Leaderboard's Villains | Players) beside the title. */
+  .page-header > .seg .seg-btn { padding: 0 6px; font-size: calc(11px * var(--ts)); }
+}
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
 /* New Game: Solo picked in the players menu. */
