@@ -389,8 +389,8 @@ const _KBD_SETTINGS = [
   ['-',  'Small text',  () => setTextSize('small')],
   ['0',  'Medium text', () => setTextSize('medium')],
   ['=',  'Large text',  () => setTextSize('large')],
-  ['1',  'English',     () => setLang('en')],
-  ['2',  'Italiano',    () => setLang('it')],
+  ['e',  'English',     () => setLang('en')],
+  ['i',  'Italiano',    () => setLang('it')],
 ];
 
 function _withShortcut(title, key) { return `${title} (${key.toUpperCase()})`; }
@@ -446,7 +446,7 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
         <div class="kbd-help-title">${_esc(t('Keyboard shortcuts'))}</div>
         <div class="kbd-help-groups">
           ${group(t('Pages'), _KBD_PAGES.map(([k, , label]) => [k.toUpperCase(), t(label)]))}
-          ${group(t('Settings'), _KBD_SETTINGS.map(([k, label]) => [k, t(label)]))}
+          ${group(t('Settings'), _KBD_SETTINGS.map(([k, label]) => [k.toUpperCase(), t(label)]))}
           ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
           ${group(t('During a game'), [['⏯︎', t('Pause or resume the timer')], ['⏮︎', t('Previous round')], ['⏭︎', t('Next round')]],
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
