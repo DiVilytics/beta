@@ -965,10 +965,8 @@ function liveMediaLines() {
 
 // + Add player and the player count menu.
 function _syncPlayerCount() {
-  // At 6 players it stays, off, its reason on hover (not in Solo: one row).
-  setVisible('orderAddBtn', !soloMode);
-  const addBtn = document.getElementById('orderAddBtn');
-  if (addBtn) { addBtn.disabled = orderSlots.length >= 6; addBtn.title = addBtn.disabled ? t('A game has at most 6 players') : ''; }
+  // Gone at 6 players, a game's most (and in Solo: one row).
+  setVisible('orderAddBtn', !soloMode && orderSlots.length < 6);
   const pcSel = document.getElementById('playerCountSel');
   if (pcSel) pcSel.value = soloMode ? 'solo' : String(orderSlots.length);
 }
