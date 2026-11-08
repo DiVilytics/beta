@@ -378,7 +378,7 @@ function closeLineup() {
   closeOverlay('lineupOverlay');
 }
 
-// No order | In order, as in New Game: the rows go unnumbered (–), and the
+// Unknown order | In order, as in New Game: the rows go unnumbered (–), and the
 // game is saved without a play order; In order saves the rows as listed.
 let lineupNoOrder    = false;
 let _lineupDragReady = false;
@@ -388,7 +388,7 @@ function toggleLineupOrder() {
 }
 
 function _renderLineup() {
-  document.getElementById('lineupOrderToggle').textContent = lineupNoOrder ? t('In order') : t('No order');
+  document.getElementById('lineupOrderToggle').textContent = lineupNoOrder ? t('In order') : t('Unknown order');
   document.getElementById('lineupSlots').innerHTML = lineupDraft.map((s, i) => {
     const taken     = new Set(lineupDraft.filter(o => o.id !== s.id).map(o => o.character));
     const available = lineupChars.filter(c => !taken.has(c.name));

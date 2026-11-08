@@ -155,13 +155,13 @@ function statGamesWidth(rows, mode) {
 // first (the villains' Leaderboard, a villain's page), `matchups: true`
 // Matchups after it (the villains' Leaderboard). Each label also has a short form ('% Wins:short' in
 // i18n: "% Vitt."), shown only where a row is too tight for the full ones
-// (.seg-short on a parent: the villain page with its All / Solo menu); without
-// one, the full label.
+// (.seg-short on a parent: the villain page with its All / Solo menu, and the
+// villains' Leaderboard, whose Matchups makes five tabs); without one, the full label.
 const _statShortLabel = key => { const s = t(key + ':short'); return s.endsWith(':short') ? t(key) : s; };
 function statModeSegHTML(mode, fn, { xp = false, chance = false, matchups = false } = {}) {
   const btn = (m, key) =>
     `<button class="seg-btn ${mode === m ? 'on' : ''}" type="button" onclick="${fn}('${m}')"><span class="stat-lbl-full">${t(key)}</span><span class="stat-lbl-short">${_statShortLabel(key)}</span></button>`;
-  return `<div class="controls mb-1"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
+  return `<div class="controls mb-1${matchups ? ' seg-short' : ''}"><div class="seg stat-mode-seg">${xp ? btn('xp', 'XP') : ''}${chance ? btn('chance', 'Δ Wins') : ''}${matchups ? btn('matchups', 'Matchups') : ''}${btn('pct', '% Wins')}${btn('count', '# Wins')}${btn('games', '# Games')}</div></div>`;
 }
 
 // The line under the switch for % Wins, # Wins and # Games (Δ Wins, Matchups and

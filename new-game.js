@@ -31,7 +31,7 @@ let _roundsCounted  = false;
 // test by which stopLive fills in the duration and rounds). Its lineup changes
 // only after a yes (_confirmLineup). Kept with the game in progress.
 let _underway       = false;
-// The play order isn't known (No order, next to Villains and Players): the
+// The play order isn't known (Unknown order, next to Villains and Players): the
 // rows go unnumbered (–), Random order is off, and the game is saved without
 // one (position null), as the imported logs. Kept with the draft and the game
 // in progress. Not in Solo (one seat).
@@ -200,7 +200,7 @@ function _restoreDraftForm() {
   return d;
 }
 
-// No order | In order (orderUnknown): the rows lose or get back their numbers.
+// Unknown order | In order (orderUnknown): the rows lose or get back their numbers.
 function toggleOrderUnknown() {
   orderUnknown = !orderUnknown;
   renderOrderSlots();
@@ -733,7 +733,7 @@ function _updateActionBtns() {
     shuffleBtn.title    = orderUnknown ? t('The play order is unknown') : filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
   }
   const orderBtn = document.getElementById('orderToggle');
-  if (orderBtn) orderBtn.textContent = orderUnknown ? t('In order') : t('No order');
+  if (orderBtn) orderBtn.textContent = orderUnknown ? t('In order') : t('Unknown order');
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
