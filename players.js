@@ -16,7 +16,7 @@ let pfFriends   = [];   // top co-players by shared games (filter-independent)
 let pfTournaments = { list: [] };   // the tournaments they organized or played in, their medals (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
-let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
+let pfMode           = 'pct';   // 'chance' (Δ Wins, first) | 'pct' (the default) | 'count' | 'games'
 let pfWinsOnly       = false;
 let pfAchAll         = false;   // achievements: the earned ones, or (Show all) every one
 let pfLocationFilter = null;
@@ -487,13 +487,22 @@ function render() {
   }
 
   // Character tally
+  // Each villain's games and wins, and for Δ Wins its chances: 1/k a game at k
+  // players (seatsIn, the summary's).
   const charMap = {};
   for (const p of mine) {
-    if (!charMap[p.character]) charMap[p.character] = { character: p.character, games: 0, wins: 0 };
-    charMap[p.character].games++;
-    if (p.is_winner) charMap[p.character].wins++;
+    if (!charMap[p.character]) charMap[p.character] = { character: p.character, games: 0, wins: 0, exp: 0, vari: 0 };
+    const r = charMap[p.character], k = seatsIn[p.game_id];
+    r.games++;
+    if (p.is_winner) r.wins++;
+    if (k >= 2) { r.exp += 1 / k; r.vari += 1 / k * (1 - 1 / k); }
   }
   const charRows = Object.values(charMap);
+  // Δ Wins first (not on Solo), % Wins the default; Δ Wins ranks a villain
+  // from the % Wins minimum (one win at a table of 5 is already +2.0), the
+  // others under the divider.
+  const mode = solo && pfMode === 'chance' ? 'pct' : pfMode;
+  const minGames = mode === 'chance' ? MIN_GAMES_FOR_PCT : 0;
 
   root.innerHTML = `
     ${soloHint}
@@ -501,11 +510,14 @@ function render() {
       ${summaryBoxesHTML({ games: nGames, wins, dur: avgDur, turns: avgTurns, solo, streak: bestStreak, hot: onBestStreak, ...chanceBox })}
     </div>
 
-    ${statModeSegHTML(pfMode, 'pfSetMode')}
-    ${statModeHintHTML(pfMode)}
+    ${statModeSegHTML(mode, 'pfSetMode', { chance: !solo })}
+    ${statModeHintHTML(mode)}
+    ${mode === 'chance' ? chanceHintHTML() : ''}
+    ${mode === 'chance' && charRows.some(r => r.games < minGames) ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
 
     ${renderStatTableHTML(charRows, {
-      mode:        pfMode,
+      mode,
+      minGames,
       headLabel:   t('Villain'),
       getKey:      r   => r.character,
       getName:     villainName,
