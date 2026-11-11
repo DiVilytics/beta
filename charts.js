@@ -65,11 +65,15 @@ const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks
 // A box's color (box-info.json: its cover's, set apart from the others), the
 // same in every chart that colors by box; gray for a villain without one.
 const _boxColor = (boxInfo, box) => boxInfo[box]?.color || 'var(--pace-gray)';
-// The boxes' colors under a chart, in release order, each a link to its box.
+// A box's short name: the initials of its words, small words aside (WTIA, DB).
+const _boxInitials = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
+const _boxYear2 = (boxInfo, b) => String(boxInfo[b]?.year ?? '').slice(-2);
+// The boxes' colors under a chart, in release order, each its initials and
+// year (WTIA 18, as Matchups), a link to its box, the full name on hover.
 function _boxLegendHTML(boxInfo, boxes) {
   const order = b => boxInfo[b]?.order ?? 99;
   return `<div class="ch-legend">${[...boxes].sort((a, b) => order(a) - order(b)).map(b =>
-    `<a class="ch-legend-item" href="villains.html?box=${boxAnchorId(b)}"><span class="ch-swatch" style="background:${_boxColor(boxInfo, b)}"></span>${_esc(b)}</a>`).join('')}</div>`;
+    `<a class="ch-legend-item" href="villains.html?box=${boxAnchorId(b)}" title="${_esc(b)}"><span class="ch-swatch" style="background:${_boxColor(boxInfo, b)}"></span>${_esc(`${_boxInitials(b)} ${_boxYear2(boxInfo, b)}`)}</a>`).join('')}</div>`;
 }
 
 // ── MATCHUPS ──────────────────────────────────────────────────────────────────
@@ -94,11 +98,9 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
         .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0))
         .map(c => ({ key: c.name, name: villainName(c.name), group: c.box, href: `villains.html?vil=${encodeURIComponent(c.name)}` }));
   if (items.length < 2) return Charts.barsV([]);
-  // A box's short name: the initials of its words, small words aside (WTIA, DB).
-  const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
   // A box: its initials over its year's two digits.
   const label = it => boxes
-    ? `<span class="vs-abbr" style="color:${_boxColor(boxInfo, it.key)}">${_esc(short(it.key))}<br>${_esc(String(boxInfo[it.key]?.year ?? '').slice(-2))}</span>`
+    ? `<span class="vs-abbr" style="color:${_boxColor(boxInfo, it.key)}">${_esc(_boxInitials(it.key))}<br>${_esc(_boxYear2(boxInfo, it.key))}</span>`
     : charImgHTML(it.key);
   const newGroup = i => !boxes && i > 0 && items[i].group !== items[i - 1].group;
   const head = (it, i) => `<th class="vs-head${newGroup(i) ? ' vs-box' : ''}" title="${_esc(it.name)}">${label(it)}</th>`;
@@ -137,7 +139,7 @@ function _localTime(g) {
   return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24 };
 }
 
-// By box or pace: each box's bars (in its color), or each pace's.
+// By pace or box: each pace's bars, or each box's (in its color).
 function _byBoxHTML({ games, chars, boxInfo, mode }) {
   const byBox = {};
   for (const c of _villainStats(games, chars)) if (c.box) (byBox[c.box] ||= []).push(c);
@@ -247,9 +249,9 @@ const CHARTS = [
   {
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
-    id: 'box', icon: '📦', label: 'By box or pace',
+    id: 'box', icon: '🎨', label: 'By pace or box',
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
-    groups: [{ id: 'box', label: 'Boxes' }, { id: 'pace', label: 'Pace' }],
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
     desc: {
       chance: {
         box:  "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.",
