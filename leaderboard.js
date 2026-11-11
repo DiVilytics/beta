@@ -5,10 +5,10 @@ let lbCharBoxMap    = {};
 let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
-let lbMode   = 'chance';       // 'pct' | 'count' | 'games' | 'chance', or 'matchups' (villains only) or 'xp' (players only)
+let lbMode   = 'matchups';     // 'pct' | 'count' | 'games' | 'chance', or 'matchups' (villains only) or 'xp' (players only)
 
 // Each tab keeps its own ranking: villains open on Δ Wins, players on XP.
-const _lbModeByTab = { characters: 'chance', players: 'xp' };
+const _lbModeByTab = { characters: 'matchups', players: 'xp' };
 
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
 // time / Year / Month (period-filter.js): any change reloads. Solo ranks the
