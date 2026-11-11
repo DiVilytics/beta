@@ -122,21 +122,21 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   return `<div class="vs-wrap"><table class="vs-grid${boxes ? ' vs-boxes' : ''}"><thead><tr><th class="vs-corner"></th>${items.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-// A game's weekday (0 = Sunday) and hour (0-23) at the local time where it was
+// A game's weekday (0 = Sunday), hour (0-23) and minute at the local time where it was
 // played (its time_zone), or null for a zone the browser doesn't know. One
 // formatter per zone.
 const _zoneFmt = {};
 function _localTime(g) {
   const z = g.time_zone;
   if (!(z in _zoneFmt)) {
-    try { _zoneFmt[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, weekday: 'short', hour: 'numeric', hourCycle: 'h23' }); }
+    try { _zoneFmt[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, weekday: 'short', hour: 'numeric', minute: '2-digit', hourCycle: 'h23' }); }
     catch (_) { _zoneFmt[z] = null; }
   }
   const f = _zoneFmt[z];
   if (!f) return null;
   const parts = f.formatToParts(new Date(g.at));
   const get = type => parts.find(p => p.type === type)?.value;
-  return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24 };
+  return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24, minute: Number(get('minute')) || 0 };
 }
 
 // By pace or box: each pace's bars, or each box's (in its color).
@@ -434,7 +434,7 @@ const CHARTS = [
     desc: {
       weekday: 'Games played on each weekday, Monday first, at the local time where each was played. Only games saved with their time zone count.',
       part:    'Games by the part of the day they started: morning 6-12, afternoon 12-18, evening 18-24, night 0-6, local time. Only games saved with their time and time zone count.',
-      hour:    'Games by the hour they started, at the local time where each was played. Only games saved with their time and time zone count.',
+      hour:    'Games by the hour they started, from 6:00 to 6:00, at the local time where each was played; the shading is the middle half. Only games saved with their time and time zone count.',
     },
     render({ games, mode }) {
       // Only the games that know where they were played (games.time_zone); the
@@ -445,19 +445,29 @@ const CHARTS = [
       const total = local.length || 1;
       const pct   = c => Math.round(c / total * 100);
       const meta  = c => `${tn(c, '{n} game', '{n} games')} | ${pct(c)}%`;
+      // The hours and the parts of the day run from 6:00 to 6:00, so a game
+      // past midnight is a late one (night after evening), and the median and
+      // middle half of the start times, shaded as on Game length, never wrap.
+      const since6 = ({ p }) => (p.hour + p.minute / 60 - 6 + 24) % 24;   // hours since 6:00
+      const starts = local.map(since6).sort((a, b) => a - b);
+      const clock  = h => { const m = Math.round((h + 6) * 12) * 5 % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+      const spread = width => {
+        const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(starts, q));
+        return { mid: mid / width, lo: q1 / width, hi: q3 / width, text: t('Median {m} | middle half {a}-{b}', { m: clock(mid), a: clock(q1), b: clock(q3) }) };
+      };
       if (mode === 'hour') {
-        const counts = new Array(24).fill(0);
-        for (const { p } of local) counts[p.hour]++;
-        const hh = h => `${String(h).padStart(2, '0')}:00`;
-        const data = counts.map((c, h) => ({ value: c, name: `${hh(h)}-${hh((h + 1) % 24)}`, meta: meta(c) }));
-        return Charts.barsV(data, { xTick: h => String(h), xEvery: 3, note: t('Evenings (18-24) {pct}%', { pct: pct(counts.slice(18).reduce((a, c) => a + c, 0)) }) });
+        const counts = new Array(24).fill(0);   // 0: 6:00-7:00
+        for (const x of local) counts[Math.floor(since6(x))]++;
+        const hh = i => `${String((i + 6) % 24).padStart(2, '0')}:00`;
+        const data = counts.map((c, i) => ({ value: c, name: `${hh(i)}-${hh(i + 1)}`, meta: meta(c) }));
+        return Charts.barsV(data, { xTick: i => String((i + 6) % 24), xEvery: 3, spread: spread(1) });
       }
       if (mode === 'part') {
         // Morning 6-12, afternoon 12-18, evening 18-24, night 0-6.
-        const parts  = [['Morning', 6], ['Afternoon', 12], ['Evening', 18], ['Night', 0]];
-        const counts = parts.map(([, from]) => local.filter(({ p }) => p.hour >= from && p.hour < from + 6).length);
-        const data   = parts.map(([label], i) => ({ value: counts[i], name: t(label), meta: meta(counts[i]) }));
-        return Charts.barsV(data, { xTick: i => t(parts[i][0]), xEvery: 1 });
+        const parts  = ['Morning', 'Afternoon', 'Evening', 'Night'];
+        const counts = parts.map((_, i) => starts.filter(h => h >= i * 6 && h < i * 6 + 6).length);
+        const data   = parts.map((label, i) => ({ value: counts[i], name: t(label), meta: meta(counts[i]) }));
+        return Charts.barsV(data, { xTick: i => t(parts[i]), xEvery: 1, spread: spread(6) });
       }
       const counts = new Array(7).fill(0);   // 0 = Sunday
       for (const { g, p } of local) counts[isDateOnly(g) ? new Date(g.at).getUTCDay() : p.day]++;   // date-only: the recorded day
