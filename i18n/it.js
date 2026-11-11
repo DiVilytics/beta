@@ -426,6 +426,8 @@ window.I18N.it = {
     "Δ Wins:short": "Δ Vitt.",
     "# Wins:short": "N. Vitt.",
     "# Games:short": "N. Part.",
+    "Games:short": "Part.",
+    "Wins:short": "Vitt.",
     "% Wins (short)": "% Vitt.",
     "# Wins (short)": "N. Vitt.",
     "# Games (short)": "N. Part.",

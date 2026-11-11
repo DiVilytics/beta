@@ -57,7 +57,7 @@ function _villainsHTML(fit, all) {
     <div class="section-label">${t('Villains: Strength')}</div>
     <p class="results-hint">${t('Strength: the villain\'s wins against those an average villain would have had at the same tables. Δ Wins: against an equal share at every table.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${_statShortLabel('Games')}</th></tr></thead>
       <tbody>${rows.map((v, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="villains.html?vil=${encodeURIComponent(v.name)}">${charImgHTML(v.name)}<span>${villainNameInline(v.name)}</span></a></td>
@@ -67,7 +67,7 @@ function _villainsHTML(fit, all) {
     </table></div>`;
 }
 
-// Players: Skill, the corrected Δ Wins, then the plain one (their claimed seats), wins, games, last game.
+// Players: Skill, the corrected Δ Wins, then the plain one (their claimed seats), wins, games.
 function _playersHTML(fit, nick, all) {
   const plain = _plainDelta(all, s => s.user_id);
   const rows = fit.players.map(p => ({ ...p, prof: nick.get(p.uid) }))
@@ -77,15 +77,14 @@ function _playersHTML(fit, nick, all) {
     <div class="section-label">${t('Players: Skill')}</div>
     <p class="results-hint">${t('Skill: the player\'s wins against those an average player would have had with the same villains at the same tables. Only the games where they claimed their villain.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${_statShortLabel('Wins')}</th><th>${_statShortLabel('Games')}</th></tr></thead>
       <tbody>${rows.map((p, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="players.html?nick=${encodeURIComponent(p.prof.nickname)}">${playerAvatarHTML(resolveAvatar(p.prof))}<span>${_esc(p.prof.nickname)}</span></a></td>
           <td class="st-main">${fmtChance(chanceDelta(p))}</td>
           <td class="st-sub">${fmtChance(chanceDelta(plain[p.uid] || {}))}</td>
           <td class="st-sub">${p.wins}</td>
-          <td class="st-sub">${p.games}</td>
-          <td class="st-sub">${fmtDateShort(new Date(p.curve[p.curve.length - 1].at).toISOString())}</td></tr>`).join('')}</tbody>
+          <td class="st-sub">${p.games}</td></tr>`).join('')}</tbody>
     </table></div>`;
 }
 
@@ -160,7 +159,7 @@ async function stRunTest(btn) {
   const rows = [];
   for (const [name, opts] of variants) {
     const r = strengthTest(games, cut, opts);
-    rows.push(`<tr><td class="st-name">${name}</td><td class="st-main">${(100 * r.hitRate).toFixed(1)}%</td><td class="st-sub">${r.gain.toFixed(3)}</td></tr>`);
+    rows.push(`<tr><td class="st-name st-wrap">${name}</td><td class="st-main">${(100 * r.hitRate).toFixed(1)}%</td><td class="st-sub">${r.gain.toFixed(3)}</td></tr>`);
     box.innerHTML = `<p class="results-hint">${t('Fitted on the games up to {d}, it guessed the winners of the {n} games after. Winner picked: how often the seat it rated highest won. Gain: how much more likely than equal chances it found the actual winners, on average (higher is better).', { d: fmtDateShort(new Date(cut).toISOString()), n: r.games })}</p>
       <div class="st-table-wrap"><table class="st-table"><thead><tr><th>${t('Model')}</th><th>${t('Winner picked')}</th><th>${t('Gain')}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
     await new Promise(r => setTimeout(r, 10));
