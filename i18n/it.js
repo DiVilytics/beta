@@ -636,7 +636,7 @@ window.I18N.it = {
     "Picks": "Scelte",
     "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.": "Quanto spesso vengono scelti i cattivi di ogni velocità in tutte le partite registrate, come quota di tutte le scelte. Tocca una fascia per le scelte e i cattivi.",
     "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.": "La percentuale di vittorie complessiva di ogni velocità, sommando tutti i cattivi di quel colore (vittorie totali su partite totali). Tocca una barra per le sue partite e i suoi cattivi.",
-    "By pace or box": "Per velocità o scatola",
+    "By villain group": "Per gruppo di cattivi",
     "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.": "La percentuale di vittorie complessiva di ogni scatola, sommando tutti i suoi cattivi (vittorie totali su partite totali); barre ordinate dalla più forte. Tocca una scatola per le sue partite totali.",
     "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.": "Quanto spesso vengono scelti i cattivi di ogni scatola in tutte le partite registrate, dalla più giocata. Tocca una barra per la sua quota di tutte le scelte, o per aprire la scatola.",
     "Game length": "Durata delle partite",

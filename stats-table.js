@@ -15,12 +15,13 @@
 // while they're on it. chance: the Δ Wins value, '-' with `chanceTitle` on
 // hover when there's none (Solo; a player under the % Wins minimum).
 function summaryBoxesHTML({ games, wins, dur, turns, solo = false, streak = null, hot = false, chance = '-', chanceTitle = '' }) {
-  const winsVal = streak == null ? wins : `${wins} <span class="stat-val-sub">(${streak})</span>`;
+  // On their max streak, the streak alone turns gold (not the wins).
+  const winsVal = streak == null ? wins : `${wins} <span class="stat-val-sub${hot ? ' hot' : ''}">(${streak})</span>`;
   return statBoxesHTML([
     { val: games, lbl: t('Games') },
     { val: dur   != null ? Math.round(dur) + 'm' : '-', lbl: t('Avg duration') },
     { val: turns != null ? Math.round(turns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
-    { val: winsVal, lbl: streak == null ? t('Wins') : t('Wins (streak)'), hot,
+    { val: winsVal, lbl: streak == null ? t('Wins') : t('Wins (streak)'),
       title: streak == null ? '' : [t('Max streak: {n}', { n: streak }), hot ? t('Currently on this streak') : ''].filter(Boolean).join(' | ') },
     { val: typeof games === 'number' && games ? Math.round(wins / games * 100) + '%' : '-', lbl: t('% Wins') },
     { val: solo ? '-' : chance, lbl: t('Δ Wins'), title: solo ? t('Not for solo games.') : chanceTitle },

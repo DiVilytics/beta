@@ -973,9 +973,9 @@ main {
 .vs-abbr { display: block; font-size: 9px; line-height: 1.1; font-weight: 700; color: var(--muted); letter-spacing: -0.02em; }
 /* Two switches on one row (Matchups on the beta), their padding shrinking
    with the screen so both fit a phone. */
-.controls.chart-switches { flex-direction: row; gap: 8px; flex-wrap: nowrap; }
+.controls.chart-switches { flex-direction: row; gap: 4px; flex-wrap: nowrap; }
 .chart-switches .chart-group-seg { margin-left: auto; }
-.chart-switches .seg-btn { padding: 0 clamp(4px, 2.6vw - 4px, 14px); }
+.chart-switches .seg-btn { padding: 0 clamp(3px, 2.6vw - 5px, 14px); }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }
@@ -1533,6 +1533,7 @@ select:disabled {
 .stat-val { font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
 .stat-lbl { font-size: calc(11px * var(--ts)); color: var(--muted); margin-top: 2px; }
 /* The second number of a box, "16 (5)": a player's max streak next to their wins. */
+.stat-val-sub.hot { color: var(--gold); }
 .stat-val-sub { font-size: 0.6em; font-weight: 600; color: var(--muted); }
 /* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
 .stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
@@ -3475,6 +3476,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 /* Too narrow for the pool's five actions (under 360px, after the phone rule
    that keeps them on one line): Done goes under them, on the right. */
 @media (max-width: 359px) {
+  .controls.chart-switches { flex-wrap: wrap; row-gap: 6px; }   /* two switches: the second on its own line */
   .filter-actions { flex-wrap: wrap; }
   .filter-actions .filter-apply-btn { margin-left: auto; }
 }

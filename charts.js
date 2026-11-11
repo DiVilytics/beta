@@ -198,8 +198,8 @@ function _byPaceHTML({ games, chars, mode }) {
     return { label: t(b[0].toUpperCase() + b.slice(1)), value, games: sum.games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
   }).filter(d => d.games > 0);
   return mode === 'chance'
-    ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 60, diverging: true })
-    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: mode === 'pct' ? _overallRef(cs) : null });
+    ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 80, diverging: true })
+    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 80, ref: mode === 'pct' ? _overallRef(cs) : null });
 }
 
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
@@ -247,7 +247,7 @@ const CHARTS = [
   {
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
-    id: 'box', icon: '🗂️', label: 'By pace or box',
+    id: 'box', icon: '🗂️', label: 'By villain group',
     solo: true,   // also on Solo: the solo games (% Wins, no Δ Wins)
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
@@ -529,8 +529,11 @@ const _groupOf = c => _pick(c.groups, _groups[c.id]);
 // every chart starts at the same height.
 function _modesHTML(c) {
   if (!c.modes && !c.groups) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
+  // A mode's short label where the language has one ('% Wins:short': "% Vitt."),
+  // so two switches fit side by side on a phone.
+  const label = l => { const s = t(l + ':short'); return s.endsWith(':short') ? t(l) : s; };
   const seg = (opts, on, fn) => `<div class="seg">${opts.map(m =>
-    `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div>`;
+    `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(label(m.label))}</button>`).join('')}</div>`;
   return `<div class="controls mb-1 chart-switches">${c.modes ? seg(_modesOf(c), _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
 }
 
