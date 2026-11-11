@@ -577,7 +577,7 @@ async function _rerender() {
     // a chart by table size (sizes: false) ignores the filter, Solo too.
     const onSolo = _onSolo(c);
     if (onSolo && !c.solo) {
-      stage.innerHTML = `<div class="chart-note">${t('This chart is about official games: pick All or a number of players.')}</div>`;
+      stage.innerHTML = `<div class="chart-note">${t('A solo game has no opponents, so no matchups: pick All or a number of players.')}</div>`;
       return;
     }
     const [all, chars, boxInfo] = await Promise.all([onSolo ? _soloChartGames() : loadOfficialGames(), loadCharacters(), loadBoxInfo()]);
