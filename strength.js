@@ -204,13 +204,34 @@ function strengthFit(data, opts = {}) {
   refresh();
   const curv = new Float64Array(villains.length);
   for (const s of seats) curv[s.v] += s.h;
-  const vOut = villains.map((v, i) => ({ name: v.name, u: b[i], sd: 1 / Math.sqrt(curv[i] + 1 / (o.sb * o.sb)), games: 0, wins: 0 }));
+  const vOut = villains.map((v, i) => ({ name: v.name, u: b[i], sd: 1 / Math.sqrt(curv[i] + 1 / (o.sb * o.sb)), games: 0, wins: 0, exp: 0, vari: 0 }));
   for (const s of seats) { vOut[s.v].games++; if (s.win) vOut[s.v].wins++; }
   const pOut = players.map((pl, pi) => {
     const v = curveStep(pi, true);   // one more (tiny) step, and the variances
     const games = playerSeats[pi].length, wins = playerSeats[pi].filter(s => s.win).length;
-    return { uid: pl.uid, curve: pl.nodes.map((nd, n) => ({ at: nd.at, u: a[pi][n], sd: Math.sqrt(v[n]) })), games, wins };
+    return { uid: pl.uid, curve: pl.nodes.map((nd, n) => ({ at: nd.at, u: a[pi][n], sd: Math.sqrt(v[n]) })), games, wins, exp: 0, vari: 0 };
   });
+  // The corrected Δ Wins (chanceDelta, stats-table.js: (W − E) / √V): E the
+  // wins an average villain (b = 0) would have had in each of the villain's
+  // seats, everything else at the table as it was (the opponents, the seat,
+  // the players); for a player, an average player (their own terms at 0) with
+  // the same villains, seats and opponents. V their variance, E's P(1 − P).
+  refresh();
+  for (const g of G) {
+    const tot = g.seats.reduce((x, t) => x + t.e, 0);
+    for (const s of g.seats) {
+      const rest = tot - s.e;
+      const ev = s.e * Math.exp(-b[s.v]);
+      const pv = ev / (ev + rest);
+      vOut[s.v].exp += pv; vOut[s.v].vari += pv * (1 - pv);
+      if (s.p >= 0) {
+        const own = a[s.p][s.node] + (o.terms.pair ? d[s.pair] : 0) + (o.terms.exp ? beta * s.x : 0) + (o.terms.know ? gamma * s.z : 0);
+        const ep = s.e * Math.exp(-own);
+        const pp = ep / (ep + rest);
+        pOut[s.p].exp += pp; pOut[s.p].vari += pp * (1 - pp);
+      }
+    }
+  }
   return {
     villains: vOut, players: pOut, iterations: iter,
     seat: c.map(arr => Array.from(arr)), beta, gamma,

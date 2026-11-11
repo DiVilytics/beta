@@ -1,15 +1,12 @@
 // ── STRENGTH AND SKILL (test page) ───────────────────────────────────────────
-// strength.html: the model of strength.js on every official game, shown next
-// to Δ Wins to compare: the villains' Strength, the players' Skill (now: their
-// last game's, rusted by the days since), the seat's edge by table size, and on
-// request the prediction test (each term's worth). Not in the menu; the
-// Leaderboard gets it once it's settled. Every value reads as a chance: winning
-// a table of 4 against three average seats (25% is average). Rankings use the
-// prudent value (the estimate less one σ): few or old games can't top them.
+// strength.html: the model of strength.js on every official game: the
+// villains' Strength and the players' Skill as a corrected Δ Wins (their wins
+// against those an average villain, or player, would have had in their exact
+// seats: the opponents, the seat, the players as the model has them), next to
+// the plain Δ Wins; the seat's edge by table size; on request the prediction
+// test (each term's worth). Not in the menu; the Leaderboard gets it once
+// it's settled.
 
-const _num = (x, d = 1) => x.toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
-const _pct = u => `${_num(100 * strengthP4(u))}%`;
-const _pm  = (u, sd) => _num(100 * (strengthP4(u + sd) - strengthP4(u)));
 
 async function init() {
   setActiveNav('');
@@ -31,54 +28,62 @@ async function init() {
   root.innerHTML = `
     <p class="results-hint"><button class="char-guide-link" type="button" onclick="openStrengthInfo()">${t('How it\'s computed')} ›</button></p>
     ${_villainsHTML(fit, all)}
-    ${_playersHTML(fit, nick)}
+    ${_playersHTML(fit, nick, all)}
     ${_seatsHTML(fit)}
     ${_modelHTML(fit, ms, all)}`;
 }
 
 // Villains: Strength (prudent, then the estimate ± σ) and, to compare, Δ Wins.
-function _villainsHTML(fit, all) {
-  const delta = {};
-  for (const g of all) {
+function _plainDelta(games, key) {
+  const out = {};
+  for (const g of games) {
     const k = g.seats.length;
     if (k < 2) continue;
     for (const s of g.seats) {
-      const r = delta[s.character] ||= { wins: 0, exp: 0, vari: 0 };
+      const id = key(s);
+      if (!id) continue;
+      const r = out[id] ||= { wins: 0, exp: 0, vari: 0 };
       if (s.is_winner) r.wins++;
       r.exp += 1 / k; r.vari += 1 / k * (1 - 1 / k);
     }
   }
-  const rows = fit.villains.slice().sort((a, b) => (b.u - b.sd) - (a.u - a.sd));
+  return out;
+}
+
+// Villains: Strength, the corrected Δ Wins (strengthFit's exp and vari), then the plain one.
+function _villainsHTML(fit, all) {
+  const plain = _plainDelta(all, s => s.character);
+  const rows = fit.villains.slice().sort((a, b) => chanceDelta(b) - chanceDelta(a));
   return `
     <div class="section-label">${t('Villains: Strength')}</div>
-    <p class="results-hint">${t('How often the villain would win at a table of 4 against three average villains, everyone with an average player, whatever the seat. Ranked by the cautious value (the estimate minus its margin), so a villain with few games doesn\'t top it by luck; the estimate and its margin are next to it, then Δ Wins to compare.')}</p>
+    <p class="results-hint">${t('Strength is the villain\'s Δ Wins corrected for everything else at its tables: its wins minus those an average villain would have had in the same seats, against the same opponents and with the same players, measured on how much luck alone moves them. 0 is average; past ±2, luck alone rarely goes. Next to it, the plain Δ Wins.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${t('Estimate')}</th><th>${t('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${t('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
       <tbody>${rows.map((v, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="villains.html?vil=${encodeURIComponent(v.name)}">${charImgHTML(v.name)}<span>${villainNameInline(v.name)}</span></a></td>
-          <td class="st-main">${_pct(v.u - v.sd)}</td>
-          <td class="st-sub">${_pct(v.u)} ± ${_pm(v.u, v.sd)}</td>
-          <td class="st-sub">${fmtChance(chanceDelta(delta[v.name] || {}))}</td>
+          <td class="st-main">${fmtChance(chanceDelta(v))}</td>
+          <td class="st-sub">${fmtChance(chanceDelta(plain[v.name] || {}))}</td>
           <td class="st-sub">${v.games}</td></tr>`).join('')}</tbody>
     </table></div>`;
 }
 
-// Players: Skill now (prudent, then the estimate ± σ), their games, wins and last game.
-function _playersHTML(fit, nick) {
-  const rows = fit.players.map(p => ({ ...p, now: strengthNow(fit, p), prof: nick.get(p.uid) }))
+// Players: Skill, the corrected Δ Wins, then the plain one (their claimed seats), wins, games, last game.
+function _playersHTML(fit, nick, all) {
+  const plain = _plainDelta(all, s => s.user_id);
+  const rows = fit.players.map(p => ({ ...p, prof: nick.get(p.uid) }))
     .filter(p => p.prof?.nickname)
-    .sort((a, b) => (b.now.u - b.now.sd) - (a.now.u - a.now.sd));
+    .sort((a, b) => chanceDelta(b) - chanceDelta(a));
   return `
     <div class="section-label">${t('Players: Skill')}</div>
-    <p class="results-hint">${t('How often the player would win at a table of 4 against three average players, everyone with an average villain. It\'s their skill after their latest game, slowly going back toward average while they don\'t play. Only the games where they claimed their villain count; ranked by the cautious value, like the villains.')}</p>
+    <p class="results-hint">${t('Skill is the same for a player: their wins minus those an average player would have had with the same villains, in the same seats and against the same opponents (each at the skill they had in that game). Only the games where they claimed their villain count.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${t('Estimate')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${t('Δ Wins')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
       <tbody>${rows.map((p, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="players.html?nick=${encodeURIComponent(p.prof.nickname)}">${playerAvatarHTML(resolveAvatar(p.prof))}<span>${_esc(p.prof.nickname)}</span></a></td>
-          <td class="st-main">${_pct(p.now.u - p.now.sd)}</td>
-          <td class="st-sub">${_pct(p.now.u)} ± ${_pm(p.now.u, p.now.sd)}</td>
+          <td class="st-main">${fmtChance(chanceDelta(p))}</td>
+          <td class="st-sub">${fmtChance(chanceDelta(plain[p.uid] || {}))}</td>
           <td class="st-sub">${p.wins}</td>
           <td class="st-sub">${p.games}</td>
           <td class="st-sub">${fmtDateShort(new Date(p.curve[p.curve.length - 1].at).toISOString())}</td></tr>`).join('')}</tbody>
@@ -109,7 +114,8 @@ function openStrengthInfo() {
     t('<b>The chance of winning</b> comes from the scores: each seat wins in proportion to e raised to its score, out of the table\'s total. With every score at 0, everyone has the same chance, 1 in the number of players: Δ Wins\' starting point.'),
     t('<b>Villains</b> have one strength each, from every game, estimated again from scratch each time: a new game can change what an old one says (a win against a villain we now know is strong counts for more).'),
     t('<b>Players</b> have a skill that changes game by game, estimated with hindsight: their skill at a game also takes their later games into account, so beating a beginner who later became strong still counts as beating a beginner. It can change within one evening; while they don\'t play, it slowly goes back toward average (rust: after a year away, about two thirds of the way).'),
-    t('<b>Few games</b>: every villain and player starts from average, and only their games move them away; with few games they stay close to it and their margin is wide. The rankings use the cautious value, the estimate minus its margin.'),
+    t('<b>Few games</b>: every villain and player starts from average, and only their games move them away; with few games they stay close to it.'),
+    t('<b>The numbers</b>: Strength and Skill are Δ Wins corrected by the model. For each game, the model says how many wins an average villain (or player) would have expected in that exact seat: same opponents, same seat, same players (each with their skill in that game). Strength is the villain\'s wins minus those, divided by how much luck alone moves them (as in Δ Wins); Skill the same for a player. 0 is average, past ±2 luck alone rarely goes. Plain Δ Wins assumes everyone at the table had the same chance instead.'),
     t('<b>Not counted yet</b>: knowing the opponents\' villains (how many times a player has already faced them). With the claimed games so far it made the predictions worse, so it\'s off; it can come back once there are more.'),
     t('<b>Does it work?</b> Fitted only on the older games, the model guesses the winners of the newer ones better than the villains alone or equal chances: the prediction test at the bottom of the page shows by how much.'),
   ].map(p => `<p class="modal-hint">${p}</p>`).join('');
