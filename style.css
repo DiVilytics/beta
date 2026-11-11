@@ -2188,6 +2188,13 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 #tnIntroHelp { white-space: normal; text-align: left; }
 .tn-row-status { line-height: 1.1; font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* As tall as + Add player under them. */
+/* Copies (tournament form): a villain's copies, − n + at the row's end. */
+.tn-copies-rows { display: grid; gap: 6px; }
+.tn-copy-steps { align-items: center; gap: 6px; }
+.tn-copy-n { min-width: 1.4em; text-align: center; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tn-copy-n.on { color: var(--accent); }
+/* + Add player under a running tournament's players (a late player). */
+.tn-late-btn { margin-top: 8px; }
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
 #tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
 #tnFormRows input.order-slot-input[type="text"] { height: 30px; min-height: 0; }

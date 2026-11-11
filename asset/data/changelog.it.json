@@ -1,4 +1,12 @@
 {
+  "2026-11-09": {
+    "title": "Tornei: copie e subentri",
+    "items": [
+      "Tornei: indica quante copie di ogni cattivo sono disponibili; due cattivi uguali non siedono mai allo stesso tavolo.",
+      "Tornei: un organizzatore può aggiungere un giocatore a torneo in corso; gioca dalla fase successiva, partendo da 0 punti.",
+      "Tornei: il risultato inserito da un organizzatore può includere durata e round."
+    ]
+  },
   "2026-11-02": {
     "title": "Partite passate, Scontri e caricamenti",
     "items": [

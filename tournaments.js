@@ -23,6 +23,7 @@ let tnTables   = [];          // its tables, each with .seats in play order
 let tnOrganizers = [];        // its organizers' user ids, the longest-standing first
 let tnProfiles = new Map();   // user id → profile (organizers, claimed names, recorders)
 let tnPool     = null;        // the form's draw pool (pace-filter.js)
+let tnCopies   = {};          // its copies: villain → 2…6 (1: not listed), the villains in the pool only
 let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
 const tnRule   = { table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' };
 // The final table, an on / off option drawn like the rules.
@@ -332,6 +333,9 @@ function tnRenderTournament() {
     ${lobby || tnView === 'players' ? `
       ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
+      ${isOrg && !lobby && !tnTour.finished_at && tnTour.current_stage < tnTour.stages
+        ? `<button class="add-row-btn tn-late-btn" type="button" onclick="tnAddLatePlayer()">${t('+ Add player')}</button>
+           <p class="tn-hint">${t('A player added now plays from stage {n}, starting from 0 points.', { n: tnTour.current_stage + 1 })}</p>` : ''}
       ${!user ? `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`
         : !mine && !isOrg && !_tnCode() && tnPlayers.some(p => !p.user_id) ? `<p class="tn-hint">${t('To claim your name, scan the tournament\'s QR code from an organizer, or open its link.')}</p>` : ''}
       ${_tnOrganizersHTML(user, isOrg)}`
@@ -357,6 +361,8 @@ function _tnPlayerRowHTML(p, i, { user, isOrg, lobby, mine }) {
   // Drops in saved games, and a withdrawal (the standings leave them out).
   const drops = tnTables.filter(tb => tb.game_id && tb.seats.some(x => x.player_id === p.id && x.dropped)).length;
   const status = [
+    // A late player's stage first: the row cuts what doesn't fit.
+    p.joined_stage ? (tnTour.current_stage < p.joined_stage ? t('Plays from stage {n}', { n: p.joined_stage }) : t('Joined at stage {n}', { n: p.joined_stage })) : '',
     p.user_id ? '' : t('Unclaimed'),
     drops ? `🏳️ ${tn(drops, '{n} drop', '{n} drops')}` : '',
     p.withdrawn_after != null ? t('Withdrawn after stage {n}', { n: p.withdrawn_after }) : '',
@@ -501,7 +507,7 @@ function _tnNextStageHTML(tables) {
 
 // What the next draw makes: "Stage 3 of 5: 2 tables and 1 bye, Swiss pairing."
 function _tnDrawSummary(stage) {
-  const playing = tnPlayers.filter(p => p.withdrawn_after == null).length;
+  const playing = tournamentPlaying(tnPlayers, stage).length;
   if (!playing) return t('Nobody is still playing: the tournament ends here, on the standings as they are.');
   const sizes = tournamentSplit(playing, tnTour.table_size, tnTour.table_split);
   const tables = sizes.filter(n => n > 1).length, byes = sizes.length - tables;
@@ -675,14 +681,23 @@ function tnRelease(playerId) {
   });
 }
 
-// Start: every player's villains for every stage and stage 1's
-// tables are drawn here (tournament-rules.js) and checked by the database.
+// Whether the pool's copies give n players at the tournament's tables
+// different villains at each table; if not, the error says so (Start, Draw).
+function _tnVillainsFit(n, tour = tnTour) {
+  if (!n || tournamentVillainsFit(tour.villain_pool, tournamentSplit(n, tour.table_size, tour.table_split))) {
+    document.querySelector('#tnRoot > .err')?.remove();   // an earlier no, now fixed
+    return true;
+  }
+  _tnShowError(t("With the draw pool's copies, {n} players can't all have different villains at their tables: add villains or copies in Edit tournament.", { n }));
+  return false;
+}
+
+// Start: stage 1's tables and villains are drawn here (tournament-rules.js)
+// and checked by the database; each next stage's with it.
 function tnStart() {
   const n = tnPlayers.length;
   if (n < 2) return _tnShowError(t('A tournament needs at least 2 players.'));
-  if (tnTour.villain_pool.length < n) {
-    return _tnShowError(t('The draw pool has {v} villains for {n} players: every player needs a different one. Add villains in Edit tournament.', { v: tnTour.villain_pool.length, n }));
-  }
+  if (!_tnVillainsFit(n)) return;
   const sizes = tournamentSplit(n, tnTour.table_size, tnTour.table_split);
   openConfirmSheet({
     id:           'tnStartSheet',
@@ -693,10 +708,10 @@ function tnStart() {
   });
 }
 
-// Every player's villains for every stage, and stage 1's tables.
+// Stage 1's tables, and its villains for them.
 async function _tnDrawStart() {
-  const villains = tournamentVillainSchedule(tnTour, tnPlayers.map(p => p.id));
   const tables   = tournamentDrawStage(tnTour, tnPlayers, []);
+  const villains = tournamentStageVillains(tnTour, tables, []);
   return (await db.rpc('start_tournament', { target: tnTour.id, villains, tables })).error;
 }
 
@@ -791,15 +806,17 @@ async function tnOpenForm(tour) {
   } else {
     tnPool.reset();
   }
+  tnCopies = Object.fromEntries(Object.entries(tournamentPoolCopies(tour?.villain_pool)).filter(([, n]) => n > 1));
   const draft = tour ? null : _tnLoadDraft();
   if (draft?.pool) tnPool.restoreState(draft.pool);
+  if (draft?.copies) tnCopies = { ...draft.copies };
   else if (!tour) tnPool.defaultToMine();   // your boxes, when you've marked some
   tnPool.updatePaceUI();
   // The players: two empty rows, or the tournament's (a default name shows as
   // the empty row's placeholder; a claimed one as its nickname).
   document.getElementById('tnFormPlayersLabel').textContent = t('Players');
   document.getElementById('tnFormPlayersHint').textContent =
-    t('From 2 players up to the villains in the draw pool. An empty name keeps the one shown. Players change here until the first game starts.');
+    t('From 2 players up to the copies of villains in the draw pool. An empty name keeps the one shown. Players change here until the first game starts.');
   const meId = getCurrentUser()?.id;
   tnFormPlayers = tour
     ? tnPlayers.map(p => ({ id: p.id, stored: p.name, name: _tnIsDefaultName(p.name) ? '' : p.name, userId: p.user_id, isMe: !!meId && p.user_id === meId }))
@@ -836,6 +853,7 @@ function _tnDraftState() {
     custom:  tnCustom,
     players: tnFormPlayers.map(p => ({ name: p.name, isMe: !!p.isMe })),
     pool:    { excluded: [...tnPool.excluded], selectedPace: tnPool.selectedPace, pacePlus: !!tnPool.selectedPace && tnPool.pacePlus, mineOn: tnPool.mineOn },
+    copies:  _tnCopiesInPool(),
   };
 }
 
@@ -845,7 +863,7 @@ function _tnFormChanged() {
   return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== '3'
     || Object.entries({ table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' }).some(([k, v]) => d.rule[k] !== v)
     || d.players.length !== 2 || d.players.some(p => p.name.trim() || p.isMe)
-    || !tnPool.isDefault();
+    || !tnPool.isDefault() || Object.keys(d.copies).length > 0;
 }
 
 function _tnSaveDraft() {
@@ -1031,14 +1049,14 @@ const TN_HELP = [
     'Fixed once the first game starts.',
   ]],
   ['villains', 'Villains', [
-    'At the start, every player\'s villain for every stage is drawn at once, from the draw pool: in each stage all villains are different, and nobody gets the same villain twice while the pool has enough of them (with more stages than villains, everyone plays every villain once before any repeats). A stage\'s villains show only once it is drawn.',
-    'The draw pool needs at least as many villains as players. Fixed once the first game starts.',
+    'Each stage\'s villains are drawn with its tables, from the draw pool: never the same villain twice at a table, in a stage a villain at most as many times as its copies, and nobody gets the same villain twice while the pool allows it. A stage\'s villains show only once it is drawn.',
+    'The draw pool has one copy of each villain, unless Copies says more (up to 6): copies let more players than villains play, each copy at a different table. The players can be at most the copies in the pool. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
     'The organizers type the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: an organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
     'An organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
     'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
-    'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Once a game has started, no player can be added. A player with no name typed is Player N until claimed.',
+    'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Later, an organizer adds a player with + Add player, under the players: they play from the next stage, starting from 0 points (not once the last stage is drawn). A player with no name typed is Player N until claimed.',
   ]],
   ['organizers', 'Organizers', [
     'Whoever creates the tournament is its first organizer. An organizer adds others with Organizer QR: whoever scans it, signed in, and taps Become an organizer is one too. There can be as many as you like, and they are all alike: each can do everything, from editing, starting and drawing the stages to entering and fixing results, withdrawing players and deleting the tournament, and can add or remove organizers.',
@@ -1092,9 +1110,12 @@ function tnTogglePool(open) {
 
 function _tnPoolChanged() {
   const badge = document.getElementById('tnPoolBadge');
-  badge.textContent = tnChars.length - tnPool.excluded.size;
+  badge.textContent = _tnPoolSize();   // copies included
   badge.classList.add('visible');
   badge.classList.toggle('full', !tnPool.excluded.size);
+  const extra = Object.keys(_tnCopiesInPool()).length;
+  const copiesBtn = document.getElementById('tnCopiesBtn');
+  if (copiesBtn) copiesBtn.textContent = extra ? `${t('Copies')} (${extra})` : t('Copies');
   document.getElementById('tnPoolReset').disabled = tnPool.isDefault();
   if (!document.getElementById('tnFormPlayers').classList.contains('hidden')) _tnRenderFormPlayers();
 }
@@ -1107,7 +1128,59 @@ function _tnPoolChanged() {
 // a name someone claimed shows their nickname and can't be typed over.
 let tnFormPlayers = [];
 
-function _tnPoolSize() { return tnChars.length - (tnPool?.excluded.size || 0); }
+// Copies (in the draw pool): every villain in the pool, by box as the pool,
+// with − n + (1 to TN_MAX_COPIES): the copies at hand for this tournament
+// only. In a stage a villain is played at most once per copy, never twice at
+// a table. Done keeps them, Cancel leaves them as they were.
+const TN_MAX_COPIES = 6;   // the database's limit too
+let _tnCopiesEdit = {};
+function tnOpenCopies() {
+  _tnCopiesEdit = _tnCopiesInPool();
+  openConfirmSheet({
+    id:           'tnCopiesSheet',
+    title:        t('Copies'),
+    bodyHTML:     `<p class="modal-hint">${t('How many copies of each villain are at hand for this tournament. In a stage a villain is played at most once per copy, and never twice at the same table.')}</p><div id="tnCopiesRows" class="tn-copies-rows"></div>`,
+    confirmLabel: t('Done'),
+    onConfirm:    () => { tnCopies = { ..._tnCopiesEdit }; _tnPoolChanged(); _tnSaveDraft(); },
+  });
+  _tnRenderCopies();
+}
+function tnBumpCopies(name, d) {
+  const n = Math.max(1, Math.min(TN_MAX_COPIES, (_tnCopiesEdit[name] || 1) + d));
+  if (n > 1) _tnCopiesEdit[name] = n; else delete _tnCopiesEdit[name];
+  _tnRenderCopies();
+}
+function _tnRenderCopies() {
+  const box = document.getElementById('tnCopiesRows');
+  if (!box) return;
+  const order = b => tnBoxInfo[b]?.order ?? 99;
+  const inPool = tnChars.filter(c => !tnPool.excluded.has(c.name))
+    .sort((a, b) => order(a.box) - order(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  box.innerHTML = inPool.map(c => {
+    const n = _tnCopiesEdit[c.name] || 1;
+    const arg = _esc(JSON.stringify(c.name));
+    return `
+      <div class="order-slot tn-copy-row">
+        <img class="order-slot-portrait" src="${charImgSrc(c.name)}" onerror="this.src='asset/players/default.svg'" alt="">
+        <div class="order-slot-info"><span class="order-slot-name">${villainNameHTML(c.name)}</span></div>
+        <div class="order-slot-actions tn-copy-steps">
+          <button class="pf-btn" type="button" onclick="tnBumpCopies(${arg}, -1)"${n <= 1 ? ' disabled' : ''} aria-label="−">−</button>
+          <span class="tn-copy-n${n > 1 ? ' on' : ''}">${n}</span>
+          <button class="pf-btn" type="button" onclick="tnBumpCopies(${arg}, 1)"${n >= TN_MAX_COPIES ? ` disabled title="${_esc(t('At most {n} copies', { n: TN_MAX_COPIES }))}"` : ''} aria-label="+">+</button>
+        </div>
+      </div>`;
+  }).join('') || `<p class="tn-hint">${t('The draw pool is empty.')}</p>`;
+}
+
+// The villains in the form's pool, once per copy (the tournament's villain_pool).
+function _tnFormPool() {
+  return tnChars.map(c => c.name).filter(n => !tnPool.excluded.has(n)).flatMap(n => Array(tnCopies[n] || 1).fill(n));
+}
+// The copies of the villains still in the pool (one taken out keeps none).
+function _tnCopiesInPool() {
+  return Object.fromEntries(Object.entries(tnCopies).filter(([n, c]) => c > 1 && !tnPool?.excluded.has(n)));
+}
+function _tnPoolSize() { return tnPool ? _tnFormPool().length : 0; }
 const _tnFormMax = () => Math.max(2, _tnPoolSize());
 
 // "Player 3" (or "Giocatore 3"): a name nobody typed.
@@ -1245,7 +1318,7 @@ async function tnSaveForm() {
   if (!user) return goToSignIn();
   const date  = document.getElementById('tnDate').value || _tnToday();
   const names = _tnFormNames();
-  const pool  = tnChars.map(c => c.name).filter(n => !tnPool.excluded.has(n));
+  const pool  = _tnFormPool();   // a villain once per copy
   // A game has started: the name and the date only.
   if (tnFormFor && !_tnAllOpen(tnFormFor)) {
     const name = document.getElementById('tnName').value.trim();
@@ -1267,9 +1340,13 @@ async function tnSaveForm() {
   if (new Set(names.map(n => n.toLowerCase())).size !== names.length) return showError('tnFormErr', t('Every player needs a different name.'));
   if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
   if (!Number.isInteger(stages) || stages < 1 || stages > 20) return showError('tnFormErr', t('Stages: from 1 to 20.'));
-  if (pool.length < 2) return showError('tnFormErr', t('The draw pool needs at least 2 villains.'));
+  if (new Set(pool).size < 2) return showError('tnFormErr', t('The draw pool needs at least 2 villains.'));
   const total = names.length;
-  if (total > pool.length) return showError('tnFormErr', t('The draw pool has {v} villains for {n} players: every player needs a different one.', { v: pool.length, n: total }));
+  if (total > pool.length) return showError('tnFormErr', t('The draw pool has {v} copies of villains for {n} players: every player needs one.', { v: pool.length, n: total }));
+  const size = Number(document.getElementById('tnSize').value);
+  if (!tournamentVillainsFit(pool, tournamentSplit(total, size, tnRule.table_split))) {
+    return showError('tnFormErr', t("With the draw pool's copies, {n} players can't all have different villains at their tables: add villains or copies.", { n: total }));
+  }
   const row = {
     name, stages,
     table_size:   Number(document.getElementById('tnSize').value),
@@ -1304,19 +1381,19 @@ async function tnSaveForm() {
     const redraw = _tnPlanChangesDraw(plan) || row.table_size !== was.table_size || row.stages !== was.stages
       || row.table_split !== undefined && row.table_split !== (was.table_split || 'even')
       || row.play_order  !== undefined && row.play_order  !== (was.play_order || 'random')
-      || pool.length !== was.villain_pool.length || pool.some(v => !was.villain_pool.includes(v));
+      || [...pool].sort().join('|') !== [...was.villain_pool].sort().join('|');   // the villains or their copies
     if (!redraw) return _tnSaveSetup({ settings: row, plan });
     return openConfirmSheet({
       id:           'tnRedrawSheet',
       title:        t('Draw stage 1 again?'),
-      bodyHTML:     `<p class="confirm-text">${t('The tables, the stages, the pool or the players changed: stage 1\'s tables and every player\'s villains are drawn again.')}</p>`,
+      bodyHTML:     `<p class="confirm-text">${t('The tables, the stages, the pool or the players changed: stage 1\'s tables and villains are drawn again.')}</p>`,
       confirmLabel: t('Draw again'),
       onConfirm:    async () => {
         // The new start, from the new settings and players (withdrawn ones stay so).
         const tour = { ...was, ...row };
-        const drawn = players.map(x => ({ id: x.id, withdrawn_after: tnPlayers.find(p => p.id === x.id)?.withdrawn_after ?? null }));
-        const villains = tournamentVillainSchedule(tour, drawn.map(x => x.id));
+        const drawn = players.map(x => { const p = tnPlayers.find(y => y.id === x.id); return { id: x.id, withdrawn_after: p?.withdrawn_after ?? null, joined_stage: p?.joined_stage ?? null }; });
         const tables   = tournamentDrawStage(tour, drawn, []);
+        const villains = tournamentStageVillains(tour, tables, []);
         await _tnSaveSetup({ settings: row, players, villains, tables });
       },
     });
@@ -1511,19 +1588,48 @@ function _tnTablesHTML(mine) {
 
 function tnNextStage() {
   const next = tnTour.current_stage + 1;
-  const nobody = !tnPlayers.some(p => p.withdrawn_after == null);   // the tournament ends here
+  const playing = tournamentPlaying(tnPlayers, next).length;
+  const nobody = !playing;   // the tournament ends here
+  if (!_tnVillainsFit(playing)) return;
   openConfirmSheet({
     id:           'tnNextSheet',
     title:        nobody ? t('End the tournament?') : t('Draw stage {n}?', { n: next }),
     bodyHTML:     `<p class="confirm-text">${_tnDrawSummary(next)}</p>`,
     confirmLabel: nobody ? t('End tournament') : t('Draw stage {n}', { n: next }),
     onConfirm:    async () => {
-      const tables = tournamentDrawStage(tnTour, tnPlayers, tnTables);
-      const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables });
+      // The tables, then their villains (each player's so far: the tables before).
+      const tables   = tournamentDrawStage(tnTour, tnPlayers, tnTables);
+      const villains = tables.length ? tournamentStageVillains(tnTour, tables, tnTables) : [];
+      const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables, villains });
       tnView = 'tables';
       await _tnAfter(error);
     },
   });
+}
+
+// A late player: an organizer adds them to the running tournament; they play
+// from the next stage, from 0 points (add_tournament_player). Only if the
+// pool's copies still give the next stage's tables different villains.
+function tnAddLatePlayer() {
+  const next = tnTour.current_stage + 1;
+  if (!_tnVillainsFit(tournamentPlaying(tnPlayers, next).length + 1)) return;
+  openConfirmSheet({
+    id:           'tnLateSheet',
+    title:        t('Add a player'),
+    bodyHTML:     `<div class="field"><label for="tnLateName">${t('Name')}</label><input type="text" id="tnLateName" maxlength="30" autocomplete="off"></div>
+                   <div class="err" id="tnLateErr"></div>
+                   <p class="modal-hint">${t('They play from stage {n}, starting from 0 points. To claim the name, they scan the tournament\'s QR code.', { n: next })}</p>`,
+    confirmLabel: t('Add player'),
+    onConfirm:    async () => {
+      const name = document.getElementById('tnLateName').value.trim();
+      if (!name) { showError('tnLateErr', t('Give the player a name.')); throw new Error('name'); }
+      const { error } = await db.rpc('add_tournament_player', { target: tnTour.id, player_name: name });
+      if (error) { showError('tnLateErr', _tnErrorMsg(error)); throw error; }
+      tnView = 'players';
+      await tnLoad(tnTour.id);
+    },
+  });
+  setTimeout(() => document.getElementById('tnLateName')?.focus(), 50);
 }
 
 async function tnWithdraw(playerId, withdrawn) {

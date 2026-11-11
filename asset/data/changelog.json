@@ -1,4 +1,12 @@
 {
+  "2026-11-09": {
+    "title": "Tournaments: copies and late players",
+    "items": [
+      "Tournaments: set how many copies of each villain are at hand; two equal villains never sit at the same table.",
+      "Tournaments: an organizer can add a player while the tournament runs; they play from the next stage, from 0 points.",
+      "Tournaments: a result entered by an organizer can include the duration and the rounds."
+    ]
+  },
   "2026-11-02": {
     "title": "Past games, Matchups and uploads",
     "items": [

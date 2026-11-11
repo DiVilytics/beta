@@ -15,22 +15,25 @@
 //   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat, tour) }
 //   TOURNAMENT_BYES[id]           { name, hint, points(win) }: a bye's points
 //   TOURNAMENT_PLAY_ORDERS[id]    { name, hint, order(table, ctx) }
-//   TOURNAMENT_VILLAIN_DRAWS[id]  { schedule(playerIds, pool, stages) }: every
-//                                 player's villain in every stage
 //   TOURNAMENT_TIEBREAKS          [{ id, name, value(row) }], in order
 //
 //   tournamentSplit(n, size, split)          the table sizes of a stage
 //   tournamentStandings(tour, tables, opts)  the ranking, from saved tables
 //   tournamentDrawStage(tour, players, tables)  the next stage's tables, play
 //                                            order included (start: no tables)
-//   tournamentVillainSchedule(tour, ids)     the villains of every stage
+//   tournamentPlaying(players, stage)        who plays a stage (late ones once joined)
+//   tournamentStageVillains(tour, tables, before) a stage's villains, for its tables
+//   tournamentVillainsFit(pool, sizes)       whether tables of these sizes can all
+//                                            have different villains from the pool
+//   tournamentPoolCopies(pool)               { villain: copies }
 //   tournamentDrawFinal(tour, players, tables) the final table, when there is one
 //   fmtTournamentPoints(p)                   "1.5" / "1,5"
 //
 // A tour is a tournaments row ({ table_size, stages, pairing, scoring,
-// villain_pool }); a table is { stage, saved_at, seats: [{ player_id,
+// villain_pool: a villain once per copy at hand }); a table is { stage, saved_at, seats: [{ player_id,
 // position, character, place, minutes, round, dropped }] }; a player is a
-// tournament_players row ({ id, name, user_id, withdrawn_after }): players are
+// tournament_players row ({ id, name, user_id, withdrawn_after, joined_stage
+// (a late player: the first stage they play) }): players are
 // their ids here, claimed or not.
 
 // ── Random ───────────────────────────────────────────────────────────────────
@@ -315,7 +318,7 @@ const TN_ERRORS = {
   not_organizer:          'Only an organizer can do this.',
   already_started:        'The tournament has already started.',
   too_few_players:        'A tournament needs at least 2 players.',
-  invalid_pool:           'The draw pool needs at least as many villains as there are players.',
+  invalid_pool:           'The draw pool needs at least as many copies of villains as there are players.',
   invalid_villains:       "The villains couldn't be drawn. Try again.",
   invalid_tables:         "The tables couldn't be drawn. Try again.",
   name_claimed:           'Someone else just claimed this name.',
@@ -349,25 +352,103 @@ function _tnErrorMsg(error) {
 
 // ── Villains ─────────────────────────────────────────────────────────────────
 
-const TOURNAMENT_VILLAIN_DRAWS = {
-  // Every stage all different, and a player never gets a villain twice while
-  // the pool allows it (more stages than villains: everyone plays every
-  // villain once before any repeats). A random Latin rectangle: villain(player,
-  // stage) = pool[(r_player + c_stage) mod V], the pool shuffled, r different
-  // for every player, c a random permutation of 0…V-1 for every V stages.
-  'no-repeat': {
-    schedule(ids, pool, stages) {
-      const V = pool.length;
-      const sym = _tnShuffle(pool);
-      const r = _tnShuffle([...Array(V).keys()]).slice(0, ids.length);
-      const c = [];
-      while (c.length < stages) c.push(..._tnShuffle([...Array(V).keys()]));
-      return ids.flatMap((id, i) => Array.from({ length: stages }, (_, s) =>
-        ({ stage: s + 1, player_id: id, character: sym[(r[i] + c[s]) % V] })));
-    },
-  },
-};
-const TOURNAMENT_VILLAIN_DRAW = 'no-repeat';
+// The pool names a villain once per copy at hand (Ursula twice: two copies).
+function tournamentPoolCopies(pool) {
+  const copies = {};
+  for (const v of pool || []) copies[v] = (copies[v] || 0) + 1;
+  return copies;
+}
+
+// A stage's villains, drawn once its tables are (each table a list of player
+// ids, a bye a table of one), as a min-cost flow: player → (table, villain) →
+// villain → end, the (table, villain) step letting one copy at most to a table
+// and the villain step its copies. So no table has the same villain twice and
+// no villain is played more often than its copies; among those draws, the
+// cheapest: a villain the player already played costs most (none repeats
+// while the pool allows), then the villains played most so far (the copies
+// take turns), then chance. played: player → { villain: times }; used:
+// { villain: times } (everyone). Returns player → villain, or null when the
+// tables can't all have different villains.
+function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
+  const villains = Object.keys(copies);
+  const P = tables.reduce((n, tb) => n + tb.length, 0), V = villains.length, T = tables.length;
+  // Nodes: 0 start, 1..P players, then (table, villain), then villains, end.
+  const tvAt = (ti, vi) => 1 + P + ti * V + vi, vAt = vi => 1 + P + T * V + vi, END = 1 + P + T * V + V;
+  const graph = Array.from({ length: END + 1 }, () => []);
+  const edge = (a, b, cap, cost) => {
+    graph[a].push({ to: b, cap, cost, rev: graph[b].length });
+    graph[b].push({ to: a, cap: 0, cost: -cost, rev: graph[a].length - 1 });
+  };
+  const who = [];
+  tables.forEach((tb, ti) => tb.forEach(id => {
+    const pi = 1 + who.length;
+    who.push(id);
+    edge(0, pi, 1, 0);
+    villains.forEach((v, vi) => edge(pi, tvAt(ti, vi), 1, 1000 * (played.get(id)?.[v] || 0) + 10 * (used[v] || 0) + _tnRandInt(10)));
+  }));
+  for (let ti = 0; ti < T; ti++) villains.forEach((_, vi) => edge(tvAt(ti, vi), vAt(vi), 1, 0));
+  villains.forEach((v, vi) => edge(vAt(vi), END, copies[v], 0));
+  // One player at a time along the cheapest path (Bellman-Ford with a queue).
+  let flow = 0;
+  while (flow < P) {
+    const dist = new Array(END + 1).fill(Infinity), prev = new Array(END + 1).fill(null), inQ = new Array(END + 1).fill(false);
+    dist[0] = 0;
+    const q = [0];
+    inQ[0] = true;
+    while (q.length) {
+      const a = q.shift();
+      inQ[a] = false;
+      graph[a].forEach((e, k) => {
+        if (e.cap > 0 && dist[a] + e.cost < dist[e.to]) {
+          dist[e.to] = dist[a] + e.cost;
+          prev[e.to] = [a, k];
+          if (!inQ[e.to]) { inQ[e.to] = true; q.push(e.to); }
+        }
+      });
+    }
+    if (dist[END] === Infinity) return null;
+    for (let b = END; b !== 0; ) {
+      const [a, k] = prev[b], e = graph[a][k];
+      e.cap--;
+      graph[b][e.rev].cap++;
+      b = a;
+    }
+    flow++;
+  }
+  const out = new Map();
+  who.forEach((id, i) => {
+    const e = graph[1 + i].find(x => x.to > P && x.cap === 0 && x.to < 1 + P + T * V);
+    out.set(id, villains[(e.to - 1 - P) % V]);
+  });
+  return out;
+}
+
+// A stage's villains, [{ player_id, character }], for its tables (play order
+// drawn already), given the tables before it (each player's villains so far);
+// null when the pool's copies can't give every table different villains.
+function tournamentStageVillains(tour, tables, before = []) {
+  const played = new Map(), used = {};
+  for (const tb of before) for (const s of tb.seats) {
+    const p = played.get(s.player_id) || played.set(s.player_id, {}).get(s.player_id);
+    p[s.character] = (p[s.character] || 0) + 1;
+    used[s.character] = (used[s.character] || 0) + 1;
+  }
+  const pick = _tnAssignVillains(tables, tournamentPoolCopies(tour.villain_pool), played, used);
+  return pick && [...pick].map(([player_id, character]) => ({ player_id, character }));
+}
+
+// Whether tables of these sizes (tournamentSplit) can all have different
+// villains from the pool's copies.
+function tournamentVillainsFit(pool, sizes) {
+  let id = 0;
+  return !!_tnAssignVillains(sizes.map(n => Array.from({ length: n }, () => id++)), tournamentPoolCopies(pool));
+}
+
+// Who plays a stage: not withdrawn, and joined by then (a late player plays
+// from their joined_stage).
+function tournamentPlaying(players, stage) {
+  return players.filter(p => p.withdrawn_after == null && (p.joined_stage ?? 1) <= stage);
+}
 
 // ── Standings ────────────────────────────────────────────────────────────────
 
@@ -440,14 +521,14 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
 // when possible, all different, seated by the play order rule. Returns
 // { players: [ids in play order], villains: [{ player_id, character }] }.
 function tournamentDrawFinal(tour, players, tables) {
-  const playing = new Set(players.filter(p => p.withdrawn_after == null).map(p => p.id));
+  const playing = new Set(tournamentPlaying(players, tour.stages + 1).map(p => p.id));
   const finalists = tournamentStandings(tour, tables, { players, stage: tour.stages })
     .filter(r => playing.has(r.player_id)).slice(0, tour.table_size).map(r => r.player_id);
   const played = new Map(finalists.map(id => [id, new Set()]));
   for (const tb of tables) for (const s of tb.seats) played.get(s.player_id)?.add(s.character);
   const taken = new Set();
   const villains = _tnShuffle(finalists).map(id => {
-    const pool = _tnShuffle(tour.villain_pool).filter(v => !taken.has(v));
+    const pool = _tnShuffle([...new Set(tour.villain_pool)]).filter(v => !taken.has(v));   // one copy each: one table
     const pick = pool.find(v => !played.get(id).has(v)) || pool[0];
     taken.add(pick);
     return { player_id: id, character: pick };
@@ -466,9 +547,9 @@ function tournamentDrawFinal(tour, players, tables) {
 // order rule): the players still playing, paired by its pairing rule.
 function tournamentDrawStage(tour, players, tables = []) {
   const pairing = TOURNAMENT_PAIRINGS[tour.pairing] || TOURNAMENT_PAIRINGS.random;
-  const playing = players.filter(p => p.withdrawn_after == null).map(p => p.id);
-  const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
   const stage = Math.max(0, ...tables.map(tb => tb.stage)) + 1;
+  const playing = tournamentPlaying(players, stage).map(p => p.id);
+  const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
   const standings = tournamentStandings(tour, tables, { players });
   const playOrder = TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random;
   const seats = new Map();   // where each player sat so far, 0 (first) to 1 (last)
@@ -479,10 +560,6 @@ function tournamentDrawStage(tour, players, tables = []) {
     .map(tb => playOrder.order(tb, { seats, size: tour.table_size }));
 }
 
-// Every player's villain in every stage, for Start.
-function tournamentVillainSchedule(tour, ids) {
-  return TOURNAMENT_VILLAIN_DRAWS[TOURNAMENT_VILLAIN_DRAW].schedule(ids, tour.villain_pool, tour.stages);
-}
 
 // Points as shown: up to two decimals, in the page's language (1.5, 1,5).
 function fmtTournamentPoints(p) {
