@@ -315,6 +315,7 @@ function glSelectPace(color) { pace.selectPace(color); }
 function glSetPaceMode(plus) { pace.setPaceMode(plus); }
 function glToggleMine()      { pace.toggleMine(); }
 function glExcludeAll()      { pace.excludeAll(); }
+function glIncludeAll()      { pace.includeAll(); }
 // Reset: back to no filter, everyone in ('only') or nobody picked ('with').
 function glResetFilter()     { if (glCharMode === 'with') pace.excludeAll(); else pace.resetToStart(); }
 // Reset is off while the filter is already at its start.
@@ -322,6 +323,8 @@ function _syncResetBtn() {
   const btn = document.getElementById('glResetBtn');
   if (!btn) return;
   btn.disabled = glCharMode === 'with' ? pace.excluded.size >= glChars.length : pace.isDefault();
+  const all = document.getElementById('glIncludeAll');   // off with every villain in already
+  if (all) all.disabled = !pace.excluded.size;
 }
 
 function showErr(msg) {
