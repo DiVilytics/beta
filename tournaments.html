@@ -135,10 +135,16 @@
       <div class="exclude-body" id="tnPoolBody">
         <div class="filter-actions">
           <button class="btn btn-ghost btn-sm" type="button" onclick="tnPool.excludeAll()" data-i18n>Exclude all</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="tnIncludeAll" onclick="tnPool.includeAll()" disabled data-i18n>Include all</button>
           <button class="btn btn-ghost btn-sm owned-toggle" id="tnMineBtn" type="button" onclick="tnPool.toggleMine()" data-i18n>My boxes</button>
           <button class="btn btn-ghost btn-sm" id="tnPoolReset" type="button" onclick="tnPool.resetToStart()" disabled data-i18n>Reset</button>
-          <button class="btn btn-ghost btn-sm" id="tnCopiesBtn" type="button" onclick="tnOpenCopies()" data-i18n>Copies</button>
           <button class="btn btn-primary btn-sm filter-apply-btn" type="button" onclick="tnTogglePool(false)" data-i18n>Done</button>
+        </div>
+        <!-- Copies (tournaments only), on a row of its own: the actions above
+             stay New Game's. Beside it, the villains in the pool and their copies. -->
+        <div class="tn-copies-bar">
+          <button class="btn btn-ghost btn-sm" type="button" onclick="tnOpenCopies()" data-i18n>Copies</button>
+          <span class="tn-copies-sum" id="tnCopiesSum"></span>
         </div>
         <div class="filter-bulk-row">
           <div class="seg seg-sm pace-mode" id="tnPaceMode">

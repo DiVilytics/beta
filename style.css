@@ -2188,6 +2188,9 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 #tnIntroHelp { white-space: normal; text-align: left; }
 .tn-row-status { line-height: 1.1; font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* As tall as + Add player under them. */
+/* Copies, under the pool's actions (tournament form), and what the pool holds. */
+.tn-copies-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tn-copies-sum { font-size: calc(12px * var(--ts)); color: var(--muted); }
 /* Copies (tournament form): a villain's copies, − n + at the row's end. */
 .tn-copies-rows { display: grid; gap: 6px; }
 .tn-copy-steps { align-items: center; gap: 6px; }
@@ -3409,7 +3412,8 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
      lines inside its button, like the lineup buttons, instead of pushing Done
      (or Reset) to a line of its own. The row's buttons share one height. */
   .filter-actions { flex-wrap: nowrap; align-items: stretch; }
-  .filter-actions .btn { height: auto; min-height: 25px; padding: 1px 8px; font-size: calc(11px * var(--ts)); line-height: 1.18; white-space: normal; text-align: center; justify-content: center; flex: 0 1 auto; min-width: min-content; }   /* 25px, or 30px on two lines */
+  .filter-actions .btn { height: auto; min-height: 25px; padding: 1px 6px; font-size: calc(11px * var(--ts)); line-height: 1.18; white-space: normal; text-align: center; justify-content: center; flex: 0 1 auto; min-width: min-content; }   /* 25px, or 30px on two lines */
+  .filter-actions { gap: 4px; }   /* five actions (Include all and Exclude all both) on one line */
   .home-steps    { grid-template-columns: 1fr; }
   /* New Game rows: a smaller portrait leaves the villain name more room. */
   .order-slot-portrait { width: 26px; height: 26px; }
@@ -3455,3 +3459,9 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .lbl-short { display: inline; }
 }
 
+/* Too narrow for the pool's five actions (under 360px, after the phone rule
+   that keeps them on one line): Done goes under them, on the right. */
+@media (max-width: 359px) {
+  .filter-actions { flex-wrap: wrap; }
+  .filter-actions .filter-apply-btn { margin-left: auto; }
+}

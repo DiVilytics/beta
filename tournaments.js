@@ -1113,10 +1113,11 @@ function _tnPoolChanged() {
   badge.textContent = _tnPoolSize();   // copies included
   badge.classList.add('visible');
   badge.classList.toggle('full', !tnPool.excluded.size);
-  const extra = Object.keys(_tnCopiesInPool()).length;
-  const copiesBtn = document.getElementById('tnCopiesBtn');
-  if (copiesBtn) copiesBtn.textContent = extra ? `${t('Copies')} (${extra})` : t('Copies');
+  // Beside Copies: "33 villains | 36 copies".
+  const sum = document.getElementById('tnCopiesSum');
+  if (sum) sum.textContent = `${tn(tnChars.length - tnPool.excluded.size, '{n} villain', '{n} villains')} | ${tn(_tnPoolSize(), '{n} copy', '{n} copies')}`;
   document.getElementById('tnPoolReset').disabled = tnPool.isDefault();
+  document.getElementById('tnIncludeAll').disabled = !tnPool.excluded.size;   // every villain in already
   if (!document.getElementById('tnFormPlayers').classList.contains('hidden')) _tnRenderFormPlayers();
 }
 

@@ -310,11 +310,14 @@ function updateExcludeUI() {
 // Bulk pool controls (wired to the filter toolbar) delegate to the shared
 // pace-filter controller.
 function excludeAll()    { pace.excludeAll(); }
+function includeAll()    { pace.includeAll(); }
 function resetPool()     { pace.resetToStart(); }   // back to your boxes (or everyone)
 // Reset is off while the pool is already where it started.
 function _syncResetBtn() {
   const btn = document.getElementById('resetPoolBtn');
   if (btn) btn.disabled = pace.isDefault();
+  const all = document.getElementById('includeAllBtn');   // off with every villain in already
+  if (all) all.disabled = !pace.excluded.size;
 }
 
 function applyExclude() {
