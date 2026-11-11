@@ -367,11 +367,14 @@ function tournamentPoolCopies(pool) {
 // villain → end, the (table, villain) step letting one copy at most to a table
 // and the villain step its copies. So no table has the same villain twice and
 // no villain is played more often than its copies; among those draws, the
-// cheapest: a villain the player already played costs most (none repeats
-// while the pool allows), then the villains played most so far (the copies
-// take turns), then chance. played: player → { villain: times }; used:
+// cheapest: a second copy of a villain in the stage costs most (TN_DUP_COST,
+// a third twice as much: no duplicate when distinct villains are enough, and
+// as few as possible otherwise), then a villain the player already played
+// (none repeats while the pool allows), then the villains played most so far,
+// then chance. played: player → { villain: times }; used:
 // { villain: times } (everyone). Returns player → villain, or null when the
 // tables can't all have different villains.
+const TN_DUP_COST = 100000;   // over any repeats a stage could hold (1000 each)
 function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
   const villains = Object.keys(copies);
   const P = tables.reduce((n, tb) => n + tb.length, 0), V = villains.length, T = tables.length;
@@ -390,7 +393,8 @@ function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
     villains.forEach((v, vi) => edge(pi, tvAt(ti, vi), 1, 1000 * (played.get(id)?.[v] || 0) + 10 * (used[v] || 0) + _tnRandInt(10)));
   }));
   for (let ti = 0; ti < T; ti++) villains.forEach((_, vi) => edge(tvAt(ti, vi), vAt(vi), 1, 0));
-  villains.forEach((v, vi) => edge(vAt(vi), END, copies[v], 0));
+  // One edge per copy, the extra ones ever dearer: copies only when needed.
+  villains.forEach((v, vi) => { for (let j = 0; j < copies[v]; j++) edge(vAt(vi), END, 1, j * TN_DUP_COST); });
   // One player at a time along the cheapest path (Bellman-Ford with a queue).
   let flow = 0;
   while (flow < P) {
