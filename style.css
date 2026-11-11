@@ -3480,3 +3480,14 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .filter-actions { flex-wrap: wrap; }
   .filter-actions .filter-apply-btn { margin-left: auto; }
 }
+
+/* Strength and skill (strength.html, a test page): plain tables. */
+.st-table-wrap { overflow-x: auto; margin-bottom: 20px; }
+.st-table { width: 100%; border-collapse: collapse; font-size: calc(13px * var(--ts)); font-variant-numeric: tabular-nums; }
+.st-table th { text-align: right; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 6px; }
+.st-table td { text-align: right; padding: 5px 6px; border-top: 1px solid var(--border); white-space: nowrap; }
+.st-table th:nth-child(-n+2), .st-table td:nth-child(-n+2) { text-align: left; }
+.st-table td.st-name a { display: inline-flex; align-items: center; gap: 6px; color: var(--text); text-decoration: none; }
+.st-table td.st-name .char-portrait, .st-table td.st-name .player-avatar { width: 22px; height: 22px; }
+.st-table .st-main { font-weight: 700; }
+.st-table .st-sub { color: var(--muted); }
