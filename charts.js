@@ -406,11 +406,11 @@ const CHARTS = [
   {
     // id kept from Games by weekday (a saved view).
     id: 'weekday', icon: '📅', label: 'When games are played',
-    modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'hour', label: 'Hour' }, { id: 'part', label: 'Part of day' }],
+    modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'part', label: 'Part of day' }, { id: 'hour', label: 'Hour' }],
     desc: {
       weekday: 'Games played on each weekday, Monday first, at the local time where each was played. Only games saved with their time zone count.',
-      hour:    'Games by the hour they started, at the local time where each was played. Only games saved with their time and time zone count.',
       part:    'Games by the part of the day they started: morning 6-12, afternoon 12-18, evening 18-24, night 0-6, local time. Only games saved with their time and time zone count.',
+      hour:    'Games by the hour they started, at the local time where each was played. Only games saved with their time and time zone count.',
     },
     render({ games, mode }) {
       // Only the games that know where they were played (games.time_zone); the
