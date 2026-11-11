@@ -24,6 +24,16 @@ function gameUserRole(g, gp, user) {
 // (solo.js) says Solo and its level where the others give the table size
 // (just the level with `soloLabel: false`, in a list of solo games only), and
 // its rounds out of the level's; its card is dashed.
+// A game's rounds as its card and its page say them: "12 rounds"; a solo game
+// out of its level's ("12/20 rounds") when won, "Game over" when lost (the
+// Phantom's last round came and went), whatever its rounds.
+function gameRoundsLabel(g, seats) {
+  const level = g.variant === 'solo' ? soloLevelOf(g) : null;
+  if (level && !(seats || []).some(p => p.is_winner)) return t('Game over');
+  if (!g.num_turns) return null;
+  return level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds');
+}
+
 function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips', soloLabel = true } = {}) {
   const rows = layout === 'rows';
   if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
@@ -37,7 +47,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
   const level = g.variant === 'solo' ? soloLevelOf(g) : null;
   const meta = [
     fmtDuration(g.duration_minutes),
-    g.num_turns ? (level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds')) : null,
+    gameRoundsLabel(g, gp),
     locationPart,
     level ? (soloLabel ? t('Solo') : null) : `${gp.length}p`,
     level ? soloLevelTagHTML(level) : null,

@@ -118,7 +118,7 @@ function render() {
   const level = solo ? soloLevelOf(claimGame) : null;
   const meta = [
     fmtDuration(claimGame.duration_minutes),
-    claimGame.num_turns ? (level ? t('{n}/{max} rounds', { n: claimGame.num_turns, max: SOLO_LEVELS[level].turns }) : tn(claimGame.num_turns, '{n} round', '{n} rounds')) : null,
+    gameRoundsLabel(claimGame, claimPlayers),
     claimGame.location  ? _esc(claimGame.location)       : null,
     solo ? t('Solo') : null,
     level ? soloLevelTagHTML(level) : null,

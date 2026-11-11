@@ -1548,24 +1548,22 @@ function tnEditTable(tableId) {
     order: tb.seats.map(s => s.position).sort((a, b) => a - b),   // the seats in play order
   };
   const first = entering ? null : tb.seats.find(s => s.place === 1);   // the standard game's duration and rounds are 1st place's
-  // Duration and rounds only for a game recorded on a phone: a result typed in
-  // afterwards has none, so the stats don't take guesses for times.
-  const timed = !entering && tb.seats.some(s => s.minutes != null);
+  // Duration and rounds, optional: a game recorded on a phone has the timer's,
+  // a result typed in afterwards those the organizer knows (or none).
   openConfirmSheet({
     id:           'tnEditSheet',
     title:        t('Table {n}', { n: tb.table_no }),
     bodyHTML:     `${entering && tb.recorder && tb.recorder !== getCurrentUser()?.id
                      ? `<p class="modal-hint">${t("{name}'s phone has this game open: once you save the result here, it can no longer save it.", { name: _esc(tnProfiles.get(tb.recorder)?.nickname || '-') })}</p>` : ''}
-                   <div class="form-row${timed ? '' : ' hidden'}">
-                     <div class="field"><label>${t('Duration <span class="optional">(min)</span>')}</label><input type="number" id="tnEditDur" min="1" max="999" value="${first?.minutes || ''}"></div>
-                     <div class="field"><label>${t('Rounds <span class="optional"></span>')}</label><input type="number" id="tnEditTurns" min="1" max="999" value="${first?.round || ''}"></div>
+                   <div class="form-row">
+                     <div class="field"><label>${t('Duration <span class="optional">(min)</span>')}</label><input type="number" id="tnEditDur" min="1" max="999" placeholder="${t('optional')}" value="${first?.minutes || ''}"></div>
+                     <div class="field"><label>${t('Rounds <span class="optional"></span>')}</label><input type="number" id="tnEditTurns" min="1" max="999" placeholder="${t('optional')}" value="${first?.round || ''}"></div>
                    </div>
                    <div class="section-label lineup-label"><span>${t('Ranking')}</span>
                      <span class="players-legend"><span class="sep-item">${t('⠿ = drag')}</span> | <span class="sep-item">${t('🏳️ = dropped')}</span></span></div>
                    <div class="err" id="tnEditErr"></div>
                    <div class="tn-edit-rows" id="tnEditRows"></div>
-                   <p class="modal-hint">${timed ? t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with this duration and these rounds).')
-                     : t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it), without a duration or rounds.')}</p>
+                   <p class="modal-hint">${t('Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with the duration and rounds above, if given).')}</p>
                    <div class="${entering ? 'hidden' : ''}">
                      <div class="section-label">${t('Play order')}</div>
                      <div class="tn-edit-rows" id="tnEditOrder"></div>
@@ -1577,11 +1575,9 @@ function tnEditTable(tableId) {
       // A new play order: each seat's new position (sent only when it changed).
       if (!entering && tnEdit.order.some((pos, i) => pos !== i)) for (const r of results) r.order = tnEdit.order.indexOf(r.position);
       // The game's duration and rounds go to whoever is 1st now (empty: as they were).
-      if (timed) {
-        const dur = parseInt(document.getElementById('tnEditDur').value), turns = parseInt(document.getElementById('tnEditTurns').value);
-        if (dur > 0)   results[0].minutes = dur;
-        if (turns > 0) results[0].round   = turns;
-      }
+      const dur = parseInt(document.getElementById('tnEditDur').value), turns = parseInt(document.getElementById('tnEditTurns').value);
+      if (dur > 0)   results[0].minutes = dur;
+      if (turns > 0) results[0].round   = turns;
       // A new result: an organizer saves it without taking the table (a phone
       // with the game open can't save it after); this phone's game of it, if
       // any, is over.
