@@ -2205,6 +2205,8 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 .tn-copy-steps { align-items: center; gap: 6px; }
 .tn-copy-n { min-width: 1.4em; text-align: center; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
 .tn-copy-n.on { color: var(--accent); }
+.tn-copy-row.none { opacity: 0.55; }   /* 0 copies: out of the draw pool */
+.tn-copy-box { margin: 6px 0 0; }
 /* + Add player under a running tournament's players (a late player). */
 .tn-late-btn { margin-top: 8px; }
 #tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }

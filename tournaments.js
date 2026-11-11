@@ -1033,10 +1033,10 @@ const TN_HELP = [
   ]],
   ['bye', 'Bye', [
     'A bye is a stage a player sits out: when the players can\'t all be seated at the tables, whoever is left over doesn\'t play in that stage and gets the bye\'s points instead.',
-    'What a bye scores, a win being what 1st scores at a full table (3 at tables of 4 with Borda count).',
-    'Last: 0.',
-    'Half a win: half of that (1.5).',
-    'A win: as much as a win, as in Swiss chess.',
+    'A bye is always measured on a full table (as many players as the table size), whatever the size of the stage\'s tables: at tables of 4 with Borda count, 1st scores 3 and last 0.',
+    'Last: what last place scores at a full table (0).',
+    'Half a win: halfway between last and 1st place at a full table (1.5).',
+    'A win: what 1st place scores at a full table (3), as in Swiss chess.',
     'A bye never counts as a 1st place for the tiebreaks, and a player with a bye has no opponents in that stage.',
     'Fixed once the first game starts.',
   ]],
@@ -1050,7 +1050,7 @@ const TN_HELP = [
   ]],
   ['villains', 'Villains', [
     'Each stage\'s villains are drawn with its tables, from the draw pool: never the same villain twice at a table, in a stage a villain at most as many times as its copies, and nobody gets the same villain twice while the pool allows it. A stage\'s villains show only once it is drawn.',
-    'The draw pool has one copy of each villain, unless Copies says more (up to 6): copies let more players than villains play, each copy at a different table. The players can be at most the copies in the pool. Fixed once the first game starts.',
+    'The draw pool has one copy of each villain, unless Copies says otherwise (0 to 9; 0 takes it out of the pool): copies let more players than villains play, each copy at a different table. The players can be at most the copies in the pool. Fixed once the first game starts.',
   ]],
   ['players', 'Players', [
     'The organizers type the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: an organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
@@ -1109,6 +1109,7 @@ function tnTogglePool(open) {
 }
 
 function _tnPoolChanged() {
+  for (const n of Object.keys(tnCopies)) if (tnPool.excluded.has(n)) delete tnCopies[n];   // out of the pool: 0 copies (back in: 1)
   const badge = document.getElementById('tnPoolBadge');
   badge.textContent = _tnPoolSize();   // copies included
   badge.classList.add('visible');
@@ -1129,48 +1130,59 @@ function _tnPoolChanged() {
 // a name someone claimed shows their nickname and can't be typed over.
 let tnFormPlayers = [];
 
-// Copies (in the draw pool): every villain in the pool, by box as the pool,
-// with − n + (1 to TN_MAX_COPIES): the copies at hand for this tournament
-// only. In a stage a villain is played at most once per copy, never twice at
-// a table. Done keeps them, Cancel leaves them as they were.
-const TN_MAX_COPIES = 6;   // the database's limit too
+// Copies (in the draw pool): every villain, by box as the pool, with − n +
+// (0 to TN_MAX_COPIES): the copies at hand for this tournament only. A villain
+// in the pool starts at its copies (1 if none set), one out of it at 0; Done
+// keeps them, and the pool follows: 0 takes a villain out, 1 or more puts it
+// in (and the other way, a villain taken out of the pool loses its copies).
+// In a stage a villain is played at most once per copy, never twice at a
+// table. Cancel leaves everything as it was.
+const TN_MAX_COPIES = 9;   // the database's limit too
 let _tnCopiesEdit = {};
 function tnOpenCopies() {
-  _tnCopiesEdit = _tnCopiesInPool();
+  _tnCopiesEdit = Object.fromEntries(tnChars.map(c => [c.name, tnPool.excluded.has(c.name) ? 0 : (tnCopies[c.name] || 1)]));
   openConfirmSheet({
     id:           'tnCopiesSheet',
     title:        t('Copies'),
-    bodyHTML:     `<p class="modal-hint">${t('How many copies of each villain are at hand for this tournament. In a stage a villain is played at most once per copy, and never twice at the same table.')}</p><div id="tnCopiesRows" class="tn-copies-rows"></div>`,
+    bodyHTML:     `<p class="modal-hint">${t('How many copies of each villain are at hand for this tournament (0: not in the draw pool). In a stage a villain is played at most once per copy, and never twice at the same table.')}</p><div id="tnCopiesRows" class="tn-copies-rows"></div>`,
     confirmLabel: t('Done'),
-    onConfirm:    () => { tnCopies = { ..._tnCopiesEdit }; _tnPoolChanged(); _tnSaveDraft(); },
+    onConfirm:    () => {
+      tnCopies = Object.fromEntries(Object.entries(_tnCopiesEdit).filter(([, n]) => n > 1));
+      const out = tnChars.map(c => c.name).filter(n => !_tnCopiesEdit[n]);
+      // The pool follows (only when its villains changed: a pace picked stays otherwise).
+      if (out.length !== tnPool.excluded.size || out.some(n => !tnPool.excluded.has(n))) {
+        tnPool.restoreState({ excluded: out, selectedPace: null, pacePlus: tnPool.pacePlus, mineOn: false });
+      }
+      _tnPoolChanged();
+      _tnSaveDraft();
+    },
   });
   _tnRenderCopies();
 }
 function tnBumpCopies(name, d) {
-  const n = Math.max(1, Math.min(TN_MAX_COPIES, (_tnCopiesEdit[name] || 1) + d));
-  if (n > 1) _tnCopiesEdit[name] = n; else delete _tnCopiesEdit[name];
+  _tnCopiesEdit[name] = Math.max(0, Math.min(TN_MAX_COPIES, (_tnCopiesEdit[name] || 0) + d));
   _tnRenderCopies();
 }
 function _tnRenderCopies() {
   const box = document.getElementById('tnCopiesRows');
   if (!box) return;
   const order = b => tnBoxInfo[b]?.order ?? 99;
-  const inPool = tnChars.filter(c => !tnPool.excluded.has(c.name))
-    .sort((a, b) => order(a.box) - order(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
-  box.innerHTML = inPool.map(c => {
-    const n = _tnCopiesEdit[c.name] || 1;
+  const all = tnChars.slice().sort((a, b) => order(a.box) - order(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  box.innerHTML = all.map((c, i) => {
+    const n = _tnCopiesEdit[c.name] || 0;
     const arg = _esc(JSON.stringify(c.name));
-    return `
-      <div class="order-slot tn-copy-row">
+    const head = i === 0 || all[i - 1].box !== c.box ? `<div class="section-label tn-copy-box">${_esc(c.box || '')}</div>` : '';
+    return `${head}
+      <div class="order-slot tn-copy-row${n ? '' : ' none'}">
         <img class="order-slot-portrait" src="${charImgSrc(c.name)}" onerror="this.src='asset/players/default.svg'" alt="">
         <div class="order-slot-info"><span class="order-slot-name">${villainNameHTML(c.name)}</span></div>
         <div class="order-slot-actions tn-copy-steps">
-          <button class="pf-btn" type="button" onclick="tnBumpCopies(${arg}, -1)"${n <= 1 ? ' disabled' : ''} aria-label="−">−</button>
+          <button class="pf-btn" type="button" onclick="tnBumpCopies(${arg}, -1)"${n <= 0 ? ' disabled' : ''} aria-label="−">−</button>
           <span class="tn-copy-n${n > 1 ? ' on' : ''}">${n}</span>
           <button class="pf-btn" type="button" onclick="tnBumpCopies(${arg}, 1)"${n >= TN_MAX_COPIES ? ` disabled title="${_esc(t('At most {n} copies', { n: TN_MAX_COPIES }))}"` : ''} aria-label="+">+</button>
         </div>
       </div>`;
-  }).join('') || `<p class="tn-hint">${t('The draw pool is empty.')}</p>`;
+  }).join('');
 }
 
 // The villains in the form's pool, once per copy (the tournament's villain_pool).

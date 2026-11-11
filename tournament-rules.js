@@ -252,20 +252,23 @@ function tournamentPointsRow(tour, n) {
   return Array.from({ length: n }, (_, i) => scoring.points(i + 1, n, tour.table_size, {}, tour));
 }
 
-// What a bye scores, a win being what 1st scores at a full table. Never a 1st
-// place for the tiebreaks.
+// What a bye scores, measured on a full table (the tournament's table size),
+// whatever the stage's tables: its 1st place's points (win) and its last's
+// (last: 0 with Borda count, maybe more with Custom). Never a 1st place for
+// the tiebreaks.
 const TOURNAMENT_BYES = {
-  last: { name: 'Last',     hint: 'A bye counts as last place.',  points: win => 0 },
-  half: { name: 'Half a win', hint: 'A bye scores half of what a win does.', points: win => win / 2 },
-  win:  { name: 'A win',    hint: 'A bye scores what a win does (as in Swiss chess).', points: win => win },
+  last: { name: 'Last',       hint: 'A bye scores what last place does at a full table.', points: (win, last) => last },
+  half: { name: 'Half a win', hint: 'A bye scores halfway between last and 1st place at a full table.', points: (win, last) => (win + last) / 2 },
+  win:  { name: 'A win',      hint: 'A bye scores what 1st place does at a full table (as in Swiss chess).', points: (win, last) => win },
 };
 
 // What a seat scored: its place at its table (n players), or the bye's.
 function tournamentSeatPoints(tour, n, seat) {
   const scoring = TOURNAMENT_SCORINGS[tour.scoring] || TOURNAMENT_SCORINGS.borda;
   if (n === 1) {
-    const win = scoring.points(1, tour.table_size, tour.table_size, {}, tour);
-    return (TOURNAMENT_BYES[tour.bye] || TOURNAMENT_BYES.last).points(win);
+    const full = tour.table_size;   // the reference: a full table
+    const win  = scoring.points(1, full, full, {}, tour), last = scoring.points(full, full, full, {}, tour);
+    return (TOURNAMENT_BYES[tour.bye] || TOURNAMENT_BYES.last).points(win, last);
   }
   return scoring.points(seat.place, n, tour.table_size, seat, tour);
 }
