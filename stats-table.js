@@ -131,8 +131,11 @@ function statValue(r, mode) {
   if (mode === 'games') return r.games;
   return r.games ? r.wins / r.games : 0;
 }
+// A villain's Matchups score: +1 for each winning matchup, −1 for each losing
+// one, 0 for even (the ranking's first key, _muNet), signed: +12, −3, 0.
+const fmtMuNet = r => { const n = _muNet(r); return n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0'; };
 function statValueDisplay(r, mode) {
-  if (mode === 'matchups') return muCountsHTML(r.mu);
+  if (mode === 'matchups') return fmtMuNet(r);
   if (mode === 'chance') return fmtChance(chanceDelta(r));
   if (mode === 'xp')    return r.xp || 0;
   if (mode === 'count') return r.wins;
@@ -150,22 +153,28 @@ function statValueLabel(mode) {
   if (mode === 'games') return _headLabel('# Games');
   if (mode === 'xp') return `${_headLabel('XP')} <span class="lb-head-sub">(${_headLabel('Achievements')})</span>`;
   if (mode === 'chance') return `${_headLabel('Δ Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
-  if (mode === 'matchups') return `${_headLabel('Matchups')} <span class="lb-head-sub">(${_headLabel('Too few')})</span>`;
+  if (mode === 'matchups') return _headLabel('Matchups');
   return `${_headLabel(mode === 'count' ? '# Wins' : '% Wins')} <span class="lb-head-sub">(${_headLabel('Games')})</span>`;
 }
-// The number in parentheses: the games, for XP the XP from achievements, for
-// Matchups the opponents with too few games.
-const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : mode === 'matchups' ? (r.mu?.few ?? 0) : r.games;
+// The number in parentheses: the games, for XP the XP from achievements; for
+// Matchups the counts, winning | even | losing | too few (_muSubHTML).
+const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
+const _muSubText = r => `${r.mu?.win ?? 0}|${r.mu?.even ?? 0}|${r.mu?.lose ?? 0}|${r.mu?.few ?? 0}`;
+const _muSubHTML = r => `<span class="mu-win">${r.mu?.win ?? 0}</span>|<span class="mu-even">${r.mu?.even ?? 0}</span>|<span class="mu-lose">${r.mu?.lose ?? 0}</span>|${r.mu?.few ?? 0}`;
 // Winning | even | losing matchups, each in its color (the bar's: the accent,
 // gray, red).
 const muCountsHTML = mu => `<span class="mu-win">${mu?.win ?? 0}</span> | <span class="mu-even">${mu?.even ?? 0}</span> | <span class="mu-lose">${mu?.lose ?? 0}</span>`;
 function statCellHTML(r, mode) {
   if ((mode === 'pct' || mode === 'chance' || mode === 'matchups') && !r.games) return '-';   // no games, no win rate
-  const v = `<span class="sv-main">${statValueDisplay(r, mode)}</span>`;
-  return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${_statSub(r, mode)})</span>`}</span>`;
+  const v = `<span class="sv-main${mode === 'matchups' ? ' mu-score' : ''}">${statValueDisplay(r, mode)}</span>`;
+  const sub = mode === 'matchups' ? _muSubHTML(r) : _statSub(r, mode);
+  return `<span class="sv">${mode === 'games' ? v : `${v}<span class="sv-games">(${sub})</span>`}</span>`;
 }
 // Tabular digits are 0.6em wide in the app font, the two parentheses 0.6em together.
 function statGamesWidth(rows, mode) {
+  // Matchups: "(12 | 13 | 0 | 7)", its longest (digits and separators alike, about 0.5em a character).
+  // The value column a little wider there (--lb-val-min): the score and its four counts.
+  if (mode === 'matchups') return `--sv-games: calc(${Math.max(0, ...rows.map(r => _muSubText(r).length))} * 0.55em + 0.65em); --lb-val-min: 112px`;
   const digits = String(Math.max(0, ...rows.map(r => _statSub(r, mode)))).length;
   return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
 }

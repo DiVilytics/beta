@@ -191,7 +191,7 @@ function cycleDateField(el) {
   else                     setDateFieldNow(el);
 }
 function dateFieldLinkLabel(el) {
-  return { full: t('Unknown time'), day: t('Unknown date'), none: t('Today') }[dateFieldMode(el)];
+  return { full: t('Unknown time'), day: t('Unknown date'), none: t('Set date') }[dateFieldMode(el)];   // Set date: today, now, to change
 }
 // A saved game's date into the field.
 function fillDateField(el, g) {

@@ -1547,7 +1547,7 @@ select:disabled {
 .lb-row {
   display: grid;
   /* The rank as wide as two digits, so the name has the room. */
-  grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
+  grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr) clamp(var(--lb-val-min, 92px), calc(48% - 60px), 240px);
   padding: 8px 14px;
   align-items: center;
 }
@@ -1658,6 +1658,9 @@ select:disabled {
    (in the table and its legend); the numbers are a button that opens the
    villain's opponents (leaderboard.js). */
 .mu-win, .mu-even, .mu-lose { font-weight: 700; }
+/* Matchups: the score in bold, its counts in the parentheses, as small as the games elsewhere. */
+.sv-main.mu-score { font-weight: 700; }
+.sv-games .mu-win, .sv-games .mu-even, .sv-games .mu-lose { font-weight: 600; }
 .mu-win  { color: var(--accent); }
 .mu-even { color: var(--muted); }
 .mu-lose { color: var(--red); }
@@ -3423,7 +3426,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .order-slot-portrait { width: 26px; height: 26px; }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); }
   .home-faq-list { grid-template-columns: 1fr; }
-  .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
+  .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(var(--lb-val-min, 92px), calc(48% - 60px), 240px); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr calc(90px * var(--ts)); }   /* the numbers grow with the text, the bar gives way */
   .form-row input { font-size: calc(13px * var(--ts)); }
   .form-row input[type="datetime-local"] { font-size: calc(13px * min(var(--ts), 1.125)); }   /* as above */

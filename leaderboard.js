@@ -480,9 +480,9 @@ function render(data) {
     ${statModeHintHTML(mode, { minGames, picks: isChar })}
     ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
     ${mode === 'chance' && !isChar && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
-    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
+    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it; the score is +1 for each it beats, −1 for each that beats it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
       ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}
-      <p class="results-hint">${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} (${t('Too few')})</p>` : ''}
+      <p class="results-hint"><strong>${t('Score')}</strong> (${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} | ${t('Too few')})</p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain and for the achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
