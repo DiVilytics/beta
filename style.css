@@ -949,7 +949,7 @@ main {
 /* Villain against villain: a grid that scrolls inside the chart's box, its
    portraits fixed on top and on the left; a line between boxes. */
 .vs-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
-.vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; }
+.vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; margin: 0 auto; }   /* centered when narrower than the chart (Boxes); scrolls when wider */
 .vs-grid td, .vs-grid th { width: 28px; min-width: 28px; height: 28px; padding: 0; text-align: center; border: 1px solid var(--s1); box-sizing: border-box; }
 .vs-grid td { color: #fff; }
 .vs-grid .vs-head { position: sticky; top: 0; z-index: 2; background: var(--s1); }
