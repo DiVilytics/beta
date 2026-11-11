@@ -296,6 +296,7 @@ window.I18N.it = {
     "No date": "No data",
     "Play now": "Gioca ora",
     "Game over": "Game over",
+    "This chart is about official games: pick All or a number of players.": "Questo grafico riguarda le partite ufficiali: scegli Tutte o un numero di giocatori.",
     "Drag the villains into their places. Drops stay at the bottom; the standard game follows (1st place won it, with the duration and rounds above, if given).": "Trascina i cattivi nei loro posti. Chi abbandona resta in fondo; la partita normale si aggiorna (l'ha vinta il 1º, con la durata e i round qui sopra, se indicati).",
     "Past game": "Partita passata",
     "A game is in progress: save it or discard it first.": "C'è una partita in corso: salvala o eliminala prima.",

@@ -2,12 +2,14 @@
 // A hub of visualizations: a menu picks a chart, rendered into the card below
 // via the hand-rolled SVG helpers in chart-lib.js. Every chart reads the same
 // games, fetched once: the official games with their seats. The table size
-// (size-filter.js, without Solo) and the period (period-filter.js) filter them
-// here, as on the Leaderboard; a chart whose view is by table size already
-// (sizes: false) grays the size filter out. A chart with `modes` gets a switch
+// (size-filter.js) and the period (period-filter.js) filter them here, as on
+// the Leaderboard; a chart whose view is by table size already (sizes: false)
+// grays the size filter out. Solo (and its Difficulty) shows the solo games
+// instead, in the charts that read them alike (solo: true: when and how long
+// games are played, how many); the others say they're about official games. A chart with `modes` gets a switch
 // above it (Minutes | Rounds, ...), each mode remembered.
 
-const size   = createSizeFilter('chartSize', { onChange: () => _rerender(), solo: false });
+const size   = createSizeFilter('chartSize', { onChange: () => _rerender() });
 const period = createPeriodFilter('chartPeriod', { onChange: () => _rerender() });
 
 // ── THE GAMES (one fetch, filtered per view) ───────────────────────────────────
@@ -17,6 +19,17 @@ const period = createPeriodFilter('chartPeriod', { onChange: () => _rerender() }
 // size itself.
 function _filterGames(all, { sized = true } = {}) {
   return gamesIn(all, period.range(), sized ? size.value() : 'all');
+}
+
+// On Solo: the solo games of the period and level picked, in the official
+// games' shape (loadOfficialGames, db.js); null if they couldn't load.
+async function _soloChartGames() {
+  const solo = await loadSoloGames();
+  if (!solo) return null;
+  const { games, players } = soloOfLevel(soloInPeriod(solo, period.range()), size.level());
+  const seatsOf = {};
+  for (const p of players) (seatsOf[p.game_id] ||= []).push(p);
+  return games.map(g => ({ ...g, seats: seatsOf[g.id] || [], at: g.played_at ? Date.parse(g.played_at) : null }));
 }
 
 // A game's [year, month (1-12), day] as it was played: in local time, or the
@@ -315,6 +328,7 @@ const CHARTS = [
   {
     // The id stays 'duration': it was the minutes-only chart.
     id: 'duration', icon: '⏳', label: 'Game length',
+    solo: true,   // also on Solo: the solo games
     modes: _MINUTES_ROUNDS,
     desc: {
       minutes: 'How many games fall into each 15-minute band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded duration.',
@@ -379,6 +393,7 @@ const CHARTS = [
   },
   {
     id: 'time', icon: '📈', label: 'Games over time',
+    solo: true,   // also on Solo: the solo games
     modes: [{ id: 'games', label: 'Games' }, { id: 'players', label: 'Players' }],
     desc: {
       games:   'Games played each month, by play date. All time shows the latest 12 months (drag sideways for earlier ones); a year shows its months, a month its days.',
@@ -430,6 +445,7 @@ const CHARTS = [
   {
     // id kept from Games by weekday (a saved view).
     id: 'weekday', icon: '📅', label: 'When games are played',
+    solo: true,   // also on Solo: the solo games
     modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'part', label: 'Part of day' }, { id: 'hour', label: 'Hour' }],
     desc: {
       weekday: 'Games played on each weekday, Monday first, at the local time where each was played. Only games saved with their time zone count.',
@@ -548,9 +564,17 @@ async function _rerender() {
   const stage = document.getElementById('chartStage');
   if (!_officialGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
   try {
-    const [all, chars, boxInfo] = await Promise.all([loadOfficialGames(), loadCharacters(), loadBoxInfo()]);
+    // Solo picked: the solo games, in a chart that reads them (solo: true);
+    // a chart by table size (sizes: false) ignores the filter, Solo too.
+    const onSolo = size.isSolo() && c.sizes !== false;
+    if (onSolo && !c.solo) {
+      stage.innerHTML = `<div class="chart-note">${t('This chart is about official games: pick All or a number of players.')}</div>`;
+      return;
+    }
+    const [all, chars, boxInfo] = await Promise.all([onSolo ? _soloChartGames() : loadOfficialGames(), loadCharacters(), loadBoxInfo()]);
     if (token !== _renderToken) return;
-    stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
+    if (!all) throw new Error('solo games');
+    stage.innerHTML = c.render({ games: onSolo ? all : _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
     const z = stage.querySelector('.ch-zoomable');
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
@@ -807,9 +831,10 @@ async function init() {
     Object.assign(_modes, saved.modes);
     Object.assign(_groups, saved.groups);
     size.set(saved.size);
+    if (saved.level) size.setLevel(saved.level);
     period.set(saved.period);
   }
-  keepViewState(() => ({ chart: _selected, modes: _modes, groups: _groups, size: size.value(), period: period.get() }));
+  keepViewState(() => ({ chart: _selected, modes: _modes, groups: _groups, size: size.value(), level: size.level(), period: period.get() }));
   period.load();
   selectChart(CHARTS.some(c => c.id === saved?.chart) ? saved.chart : CHARTS[0].id);
 }
