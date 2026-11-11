@@ -5,8 +5,10 @@
 // (size-filter.js) and the period (period-filter.js) filter them here, as on
 // the Leaderboard; a chart whose view is by table size already (sizes: false)
 // grays the size filter out. Solo (and its Difficulty) shows the solo games
-// instead, in the charts that read them alike (solo: true: when and how long
-// games are played, how many); the others say they're about official games. A chart with `modes` gets a switch
+// instead, in the charts that read them (solo: true: the villains' and the
+// groups' win rates and picks, without Δ Wins, and when, how long and how many
+// games are played); the others (Matchups, no opponents) say they're about
+// official games. A chart with `modes` gets a switch
 // above it (Minutes | Rounds, ...), each mode remembered.
 
 const size   = createSizeFilter('chartSize', { onChange: () => _rerender() });
@@ -210,6 +212,7 @@ function _byPaceHTML({ games, chars, mode }) {
 const CHARTS = [
   {
     id: 'scatter', icon: '✨', label: 'Wins vs games',
+    solo: true,   // also on Solo: the solo games (% Wins, no Δ Wins)
     modes: _CHANCE_PCT,
     // The dots' colors: each villain's pace, or its box's.
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
@@ -245,6 +248,7 @@ const CHARTS = [
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
     id: 'box', icon: '🗂️', label: 'By pace or box',
+    solo: true,   // also on Solo: the solo games (% Wins, no Δ Wins)
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
     desc: {
@@ -513,7 +517,12 @@ function _renderPicker() {
 // row, flush right: Matchups' Villains | Boxes), the first one until picked.
 const _modes = {}, _groups = {};
 const _pick = (opts, saved) => opts ? (opts.some(m => m.id === saved) ? saved : opts[0].id) : null;
-const _modeOf  = c => _pick(c.modes, _modes[c.id]);
+// On Solo (a chart that reads solo games, not one by table size) there's no
+// Δ Wins: one player against the game shares the chances with nobody. Its
+// switch goes, as on the Leaderboard, and % Wins shows (the pick is kept for All).
+const _onSolo  = c => size.isSolo() && c.sizes !== false;
+const _modesOf = c => _onSolo(c) && c.modes ? c.modes.filter(m => m.id !== 'chance') : c.modes;
+const _modeOf  = c => _pick(_modesOf(c), _modes[c.id]);
 const _groupOf = c => _pick(c.groups, _groups[c.id]);
 
 // The switches, on one row. A chart without one keeps its place, empty, so
@@ -522,7 +531,7 @@ function _modesHTML(c) {
   if (!c.modes && !c.groups) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
   const seg = (opts, on, fn) => `<div class="seg">${opts.map(m =>
     `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div>`;
-  return `<div class="controls mb-1 chart-switches">${c.modes ? seg(c.modes, _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
+  return `<div class="controls mb-1 chart-switches">${c.modes ? seg(_modesOf(c), _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
 }
 
 function setChartMode(mode) {
@@ -566,7 +575,7 @@ async function _rerender() {
   try {
     // Solo picked: the solo games, in a chart that reads them (solo: true);
     // a chart by table size (sizes: false) ignores the filter, Solo too.
-    const onSolo = size.isSolo() && c.sizes !== false;
+    const onSolo = _onSolo(c);
     if (onSolo && !c.solo) {
       stage.innerHTML = `<div class="chart-note">${t('This chart is about official games: pick All or a number of players.')}</div>`;
       return;
