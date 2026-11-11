@@ -229,27 +229,9 @@ const CHARTS = [
     },
   },
   {
-    id: 'versus', icon: '🆚', label: 'Matchups',
-    groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
-    modes: _CHANCE_PCT,
-    desc: {
-      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
-      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
-    },
-    render({ games, chars, boxInfo, group, mode }) {
-      const chance = mode === 'chance';
-      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
-        const d = pairDelta(w, l);
-        return chance
-          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
-          : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
-      } });
-    },
-  },
-  {
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
-    id: 'box', icon: '🎨', label: 'By pace or box',
+    id: 'box', icon: '🌈', label: 'By pace or box',
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
     desc: {
@@ -267,6 +249,24 @@ const CHARTS = [
       },
     },
     render(ctx) { return ctx.group === 'pace' ? _byPaceHTML(ctx) : _byBoxHTML(ctx); },
+  },
+  {
+    id: 'versus', icon: '🆚', label: 'Matchups',
+    groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
+      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
+    },
+    render({ games, chars, boxInfo, group, mode }) {
+      const chance = mode === 'chance';
+      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
+        const d = pairDelta(w, l);
+        return chance
+          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
+          : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
+      } });
+    },
   },
   {
     id: 'seatorder', icon: '🪑', label: 'Play order',
