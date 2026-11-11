@@ -62,6 +62,15 @@ function _overallRef(stats) {
   return { value: pct, text: t('Average {pct}%', { pct }) };
 }
 const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
+// A box's color (box-info.json: its cover's, set apart from the others), the
+// same in every chart that colors by box; gray for a villain without one.
+const _boxColor = (boxInfo, box) => boxInfo[box]?.color || 'var(--pace-gray)';
+// The boxes' colors under a chart, in release order, each a link to its box.
+function _boxLegendHTML(boxInfo, boxes) {
+  const order = b => boxInfo[b]?.order ?? 99;
+  return `<div class="ch-legend">${[...boxes].sort((a, b) => order(a) - order(b)).map(b =>
+    `<a class="ch-legend-item" href="villains.html?box=${boxAnchorId(b)}"><span class="ch-swatch" style="background:${_boxColor(boxInfo, b)}"></span>${_esc(b)}</a>`).join('')}</div>`;
+}
 
 // ── MATCHUPS ──────────────────────────────────────────────────────────────────
 // The grid of who beats whom: villains (by box, as on the Villains page) or
@@ -89,7 +98,7 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
   // A box: its initials over its year's two digits.
   const label = it => boxes
-    ? `<span class="vs-abbr">${_esc(short(it.key))}<br>${_esc(String(boxInfo[it.key]?.year ?? '').slice(-2))}</span>`
+    ? `<span class="vs-abbr" style="color:${_boxColor(boxInfo, it.key)}">${_esc(short(it.key))}<br>${_esc(String(boxInfo[it.key]?.year ?? '').slice(-2))}</span>`
     : charImgHTML(it.key);
   const newGroup = i => !boxes && i > 0 && items[i].group !== items[i - 1].group;
   const head = (it, i) => `<th class="vs-head${newGroup(i) ? ' vs-box' : ''}" title="${_esc(it.name)}">${label(it)}</th>`;
@@ -128,8 +137,57 @@ function _localTime(g) {
   return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24 };
 }
 
+// By box or pace: each box's bars (in its color), or each pace's.
+function _byBoxHTML({ games, chars, boxInfo, mode }) {
+  const byBox = {};
+  for (const c of _villainStats(games, chars)) if (c.box) (byBox[c.box] ||= []).push(c);
+  const total = Object.values(byBox).flat().reduce((a, c) => a + c.games, 0) || 1;
+  const data = Object.entries(byBox)
+    .map(([box, rows]) => {
+      const v = _pool(rows), d = chanceDelta(v);
+      const pct  = Math.round(v.wins / v.games * 100);
+      const year = boxInfo[box]?.year;
+      return {
+        label: box,
+        color: _boxColor(boxInfo, box),
+        value: mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? v.games : pct,
+        games: v.games,
+        href: `villains.html?box=${boxAnchorId(box)}`,
+        meta: mode === 'picks'
+          ? `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / total * 100) })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+          : `${year ? year + ' | ' : ''}${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`,
+      };
+    })
+    .filter(d => d.games > 0)
+    .sort((a, b) => b.value - a.value);
+  return mode === 'chance' ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 152, diverging: true })
+    : mode === 'picks' ? Charts.barsH(data, { labelW: 152 })
+    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
+}
+
+function _byPaceHTML({ games, chars, mode }) {
+  const cs = _villainStats(games, chars);
+  const total = cs.reduce((a, c) => a + c.games, 0) || 1;
+  const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
+  const data = bands.map(b => {
+    const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
+    const sum   = _pool(rows), d = chanceDelta(sum);
+    const pct   = sum.games ? Math.round(sum.wins / sum.games * 100) : 0;
+    const share = Math.round(sum.games / total * 100);
+    const meta  = mode === 'picks'
+      ? `${tn(sum.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+      : `${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(sum.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
+    const value = mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? share : pct;
+    return { label: t(b[0].toUpperCase() + b.slice(1)), value, games: sum.games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
+  }).filter(d => d.games > 0);
+  return mode === 'chance'
+    ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 60, diverging: true })
+    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: mode === 'pct' ? _overallRef(cs) : null });
+}
+
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
-// Each: { id, icon, label, desc (a string, or per mode { mode: string }),
+// Each: { id, icon, label, desc (a string, or per mode { mode: string }, or per
+// mode and second switch { mode: { group: string } }), groups? (that switch),
 // modes?: [{ id, label }], sizes?: false, render(ctx) -> SVG/HTML string },
 // ctx = { games (filtered), chars, boxInfo, mode }. label, desc and the mode
 // labels are English keys, translated where they are shown.
@@ -138,29 +196,34 @@ const CHARTS = [
   {
     id: 'scatter', icon: '✨', label: 'Wins vs games',
     modes: _CHANCE_PCT,
+    // The dots' colors: each villain's pace, or its box's.
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
     desc: {
       chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.',
       pct:    'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
     },
-    render({ games, chars, mode }) {
+    render({ games, chars, boxInfo, mode, group }) {
       const chance = mode === 'chance';
-      const points = _villainStats(games, chars).map(c => {
+      const byBox  = group === 'box';
+      const stats  = _villainStats(games, chars);
+      const points = stats.map(c => {
         const pct = Math.round(c.wins / c.games * 100);
         const d = chanceDelta(c);
         return {
           x: c.games,
           y: chance ? (d ?? 0) : pct,
           label: villainName(c.name),
-          color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
+          color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           box: c.box || null,
           boxHref: c.box ? `villains.html?box=${boxAnchorId(c.box)}` : null,
           meta: `${tn(c.games, '{n} game', '{n} games')} | ${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })}`,
         };
       });
-      return chance
+      const chart = chance
         ? Charts.scatter(points, { xLabel: t('Games played'), ySymmetric: true, refs: [-2, 0, 2], include: [-2, 2] })
-        : Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100, avg: _overallRef(_villainStats(games, chars)) });
+        : Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100, avg: _overallRef(stats) });
+      return byBox ? chart + _boxLegendHTML(boxInfo, new Set(stats.map(c => c.box).filter(Boolean))) : chart;
     },
   },
   {
@@ -182,67 +245,26 @@ const CHARTS = [
     },
   },
   {
-    // The id stays 'box': it was the win rate chart; Box popularity is its Picks.
-    id: 'box', icon: '📦', label: 'By box',
+    // The id stays 'box': it was the win rate chart; Box popularity is its
+    // Picks; By pace joined it as its Pace switch.
+    id: 'box', icon: '📦', label: 'By box or pace',
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
+    groups: [{ id: 'box', label: 'Boxes' }, { id: 'pace', label: 'Pace' }],
     desc: {
-      chance: "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.",
-      pct:    "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
-      picks:  "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
+      chance: {
+        box:  "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.",
+        pace: "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.",
+      },
+      pct: {
+        box:  "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
+        pace: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
+      },
+      picks: {
+        box:  "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
+        pace: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
+      },
     },
-    render({ games, chars, boxInfo, mode }) {
-      const byBox = {};
-      for (const c of _villainStats(games, chars)) if (c.box) (byBox[c.box] ||= []).push(c);
-      const total = Object.values(byBox).flat().reduce((a, c) => a + c.games, 0) || 1;
-      const data = Object.entries(byBox)
-        .map(([box, rows]) => {
-          const v = _pool(rows), d = chanceDelta(v);
-          const pct  = Math.round(v.wins / v.games * 100);
-          const year = boxInfo[box]?.year;
-          return {
-            label: box,
-            value: mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? v.games : pct,
-            games: v.games,
-            href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: mode === 'picks'
-              ? `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / total * 100) })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
-              : `${year ? year + ' | ' : ''}${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`,
-          };
-        })
-        .filter(d => d.games > 0)
-        .sort((a, b) => b.value - a.value);
-      return mode === 'chance' ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 152, diverging: true })
-        : mode === 'picks' ? Charts.barsH(data, { labelW: 152 })
-        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
-    },
-  },
-  {
-    id: 'pace', icon: '🌈', label: 'By pace',
-    modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
-    desc: {
-      chance: "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.",
-      pct:    "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-      picks:  "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
-    },
-    render({ games, chars, mode }) {
-      const cs = _villainStats(games, chars);
-      const total = cs.reduce((a, c) => a + c.games, 0) || 1;
-      const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
-      const data = bands.map(b => {
-        const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
-        const sum   = _pool(rows), d = chanceDelta(sum);
-        const pct   = sum.games ? Math.round(sum.wins / sum.games * 100) : 0;
-        const share = Math.round(sum.games / total * 100);
-        const meta  = mode === 'picks'
-          ? `${tn(sum.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
-          : `${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(sum.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
-        const value = mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? share : pct;
-        return { label: t(b[0].toUpperCase() + b.slice(1)), value, games: sum.games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
-      }).filter(d => d.games > 0);
-      return mode === 'chance'
-        ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 60, diverging: true })
-        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: mode === 'pct' ? _overallRef(cs) : null });
-    },
+    render(ctx) { return ctx.group === 'pace' ? _byPaceHTML(ctx) : _byBoxHTML(ctx); },
   },
   {
     id: 'seatorder', icon: '🪑', label: 'Play order',
@@ -504,8 +526,10 @@ async function _rerender() {
   size.setDisabled(c.sizes === false);
   // Every mode's description in the same spot, only the picked one visible:
   // the card is as tall as the longest, so a switch never moves the chart.
+  // A mode's description may also depend on the second switch ({ box, pace }).
+  const descOf = d => typeof d === 'string' ? d : d[_groupOf(c)];
   document.getElementById('chartDesc').innerHTML = typeof c.desc === 'string' ? _esc(t(c.desc))
-    : Object.entries(c.desc).map(([m, d]) => `<span${m === mode ? '' : ' class="chart-desc-off" aria-hidden="true"'}>${_esc(t(d))}</span>`).join('');
+    : Object.entries(c.desc).map(([m, d]) => `<span${m === mode ? '' : ' class="chart-desc-off" aria-hidden="true"'}>${_esc(t(descOf(d)))}</span>`).join('');
   document.getElementById('chartModes').innerHTML = _modesHTML(c);
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
