@@ -1660,6 +1660,8 @@ select:disabled {
 .mu-win, .mu-even, .mu-lose { font-weight: 700; }
 /* Matchups: the score in bold, its counts in the parentheses, as small as the games elsewhere. */
 .sv-main.mu-score { font-weight: 700; }
+.lb-mode-matchups .sv { gap: 2px; }   /* the score close to its parentheses */
+.lb-mode-matchups .sv-games { text-align: left; }   /* "(" right after the score, whatever its digits */
 .sv-games .mu-win, .sv-games .mu-even, .sv-games .mu-lose { font-weight: 600; }
 .mu-win  { color: var(--accent); }
 .mu-even { color: var(--muted); }
@@ -3427,6 +3429,8 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); }
   .home-faq-list { grid-template-columns: 1fr; }
   .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(var(--lb-val-min, 92px), calc(48% - 60px), 240px); }
+  /* Matchups on a phone: the value column (and its bar) only as wide as the score and its counts. */
+  .lb-mode-matchups .lb-head, .lb-mode-matchups .lb-row { grid-template-columns: 24px minmax(0, 1fr) var(--lb-val-min); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr calc(90px * var(--ts)); }   /* the numbers grow with the text, the bar gives way */
   .form-row input { font-size: calc(13px * var(--ts)); }
   .form-row input[type="datetime-local"] { font-size: calc(13px * min(var(--ts), 1.125)); }   /* as above */

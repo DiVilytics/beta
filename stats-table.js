@@ -173,8 +173,16 @@ function statCellHTML(r, mode) {
 // Tabular digits are 0.6em wide in the app font, the two parentheses 0.6em together.
 function statGamesWidth(rows, mode) {
   // Matchups: "(12 | 13 | 0 | 7)", its longest (digits and separators alike, about 0.5em a character).
-  // The value column a little wider there (--lb-val-min): the score and its four counts.
-  if (mode === 'matchups') return `--sv-games: calc(${Math.max(0, ...rows.map(r => _muSubText(r).length))} * 0.55em + 0.65em); --lb-val-min: 112px`;
+  // Matchups: the counts' part as wide as the widest "(12|13|0|7)" (a digit
+  // 0.6em, a bar 0.3em, the parentheses 0.65em), and on a phone the value
+  // column just as wide as the score (15px text, about 0.62em a character)
+  // with it (--lb-val-min), so the names keep the rest.
+  if (mode === 'matchups') {
+    const sub = rows.map(_muSubText);
+    const digits = Math.max(0, ...sub.map(s => s.replace(/\|/g, '').length));
+    const score  = Math.max(1, ...rows.map(r => fmtMuNet(r).length));
+    return `--sv-games: calc(${digits} * 0.6em + 0.85em + 0.65em); --lb-val-min: calc((${score} * 0.62 * 15px + (${digits} * 0.6 + 0.85 + 0.65) * 12px) * var(--ts) + 4px)`;
+  }
   const digits = String(Math.max(0, ...rows.map(r => _statSub(r, mode)))).length;
   return `--sv-games: calc(${digits} * 0.6em + 0.65em)`;
 }
@@ -388,7 +396,7 @@ function renderStatTableHTML(rows, opts) {
   }
 
   return `
-    <div class="lb-table${wrapClass ? ' ' + wrapClass : ''}" style="${statGamesWidth(sorted, mode)}">
+    <div class="lb-table lb-mode-${mode}${wrapClass ? ' ' + wrapClass : ''}" style="${statGamesWidth(sorted, mode)}">
       <div class="lb-head">
         <span>#</span>
         <span>${headLabel}</span>
