@@ -21,7 +21,7 @@ function summaryBoxesHTML({ games, wins, dur, turns, solo = false, streak = null
     { val: games, lbl: t('Games') },
     { val: dur   != null ? Math.round(dur) + 'm' : '-', lbl: t('Avg duration') },
     { val: turns != null ? Math.round(turns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
-    { val: winsVal, lbl: streak == null ? t('Wins') : t('Wins (streak)'),
+    { val: winsVal, lbl: streak == null ? t('Wins') : t('Wins (streak)'), hot,
       title: streak == null ? '' : [t('Max streak: {n}', { n: streak }), hot ? t('Currently on this streak') : ''].filter(Boolean).join(' | ') },
     { val: typeof games === 'number' && games ? Math.round(wins / games * 100) + '%' : '-', lbl: t('% Wins') },
     { val: solo ? '-' : chance, lbl: t('Δ Wins'), title: solo ? t('Not for solo games.') : chanceTitle },

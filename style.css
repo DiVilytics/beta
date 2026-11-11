@@ -1537,7 +1537,7 @@ select:disabled {
 .stat-val-sub { font-size: 0.6em; font-weight: 600; color: var(--muted); }
 /* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
 .stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
-.stat-box.hot .stat-val { color: var(--gold); }
+.stat-box.hot .stat-val { color: var(--text); }   /* the box gold, the wins as usual: only the streak (.stat-val-sub.hot) */
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
 /* Rank | name | value with its bar underneath: "40% (12)", the games played in
