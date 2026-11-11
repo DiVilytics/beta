@@ -159,7 +159,7 @@ function fmtDateTime(iso) {
 }
 
 // A game whose day is known but not its time (games.time_unknown: New Game's
-// No time, an upload's YYYY-MM-DD, the date-only imports): its played_at is
+// Unknown time, an upload's YYYY-MM-DD, the date-only imports): its played_at is
 // that day at 00:00 UTC, so the date is shown alone and read in UTC (local
 // time would move it to the day before west of UTC). The source too, for a
 // query that doesn't fetch the column.
@@ -169,7 +169,7 @@ function isDateOnly(g) { return !!g && (g.time_unknown === true || DATE_ONLY_SOU
 // ── A GAME'S DATE FIELD ──────────────────────────────────────────────────────
 // New Game's and Edit details' Date/Time: one field, and a link beside its
 // label that steps through three: the date and time (the current ones to start)
-// → No time (the day alone: the same field as a date) → No date (empty) →
+// → Unknown time (the day alone: the same field as a date) → Unknown date (empty) →
 // Today (the current date and time again). dateFieldValue reads it for saving.
 function _localDateTimeValue(d = new Date()) {
   const pad = n => String(n).padStart(2, '0');
@@ -191,7 +191,7 @@ function cycleDateField(el) {
   else                     setDateFieldNow(el);
 }
 function dateFieldLinkLabel(el) {
-  return { full: t('No time'), day: t('No date'), none: t('Today') }[dateFieldMode(el)];
+  return { full: t('Unknown time'), day: t('Unknown date'), none: t('Today') }[dateFieldMode(el)];
 }
 // A saved game's date into the field.
 function fillDateField(el, g) {

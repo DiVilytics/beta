@@ -273,8 +273,8 @@ function _setDateToNow() {
 }
 
 // The date is optional (a game remembered later): it starts at the current
-// date and time, and the link beside its label steps through No time (the day
-// alone), No date and Today (A GAME'S DATE FIELD, ui.js). A game started live
+// date and time, and the button beside it steps through Unknown time (the day
+// alone), Unknown date and Today (A GAME'S DATE FIELD, ui.js). A game started live
 // takes the start's.
 function toggleNoDate() {
   cycleDateField(document.getElementById('fDate'));

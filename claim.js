@@ -220,7 +220,7 @@ function closeEditDetails() {
   closeOverlay('editDetailsOverlay');
 }
 
-// The date's link, as in New Game: No time → No date → Today (ui.js).
+// The date's link, as in New Game: Unknown time → Unknown date → Today (ui.js).
 function cycleEditDate() {
   cycleDateField(document.getElementById('editDate'));
   _syncEditDateLink();
