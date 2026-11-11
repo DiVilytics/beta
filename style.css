@@ -602,7 +602,11 @@ main {
    form's left column (the Duration box): half the row minus the 10px gap. The
    buttons split that width; their labels go on two lines together when one
    doesn't fit (_balanceButtonLines, new-game.js). */
-#lineupBtns { width: calc((100% - 10px) / 2); }
+#lineupBtns, #orderBtns { width: calc((100% - 10px) / 2); }
+/* Past game's date: the field, then its button (No time, No date, Today). */
+.date-field-row { display: flex; gap: 8px; align-items: stretch; }
+.date-field-row input { flex: 1; min-width: 0; }
+.date-field-row .btn.btn-lineup { flex: 0 0 auto; padding: 2px 12px; min-width: 6.5em; }   /* as wide for each label: the field doesn't shift */
 .btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }

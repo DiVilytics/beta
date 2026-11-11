@@ -31,7 +31,7 @@ let _roundsCounted  = false;
 // test by which stopLive fills in the duration and rounds). Its lineup changes
 // only after a yes (_confirmLineup). Kept with the game in progress.
 let _underway       = false;
-// The play order isn't known (Unknown order, next to Villains and Players): the
+// The play order isn't known (Unknown order, above the rows in Past game): the
 // rows go unnumbered (–), Random order is off, and the game is saved without
 // one (position null), as the imported logs. Kept with the draft and the game
 // in progress. Not in Solo (one seat).
@@ -96,7 +96,7 @@ async function init() {
   }
   _syncDateToggle();
   _checkResume();   // a game in progress shows right away, not after an empty form
-  const lines = () => _initButtonLines(['#lineupBtns', '#footerDefault']);   // ui.js
+  const lines = () => _initButtonLines(['#lineupBtns', '#orderBtns', '#footerDefault']);   // ui.js
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', lines, { once: true });
   else lines();
 
@@ -250,10 +250,9 @@ function _syncModeUI() {
     b.disabled = session && !on;
     b.title    = session && !on ? t('A game is in progress: save it or discard it first.') : '';
   }
-  setVisible('fDateField', pastGame);
-  document.getElementById('dateLocRow')?.classList.toggle('one-field', !pastGame);
+  setVisible('fDateRow', pastGame);
   setVisible('durRoundsRow', pastGame);   // Play now: the timer's, fixed in Edit details
-  setVisible('orderToggle', pastGame && !soloMode);
+  setVisible('orderBtns', pastGame && !soloMode);
   setVisible('excludeToggle', !pastGame);
   setVisible('lineupBtns', !pastGame && !soloMode);
   setVisible('startBtn', !pastGame);
@@ -446,7 +445,7 @@ function _syncSoloUI() {
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
-  setVisible('orderToggle', pastGame && !soloMode);
+  setVisible('orderBtns', pastGame && !soloMode);
   setVisible('drawAllBtn', !soloMode);
   setVisible('lineupBtns', !pastGame && !soloMode);   // in Solo its half of the row goes to the level picker
   setVisible('liveHint', !soloMode);
@@ -796,7 +795,7 @@ function _updateActionBtns() {
     shuffleBtn.title    = orderUnknown ? t('The play order is unknown') : filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
   }
   const orderBtn = document.getElementById('orderToggle');
-  if (orderBtn) orderBtn.textContent = orderUnknown ? t('In order') : t('Unknown order');
+  if (orderBtn) _setBtnLabel(orderBtn, orderUnknown ? t('In order') : t('Unknown order'));
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
