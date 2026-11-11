@@ -2209,7 +2209,7 @@ input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; bo
 /* The villain's portrait close to its position number (one digit, 1 to 6:
    only as wide as it), so the name has the room: "Scegli cattivo" whole on a
    small phone at Large text. */
-.order-slot .row-num { width: auto; margin-right: 2px; font-variant-numeric: tabular-nums; }
+.order-slot .row-num { width: auto; min-width: 0.9em; margin-right: 2px; font-variant-numeric: tabular-nums; }   /* "–" (unknown order) as wide as "1." */
 /* New Game: one name on two lines (Large text) makes every row as tall. */
 #orderSlots { display: grid; grid-auto-rows: 1fr; grid-template-columns: minmax(0, 1fr); }   /* a long word never widens the rows */
 .order-slot {
