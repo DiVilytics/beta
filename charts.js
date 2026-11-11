@@ -231,7 +231,7 @@ const CHARTS = [
   {
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
-    id: 'box', icon: '🌈', label: 'By pace or box',
+    id: 'box', icon: '🗂️', label: 'By pace or box',
     modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
     desc: {
