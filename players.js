@@ -215,7 +215,7 @@ async function _loadTournaments() {
     const myPlayer  = new Map((played.data || []).map(r => [r.tournament_id, r.id]));
     const organized = new Set((org.data || []).map(r => r.tournament_id));
     const ids       = [...new Set([...organized, ...myPlayer.keys()])];
-    const tours     = ids.length ? (await db.from('tournaments').select('*, tournament_players(count), tournament_organizers(user_id, added_at)').in('id', ids)).data || [] : [];
+    const tours     = ids.length ? (await db.from('tournaments').select('*, tournament_players!tournament_players_tournament_id_fkey(count), tournament_organizers(user_id, added_at)').in('id', ids)).data || [] : [];
     // The organizers of the ones they only played, by nickname, the longest-standing first.
     const orgsOf = x => (x.tournament_organizers || []).slice().sort((a, b) => a.added_at.localeCompare(b.added_at)).map(o => o.user_id);
     const orgIds = [...new Set(tours.filter(x => !organized.has(x.id)).flatMap(orgsOf))];

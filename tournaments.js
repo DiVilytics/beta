@@ -167,7 +167,7 @@ async function tnLoadList() {
   const root = document.getElementById('tnRoot');
   const user = getCurrentUser();
   const [{ data, error }, mine] = await Promise.all([
-    db.from('tournaments').select('*, tournament_players(count), tournament_organizers(user_id, added_at)').order('created_at', { ascending: false }),
+    db.from('tournaments').select('*, tournament_players!tournament_players_tournament_id_fkey(count), tournament_organizers(user_id, added_at)').order('created_at', { ascending: false }),
     user ? db.from('tournament_players').select('tournament_id').eq('user_id', user.id).is('withdrawn_after', null) : { data: [] },
   ]);
   root.className = '';
