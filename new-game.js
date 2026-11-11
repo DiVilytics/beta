@@ -37,9 +37,9 @@ let _underway       = false;
 // in progress. Not in Solo (one seat).
 let orderUnknown    = false;
 // Past game (the switch on top) or Play now. Play now is a game about to be
-// played: no date field (the start sets it), no duration and rounds until it
-// has been played (the timer fills them, then they can be fixed), the order
-// always known, and Save only once it has started. Past game records an
+// played: no date field (the start sets it), no duration and rounds (the timer
+// fills them; Edit details fixes them after), the order always known, and Save
+// only once it has started. Past game records an
 // earlier one: date (or the day alone, or none), duration and rounds typed in,
 // Unknown order, Save only; no timer and nothing to draw (no draw pool, no
 // 🎲, no Random order). Kept with the draft; a game in progress is Play now.
@@ -238,7 +238,7 @@ function setPastGame(on) {
 
 // What Play now and Past game show (setPastGame): the switch, off while a game
 // is in progress; the date field and Unknown order (past only); the duration
-// and rounds (past, or a game played now once it has started); the draw pool,
+// and rounds (past only: a game played now takes the timer's); the draw pool,
 // the rows' 🎲 and Random order / Draw villains (now only); Start (now) and
 // Save (past, or once started).
 function _syncModeUI() {
@@ -252,7 +252,7 @@ function _syncModeUI() {
   }
   setVisible('fDateField', pastGame);
   document.getElementById('dateLocRow')?.classList.toggle('one-field', !pastGame);
-  setVisible('durRoundsRow', pastGame || session);
+  setVisible('durRoundsRow', pastGame);   // Play now: the timer's, fixed in Edit details
   setVisible('orderToggle', pastGame && !soloMode);
   setVisible('excludeToggle', !pastGame);
   setVisible('lineupBtns', !pastGame && !soloMode);
