@@ -57,7 +57,7 @@ function _villainsHTML(fit, all) {
     <div class="section-label">${t('Villains: Strength')}</div>
     <p class="results-hint">${t('Strength: the villain\'s wins against those an average villain would have had at the same tables. Δ Wins: against an equal share at every table.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${t('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
       <tbody>${rows.map((v, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="villains.html?vil=${encodeURIComponent(v.name)}">${charImgHTML(v.name)}<span>${villainNameInline(v.name)}</span></a></td>
@@ -77,7 +77,7 @@ function _playersHTML(fit, nick, all) {
     <div class="section-label">${t('Players: Skill')}</div>
     <p class="results-hint">${t('Skill: the player\'s wins against those an average player would have had with the same villains at the same tables. Only the games where they claimed their villain.')}</p>
     <div class="st-table-wrap"><table class="st-table">
-      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${t('Δ Wins')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
+      <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${_statShortLabel('Δ Wins')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
       <tbody>${rows.map((p, i) => `
         <tr><td>${i + 1}</td>
           <td class="st-name"><a href="players.html?nick=${encodeURIComponent(p.prof.nickname)}">${playerAvatarHTML(resolveAvatar(p.prof))}<span>${_esc(p.prof.nickname)}</span></a></td>
