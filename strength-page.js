@@ -29,6 +29,7 @@ async function init() {
   const nick = new Map(profiles.map(p => [p.id, p]));
   root.className = '';
   root.innerHTML = `
+    <p class="results-hint"><button class="char-guide-link" type="button" onclick="openStrengthInfo()">${t('How it\'s computed')} ›</button></p>
     ${_villainsHTML(fit, all)}
     ${_playersHTML(fit, nick)}
     ${_seatsHTML(fit)}
@@ -50,7 +51,7 @@ function _villainsHTML(fit, all) {
   const rows = fit.villains.slice().sort((a, b) => (b.u - b.sd) - (a.u - a.sd));
   return `
     <div class="section-label">${t('Villains: Strength')}</div>
-    <p class="results-hint">${t('The chance of winning a table of 4 against three average villains, with an average player. Ranked by the prudent value (the estimate less its uncertainty).')}</p>
+    <p class="results-hint">${t('How often the villain would win at a table of 4 against three average villains, everyone with an average player, whatever the seat. Ranked by the cautious value (the estimate minus its margin), so a villain with few games doesn\'t top it by luck; the estimate and its margin are next to it, then Δ Wins to compare.')}</p>
     <div class="st-table-wrap"><table class="st-table">
       <thead><tr><th>#</th><th>${t('Villain')}</th><th>${t('Strength')}</th><th>${t('Estimate')}</th><th>${t('Δ Wins')}</th><th>${t('Games')}</th></tr></thead>
       <tbody>${rows.map((v, i) => `
@@ -70,7 +71,7 @@ function _playersHTML(fit, nick) {
     .sort((a, b) => (b.now.u - b.now.sd) - (a.now.u - a.now.sd));
   return `
     <div class="section-label">${t('Players: Skill')}</div>
-    <p class="results-hint">${t('The chance of winning a table of 4 against three average opponents, with an average villain: the skill after their last game, toward average the longer they don\'t play (rust). Only their claimed games count.')}</p>
+    <p class="results-hint">${t('How often the player would win at a table of 4 against three average players, everyone with an average villain. It\'s their skill after their latest game, slowly going back toward average while they don\'t play. Only the games where they claimed their villain count; ranked by the cautious value, like the villains.')}</p>
     <div class="st-table-wrap"><table class="st-table">
       <thead><tr><th>#</th><th>${t('Player')}</th><th>${t('Skill')}</th><th>${t('Estimate')}</th><th>${t('Wins')}</th><th>${t('Games')}</th><th>${t('Last game')}</th></tr></thead>
       <tbody>${rows.map((p, i) => `
@@ -92,20 +93,35 @@ function _seatsHTML(fit) {
   }).join('');
   return `
     <div class="section-label">${t('Play order')}</div>
-    <p class="results-hint">${t('Each seat\'s chance of winning, everything else equal (seat 1 plays first). From the games with their play order recorded.')}</p>
+    <p class="results-hint">${t('How often each seat would win if villains and players were all equal (seat 1 plays first). From the games with their play order recorded.')}</p>
     <div class="st-table-wrap"><table class="st-table">
       <thead><tr><th></th>${[1, 2, 3, 4, 5, 6].map(s => `<th>${s}</th>`).join('')}</tr></thead>
       <tbody>${rows}</tbody>
     </table></div>`;
 }
 
-// The model's numbers, and the prediction test on request.
+// How it's computed (the link under the title): the model in words.
+function openStrengthInfo() {
+  const body = infoSheet('stInfoOverlay', t('How it\'s computed'));
+  body.innerHTML = [
+    t('<b>In short</b>: every game is a small contest. The model gives every seat a score, and picks the scores that make the winners of all the recorded games as likely as possible. A villain that keeps winning against strong villains ends up strong; a player who keeps winning with weak villains ends up skilled.'),
+    t('<b>A seat\'s score</b> adds up: the villain\'s strength; the seat\'s edge (playing first helps); and, when the seat was claimed, the player\'s skill at that moment, how much better than usual they do with that villain, and their experience with it (how many times they played it before). An unclaimed seat counts as an average player.'),
+    t('<b>The chance of winning</b> comes from the scores: each seat wins in proportion to e raised to its score, out of the table\'s total. With every score at 0, everyone has the same chance, 1 in the number of players: Δ Wins\' starting point.'),
+    t('<b>Villains</b> have one strength each, from every game, estimated again from scratch each time: a new game can change what an old one says (a win against a villain we now know is strong counts for more).'),
+    t('<b>Players</b> have a skill that changes game by game, estimated with hindsight: their skill at a game also takes their later games into account, so beating a beginner who later became strong still counts as beating a beginner. It can change within one evening; while they don\'t play, it slowly goes back toward average (rust: after a year away, about two thirds of the way).'),
+    t('<b>Few games</b>: every villain and player starts from average, and only their games move them away; with few games they stay close to it and their margin is wide. The rankings use the cautious value, the estimate minus its margin.'),
+    t('<b>Not counted yet</b>: knowing the opponents\' villains (how many times a player has already faced them). With the claimed games so far it made the predictions worse, so it\'s off; it can come back once there are more.'),
+    t('<b>Does it work?</b> Fitted only on the older games, the model guesses the winners of the newer ones better than the villains alone or equal chances: the prediction test at the bottom of the page shows by how much.'),
+  ].map(p => `<p class="modal-hint">${p}</p>`).join('');
+  openOverlay('stInfoOverlay');
+}
+
+// The prediction test, on request.
 function _modelHTML(fit, ms, all) {
   window._stGames = all;
-  const o = fit.opts;
   return `
     <div class="section-label">${t('The model')}</div>
-    <p class="results-hint">${t('Experience with one\'s own villain (β): {b}. Knowing the opponents\' villains (γ): off for now (it made the predictions worse). Skill change per game {tp}, rust {l} days. Computed in {ms} ms ({it} rounds).', { b: fit.beta.toFixed(2), tp: o.tp, l: o.lambda, ms, it: fit.iterations })}</p>
+    <p class="results-hint">${t('Computed in {ms} ms. To check it works: fitted only on the older games, it guesses the winners of the newer ones.', { ms })}</p>
     <button class="btn btn-ghost btn-sm" type="button" onclick="stRunTest(this)">${t('Run the prediction test')}</button>
     <div id="stTest"></div>`;
 }
@@ -131,7 +147,7 @@ async function stRunTest(btn) {
   for (const [name, opts] of variants) {
     const r = strengthTest(games, cut, opts);
     rows.push(`<tr><td class="st-name">${name}</td><td class="st-main">${(100 * r.hitRate).toFixed(1)}%</td><td class="st-sub">${r.gain.toFixed(3)}</td></tr>`);
-    box.innerHTML = `<p class="results-hint">${t('Fitted on the games up to {d}, predicting the {n} after.', { d: fmtDateShort(new Date(cut).toISOString()), n: r.games })}</p>
+    box.innerHTML = `<p class="results-hint">${t('Fitted on the games up to {d}, it guessed the winners of the {n} games after. Winner picked: how often the seat it rated highest won. Gain: how much more likely than equal chances it found the actual winners, on average (higher is better).', { d: fmtDateShort(new Date(cut).toISOString()), n: r.games })}</p>
       <div class="st-table-wrap"><table class="st-table"><thead><tr><th>${t('Model')}</th><th>${t('Winner picked')}</th><th>${t('Gain')}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
     await new Promise(r => setTimeout(r, 10));
   }
