@@ -115,9 +115,10 @@ function tournamentStatus(tour) {
 }
 
 // A stage's name: "Stage 2 of 3" (of the stage the stages ended at, once
-// ended early; "Stage 2" while open), or "Final" for the final table.
+// ended early; "Stage 2" while open), or "Final" for the final table (and a
+// knockout's last stage).
 function tournamentStageName(tour, stage) {
-  if (tournamentIsFinal(tour, stage)) return t('Final');
+  if (tournamentIsLastTable(tour, stage)) return t('Final');
   const last = tournamentLastStage(tour);
   return last ? t('Stage {n} of {m}', { n: stage, m: last }) : t('Stage {n}', { n: stage });
 }

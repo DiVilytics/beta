@@ -71,6 +71,13 @@
         <input type="date" id="tnDate">
       </div>
     </div>
+    <!-- Points (stages scored by places) or Knockout (a fixed bracket): each
+         shows its own options (tn-points-only, tn-ko-only; tournaments.js). -->
+    <div class="field tn-fixed" data-help="format">
+      <label data-i18n>Format</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnFormat"></div>
+      <p class="modal-hint tn-rule-hint" id="tnFormatHint"></p>
+    </div>
     <div class="form-row tn-fixed">
       <div class="field" data-help="size">
         <label for="tnSize" data-i18n>Table size</label>
@@ -84,7 +91,7 @@
       </div>
       <div class="field" data-help="stages">
         <label for="tnStages" data-i18n>Stages</label>
-        <select id="tnStages">
+        <select id="tnStages" onchange="_tnSyncFormat()">
           <option value="open" data-i18n>Open-ended</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -109,12 +116,17 @@
         </select>
       </div>
     </div>
-    <div class="field tn-fixed" data-help="tables">
+    <div class="field tn-fixed tn-ko-only" data-help="advance">
+      <label for="tnAdvance" data-i18n>Advance from each table</label>
+      <select id="tnAdvance" onchange="_tnSyncFormat()"></select>
+      <p class="modal-hint tn-rule-hint" id="tnAdvanceHint"></p>
+    </div>
+    <div class="field tn-fixed tn-points-only" data-help="tables">
       <label data-i18n>Tables</label>
       <div class="seg seg-sm tn-rule-seg" id="tnSplit"></div>
       <p class="modal-hint tn-rule-hint" id="tnSplitHint"></p>
     </div>
-    <div class="field tn-fixed" data-help="pairing">
+    <div class="field tn-fixed tn-points-only" data-help="pairing">
       <label data-i18n>Pairing</label>
       <div class="seg seg-sm tn-rule-seg" id="tnPairing"></div>
       <p class="modal-hint tn-rule-hint" id="tnPairingHint"></p>
@@ -124,7 +136,7 @@
       <div class="seg seg-sm tn-rule-seg" id="tnPlayOrder"></div>
       <p class="modal-hint tn-rule-hint" id="tnPlayOrderHint"></p>
     </div>
-    <div class="field tn-fixed" data-help="scoring">
+    <div class="field tn-fixed tn-points-only" data-help="scoring">
       <label data-i18n>Scoring</label>
       <div class="seg seg-sm tn-rule-seg" id="tnScoring"></div>
       <p class="modal-hint tn-rule-hint" id="tnScoringHint"></p>
@@ -135,12 +147,12 @@
         <div id="tnCustomRows"></div>
       </div>
     </div>
-    <div class="field tn-fixed" data-help="bye">
+    <div class="field tn-fixed tn-points-only" data-help="bye">
       <label data-i18n>Bye</label>
       <div class="seg seg-sm tn-rule-seg" id="tnBye"></div>
       <p class="modal-hint tn-rule-hint" id="tnByeHint"></p>
     </div>
-    <div class="field tn-fixed" data-help="final">
+    <div class="field tn-fixed tn-points-only" data-help="final">
       <label data-i18n>Final table</label>
       <div class="seg seg-sm tn-rule-seg" id="tnFinal"></div>
       <p class="modal-hint tn-rule-hint" id="tnFinalHint"></p>
@@ -217,6 +229,18 @@
       <button class="sheet-close" onclick="closeOverlay('tnHelpSheet')">×</button>
     </div>
     <div class="sheet-body tn-help" id="tnHelpBody"></div>
+  </div>
+</div>
+
+<!-- A knockout bracket's table, tapped: the whole table (tournaments.js). -->
+<div class="overlay" id="tnTableSheet" onclick="if(event.target===this) closeOverlay('tnTableSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="tnTableSheetTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('tnTableSheet')">×</button>
+    </div>
+    <div class="sheet-body" id="tnTableSheetBody"></div>
   </div>
 </div>
 

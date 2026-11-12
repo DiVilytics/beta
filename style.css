@@ -2609,6 +2609,27 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-villain .mover { margin-left: auto; }   /* on the right, the villain page's size (.cs-mover) */
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
+/* A knockout's bracket (tournaments.js, _tnBracketHTML): a column per stage,
+   each table centered on those feeding it, the lines (svg) drawn behind. */
+.tn-bracket-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px 6px; }
+.tn-bracket { --tn-bk-w: calc(118px * var(--ts)); position: relative; display: grid; column-gap: 22px; row-gap: 8px; width: max-content; min-width: 100%; }
+.tn-bk-lines { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.tn-bk-lines path { fill: none; stroke: var(--dim); stroke-width: 1.5; }
+.tn-bk-head { grid-row: 1; font-size: calc(11px * var(--ts)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tn-bk-box { position: relative; align-self: center; display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 6px 8px; text-align: left;
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--rs); color: var(--text); font: inherit; cursor: pointer; }
+.tn-bk-box:disabled { cursor: default; }
+.tn-bk-box.live { border-color: var(--accent); }
+.tn-bk-box.self { box-shadow: inset 0 0 0 1px var(--accent); }
+.tn-bk-title { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-bk-name { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: calc(13px * var(--ts)); }
+.tn-bk-name .char-portrait { width: 18px; height: 18px; flex-shrink: 0; }
+.tn-bk-name.won { font-weight: 600; }
+.tn-bk-name.waiting { color: var(--muted); }
+.tn-bk-name.self .tn-bk-text { color: var(--accent); }
+.tn-bk-place { flex-shrink: 0; font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-bk-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tn-bk-empty { font-size: calc(12px * var(--ts)); color: var(--muted); }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
 /* Tournament options: an ⓘ after the page intro, and one by each option. */
 .tn-info { border: none; background: none; padding: 0 2px; font: inherit; font-size: calc(12px * var(--ts)); color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }
