@@ -1,0 +1,133 @@
+{
+  "date": {
+    "title": "Data",
+    "paras": [
+      "Il giorno del torneo, mostrato nella sua pagina e negli elenchi. Può essere un giorno futuro: crea il torneo in anticipo e condividilo. Gli organizzatori possono cambiarlo in qualsiasi momento, come il nome. Le partite tengono il giorno e l'ora in cui sono state giocate davvero."
+    ]
+  },
+  "format": {
+    "title": "Formato",
+    "paras": [
+      "Punti: a ogni fase, chiunque sia ancora nel torneo gioca una partita (o riposa) e prende punti in base al posto; decidono la classifica e, se attivo, il tavolo finale.",
+      "Eliminazione diretta: un tabellone. La fase 1 è sorteggiata a caso; a ogni tavolo i primi (vedi Passano per tavolo) giocano la fase successiva, al tavolo a cui li porta il tabellone, e gli altri sono fuori. L'ultima fase è la finale, un solo tavolo: chi la vince vince il torneo. Niente punti, riposi o tavolo finale: la scheda Tabellone mostra chi è passato.",
+      "Ogni formato mostra le sue opzioni. Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "size": {
+    "title": "Giocatori per tavolo",
+    "paras": [
+      "Nessun tavolo ha più giocatori di così. Con tavoli Bilanciati, alcuni tavoli possono avere un giocatore in meno; con tavoli Completi, ogni tavolo ne ha esattamente tanti.",
+      "Fissa anche la scala dei punti: una vittoria vale lo stesso a ogni tavolo, qualunque sia la sua grandezza.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "stages": {
+    "title": "Fasi",
+    "paras": [
+      "Quanti giri di tavoli gioca il torneo, oppure Libere: quanti ne vogliono gli organizzatori. In ogni fase, ogni giocatore ancora nel torneo gioca una partita, o riposa. Il tavolo finale, se attivo, viene dopo l'ultima fase.",
+      "Le fasi possono finire prima: dopo una fase qualsiasi, quando tutti i suoi tavoli sono salvati, un organizzatore tocca Sorteggia la finale (con il tavolo finale) o Concludi torneo (senza). Annulla sorteggio ritira la finale finché la sua partita non è salvata; senza finale, Riapri annulla la conclusione.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "advance": {
+    "title": "Passano per tavolo",
+    "paras": [
+      "Solo per l'eliminazione diretta: quanti giocatori di ogni tavolo giocano la fase successiva. 1, o un numero che divide la dimensione del tavolo (a tavoli da 4: 1 o 2; a tavoli da 6: 1, 2 o 3), così i tavoli della fase successiva sono pieni.",
+      "Con la dimensione dei tavoli e le fasi, stabilisce quanti giocatori prevede il torneo. Al massimo un tabellone pieno: a tavoli da 4 con 1 che passa, 16 giocatori in 2 fasi, 64 in 3. Almeno uno in più di quanti passano a ogni tavolo della fase 1: 8 su quei 16. Con meno di un tabellone pieno, i tavoli della fase 1 hanno posti vuoti, distribuiti; dalla fase 2 in poi i tavoli sono pieni.",
+      "Un giocatore ritirato dopo il suo tavolo non gioca la fase successiva: il suo tavolo successivo gioca con un giocatore in meno. Una volta iniziato il torneo non si aggiungono giocatori.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "tables": {
+    "title": "Tavoli",
+    "paras": [
+      "Bilanciati: tutti i tavoli necessari, il più possibile bilanciati. 9 giocatori a tavoli da 4 giocano a tre tavoli da 3; 10 giocatori a 4, 3 e 3. Solo i tavoli da 2 con un numero dispari di giocatori lasciano qualcuno senza tavolo: un riposo (vedi Riposo).",
+      "Completi: ogni tavolo pieno, e chi avanza riposa (salta la fase, vedi Riposo). 9 giocatori a tavoli da 4 giocano a due tavoli da 4, e uno riposa; 7 giocatori giocano a un tavolo da 4, e tre riposano. Con meno giocatori di un tavolo, giocano tutti insieme.",
+      "I riposi vanno a chi ne ha avuti meno finora (con l'abbinamento Svizzero, al più in basso in classifica tra loro), così nelle fasi ognuno ha la sua parte.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "pairing": {
+    "title": "Abbinamento",
+    "paras": [
+      "Casuale: nuovi tavoli a caso a ogni fase.",
+      "Svizzero: fase 1 a caso. Dalla fase 2, i giocatori sono ordinati per classifica (punti, poi gli spareggi, vedi Classifica) e seduti in quell'ordine, i primi allo stesso tavolo; poi i giocatori si scambiano tra tavoli vicini ogni volta che questo riduce quanti giocatori di un tavolo si sono già affrontati. Una rivincita capita comunque quando non c'è modo di evitarla.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "order": {
+    "title": "Ordine di gioco",
+    "paras": [
+      "Casuale: l'ordine di gioco di ogni tavolo è sorteggiato a caso.",
+      "Rotazione: ogni tavolo gioca nell'ordine che rimette il minor numero possibile di giocatori in un posto già avuto (ogni ripetizione conta: essere 2º due volte conta due volte); tra ordini ugualmente buoni, chi finora si è seduto più tardi, in media, gioca prima. I posti si confrontano tra tavoli di grandezze diverse in base a dove cadono tra primo e ultimo. Con 4 giocatori a un tavolo per 4 fasi, ognuno siede una volta in ogni posto.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "scoring": {
+    "title": "Punteggio",
+    "paras": [
+      "Metodo Borda: a un tavolo della grandezza massima, il 1º prende un punto in meno dei giocatori al tavolo, il 2º uno in meno, fino a 0 per l'ultimo (a tavoli da 4: 3, 2, 1, 0). Un tavolo più piccolo tiene i punti del 1º e dell'ultimo e distribuisce in modo uniforme i posti in mezzo: a 3 giocatori, 3, 1,5 e 0.",
+      "Personalizzato: scrivi i punti per ogni posto a ogni dimensione di tavolo, ogni posto non più di quello sopra. Scrivi la riga del tavolo più grande, poi riempi i tavoli più piccoli con uno dei due pulsanti, e se vuoi cambia a mano qualsiasi casella.",
+      "Stessa vittoria: un tavolo più piccolo tiene i punti del 1º e dell'ultimo e distribuisce gli altri lungo la tua riga. 5, 3, 1, 0 a 4 dà 5, 2, 0 a 3 e 5, 0 a 2. Una vittoria vale lo stesso a ogni tavolo, ma il posto medio vale di più a un tavolo più piccolo (2,33 a 3 e 2,5 a 2, contro 2,25 a 4).",
+      "Stessa media: ogni posto a un tavolo più piccolo prende la media dei posti del tavolo più grande che rappresenta. 5, 3, 1, 0 a 4 dà 4,5, 2, 0,25 a 3 e 4, 0,5 a 2. Il posto medio vale lo stesso a ogni tavolo (2,25), così nessun tavolo è più facile, ma una vittoria a un tavolo più piccolo vale meno.",
+      "In entrambi, chi abbandona una partita prende i punti del posto ottenuto: chi abbandona prende gli ultimi posti, nell'ordine in cui abbandona (il primo ad abbandonare è ultimo).",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "bye": {
+    "title": "Riposo",
+    "paras": [
+      "Un riposo è una fase che un giocatore salta: quando non tutti i giocatori trovano posto ai tavoli, chi resta fuori non gioca in quella fase e prende invece i punti del riposo.",
+      "Un riposo si misura sempre su un tavolo pieno (tanti giocatori quanto la dimensione del tavolo), qualunque sia la dimensione dei tavoli della fase: a tavoli da 4 con il conteggio Borda, il 1º prende 3 e l'ultimo 0.",
+      "Ultimo: quanto l'ultimo posto a un tavolo pieno (0).",
+      "Mezza vittoria: a metà strada tra l'ultimo e il 1º posto a un tavolo pieno (1,5).",
+      "Una vittoria: quanto il 1º posto a un tavolo pieno (3), come negli scacchi svizzeri.",
+      "Un riposo non conta mai come primo posto per gli spareggi, e chi riposa non ha avversari in quella fase.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "ranking": {
+    "title": "Classifica e spareggi",
+    "paras": [
+      "La classifica ordina per punti. A pari punti conta chi ha più primi posti, poi i punti degli avversari: la somma dei punti attuali di ogni avversario affrontato, una volta per ogni incontro. I giocatori ancora pari condividono il posto."
+    ]
+  },
+  "final": {
+    "title": "Tavolo finale",
+    "paras": [
+      "No: la classifica dopo l'ultima fase è quella finale.",
+      "Sì: dopo l'ultima fase, i primi della classifica (quanti ne tiene un tavolo, tra i giocatori ancora nel torneo; a pari posto, nell'ordine della classifica) giocano un tavolo finale. La sua classifica decide i primi posti: chi la vince vince il torneo, il suo 2º è 2º, e così via; tutti gli altri tengono il loro ordine della classifica, dopo i finalisti. La finale non dà punti. Ogni finalista riceve un cattivo che non ha giocato nel torneo, se la riserva lo permette.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "villains": {
+    "title": "Cattivi",
+    "paras": [
+      "I cattivi di ogni fase si pescano insieme ai suoi tavoli, dalla riserva: mai lo stesso cattivo due volte allo stesso tavolo, in una fase un cattivo al massimo tante volte quante sono le sue copie, e nessuno riprende lo stesso cattivo finché la riserva lo permette. I cattivi di una fase si vedono solo quando la fase è sorteggiata.",
+      "La riserva ha una copia di ogni cattivo, salvo dove Copie indica altro (da 0 a 9; 0 lo toglie dalla riserva): le copie fanno giocare più giocatori dei cattivi, ogni copia a un tavolo diverso. I giocatori possono essere al massimo le copie nella riserva. Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "players": {
+    "title": "Giocatori",
+    "paras": [
+      "Gli organizzatori scrivono i nomi, in Nuovo torneo e poi in Modifica torneo finché non inizia la prima partita. Un giocatore che ha fatto l'accesso rivendica il suo con Sono io, in qualsiasi momento, ma solo dal codice QR o dal link del torneo: un organizzatore lo condivide con Condividi QR (può farlo anche chi ha già rivendicato un nome). Da lì compare con il suo nickname, e i suoi cattivi nelle partite del torneo sono suoi; Rilascia restituisce tutto. I cattivi di una partita del torneo si rivendicano solo così, non dalla pagina della partita.",
+      "Un organizzatore può ritirare un giocatore in qualsiasi momento: lascia il torneo, tiene i suoi punti e non viene più sorteggiato. Se la sua partita della fase in corso non è ancora iniziata, la abbandona (gli ultimi posti); riammetterlo prima che inizi annulla l'abbandono. Riammetti lo fa giocare di nuovo dalla fase successiva.",
+      "Abbandonare una partita non è ritirarsi: il giocatore lascia solo quella partita (gli ultimi posti) e viene sorteggiato nella fase successiva come sempre.",
+      "Modifica torneo aggiunge giocatori anche dopo l'inizio, finché non inizia la prima partita: la fase 1 viene sorteggiata di nuovo con loro. Dopo, un organizzatore aggiunge un giocatore con + Aggiungi giocatore, sotto i giocatori: gioca dalla fase successiva, partendo da 0 punti (non più una volta sorteggiata l'ultima fase). Un giocatore senza nome è Giocatore N finché non viene rivendicato."
+    ]
+  },
+  "organizers": {
+    "title": "Organizzatori",
+    "paras": [
+      "Chi crea il torneo è il suo primo organizzatore. Un organizzatore ne aggiunge altri con QR organizzatori: chi lo inquadra, dopo l'accesso, e tocca Diventa organizzatore lo è anche lui. Possono essere quanti si vuole, e sono tutti uguali: ognuno può fare tutto, dal modificare e avviare il torneo e sorteggiarne le fasi fino a inserire e correggere i risultati, ritirare giocatori ed eliminare il torneo, e può aggiungere o rimuovere organizzatori.",
+      "Un organizzatore può anche giocare: rivendica il suo nome con Sono io, senza il codice. Un organizzatore può rimuovere qualsiasi altro organizzatore, o lasciare il ruolo; ne resta sempre almeno uno. Se un organizzatore elimina il suo account, gli altri continuano il torneo."
+    ]
+  },
+  "changes": {
+    "title": "Dopo l'inizio",
+    "paras": [
+      "Finché non inizia la prima partita (un riposo non è una partita) si può cambiare ogni impostazione, in Modifica torneo; cambiare tavoli, fasi, riserva o giocatori sorteggia di nuovo la fase 1. Una volta iniziata una partita, cambiano solo il nome e la data, niente delle regole. Annulla sorteggio cancella il sorteggio della fase in corso finché nessuna delle sue partite è salvata (annullare la fase 1 riporta a prima dell'inizio, e Inizia sorteggia tutto di nuovo).",
+      "Un organizzatore può correggere qualsiasi tavolo salvato con Modifica risultato (posti, abbandoni, durata, round, ordine di gioco) e inserire con Inserisci risultato il risultato di qualsiasi tavolo non ancora salvato, anche uno che un telefono ha aperto (per esempio con la batteria scarica): quel telefono non potrà più salvarlo."
+    ]
+  }
+}

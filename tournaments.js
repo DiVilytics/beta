@@ -433,100 +433,16 @@ function tnToggleOptions() {
 }
 
 // ── Tournament options ──
-// Every option in full, with examples, in a sheet: the button on top of the
-// form opens it at the start, each option's ⓘ at its own section.
-const TN_HELP = [
-  ['date', 'Date', [
-    'The day of the tournament, shown on its page and in the lists. It can be a day to come: create the tournament in advance and share it. The organizers can change it at any time, like the name. The games keep the day and time they were actually played.',
-  ]],
-  ['format', 'Format', [
-    'Points: every stage, everyone still in the tournament plays one game (or has a bye) and scores points by their place; the standings, and the final table when on, decide the ranking.',
-    'Knockout: a bracket. Stage 1 is drawn at random; at each table the top players (see Advance from each table) play the next stage, at the table the bracket leads them to, and the others are out. The last stage is the final, one table: its winner wins the tournament. No points, byes or final table: the Bracket tab shows who went on.',
-    'Each format shows its own options. Fixed once the first game starts.',
-  ]],
-  ['size', 'Table size', [
-    'No table has more players than this. With Balanced tables, some tables can have one player fewer; with Full tables, every table has exactly this many.',
-    'It also sets the scale of the points: a win scores the same at every table, whatever its size.',
-    'Fixed once the first game starts.',
-  ]],
-  ['stages', 'Stages', [
-    'How many rounds of tables the tournament plays, or Open-ended: as many as the organizers want. In every stage, each player still in the tournament plays one game, or has a bye. The final table, when on, comes after the last stage.',
-    'The stages can end early: after any stage, once all its tables are saved, an organizer taps Draw the final (with a final table) or End tournament (without one). Undo draw takes the final back until its game is saved; without a final, Reopen takes the end back.',
-    'Fixed once the first game starts.',
-  ]],
-  ['advance', 'Advance from each table', [
-    'Knockout only: how many players of each table play the next stage. 1, or a number that divides the table size (at tables of 4: 1 or 2; at tables of 6: 1, 2 or 3), so the next stage\'s tables are full.',
-    'With the table size and the stages, it sets how many players the tournament takes. At most a full bracket: tables of 4 with 1 advancing take 16 players in 2 stages, 64 in 3. At least one more than advance at every table of stage 1: 8 of those 16. With fewer than a full bracket, stage 1\'s tables have empty seats, spread out; from stage 2 on, the tables are full.',
-    'A player withdrawn after their table doesn\'t play the next stage: their next table plays with one player fewer. Players can\'t be added once the tournament has started.',
-    'Fixed once the first game starts.',
-  ]],
-  ['tables', 'Tables', [
-    'Balanced: as many tables as needed, all as balanced as possible. 9 players at tables of 4 play at three tables of 3; 10 players at 4, 3 and 3. Only tables of 2 with an odd number of players leave someone without a table: a bye (see Bye).',
-    'Full: every table full, and whoever is left over has a bye (sits out the stage, see Bye). 9 players at tables of 4 play at two tables of 4, and one has a bye; 7 players play at one table of 4, and three have a bye. With fewer players than a table, they all play together.',
-    'Byes go to whoever has had the fewest so far (with Swiss pairing, the lowest ranked of them), so over the stages everyone gets their share.',
-    'Fixed once the first game starts.',
-  ]],
-  ['pairing', 'Pairing', [
-    'Random: new random tables every stage.',
-    'Swiss: stage 1 at random. From stage 2, the players are sorted by the standings (points, then the tiebreaks, see Ranking) and seated in that order, the leaders at the same table; then players swap between neighboring tables whenever that lowers how many players at a table already met. A rematch still happens when there is no way around it.',
-    'Fixed once the first game starts.',
-  ]],
-  ['order', 'Play order', [
-    'Random: each table\'s play order is drawn at random.',
-    'Rotation: each table plays in the order that puts as few players as possible back in a seat they already had (every repeat counts: sitting 2nd twice counts twice); among equally good orders, whoever sat later so far, on average, plays earlier. Seats compare across table sizes by where they fall between first and last. With 4 players at one table for 4 stages, everyone sits in every seat once.',
-    'Fixed once the first game starts.',
-  ]],
-  ['scoring', 'Scoring', [
-    'Borda count: at a table of the largest size, 1st scores one point less than the players at the table, 2nd one less, down to 0 for last (at tables of 4: 3, 2, 1, 0). A smaller table keeps 1st\'s and last\'s points and spreads the places in between evenly: at 3 players, 3, 1.5 and 0.',
-    'Custom: you type the points for each place at every table size, each place no more than the one above. Type the largest table\'s row, then fill the smaller tables from it with one of two buttons, and change any box by hand if you like.',
-    'Same win: a smaller table keeps 1st\'s and last\'s points and spreads the others along your row. 5, 3, 1, 0 at 4 gives 5, 2, 0 at 3 and 5, 0 at 2. A win is worth the same at every table, but the average place scores more at a smaller table (2.33 at 3 and 2.5 at 2, against 2.25 at 4).',
-    'Same average: each place at a smaller table scores the average of the largest table\'s places it stands for. 5, 3, 1, 0 at 4 gives 4.5, 2, 0.25 at 3 and 4, 0.5 at 2. The average place scores the same at every table (2.25), so no table is easier to score at, but a win at a smaller table is worth less.',
-    'With both, a player who drops out of a game scores the place they got: drops take the last places, in the order they drop (the first to drop is last).',
-    'Fixed once the first game starts.',
-  ]],
-  ['bye', 'Bye', [
-    'A bye is a stage a player sits out: when the players can\'t all be seated at the tables, whoever is left over doesn\'t play in that stage and gets the bye\'s points instead.',
-    'A bye is always measured on a full table (as many players as the table size), whatever the size of the stage\'s tables: at tables of 4 with Borda count, 1st scores 3 and last 0.',
-    'Last: what last place scores at a full table (0).',
-    'Half a win: halfway between last and 1st place at a full table (1.5).',
-    'A win: what 1st place scores at a full table (3), as in Swiss chess.',
-    'A bye never counts as a 1st place for the tiebreaks, and a player with a bye has no opponents in that stage.',
-    'Fixed once the first game starts.',
-  ]],
-  ['ranking', 'Ranking and tiebreaks', [
-    'The standings rank by points. Equal points are separated by the most 1st places, then by the opponents\' points: the sum of the current points of every opponent faced, once for each time they met. Players still equal share their place.',
-  ]],
-  ['final', 'Final table', [
-    'Off: the standings after the last stage are the final ranking.',
-    'On: after the last stage, the top of the standings (as many as a table holds, among the players still in the tournament; equal places in the standings\' order) play one final table. Its ranking decides the top places: its winner wins the tournament, its 2nd is 2nd, and so on; everyone else keeps their order from the standings, after the finalists. The final scores no points. Each finalist gets a villain they haven\'t played in the tournament, when the pool allows.',
-    'Fixed once the first game starts.',
-  ]],
-  ['villains', 'Villains', [
-    'Each stage\'s villains are drawn with its tables, from the draw pool: never the same villain twice at a table, in a stage a villain at most as many times as its copies, and nobody gets the same villain twice while the pool allows it. A stage\'s villains show only once it is drawn.',
-    'The draw pool has one copy of each villain, unless Copies says otherwise (0 to 9; 0 takes it out of the pool): copies let more players than villains play, each copy at a different table. The players can be at most the copies in the pool. Fixed once the first game starts.',
-  ]],
-  ['players', 'Players', [
-    'The organizers type the names, in New tournament and then in Edit tournament until the first game starts. A signed-in player claims theirs with That\'s me, at any time, but only from the tournament\'s QR code or link: an organizer shares it with Share QR (so can anyone who already claimed a name). From then on they show by their nickname, and their villains in the tournament\'s games are theirs; Release gives it all back. A tournament game\'s villains are claimed only this way, not on the game\'s page.',
-    'An organizer can withdraw a player at any time: they leave the tournament, keep their points and are no longer drawn. If their game of the current stage hasn\'t started yet, they drop out of it (the last places); bringing them back before it starts takes the drop back. Bring back makes them play again from the next stage.',
-    'Dropping out of a game is not withdrawing: the player leaves that game only (the last places) and is drawn in the next stage as usual.',
-    'Edit tournament adds players after the start too, until the first game starts: stage 1 is drawn again with them. Later, an organizer adds a player with + Add player, under the players: they play from the next stage, starting from 0 points (not once the last stage is drawn). A player with no name typed is Player N until claimed.',
-  ]],
-  ['organizers', 'Organizers', [
-    'Whoever creates the tournament is its first organizer. An organizer adds others with Organizer QR: whoever scans it, signed in, and taps Become an organizer is one too. There can be as many as you like, and they are all alike: each can do everything, from editing, starting and drawing the stages to entering and fixing results, withdrawing players and deleting the tournament, and can add or remove organizers.',
-    'An organizer can play too: they claim their name with That\'s me, without the claim code. An organizer can remove any other, or step down; one is always left. If an organizer deletes their account, the others go on with the tournament.',
-  ]],
-  ['changes', 'After the start', [
-    'Until the first game starts (a bye isn\'t a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage\'s draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).',
-    'An organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it.',
-  ]],
-];
-
-// A paragraph that opens with an option's name ("Random: ...") shows the name in bold.
-function tnHelp(section) {
-  document.getElementById('tnHelpBody').innerHTML = TN_HELP.map(([id, title, paras]) => `
+// The sheet behind every ⓘ: each option, what its choices do
+// (asset/data/tournament-help.json, .it.json; db.js loadTournamentHelp). A
+// paragraph that opens with an option's name ("Random: ...") shows the name
+// in bold; section opens it at that option's.
+async function tnHelp(section) {
+  const help = await loadTournamentHelp();
+  document.getElementById('tnHelpBody').innerHTML = Object.entries(help).map(([id, { title, paras }]) => `
     <section class="tn-help-section" id="tnHelp-${id}">
-      <h4>${t(title)}</h4>
-      ${paras.map(p => `<p>${t(p).replace(/^[^:.;,]{1,24}:/, '<strong>$&</strong>')}</p>`).join('')}
+      <h4>${_esc(title)}</h4>
+      ${paras.map(p => `<p>${_esc(p).replace(/^[^:.;,]{1,24}:/, '<strong>$&</strong>')}</p>`).join('')}
     </section>`).join('');
   openOverlay('tnHelpSheet');
   if (section) document.getElementById(`tnHelp-${section}`)?.scrollIntoView({ block: 'start' });
