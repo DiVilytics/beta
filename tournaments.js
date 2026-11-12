@@ -805,7 +805,7 @@ async function tnOpenForm(tour) {
   document.getElementById('tnName').value   = tour?.name || '';
   document.getElementById('tnDate').value   = tour?.event_date || _tnToday();
   document.getElementById('tnSize').value   = String(tour?.table_size || 4);
-  document.getElementById('tnStages').value = tour ? String(tour.stages ?? 'open') : '3';
+  document.getElementById('tnStages').value = tour ? String(tour.stages ?? 'open') : 'open';
   tnRule.table_split = tour?.table_split || 'even';
   tnRule.pairing     = tour?.pairing || 'random';
   tnRule.play_order  = tour?.play_order || 'random';
@@ -900,7 +900,7 @@ function _tnDraftState() {
 // Anything changed from a fresh New tournament form?
 function _tnFormChanged() {
   const d = _tnDraftState();
-  return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== '3'
+  return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== 'open'
     || Object.entries({ table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' }).some(([k, v]) => d.rule[k] !== v)
     || d.players.length !== 2 || d.players.some(p => p.name.trim() || p.isMe)
     || !tnPool.isDefault() || Object.keys(d.copies).length > 0;

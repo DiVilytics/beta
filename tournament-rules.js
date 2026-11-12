@@ -86,11 +86,11 @@ const TOURNAMENT_SPLITS = {
       return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
     },
   },
-  // Every table full; whoever is left has a bye (9 at 4 → 4, 4 and a bye; up
+  // Every table full; whoever is left has a bye (9 at 4 → 4, 4, 1; up
   // to size - 1 byes). Fewer players than a table: they all play together.
   full: {
     name: 'Full',
-    hint: 'Every table full, the players left over have a bye (9 players at tables of 4: 4, 4 and a bye).',
+    hint: 'Every table full, the players left over have a bye (9 players at tables of 4: 4, 4, 1).',
     sizes(n, size) {
       const k = Math.floor(n / size);
       if (!k) return [n];

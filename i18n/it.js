@@ -1029,7 +1029,7 @@ window.I18N.it = {
     "Balanced": "Bilanciati",
     "Full": "Completi",
     "As many tables as needed, as balanced as possible (9 players at tables of 4: 3, 3, 3).": "Tutti i tavoli necessari, il più possibile bilanciati (9 giocatori a tavoli da 4: 3, 3, 3).",
-    "Every table full, the players left over have a bye (9 players at tables of 4: 4, 4 and a bye).": "Ogni tavolo pieno, chi avanza riposa (9 giocatori a tavoli da 4: 4, 4 e un riposo).",
+    "Every table full, the players left over have a bye (9 players at tables of 4: 4, 4, 1).": "Ogni tavolo pieno, chi avanza riposa (9 giocatori a tavoli da 4: 4, 4, 1).",
     "Me": "Io",
     "Every player needs a different name.": "Ogni giocatore deve avere un nome diverso.",
     "Enter result": "Inserisci risultato",
