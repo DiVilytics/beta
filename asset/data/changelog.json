@@ -1,40 +1,31 @@
 {
   "2026-11-09": {
-    "title": "Tournaments: copies and late players",
+    "title": "Tournaments, Δ Wins and games played earlier",
     "items": [
-      "Tournaments: set how many copies of each villain are at hand; two equal villains never sit at the same table.",
-      "Tournaments: an organizer can add a player while the tournament runs; they play from the next stage, from 0 points.",
-      "Tournaments: a result entered by an organizer can include the duration and the rounds."
-    ]
-  },
-  "2026-11-02": {
-    "title": "Past games, Matchups and uploads",
-    "items": [
-      "New Game: Play now or Past game; a past game can be saved without its time, its date or its play order.",
-      "Leaderboard: Matchups for villains and Δ Wins for players; Charts: When games are played (weekday, part of the day, hour), and each box in its own color.",
-      "Account: Upload games from a file; player pages list their tournaments, the games they played and those they recorded."
+      "Tournaments: set one up with its players and options, and DiVilytics draws the tables and villains of every stage and keeps the standings; players claim their name with a QR code, organizers can enter results, and the stages can be open-ended.",
+      "Δ Wins: how far wins are from what equal chances give, for villains and players, on the Leaderboard, their pages and the charts; and Matchups on the Leaderboard, and the Day and hour chart.",
+      "New Game: Play now or Past game; a game played earlier can be saved without its time, its date or its play order. Account: Upload games from a file; and the settings under your avatar."
     ]
   },
   "2026-10-26": {
     "title": "Three text sizes",
     "items": [
-      "Text size: Small, Medium (the new default) and Large, under your avatar; Large is bigger than before, and New Game and the villain pages make room for it on small phones."
+      "Text size: Small, Medium (the new default) and Large, under ⚙️; Large is bigger than before, and New Game and the villain pages make room for it on small phones."
     ]
   },
   "2026-10-19": {
-    "title": "Organizers, Δ Wins on villain pages and tap the winner",
+    "title": "Tap the winner, and total XP",
     "items": [
-      "Tournaments: as many organizers as you like, added with the Organizer QR; your running tournaments come first, with a clearer status and the final result.",
-      "Δ Wins on every villain page, for each number of players; and every player page shows the player's total XP.",
-      "New Game: when a villain wins, tap their mover; the game stops with the winner marked, ready to save."
+      "New Game: when a villain wins, tap their mover; the game stops with the winner marked, ready to save.",
+      "Every player page shows the player's total XP, the same as on the Leaderboard."
     ]
   },
   "2026-10-12": {
-    "title": "Tournaments, Δ Wins and new charts",
+    "title": "Charts by period and number of players",
     "items": [
-      "Tournaments: set one up with its players and options, and DiVilytics draws the tables and villains of every stage and keeps the standings; players claim their name with its QR code, and one phone records each table's game.",
-      "Δ Wins: how far each villain's wins are from what equal chances give, on the villains' Leaderboard and the charts.",
-      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians, and Matchups: who beats whom; and Solo warns you on your last round."
+      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians.",
+      "Matchups: who beats whom, villain against villain or box against box.",
+      "Solo: a clear warning on your last round, and the Phantom's die keeps its roll."
     ]
   },
   "2026-10-05": {
@@ -42,7 +33,7 @@
     "items": [
       "Solo, an unofficial variant for one player against a Phantom player, with its own rankings; and XP, earned from claimed games and achievements.",
       "All time, Year and Month on the Leaderboard, the Game Log and player pages; a guide for every villain; Villain Movers; and this page.",
-      "New Game keeps your game in progress and your draw pool; whoever recorded a game can fix or delete it; text size, Install, keyboard shortcuts and the settings under your avatar."
+      "New Game keeps your game in progress and your draw pool; whoever recorded a game can fix or delete it; text size, Install and keyboard shortcuts."
     ]
   },
   "2026-09-28": {

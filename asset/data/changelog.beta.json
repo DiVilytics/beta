@@ -1,0 +1,110 @@
+{
+  "2026-11-09": {
+    "title": "Tournaments: copies and late players",
+    "items": [
+      "Tournaments: set how many copies of each villain are at hand; two equal villains never sit at the same table.",
+      "Tournaments: an organizer can add a player while the tournament runs; they play from the next stage, from 0 points.",
+      "Tournaments: a result entered by an organizer can include the duration and the rounds."
+    ]
+  },
+  "2026-11-02": {
+    "title": "Past games, Matchups and uploads",
+    "items": [
+      "New Game: Play now or Past game; a past game can be saved without its time, its date or its play order.",
+      "Leaderboard: Matchups for villains and Δ Wins for players; Charts: When games are played (weekday, part of the day, hour), and each box in its own color.",
+      "Account: Upload games from a file; player pages list their tournaments, the games they played and those they recorded."
+    ]
+  },
+  "2026-10-26": {
+    "title": "Three text sizes",
+    "items": [
+      "Text size: Small, Medium (the new default) and Large, under your avatar; Large is bigger than before, and New Game and the villain pages make room for it on small phones."
+    ]
+  },
+  "2026-10-19": {
+    "title": "Organizers, Δ Wins on villain pages and tap the winner",
+    "items": [
+      "Tournaments: as many organizers as you like, added with the Organizer QR; your running tournaments come first, with a clearer status and the final result.",
+      "Δ Wins on every villain page, for each number of players; and every player page shows the player's total XP.",
+      "New Game: when a villain wins, tap their mover; the game stops with the winner marked, ready to save."
+    ]
+  },
+  "2026-10-12": {
+    "title": "Tournaments, Δ Wins and new charts",
+    "items": [
+      "Tournaments: set one up with its players and options, and DiVilytics draws the tables and villains of every stage and keeps the standings; players claim their name with its QR code, and one phone records each table's game.",
+      "Δ Wins: how far each villain's wins are from what equal chances give, on the villains' Leaderboard and the charts.",
+      "Charts: the Leaderboard's filters on every chart, switches between views, averages and medians, and Matchups: who beats whom; and Solo warns you on your last round."
+    ]
+  },
+  "2026-10-05": {
+    "title": "Solo, XP, guides and a smoother New Game",
+    "items": [
+      "Solo, an unofficial variant for one player against a Phantom player, with its own rankings; and XP, earned from claimed games and achievements.",
+      "All time, Year and Month on the Leaderboard, the Game Log and player pages; a guide for every villain; Villain Movers; and this page.",
+      "New Game keeps your game in progress and your draw pool; whoever recorded a game can fix or delete it; text size, Install, keyboard shortcuts and the settings under your avatar."
+    ]
+  },
+  "2026-09-28": {
+    "title": "DiVilytics in Italian, Tutorial and F.A.Q.",
+    "items": [
+      "DiVilytics in Italian, with cards, objectives and guides as printed in the Italian edition.",
+      "A Tutorial, the F.A.Q. with the official rules summarized, and every villain's decks card by card."
+    ]
+  },
+  "2026-08-03": {
+    "title": "Introduction to Evil and Darkness Brewing",
+    "items": [
+      "Introduction to Evil's reworked villains with stats of their own, and Darkness Brewing among your boxes.",
+      "Download all your games as a CSV from your Account."
+    ]
+  },
+  "2026-07-20": {
+    "title": "Three new villains",
+    "items": [
+      "Ernesto de la Cruz, Prince Hans and the Sanderson Sisters."
+    ]
+  },
+  "2026-06-22": {
+    "title": "Charts and the Players page",
+    "items": [
+      "Charts: a dozen ways to explore every recorded game.",
+      "Players: search for any player, or share your profile with a QR code."
+    ]
+  },
+  "2026-06-15": {
+    "title": "New Account page, rivalries and more achievements",
+    "items": [
+      "A new Account page, villain filters in New Game and the Game Log, and many new achievements.",
+      "Villain pages show their rivalries, and player pages who they play with most."
+    ]
+  },
+  "2026-06-01": {
+    "title": "Claim your villain, and build your avatar",
+    "items": [
+      "Scanning a game's QR code opens its page: claim your villain, or fix the game's details.",
+      "Build your own avatar, and places you've used are suggested as you type a location."
+    ]
+  },
+  "2026-05-11": {
+    "title": "My boxes, achievements and Google",
+    "items": [
+      "Mark the boxes you own, and earn bronze, silver and gold achievements for every villain.",
+      "Sign in with Google as well as Discord, and choose your player icon."
+    ]
+  },
+  "2026-05-04": {
+    "title": "A new name, New Game and the Game Log",
+    "items": [
+      "DVS becomes DiVilytics, and villain pages show their rules clarifications.",
+      "Recording a game gets its own page, New Game, with the random draw, and the game history becomes the Game Log."
+    ]
+  },
+  "2026-04-20": {
+    "title": "DVS goes online",
+    "items": [
+      "Record your games with a timer, and share a QR code so every player can claim their villain.",
+      "Game history, leaderboards, and a page for every villain and every player."
+    ]
+  }
+}

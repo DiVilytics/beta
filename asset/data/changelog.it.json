@@ -1,40 +1,31 @@
 {
   "2026-11-09": {
-    "title": "Tornei: copie e subentri",
+    "title": "Tornei, Δ Vittorie e partite giocate",
     "items": [
-      "Tornei: indica quante copie di ogni cattivo sono disponibili; due cattivi uguali non siedono mai allo stesso tavolo.",
-      "Tornei: un organizzatore può aggiungere un giocatore a torneo in corso; gioca dalla fase successiva, partendo da 0 punti.",
-      "Tornei: il risultato inserito da un organizzatore può includere durata e round."
-    ]
-  },
-  "2026-11-02": {
-    "title": "Partite passate, Scontri e caricamenti",
-    "items": [
-      "Nuova partita: Gioca ora o Partita giocata; una partita giocata si salva anche senza ora, data o ordine di gioco.",
-      "Classifica: Scontri per i cattivi e Δ Vittorie per i giocatori; Grafici: Quando si gioca (giorno, fascia oraria, ora), e ogni scatola con il suo colore.",
-      "Account: Carica partite da un file; le pagine giocatore elencano i loro tornei, le partite giocate e quelle registrate."
+      "Tornei: creane uno con i suoi giocatori e le opzioni, e DiVilytics sorteggia tavoli e cattivi di ogni fase e tiene la classifica; i giocatori rivendicano il proprio nome con un codice QR, gli organizzatori possono inserire i risultati, e le fasi possono essere libere.",
+      "Δ Vittorie: quanto le vittorie si scostano da quelle attese a pari possibilità, per cattivi e giocatori, in Classifica, nelle loro pagine e nei grafici; e gli Scontri in Classifica, e il grafico Giorno e ora.",
+      "Nuova partita: Gioca ora o Partita giocata; una partita giocata si salva anche senza ora, data o ordine di gioco. Account: Carica partite da un file; e le impostazioni sotto il tuo avatar."
     ]
   },
   "2026-10-26": {
     "title": "Tre dimensioni del testo",
     "items": [
-      "Dimensione del testo: Piccola, Media (la nuova predefinita) e Grande, sotto il tuo avatar; Grande è più grande di prima, e Nuova partita e le pagine dei cattivi le fanno spazio sui telefoni piccoli."
+      "Dimensione del testo: Piccola, Media (la nuova predefinita) e Grande, sotto ⚙️; Grande è più grande di prima, e Nuova partita e le pagine dei cattivi le fanno spazio sui telefoni piccoli."
     ]
   },
   "2026-10-19": {
-    "title": "Organizzatori, Δ Vittorie nelle pagine dei cattivi e tocca il vincitore",
+    "title": "Tocca il vincitore, e XP totali",
     "items": [
-      "Tornei: quanti organizzatori vuoi, aggiunti con il QR organizzatori; i tuoi tornei in corso vengono prima, con uno stato più chiaro e il risultato finale.",
-      "Δ Vittorie in ogni pagina dei cattivi, per ogni numero di giocatori; e ogni pagina giocatore mostra gli XP totali del giocatore.",
-      "Nuova partita: quando un cattivo vince, tocca la sua pedina; la partita si ferma con il vincitore segnato, pronta da salvare."
+      "Nuova partita: quando un cattivo vince, tocca la sua pedina; la partita si ferma con il vincitore segnato, pronta da salvare.",
+      "Ogni pagina giocatore mostra gli XP totali del giocatore, gli stessi della Classifica."
     ]
   },
   "2026-10-12": {
-    "title": "Tornei, Δ Vittorie e nuovi grafici",
+    "title": "Grafici per periodo e numero di giocatori",
     "items": [
-      "Tornei: crealo con i suoi giocatori e le sue opzioni, e DiVilytics sorteggia tavoli e cattivi di ogni fase e tiene la classifica; i giocatori rivendicano il proprio nome con il suo codice QR, e un telefono registra la partita di ogni tavolo.",
-      "Δ Vittorie: quanto le vittorie di ogni cattivo si scostano da quelle attese con pari probabilità, nella classifica dei cattivi e nei grafici.",
-      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi; e il Solitario ti avvisa all'ultimo round."
+      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane.",
+      "Scontri: chi batte chi, cattivo contro cattivo o scatola contro scatola.",
+      "Solo: un avviso chiaro all'ultimo round, e il dado del giocatore Fantasma mantiene il suo tiro."
     ]
   },
   "2026-10-05": {
@@ -42,7 +33,7 @@
     "items": [
       "Il Solitario, una variante non ufficiale per un giocatore contro un giocatore Fantasma, con classifiche proprie; e gli XP, guadagnati con le partite rivendicate e i traguardi.",
       "Sempre, Anno e Mese in Classifica, nel Registro e nelle pagine dei giocatori; una guida per ogni cattivo; le pedine; e questa pagina.",
-      "Nuova partita conserva la partita in corso e la riserva cattivi; chi ha registrato una partita può correggerla o eliminarla; dimensione del testo, Installa, scorciatoie da tastiera e le impostazioni sotto il tuo avatar."
+      "Nuova partita conserva la partita in corso e la riserva cattivi; chi ha registrato una partita può correggerla o eliminarla; dimensione del testo, Installa e scorciatoie da tastiera."
     ]
   },
   "2026-09-28": {
