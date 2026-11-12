@@ -361,6 +361,13 @@ function tournamentSeatPoints(tour, n, seat) {
   return scoring.points(seat.place, n, tour.table_size, seat, tour);
 }
 
+// ── Final table ──────────────────────────────────────────────────────────────
+// The final table, an on / off option drawn like the rules.
+const TN_FINAL = {
+  off: { name: 'Off', hint: 'The standings after the last stage are the final ranking.' },
+  on:  { name: 'On',  hint: 'After the last stage, the top of the standings play one final table, which decides the top places.' },
+};
+
 // ── Play order ───────────────────────────────────────────────────────────────
 // order(table, ctx): a table's players in their play order; ctx.seats maps a
 // player to where they sat so far (0 = first, 1 = last, at any table size),
