@@ -193,16 +193,15 @@ function cycleDateField(el) {
 function dateFieldLinkLabel(el) {
   return { full: t('Unknown time'), day: t('Unknown date'), none: t('Set date') }[dateFieldMode(el)];   // Set date: today, now, to change
 }
-// New Game's three buttons: 'day' (Unknown time: the day alone), 'none'
-// (Unknown date) or 'now' (Today: the current date and time). Tapping the
-// unknown one on turns it off: the date and time again (that day, at the
-// current time; no date: now).
+// New Game's switch: No time ('day': the day alone), No date ('none') or
+// Set date ('full': the date and time). Switching keeps what it can: the day
+// (at the current time), or today when there was no date.
 function setDateFieldMode(el, mode) {
   const cur = dateFieldMode(el), now = _localDateTimeValue();
-  if (mode === 'now' || (mode === cur && cur === 'none')) setDateFieldNow(el);
-  else if (mode === cur) setDateField(el, 'full', `${el.value}T${now.slice(11)}`);
+  if (mode === cur) return;
+  if (mode === 'none') setDateField(el, 'none');
   else if (mode === 'day') setDateField(el, 'day', (el.value || now).slice(0, 10));
-  else setDateField(el, 'none');
+  else setDateField(el, 'full', cur === 'day' ? `${el.value}T${now.slice(11)}` : now);
 }
 // A saved game's date into the field.
 function fillDateField(el, g) {

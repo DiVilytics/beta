@@ -273,10 +273,9 @@ function _setDateToNow() {
 }
 
 // The date is optional (a game remembered later): it starts at the current
-// date and time, and the buttons beside it set Unknown time (Time?: the day
-// alone), Unknown date (Date?) or Today, the current date and time (A GAME'S
-// DATE FIELD, ui.js); Time? and Date? stay lit while on. A game started live
-// takes the start's.
+// date and time, and the switch beside it picks No time (the day alone), No
+// date or Set date, the date and time (A GAME'S DATE FIELD, ui.js). A game
+// started live takes the start's.
 function setDateMode(mode) {
   setDateFieldMode(document.getElementById('fDate'), mode);
   _syncDateToggle();
@@ -285,8 +284,7 @@ function setDateMode(mode) {
 }
 function _syncDateToggle() {
   const mode = dateFieldMode(document.getElementById('fDate'));
-  document.getElementById('fDateNoTime')?.classList.toggle('on', mode === 'day');
-  document.getElementById('fDateNoDate')?.classList.toggle('on', mode === 'none');
+  for (const b of document.querySelectorAll('#fDateBtns .seg-btn')) b.classList.toggle('on', b.dataset.mode === mode);
 }
 
 // ── EXCLUDE CONTROLS ─────────────────────────────────────────────────────────

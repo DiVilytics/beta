@@ -88,7 +88,7 @@
          lost (+ after the last round). new-game.js. -->
     <p class="live-end-note hidden" id="liveEndNote" role="status"></p>
     <!-- Location first, on its own row; the date (Past game) on the next, with
-         its buttons: Time? (unknown time), Date? (unknown date), Today (new-game.js). -->
+         its switch: No time | No date | Set date (new-game.js). -->
     <div class="form-row one-field">
       <div class="field">
         <label data-i18n>Location <span class="optional"></span></label>
@@ -104,9 +104,9 @@
         <div class="date-field-row">
           <input type="datetime-local" id="fDate">
           <div class="seg date-mode-seg" id="fDateBtns">
-            <button class="seg-btn" id="fDateNoTime" type="button" onclick="setDateMode('day')" title="Unknown time" data-i18n-attr="title" data-i18n>Time?</button>
-            <button class="seg-btn" id="fDateNoDate" type="button" onclick="setDateMode('none')" title="Unknown date" data-i18n-attr="title" data-i18n>Date?</button>
-            <button class="seg-btn" id="fDateNow" type="button" onclick="setDateMode('now')" title="The current date and time" data-i18n-attr="title" data-i18n>Today</button>
+            <button class="seg-btn" data-mode="day" type="button" onclick="setDateMode('day')" data-i18n>No time</button>
+            <button class="seg-btn" data-mode="none" type="button" onclick="setDateMode('none')" data-i18n>No date</button>
+            <button class="seg-btn" data-mode="full" type="button" onclick="setDateMode('full')" data-i18n>Set date</button>
           </div>
         </div>
       </div>
