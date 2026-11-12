@@ -607,8 +607,7 @@ main {
    half the row each, like Duration and Rounds; a label goes on two lines
    when it doesn't fit. */
 .date-field-row { display: flex; gap: 10px; align-items: stretch; }
-.date-field-row input { flex: 1 1 0; min-width: 0; }
-.date-field-row .date-mode-seg { flex: 1 1 0; min-width: 0; }
+.date-field-row input, .date-field-row .date-mode-seg { flex: 0 0 calc((100% - 10px) / 2); min-width: 0; box-sizing: border-box; }
 .date-mode-seg .seg-btn { flex: 1 1 auto; min-width: 0; height: auto; padding: 0 3px; justify-content: center; white-space: normal; line-height: 1.1; text-align: center; }
 .btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
@@ -3504,3 +3503,8 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 /* Strength and skill, How it's computed: a formula on its own line. */
 .st-math { font-family: Georgia, 'Times New Roman', serif; font-size: calc(15px * var(--ts)); color: var(--text); text-align: center; margin: -6px 0 16px; line-height: 1.6; }
 .st-math span { white-space: nowrap; }
+
+/* The narrowest phones: Past game's date and time fit their half of the row. */
+@media (max-width: 359px) {
+  .date-field-row input { padding-left: 6px; padding-right: 6px; }
+}
