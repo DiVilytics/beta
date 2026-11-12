@@ -448,7 +448,7 @@ const CHARTS = [
   },
   {
     // id kept from Games by weekday (a saved view).
-    id: 'weekday', icon: '📅', label: 'When games are played',
+    id: 'weekday', icon: '📅', label: 'Day and hour',
     solo: true,   // also on Solo: the solo games
     modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'part', label: 'Part of day' }, { id: 'hour', label: 'Hour' }],
     desc: {

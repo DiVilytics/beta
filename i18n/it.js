@@ -691,7 +691,7 @@ window.I18N.it = {
     "{n} a month on average": "{n} al mese in media",
     "{n} a day on average": "{n} al giorno in media",
     "Weekends {pct}%": "Fine settimana {pct}%",
-    "When games are played": "Quando si gioca",
+    "Day and hour": "Giorno e ora",
     "Weekday": "Giorno",
     "Hour": "Ora",
     "Part of day": "Fascia oraria",
