@@ -2609,6 +2609,19 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-villain .mover { margin-left: auto; }   /* on the right, the villain page's size (.cs-mover) */
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
+/* Guided tour (tour.js): the page dimmed but the lit element (.tour-spot,
+   its shadow is the dimming), a bubble with the step's text. */
+.tour-shade { position: fixed; inset: 0; z-index: 1000; }
+.tour-spot { position: fixed; z-index: 1001; border-radius: var(--r); box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.6), 0 0 0 2px var(--accent);
+  pointer-events: none; transition: left 0.2s, top 0.2s, width 0.2s, height 0.2s; }
+.tour-bubble { position: fixed; z-index: 1002; width: min(340px, calc(100vw - 16px)); box-sizing: border-box; padding: 14px 14px 12px;
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); color: var(--text); }
+.tour-text { margin: 0 22px 12px 0; font-size: calc(14px * var(--ts)); line-height: 1.45; }
+.tour-close { position: absolute; top: 6px; right: 8px; border: none; background: none; color: var(--muted); font-size: calc(20px * var(--ts)); line-height: 1; cursor: pointer; padding: 2px 4px; }
+.tour-actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.tour-count { margin-right: auto; font-size: calc(12px * var(--ts)); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }
+
 /* A knockout's bracket (tournaments.js, _tnBracketHTML): a column per stage,
    each table centered on those feeding it, the lines (svg) drawn behind. */
 .tn-bracket-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px 6px; }

@@ -135,6 +135,48 @@ async function init() {
   updateExcludeUI();   // show the pool size from the start
   _initDrag();
   attachLocationAutocomplete('fLocation', 'fLocationDropdown');
+  // Show me around (the Tutorial's link): the tour, once the page is ready.
+  if (new URLSearchParams(location.search).has('tour')) {
+    history.replaceState(null, '', location.pathname);
+    startNewGameTour();
+  }
+}
+
+// ── TOUR ──────────────────────────────────────────────────────────────────────
+// Show me around (ⓘ by the intro, or the Tutorial's link): a few steps over a
+// demo game (tour.js). The demo is never saved (_touring stops the draft and
+// the live state), and the page reloads at the end, so your form and draw
+// pool come back as they were. Not over a game in progress.
+let _touring = false;
+
+function startNewGameTour() {
+  if (liveGame.hasSession) return showError('err', t('A game is in progress: finish or discard it first, then the tour can start.'));
+  _touring = true;
+  // The demo: Play now, 4 players with villains from your draw pool, you on the first row.
+  if (pastGame) setPastGame(false);
+  if (soloMode) _setSolo(false);
+  if (document.getElementById('excludeBody')?.classList.contains('open')) toggleExclude();
+  const pool = _tourPool();
+  orderSlots = Array.from({ length: 4 }, (_, i) => ({ id: orderNextId++, char: pool[i] || '', isMe: i === 0 && !!getCurrentUser(), isWinner: false }));
+  orderUnknown = false;
+  renderOrderSlots();
+  _layoutLegend();
+  const past = on => () => { if (pastGame !== on) setPastGame(on); };
+  startTour([
+    { el: '#ngModeSeg', prep: past(false), text: t('<b>Play now</b> is for a game about to start: the timer sets its date and how long it lasted. <b>Past game</b> records one played earlier. Switching keeps the villains, the players and their order.') },
+    { el: ['#fDateRow', '#durRoundsRow'], prep: past(true), text: t('In <b>Past game</b>, the date and time: <b>No time</b> if you only remember the day, <b>No date</b> if not even that. The duration and rounds are optional.') },
+    { el: '.draw-mode-row', prep: past(false), text: t('The <b>draw pool</b>: the villains that can be drawn (narrow it to your boxes or to a pace), and how many play.') },
+    { el: '#orderSlots', text: t('A row per player, in play order. Pick the villain or tap 🎲 to draw one; ❌ removes the row, 👤 marks you and 👑 the winner; ⠿ drags a row to another seat.') },
+    { el: '#lineupBtns', text: t('<b>Random order</b> shuffles the seats; <b>Draw villains</b> fills the rows from the draw pool (<b>Redraw all</b> once every row has one).') },
+    { el: '#footerDefault', text: t('<b>Start game</b> opens the timer: tap + after each round, and the winner\'s mover when someone wins; then save. In Past game, <b>Save game</b> right away.') },
+  ], { onEnd: () => location.replace(location.pathname) });
+}
+
+// The demo's villains: four from the draw pool, at random.
+function _tourPool() {
+  const pool = _slotPool(null).map(c => c.name);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool;
 }
 
 // ── DRAFT ─────────────────────────────────────────────────────────────────────
@@ -151,7 +193,7 @@ let _draftReady = false;   // nothing is saved until init has restored (or not) 
 
 // Saves the draft, or drops it when the page is back to a fresh one (nothing to keep).
 function _saveDraft() {
-  if (!_draftReady) return;
+  if (!_draftReady || _touring) return;
   if (!_isFormChanged()) { _dropDraft(); return; }
   const val = id => document.getElementById(id)?.value || '';
   try {
@@ -1082,6 +1124,7 @@ function stopLive() {
 // ── LIVE STATE PERSISTENCE ────────────────────────────────────────────────────
 
 function _saveLiveState() {
+  if (_touring) return;   // the tour's demo is never saved
   liveGame.persist({
     slots:     orderSlots,
     solo:      soloMode,

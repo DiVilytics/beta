@@ -48,7 +48,9 @@
   <div class="page-header">
     <h2><span class="page-ico" aria-hidden="true">⚔️</span><span data-i18n>New Game</span></h2>
   </div>
-  <p class="page-intro" data-i18n>Play a game with the timer or record a past one, then save and share it.</p>
+  <!-- ⓘ: Show me around, a tour over a demo game (startNewGameTour, tour.js). -->
+  <p class="page-intro"><span data-i18n>Play a game with the timer or record a past one, then save and share it.</span>
+    <button class="tn-info" id="ngTourBtn" type="button" onclick="startNewGameTour()" title="Show me around" data-i18n-attr="title">ⓘ</button></p>
 
   <div class="err" id="err"></div>
 
@@ -223,6 +225,7 @@
 <script src="shared.js"></script>
 <script src="pace-filter.js"></script>
 <script src="solo.js"></script>
+<script src="tour.js"></script>
 <script src="new-game.js"></script>
 <script src="new-game-audio.js"></script>
 </body>
