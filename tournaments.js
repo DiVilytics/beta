@@ -749,7 +749,7 @@ function tnRelease(playerId) {
 // Whether the pool's copies give n players at the tournament's tables
 // different villains at each table; if not, the error says so (Start, Draw).
 function _tnVillainsFit(n, tour = tnTour, sizes = null) {
-  sizes ??= tournamentIsKnockout(tour) && tour.current_stage === 0 ? _tnKoStartSizes(tour, n) : tournamentSplit(n, tour.table_size, tour.table_split);
+  sizes ??= tournamentIsKnockout(tour) && tour.current_stage === 0 ? tournamentKoStartSizes(tour, n) : tournamentSplit(n, tour.table_size, tour.table_split);
   if (!n || tournamentVillainsFit(tour.villain_pool, sizes.filter(x => x > 0))) {
     document.querySelector('#tnRoot > .err')?.remove();   // an earlier no, now fixed
     return true;
@@ -767,7 +767,7 @@ function tnStart() {
     return _tnShowError(t('This knockout takes from {min} to {max} players.', { min: tournamentKoMin(tnTour), max: tournamentKoMax(tnTour) }));
   }
   if (!_tnVillainsFit(n)) return;
-  const sizes = tournamentIsKnockout(tnTour) ? _tnKoStartSizes(tnTour, n) : tournamentSplit(n, tnTour.table_size, tnTour.table_split);
+  const sizes = tournamentIsKnockout(tnTour) ? tournamentKoStartSizes(tnTour, n) : tournamentSplit(n, tnTour.table_size, tnTour.table_split);
   openConfirmSheet({
     id:           'tnStartSheet',
     title:        t('Start the tournament?'),
@@ -1196,12 +1196,6 @@ const _tnFormKo = () => tnRule.format === 'knockout';
 const _tnFormKoTour = () => ({ format: 'knockout', table_size: _tnFormSize(), advance: Number(document.getElementById('tnAdvance').value) || 1,
   stages: Number(document.getElementById('tnStages').value) || 2 });
 
-// A knockout's stage 1 for n players: its tables, as even as they come.
-function _tnKoStartSizes(tour, n) {
-  const k = tournamentKoTables(tour, 1), base = Math.floor(n / k), extra = n % k;
-  return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
-}
-
 // Advance's choices for the table size: 1 up to half of it, those dividing it.
 function _tnAdvanceOptions(keep) {
   const sel = document.getElementById('tnAdvance');
@@ -1505,7 +1499,7 @@ async function tnSaveForm() {
   if (ko && (total < tournamentKoMin(ko) || total > tournamentKoMax(ko))) {
     return showError('tnFormErr', t('This knockout takes from {min} to {max} players.', { min: tournamentKoMin(ko), max: tournamentKoMax(ko) }));
   }
-  if (!tournamentVillainsFit(pool, ko ? _tnKoStartSizes(ko, total) : tournamentSplit(total, size, tnRule.table_split))) {
+  if (!tournamentVillainsFit(pool, ko ? tournamentKoStartSizes(ko, total) : tournamentSplit(total, size, tnRule.table_split))) {
     return showError('tnFormErr', t("With the draw pool's copies, {n} players can't all have different villains at their tables: add villains or copies.", { n: total }));
   }
   const row = {

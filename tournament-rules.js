@@ -26,7 +26,8 @@
 //   TOURNAMENT_FORMATS[id]                   { name, hint }: points | knockout
 //   tournamentIsLastTable(tour, stage)       the final table's stage, or a knockout's last
 //   tournamentIsKnockout(tour), tournamentKoTables(tour, stage), tournamentKoMin(tour),
-//   tournamentKoMax(tour)                    the knockout format's bracket
+//   tournamentKoMax(tour), tournamentKoValid(size, advance, stages),
+//   tournamentKoStartSizes(tour, n)          the knockout format's bracket
 //   tournamentStageVillains(tour, tables, before) a stage's villains, for its tables
 //   tournamentVillainsFit(pool, sizes)       whether tables of these sizes can all
 //                                            have different villains from the pool
@@ -78,16 +79,16 @@ const tournamentKoMin = tour => (tour.advance + 1) * tournamentKoTables(tour, 1)
 // Whether a knockout's T, P and F make a bracket (and how many play it, at
 // most): P divides T, below it, 2 stages or more.
 const tournamentKoValid = (size, advance, stages) => advance >= 1 && advance < size && size % advance === 0 && stages >= 2;
+// Stage 1's tables for n players: as even as they come.
+const tournamentKoStartSizes = (tour, n) => _tnEvenSizes(n, tournamentKoTables(tour, 1));
 
 // A knockout stage's tables in bracket order (an empty one keeps its place).
 function _tnKnockoutTables(tour, players, tables, stage) {
   const n = tournamentKoTables(tour, stage);
   if (stage === 1) {
     const ids = _tnShuffle(tournamentPlaying(players, 1).map(p => p.id));
-    const base = Math.floor(ids.length / n), extra = ids.length % n;
-    const out = [];
-    for (let j = 0, i = 0; j < n; j++) { const m = base + (j < extra ? 1 : 0); out.push(ids.slice(i, i + m)); i += m; }
-    return _tnShuffle(out);   // the larger tables anywhere in the bracket
+    let i = 0;
+    return _tnShuffle(tournamentKoStartSizes(tour, ids.length).map(m => ids.slice(i, i += m)));   // the larger tables anywhere in the bracket
   }
   const playing = new Set(tournamentPlaying(players, stage, tour, tables).map(p => p.id));
   const k = _tnKoGroup(tour);
@@ -148,11 +149,7 @@ const TOURNAMENT_SPLITS = {
   even: {
     name: 'Balanced',
     hint: 'As many tables as needed, as balanced as possible (9 players at tables of 4: 3, 3, 3).',
-    sizes(n, size) {
-      const k = Math.ceil(n / size);
-      const base = Math.floor(n / k), extra = n % k;
-      return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
-    },
+    sizes: (n, size) => _tnEvenSizes(n, Math.ceil(n / size)),
   },
   // Every table full; whoever is left has a bye (9 at 4 → 4, 4, 1; up
   // to size - 1 byes). Fewer players than a table: they all play together.
@@ -166,6 +163,12 @@ const TOURNAMENT_SPLITS = {
     },
   },
 };
+
+// n players at k tables, as even as they come, the larger first (10 at 3: 4, 3, 3).
+function _tnEvenSizes(n, k) {
+  const base = Math.floor(n / k), extra = n % k;
+  return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
+}
 
 function tournamentSplit(n, size, split = 'even') {
   if (n < 1) return [];
@@ -189,18 +192,20 @@ function _tnSeat(order, { size, split, byes }) {
 
 // ── History ──────────────────────────────────────────────────────────────────
 
-// Who met whom (how many times) and who had a bye, over the given tables.
+// Over the given tables: who met whom (how many times), who had a bye, and
+// where each player sat (0 = first, 1 = last, at any table size; byes aside).
 function _tnHistory(tables) {
-  const met = new Map(), byes = new Map();
+  const met = new Map(), byes = new Map(), seats = new Map();
   for (const tb of tables) {
     const ids = tb.seats.map(s => s.player_id);
     if (ids.length === 1) byes.set(ids[0], (byes.get(ids[0]) || 0) + 1);
+    else for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (ids.length - 1));
     for (const a of ids) {
       if (!met.has(a)) met.set(a, new Map());
       for (const b of ids) if (a !== b) met.get(a).set(b, (met.get(a).get(b) || 0) + 1);
     }
   }
-  return { met, byes };
+  return { met, byes, seats };
 }
 
 // How many pairs at the same table already met (each meeting counted).
@@ -631,10 +636,7 @@ function tournamentDrawFinal(tour, players, tables) {
     taken.add(pick);
     return { player_id: id, character: pick };
   });
-  const seats = new Map();
-  for (const tb of tables.filter(x => x.saved_at && x.seats.length > 1)) {
-    for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (tb.seats.length - 1));
-  }
+  const { seats } = _tnHistory(tables.filter(x => x.saved_at));
   const order = (TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random).order(finalists, { seats, size: tour.table_size });
   return { players: order, villains };
 }
@@ -648,13 +650,9 @@ function tournamentDrawStage(tour, players, tables = []) {
   const pairing = TOURNAMENT_PAIRINGS[tour.pairing] || TOURNAMENT_PAIRINGS.random;
   const stage = Math.max(0, ...tables.map(tb => tb.stage)) + 1;
   const playing = tournamentPlaying(players, stage).map(p => p.id);
-  const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
+  const { met, byes, seats } = _tnHistory(tables.filter(tb => tb.saved_at));
   const standings = tournamentStandings(tour, tables, { players });
   const playOrder = TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random;
-  const seats = new Map();   // where each player sat so far, 0 (first) to 1 (last)
-  for (const tb of tables.filter(x => x.saved_at && x.seats.length > 1)) {
-    for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (tb.seats.length - 1));
-  }
   // A knockout: its bracket (in order, an empty table kept in its place).
   const drawn = tournamentIsKnockout(tour) ? _tnKnockoutTables(tour, players, tables, stage)
     : pairing.tables(playing, { size: tour.table_size, split: tour.table_split || 'even', stage, standings, met, byes });
