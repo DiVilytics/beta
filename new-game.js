@@ -163,9 +163,10 @@ function startNewGameTour() {
   renderOrderSlots();
   _layoutLegend();
   // Each step sets the form or the demo game it shows (also going Back).
-  const past = on => () => { _tourLive(false); if (pastGame !== on) setPastGame(on); };
-  const form = () => _tourLive(false);
-  const live = (lock = false) => () => { _tourLive(true); setVisible('tapResume', lock); };
+  const past = on => () => { _tourLive(false); _tourPaused(false); if (pastGame !== on) setPastGame(on); };
+  const form = () => { _tourLive(false); _tourPaused(false); };
+  const live = (lock = false) => () => { _tourPaused(false); _tourLive(true); setVisible('tapResume', lock); };
+  const paused = () => { _tourLive(false); _tourPaused(true); };
   startTour([
     { el: '#ngModeSeg', prep: past(false), text: t('<b>Play now</b> is for a game about to start: the timer sets its date and how long it lasted. <b>Past game</b> records one played earlier. Switching keeps the villains, the players and their order.') },
     { el: ['#fDateRow', '#durRoundsRow'], prep: past(true), text: t('In <b>Past game</b>, the date and time: <b>No time</b> if you only remember the day, <b>No date</b> if not even that. The duration and rounds are optional.') },
@@ -177,7 +178,14 @@ function startNewGameTour() {
     { el: '#liveMovers', prep: live(), text: t('When a villain wins, tap their mover: the game stops, with the winner, the duration and the rounds filled in, ready to save.') },
     { el: '.tap-resume-card', prep: live(true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
     { el: '#footerLive', prep: live(), text: t('<b>Pause game</b> stops the timer: from there you save the game, or start it again.') },
+    { el: '#footerDefault', prep: paused, text: t('Paused: <b>Resume game</b> starts the timer again; <b>Save game</b> saves the game with its duration and rounds (Edit details fixes them later), then you share it so the others claim their villains.') },
   ], { onEnd: () => location.replace(location.pathname) });
+}
+
+// The demo game paused (or not): Resume game and Save game, as after Pause game.
+function _tourPaused(on) {
+  document.getElementById('startBtn').textContent = on ? t('Resume game') : t('Start game');
+  setVisible('submitBtn', on || pastGame);
 }
 
 // The demo game in progress (or back to the form): the live panel drawn with

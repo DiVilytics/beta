@@ -338,6 +338,7 @@ window.I18N.it = {
     "Winner picked": "Vincitore indovinato",
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
+    "Paused: <b>Resume game</b> starts the timer again; <b>Save game</b> saves the game with its duration and rounds (Edit details fixes them later), then you share it so the others claim their villains.": "In pausa: <b>Riprendi partita</b> fa ripartire il timer; <b>Salva partita</b> salva la partita con durata e round (con Modifica dettagli li correggi dopo), poi la condividi perché gli altri rivendichino i loro cattivi.",
     "Forbidden Mountain": "Montagna Proibita",
     "<b>Start game</b> starts the timer, as in the next steps. In Past game, <b>Save game</b> saves it right away.": "<b>Inizia partita</b> fa partire il timer, come nei prossimi passi. In Partita giocata, <b>Salva partita</b> la salva subito.",
     "The game is on: the timer runs from the start. A round ends when every player has had their turn: tap + when the first player is up again (− fixes a wrong tap).": "La partita è in corso: il timer parte dall'inizio. Un round finisce quando tutti hanno fatto il proprio turno: tocca + quando tocca di nuovo al primo giocatore (− corregge un tocco sbagliato).",
