@@ -179,6 +179,14 @@ function _localDateTimeValue(d = new Date()) {
 function dateFieldMode(el) { return !el.value ? 'none' : el.type === 'date' ? 'day' : 'full'; }
 // The field set to a mode; value: its 'YYYY-MM-DDTHH:MM' (full) or 'YYYY-MM-DD' (day).
 // No date: the field empty and off (gray, not tappable), until a date is set.
+// Date fields show no calendar icon (style.css): a click on one opens the
+// system picker instead.
+document.addEventListener('click', e => {
+  const el = e.target;
+  if (!(el instanceof HTMLInputElement) || !['date', 'datetime-local'].includes(el.type) || el.disabled) return;
+  try { el.showPicker(); } catch (_) {}
+});
+
 function setDateField(el, mode, value = '') {
   el.type  = mode === 'day' ? 'date' : 'datetime-local';
   el.value = mode === 'none' ? '' : value;
