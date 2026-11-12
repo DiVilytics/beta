@@ -5,10 +5,10 @@ let lbCharBoxMap    = {};
 let lbNickAvatarMap = {};
 
 let lbTab    = 'characters';   // 'characters' | 'players'
-let lbMode   = 'pct';          // 'pct' | 'count' | 'games', or 'xp' (players only)
+let lbMode   = 'matchups';     // 'pct' | 'count' | 'games' | 'chance', or 'matchups' (villains only) or 'xp' (players only)
 
-// Each tab keeps its own ranking: villains open on % Wins, players on XP.
-const _lbModeByTab = { characters: 'pct', players: 'xp' };
+// Each tab keeps its own ranking: villains open on Δ Wins, players on XP.
+const _lbModeByTab = { characters: 'matchups', players: 'xp' };
 
 // The table size, All / 2p…6p / Solo (size-filter.js), and the period, All
 // time / Year / Month (period-filter.js): any change reloads. Solo ranks the
@@ -95,7 +95,7 @@ function _applyTab(t) {
 function setMode(m) {
   lbMode = m;
   const cached = _lbCache[_lbKey()];
-  if (cached) render(cached);
+  if (cached) _show(cached, ++_lbLoadToken);
 }
 
 function lbLoadMore() {
@@ -140,7 +140,21 @@ async function loadAndRender() {
   // Also clears the dimming an older, overtaken fetch left on.
   summary.className = 'summary';
   lb.className = '';
-  render(_lbCache[key]);
+  _show(_lbCache[key], token);
+}
+
+// Draws the board, Matchups' games first when it shows them and they aren't
+// in yet (only the latest request draws).
+async function _show(data, token) {
+  const lb = document.getElementById('lb');
+  if (_showsMatchups() && !data.mu) {
+    lb.classList.add('lb-loading');
+    const ok = await _addMatchups(data);
+    if (token !== _lbLoadToken) return;
+    lb.className = '';
+    if (!ok) { lb.innerHTML = loadErrorHTML(t("Couldn't load the leaderboard")); return; }
+  }
+  render(data);
 }
 
 async function _fetchAllTime() {
@@ -157,12 +171,15 @@ async function _fetchAllTime() {
     ? db.from(view).select('*')
     : db.from(view).select('*').eq('player_count', lbFilter);
 
-  const [{ rows }, { data: summary }, xp] = await Promise.all([
+  const [{ rows }, { data: summary }, xp, bySize] = await Promise.all([
     _fetchAllRows(buildRows),
     db.rpc('game_stats', lbFilter === 'all' ? {} : { player_count_filter: lbFilter }),
     _fetchXp(),
+    // Δ Wins needs each row's games by table size: the rows themselves when a
+    // size is picked.
+    lbFilter === 'all' ? _fetchAllRows(() => db.from(isChar ? 'character_stats_by_size' : 'player_stats_by_size').select('*')) : null,
   ]);
-  if (xp === null) return null;
+  if (xp === null || bySize?.error) return null;
 
   let lbRows = rows;
   // Overall players board: also list registered players who've never played,
@@ -174,7 +191,7 @@ async function _fetchAllTime() {
   }
 
   return {
-    rows:    _addXp(lbRows, xp),
+    rows:    _addChance(_addXp(lbRows, xp), bySize ? bySize.rows : rows),
     summary: (summary || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
   };
 }
@@ -184,15 +201,19 @@ async function _fetchAllTime() {
 async function _fetchPeriod() {
   const lbFilter = size.value();
   const range = { player_count_filter: lbFilter === 'all' ? null : lbFilter, ...period.range() };
-  const [stats, summary, xp] = await Promise.all([
+  // Δ Wins, every table size: each size's games apart.
+  const sizes = lbFilter === 'all' ? CHANCE_SIZES : [lbFilter];
+  const [stats, summary, xp, ...bySize] = await Promise.all([
     db.rpc('period_leaderboard', { kind: lbTab, ...range }),
     db.rpc('period_game_stats', range),
     _fetchXp(),
+    ...sizes.map(k => k === lbFilter ? null : db.rpc('period_leaderboard', { kind: lbTab, ...range, player_count_filter: k })),
   ]);
-  if (stats.error || summary.error || xp === null) return null;
+  if (stats.error || summary.error || xp === null || bySize.some(b => b?.error)) return null;
   const nameKey = lbTab === 'characters' ? 'character' : 'nickname';
+  const sized = sizes.flatMap((k, i) => ((bySize[i] || stats).data || []).map(r => ({ [nameKey]: r.name, player_count: k, games: r.games })));
   return {
-    rows:    _addXp((stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })), xp),
+    rows:    _addChance(_addXp((stats.data || []).map(r => ({ [nameKey]: r.name, wins: r.wins, games: r.games })), xp), sized),
     summary: (summary.data || [])[0] || { games: 0, avg_duration: null, avg_turns: null },
   };
 }
@@ -207,6 +228,84 @@ async function _fetchSolo() {
     rows:    soloRankRows(players, lbTab === 'characters' ? 'character' : 'nickname'),
     summary: soloSummary(games, soloWonIds(players)),
   };
+}
+
+// ── CHANCE Δ ──────────────────────────────────────────────────────────────────
+// Each villain's (or player's) wins against what equal chances would give
+// (chanceDelta, stats-table.js). Their games by table size give E = Σ games / k
+// and V = Σ games / k (1 - 1/k); with one size picked, that size's alone. A
+// player's games are those where they claimed their villain, as everywhere.
+const CHANCE_SIZES = [2, 3, 4, 5, 6];
+
+function _addChance(rows, bySize) {
+  const key = lbTab === 'characters' ? 'character' : 'nickname';
+  const terms = {};
+  for (const r of bySize) {
+    const k = Number(r.player_count ?? size.value()), n = Number(r.games);
+    if (!(k >= 2)) continue;
+    const o = terms[r[key]] ||= { exp: 0, vari: 0 };
+    o.exp  += n / k;
+    o.vari += n / k * (1 - 1 / k);
+  }
+  return rows.map(r => ({ ...r, exp: 0, vari: 0, ...terms[r[key]] }));
+}
+
+// ── MATCHUPS ──────────────────────────────────────────────────────────────────
+// Villains only: each villain against every other villain, its matchups by
+// matchupClass (stats-table.js): winning, even, losing, too few, from the
+// games of the table size and period picked, read as the Matchups chart reads
+// them. Every game is loaded once (loadOfficialGames, db.js), the first time
+// the mode shows; each filter's matchups then once. data.mu: { villain:
+// { win, even, lose, few: [{ name, n, w, l }] } }; false if the games couldn't load.
+const _showsMatchups = () => lbTab === 'characters' && lbMode === 'matchups' && !size.isSolo();
+
+async function _addMatchups(data) {
+  let all;
+  try { all = await loadOfficialGames(); } catch (_) { return false; }
+  const rec = pairRecords(gamesIn(all, period.range(), size.value()));
+  data.mu = {};
+  for (const a of lbChars) {
+    const m = data.mu[a.name] = { win: [], even: [], lose: [], few: [] };
+    for (const b of lbChars) {
+      if (b.name === a.name) continue;
+      const r = pairRecord(rec, a.name, b.name);
+      m[matchupClass(r)].push({ name: b.name, ...r });
+    }
+  }
+  return true;
+}
+
+// How Matchups is computed (How it's computed ›, under the switch).
+function openMatchupsInfo() {
+  const body = infoSheet('muInfoOverlay', t('Matchups'));
+  const p = s => `<p class="modal-hint">${s}</p>`;
+  body.innerHTML =
+    p(t('Each villain against every other villain, in the games one of the two won (a game won by a third villain counts for neither).')) +
+    p(t('<b>Winning</b>: it clearly beats them, the pair\'s Δ Wins above +{d}, rare by chance alone (about 1 in 20). <b>Losing</b>: they clearly beat it, below −{d}. <b>Even</b>: in between, no clear winner yet. <b>Too few</b>: fewer than {n} games won by one of the two.', { d: MATCHUP_CLEAR, n: MIN_PAIR_GAMES })) +
+    p(t('<b>Ranking</b>: winning minus losing matchups. Ties are broken by the number of even matchups, then by their quality: the even ones leaning to winning (Δ above +{lean}) minus those leaning to losing (below −{lean}), then by games.', { lean: MATCHUP_LEAN })) +
+    p(t('Ranked only with at least {n} matchups that aren\'t too few: a newer villain waits under the divider until it has the games.', { n: MIN_MATCHUPS }));
+  openOverlay('muInfoOverlay');
+}
+
+// A villain's matchups (its row's numbers, tapped): its opponents in the four
+// groups, the clearest first, each with its record (its wins - theirs).
+let _lbMu = {};
+function openMatchups(name) {
+  const m = _lbMu[name];
+  if (!m) return;
+  const order = list => list.slice().sort((a, b) => pairDelta(b.w, b.l) - pairDelta(a.w, a.l) || b.n - a.n);
+  const group = (key, label, list) => `
+    <div class="section-label"><span class="mu-${key}">${label}</span> (${list.length})</div>
+    ${list.length ? `<div class="mu-grid">${order(list).map(o => `
+      <a class="mu-opp" href="villains.html?vil=${encodeURIComponent(o.name)}" title="${_esc(`${villainName(o.name)}: ${t('{a} won {w}, {b} won {l}', { a: villainName(name), w: o.w, b: villainName(o.name), l: o.l })} | ${tn(o.n, '{n} game together', '{n} games together')}`)}">
+        ${charImgHTML(o.name)}<span>${o.w}–${o.l}</span>
+      </a>`).join('')}</div>` : '<p class="results-hint">-</p>'}`;
+  document.getElementById('muTitle').textContent = villainName(name);
+  document.getElementById('muBody').innerHTML =
+    `<p class="modal-hint">${t('Under each opponent: wins of {villain} – wins of the opponent. Games won by a third villain don\'t count.', { villain: `<b>${_esc(villainName(name))}</b>` })}</p>` +
+    group('win',  t('Winning'), m.win) + group('even', t('Even'), m.even) +
+    group('lose', t('Losing'),  m.lose) + group('few', t('Too few games'), m.few);
+  openOverlay('muOverlay');
 }
 
 // ── XP ────────────────────────────────────────────────────────────────────────
@@ -312,7 +411,8 @@ function openXpTable() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 
-function render({ rows, summary }) {
+function render(data) {
+  let { rows, summary } = data;
   const { games, avg_duration, avg_turns } = summary;
   const avgDur   = avg_duration != null ? Math.round(avg_duration) : null;
   const avgTurns = avg_turns    != null ? Math.round(avg_turns)    : null;
@@ -326,7 +426,7 @@ function render({ rows, summary }) {
   // Solo: what it is, above its own ranking (which has no XP: % Wins instead).
   const solo     = size.isSolo();
   const soloHint = solo ? soloHintHTML() : '';
-  const mode     = solo && lbMode === 'xp' ? 'pct' : lbMode;
+  const mode     = solo && (lbMode === 'xp' || lbMode === 'chance' || lbMode === 'matchups') ? 'pct' : lbMode;
 
   // No games at all (every table size, or on Solo every level, all time): the
   // card, as in the Game log, not a ranking of empty rows, on both tabs.
@@ -350,12 +450,23 @@ function render({ rows, summary }) {
   // % Wins only: a 1-2 game sample can sit at 100% (or 0%) purely by noise, so
   // those rows follow the ranking under a divider, unranked. # Wins / # Games
   // rank everyone, a low count there isn't misleading the same way.
-  const minGames = mode === 'pct' ? MIN_GAMES_FOR_PCT : 0;   // stats-table.js
-  // Registered players who never played have no % at all: only in the counts.
-  // Villains are all listed, those without games under the divider ("-").
-  if (mode === 'pct' && lbTab === 'players') rows = rows.filter(r => r.games > 0);
+  // Δ Wins ranks every villain with games (few games can't swing it far):
+  // those without, under "No games". Players need the % Wins minimum there too:
+  // one win at a table of 5 is already +2.0, and most players have few games.
+  const minGames = mode === 'pct' || (mode === 'chance' && lbTab === 'players') ? MIN_GAMES_FOR_PCT
+                 : mode === 'chance' || mode === 'matchups' ? 1 : 0;   // stats-table.js
+  // Matchups: each villain's counts (the lists stay for its sheet).
+  if (mode === 'matchups' && data.mu) {
+    _lbMu = data.mu;
+    const lean  = m => m.even.filter(o => pairDelta(o.w, o.l) > MATCHUP_LEAN).length - m.even.filter(o => pairDelta(o.w, o.l) < -MATCHUP_LEAN).length;
+    const count = m => m && { win: m.win.length, even: m.even.length, lose: m.lose.length, few: m.few.length, lean: lean(m) };
+    rows = rows.map(r => ({ ...r, mu: count(data.mu[r.character]) }));
+  }
+  // Registered players who never played have no % or Δ at all: only in the
+  // counts. Villains are all listed, those without games under the divider ("-").
+  if ((mode === 'pct' || mode === 'chance') && lbTab === 'players') rows = rows.filter(r => r.games > 0);
   // The note explains the divider, so it shows only when someone is under it.
-  const hasUnranked = rows.some(r => r.games < minGames);
+  const hasUnranked = rows.some(r => !statRanked(r, mode, minGames));
 
   const isChar  = lbTab === 'characters';
   // Only the Players tab has a "you" to highlight.
@@ -365,8 +476,13 @@ function render({ rows, summary }) {
 
   document.getElementById('lb').innerHTML = `
     ${soloHint}
-    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo })}
-    ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
+    ${statModeSegHTML(mode, 'setMode', { xp: !isChar && !solo, chance: !solo, matchups: isChar && !solo })}
+    ${statModeHintHTML(mode, { minGames, picks: isChar })}
+    ${mode === 'chance' ? chanceHintHTML(t('With a number of players picked, only its games count.')) : ''}
+    ${mode === 'chance' && !isChar && hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
+    ${mode === 'matchups' ? `<p class="results-hint">${t('Each villain against every other: how many it clearly beats, how many are even, how many clearly beat it; the score is +1 for each it beats, −1 for each that beats it. Tap the numbers for the opponents.')} <button class="char-guide-link" type="button" onclick="openMatchupsInfo()">${t('How it\'s computed')} ›</button></p>
+      ${hasUnranked ? `<p class="results-hint">${t('Ranked only with at least {n} matchups.', { n: MIN_MATCHUPS })}</p>` : ''}
+      <p class="results-hint"><strong>${t('Score')}</strong> (${muCountsHTML({ win: t('Winning'), even: t('Even'), lose: t('Losing') })} | ${t('Too few')})</p>` : ''}
     ${mode === 'xp' ? `<p class="results-hint">${t('XP for every game where you claimed your villain and for the achievements.')} <button class="char-guide-link" type="button" onclick="openXpTable()">${t('XP table')} ›</button></p>` : ''}
     ${renderStatTableHTML(rows, {
       mode,
@@ -376,6 +492,7 @@ function render({ rows, summary }) {
       limit,
       selfKey,
       minGames,
+      valAction:   mode === 'matchups' ? 'openMatchups' : undefined,
       getKey:      r   => isChar ? r.character : r.nickname,
       getHref:     key => isChar
         ? `villains.html?vil=${encodeURIComponent(key)}`

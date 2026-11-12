@@ -203,9 +203,8 @@ nav {
 .nav-right { display: flex; align-items: center; gap: 4px; }
 .nav-auth  { display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }
 /* Until shared.js fills it, at the end of the page, #navAuth keeps the room of
-   its ⚙️ and avatar, so the icons beside it don't jump on every page. */
-.nav-auth:empty::before { content: ''; width: 28px; height: 30px; }   /* ⚙️ (.nav-icon-btn) */
-.nav-auth:empty::after  { content: ''; width: 28px; height: 28px; }   /* .nav-avatar */
+   its avatar, so the icons beside it don't jump on every page. */
+.nav-auth:empty::after { content: ''; width: 28px; height: 28px; }   /* .nav-avatar */
 
 .nav-links { display: flex; gap: 2px; }
 
@@ -281,8 +280,9 @@ nav {
 .nav-avatar-guest {
   opacity: 0.4;
 }
-/* Settings panel (⚙️ in the nav): theme and language switches, under the nav's
-   right edge. The nav is sticky, so the panel is positioned against it. */
+/* Settings panel (the nav's avatar opens it): the account, then the theme,
+   text size and language switches, under the nav's right edge. The nav is
+   sticky, so the panel is positioned against it. */
 .settings-panel {
   position: absolute; top: calc(100% + 6px); right: 1rem; z-index: 45;
   display: none; flex-direction: column; gap: 10px;
@@ -308,22 +308,18 @@ nav {
 [data-text-opt="medium"] .ts-a { font-size: 14px; }
 [data-text-opt="large"] .ts-a  { font-size: 17px; }
 
-.nav-icon-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;   /* whatever the ⚙️'s width on the device (.nav-auth:empty) */
-  height: 30px;
-  padding: 0;
-  border-radius: var(--rs);
-  cursor: pointer;
-  color: var(--muted);
-  transition: color 0.15s, background 0.15s;
+/* The account: your avatar and nickname, to the account page (Sign in for a
+   guest), framed like the switches under it. */
+.settings-account {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  height: 30px; padding: 0 10px 0 3px;
+  background: var(--s2); border: 1px solid var(--border); border-radius: var(--rs);
+  font-family: inherit; font-size: calc(12px * var(--ts)); font-weight: 600;
+  color: var(--text); text-decoration: none; cursor: pointer;
 }
+.settings-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.settings-nick { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.settings-go { color: var(--muted); }
 
 /* Clickable chip (profile link from game card / leaderboard) */
 a.chip {
@@ -606,12 +602,24 @@ main {
    form's left column (the Duration box): half the row minus the 10px gap. The
    buttons split that width; their labels go on two lines together when one
    doesn't fit (_balanceButtonLines, new-game.js). */
-#lineupBtns { width: calc((100% - 10px) / 2); }
+#lineupBtns, #orderBtns { width: calc((100% - 10px) / 2); }
+/* Past game's date: the field and its switch (Set date | No time | No date),
+   half the row each, like Duration and Rounds; a label goes on two lines
+   when it doesn't fit. */
+.date-field-row { display: flex; gap: 10px; align-items: stretch; }
+/* No date: the field gray and empty, its placeholder and calendar icon hidden. */
+.date-field-row input:disabled, input[type="datetime-local"]:disabled, input[type="date"]:disabled { opacity: 0.55; cursor: not-allowed; background-color: var(--s3); color: transparent; user-select: none; }
+input[type="datetime-local"]:disabled::-webkit-datetime-edit,
+input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visibility: hidden; }
+.date-field-row input, .date-field-row .date-mode-seg { flex: 0 0 calc((100% - 10px) / 2); min-width: 0; box-sizing: border-box; }
+.date-mode-seg .seg-btn { flex: 1 1 auto; min-width: 0; height: auto; padding: 0 3px; justify-content: center; white-space: normal; line-height: 1.1; text-align: center; }
 .btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
-/* New Game: the player count sits on the Draw pool row, at its right end. */
-.count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }
+/* New Game: the player count sits on the Draw pool row, at its right end,
+   the other half of it (the Draw pool box, or the order button, the first). */
+.count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; width: calc((100% - 10px) / 2); }
+.count-select-wrap.draw-mode-count .players-count-select { width: 100%; }
 /* The same ▼ as the Draw pool box, instead of the select's line chevron. */
 .count-select-wrap .players-count-select { height: 30px; min-height: 30px; max-height: 30px; background-image: none; padding-right: 24px; }
 .count-select-wrap .chevron { position: absolute; right: 10px; pointer-events: none; }
@@ -953,7 +961,7 @@ main {
 /* Villain against villain: a grid that scrolls inside the chart's box, its
    portraits fixed on top and on the left; a line between boxes. */
 .vs-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
-.vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; }
+.vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; margin: 0 auto; }   /* centered when narrower than the chart (Boxes); scrolls when wider */
 .vs-grid td, .vs-grid th { width: 28px; min-width: 28px; height: 28px; padding: 0; text-align: center; border: 1px solid var(--s1); box-sizing: border-box; }
 .vs-grid td { color: #fff; }
 .vs-grid .vs-head { position: sticky; top: 0; z-index: 2; background: var(--s1); }
@@ -965,12 +973,17 @@ main {
 .vs-grid .vs-box { border-left: 2px solid var(--muted); }
 .vs-grid tr.vs-box > * { border-top: 2px solid var(--muted); }
 .vs-grid td.ch-hit.sel { outline: 2px solid var(--text); outline-offset: -2px; }
+/* A chart colored by box (Wins vs games): each box's color, a link to it. */
+.ch-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; font-size: calc(11px * var(--ts)); }
+.ch-legend-item { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); text-decoration: none; }
+.ch-legend-item:hover { color: var(--text); }
+.ch-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .vs-abbr { display: block; font-size: 9px; line-height: 1.1; font-weight: 700; color: var(--muted); letter-spacing: -0.02em; }
 /* Two switches on one row (Matchups on the beta), their padding shrinking
    with the screen so both fit a phone. */
-.controls.chart-switches { flex-direction: row; gap: 8px; flex-wrap: nowrap; }
+.controls.chart-switches { flex-direction: row; gap: 4px; flex-wrap: nowrap; }
 .chart-switches .chart-group-seg { margin-left: auto; }
-.chart-switches .seg-btn { padding: 0 clamp(4px, 2.6vw - 4px, 14px); }
+.chart-switches .seg-btn { padding: 0 clamp(3px, 2.6vw - 5px, 14px); }
 .chart-note { color: var(--muted); font-size: calc(13px * var(--ts)); text-align: center; padding: 0 16px; }
 .chart-note code { background: var(--s3); padding: 1px 6px; border-radius: 4px; font-size: calc(12px * var(--ts)); }
 .chart-caption { margin-top: 10px; min-height: 18px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--text); text-align: center; }
@@ -988,6 +1001,10 @@ main {
 .ch-ax  { font-size: 9.5px; fill: var(--muted); }
 .ch-axlbl { font-size: 10px; fill: var(--muted); }
 .ch-grid { stroke: var(--border); stroke-width: 1; }
+/* Δ Wins: the 0 line (as expected) and the dashed ±2 (beyond what luck alone
+   gives); in a zooming scatter they keep their width. */
+.ch-ref { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.ch-ref.ch-ref-zero, .ch-grid.ch-ref-zero { stroke: var(--muted); stroke-dasharray: none; }
 /* Game length: the middle half of the games shaded, the median dashed. */
 .ch-spread { fill: var(--accent); fill-opacity: 0.12; }
 .ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
@@ -1033,7 +1050,9 @@ main {
 }
 
 .card-date { font-size: calc(13px * var(--ts)); font-weight: 600; }
+/* A tournament game: 🏟️ before its date, to the tournament (game-card.js). */
 .tn-mark { margin-right: 6px; text-decoration: none; }
+.tn-game-link { color: var(--accent); font-weight: 600; text-decoration: none; }
 
 .card-meta {
   font-size: calc(11px * var(--ts));
@@ -1243,6 +1262,10 @@ main {
   margin-bottom: 6px;
 }
 
+.field label .label-link, .section-label .label-link {
+  float: right; padding: 0; border: none; background: none; cursor: pointer;
+  font: inherit; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--accent);
+}
 .optional {
   font-weight: 400;
   text-transform: none;
@@ -1252,6 +1275,7 @@ main {
 }
 
 input[type="datetime-local"],
+input[type="date"],
 input[type="number"],
 input[type="text"],
 select {
@@ -1273,7 +1297,9 @@ select {
   -webkit-appearance: none;
   appearance: none;
 }
-input[type="datetime-local"] {
+input[type="datetime-local"],
+input[type="date"] {
+  position: relative;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -1281,10 +1307,12 @@ input[type="datetime-local"] {
      keeps the Small size. */
   font-size: calc(14px * min(var(--ts), 1.125));
 }
-input[type="datetime-local"]::-webkit-datetime-edit         { padding: 0; line-height: 1.3; height: 100%; display: flex; align-items: center; }
-input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-input[type="datetime-local"]::-webkit-calendar-picker-indicator    { padding: 0; margin: 0; }
-input[type="datetime-local"]::-webkit-inner-spin-button            { display: none; }
+/* The date and time (or the date alone, No time) on the left; no calendar
+   icon (a click on the field opens the system picker, ui.js). */
+input[type="datetime-local"]::-webkit-datetime-edit, input[type="date"]::-webkit-datetime-edit { padding: 0; line-height: 1.3; height: 100%; display: flex; align-items: center; }
+input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper, input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+input[type="datetime-local"]::-webkit-calendar-picker-indicator, input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0; width: 0; height: 0; margin: 0; padding: 0; pointer-events: none; }
+input[type="datetime-local"]::-webkit-inner-spin-button, input[type="date"]::-webkit-inner-spin-button { display: none; }
 input:focus, select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-d);
@@ -1301,7 +1329,11 @@ select {
 select option { background: #1a1a1a; }
 select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; font-size: calc(11px * var(--ts)); }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Side by side fields line up by their boxes: a label on two lines (a narrow
+   phone, New Game's Date & Time with No date) grows upward. */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+/* New Game's Play now: the date is the start's, so Location has the row. */
+.form-row.one-field { grid-template-columns: 1fr; }
 
 .section-label {
   font-size: calc(11px * var(--ts));
@@ -1375,6 +1407,9 @@ select optgroup { background: #1a1a1a; color: var(--muted); font-style: normal; 
 }
 .drag-handle:active { cursor: grabbing; }
 .drag-dots { font-size: calc(16px * var(--ts)); color: var(--muted); line-height: 1; }
+/* In a row (New Game, Edit villains and winner, a tournament's players), the
+   dots sit closer to its left edge. */
+.order-slot .drag-dots { margin-left: -4px; }
 /* Mid-draw / mid-shuffle the rows can't be dragged (new-game.js): ⠿ grays out. */
 #orderSlots.busy .drag-dots { color: var(--dim); opacity: 0.5; }
 #orderSlots.busy .drag-handle { cursor: not-allowed; }
@@ -1509,9 +1544,12 @@ select:disabled {
 }
 .stat-val { font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
 .stat-lbl { font-size: calc(11px * var(--ts)); color: var(--muted); margin-top: 2px; }
+/* The second number of a box, "16 (5)": a player's max streak next to their wins. */
+.stat-val-sub.hot { color: var(--gold); }
+.stat-val-sub { font-size: 0.6em; font-weight: 600; color: var(--muted); }
 /* A stat currently at its record (the player's max win streak while still on it); same gold as winner highlights. */
 .stat-box.hot { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
-.stat-box.hot .stat-val { color: var(--gold); }
+.stat-box.hot .stat-val { color: var(--text); }   /* the box gold, the wins as usual: only the streak (.stat-val-sub.hot) */
 
 /* .lb-table surface is defined with .game-card (shared panel surface). */
 /* Rank | name | value with its bar underneath: "40% (12)", the games played in
@@ -1521,7 +1559,8 @@ select:disabled {
 .lb-head,
 .lb-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px);
+  /* The rank as wide as two digits, so the name has the room. */
+  grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr) clamp(var(--lb-val-min, 92px), calc(48% - 60px), 240px);
   padding: 8px 14px;
   align-items: center;
 }
@@ -1596,7 +1635,7 @@ select:disabled {
 .row-name .char-portrait { margin-right: 6px; }
 .row-sub  { display: block; font-size: calc(11px * var(--ts)); color: var(--dim); text-decoration: none; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.row-identity { display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; }
+.row-identity { display: flex; align-items: center; gap: 6px; overflow: hidden; min-width: 0; }
 .row-identity > div { overflow: hidden; min-width: 0; }
 .row-identity .char-portrait { width: 28px; height: 28px; flex-shrink: 0; }
 .row-identity .player-avatar { width: 28px; height: 28px; flex-shrink: 0; }
@@ -1622,6 +1661,28 @@ select:disabled {
 .bar-bg { height: 4px; background: var(--s4); border-radius: 2px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .bar-fill.gold { background: var(--gold); }
+/* Δ Wins's formulas (leaderboard.js, How it's computed). */
+/* Δ Wins: from the middle, right above 0, left below it (stats-table.js). */
+.bar-diverge { position: relative; }
+.bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
+.bar-diverge .bar-fill { position: absolute; top: 0; }
+.bar-fill.neg { background: var(--red); }
+/* Matchups (stats-table.js): winning | even | losing, bold in the bar's colors
+   (in the table and its legend); the numbers are a button that opens the
+   villain's opponents (leaderboard.js). */
+.mu-win, .mu-even, .mu-lose { font-weight: 700; }
+/* Matchups: the score in bold, its counts in the parentheses, as small as the games elsewhere. */
+.sv-main.mu-score { font-weight: 700; }
+.lb-mode-matchups .sv { gap: 2px; }   /* the score close to its parentheses */
+.lb-mode-matchups .sv-games { text-align: left; }   /* "(" right after the score, whatever its digits */
+.sv-games .mu-win, .sv-games .mu-even, .sv-games .mu-lose { font-weight: 600; }
+.mu-win  { color: var(--accent); }
+.mu-even { color: var(--muted); }
+.mu-lose { color: var(--red); }
+.row-val-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: inherit; cursor: pointer; width: 100%; }
+.mu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(52px * var(--ts)), 1fr)); gap: 10px 6px; }
+.mu-opp { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--text); font-size: calc(12px * var(--ts)); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mu-opp .char-portrait { width: calc(32px * var(--ts)); height: calc(32px * var(--ts)); }
 
 
 /* ── CHARACTER PICKER ─────────────────────────────────────────────── */
@@ -2089,12 +2150,10 @@ select:disabled {
 
 /* Inline variant, sits in the same row as the mode select */
 /* As wide as the Duration box (the form's left column), like the lineup
-   buttons under it; wider only when its label needs it (Riserva cattivi,
-   Large text), up to the player count's room. */
+   buttons under it and the player count beside it. */
 .exclude-toggle.exclude-toggle-inline {
-  width: auto;
-  min-width: calc((100% - 10px) / 2);
-  max-width: calc(100% - 90px);
+  width: calc((100% - 10px) / 2);
+  min-width: 0;
   justify-content: space-between;
   padding: 0 10px;
   font-size: calc(12px * var(--ts));
@@ -2133,15 +2192,48 @@ select:disabled {
 .owned-toggle.on { color: var(--accent); background: var(--accent-d); border-color: var(--accent); }
 
 /* ── PLAYER SLOTS ─────────────────────────────────────────────────── */
-#orderSlots { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
-/* The villain's portrait close to its position number. */
-.order-slot .row-num { margin-right: 3px; }
+#orderSlots, #tnFormRows, .tn-player-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+/* A row whose name is typed (a tournament's players): the name's look, no box. */
+input.order-slot-input[type="text"] { min-width: 0; height: 32px; padding: 0; border: none; background: none; box-shadow: none; font-family: inherit; }
+.order-slot-input:focus { outline: none; box-shadow: none; }
+#tnFormRows .order-slot:focus-within { border-color: var(--accent); }
+/* The tournament's players: New tournament's rows, with who claimed them. */
+.tn-player-rows { margin-bottom: 20px; }
+.tn-player-row { min-height: calc(38px * var(--ts)); padding: 3px 10px; box-sizing: border-box; }
+.tn-player-row .order-slot-portrait { width: 26px; height: 26px; }
+.tn-player-row.mine { border-color: var(--accent); }
+.tn-player-row .order-slot-info { flex-direction: column; align-items: stretch; gap: 0; }
+.tn-player-row .order-slot-name { flex: none; line-height: 1.1; }
+/* Under the name, as a claimed nickname sits under a game page's villain. */
+#tnIntroHelp { white-space: normal; text-align: left; }
+.tn-row-status { line-height: 1.1; font-size: calc(11px * var(--ts)); color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* As tall as + Add player under them. */
+/* Copies, under the pool's actions (tournament form), and what the pool holds. */
+.tn-copies-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tn-copies-sum { font-size: calc(12px * var(--ts)); color: var(--muted); }
+/* Copies (tournament form): a villain's copies, − n + at the row's end. */
+.tn-copies-rows { display: grid; gap: 6px; }
+.tn-copy-steps { align-items: center; gap: 6px; }
+.tn-copy-n { min-width: 1.4em; text-align: center; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tn-copy-n.on { color: var(--accent); }
+.tn-copy-row.none { opacity: 0.55; }   /* 0 copies: out of the draw pool */
+.tn-copy-box { margin: 6px 0 0; }
+/* + Add player under a running tournament's players (a late player). */
+.tn-late-btn { margin-top: 8px; }
+#tnFormRows .order-slot { height: 38px; padding: 0 10px; box-sizing: border-box; }
+#tnFormRows .order-slot-portrait { width: 26px; height: 26px; }
+#tnFormRows input.order-slot-input[type="text"] { height: 30px; min-height: 0; }
+.order-slot-input::placeholder { color: var(--dim); font-weight: 400; font-style: italic; }
+/* The villain's portrait close to its position number (one digit, 1 to 6:
+   only as wide as it), so the name has the room: "Scegli cattivo" whole on a
+   small phone at Large text. */
+.order-slot .row-num { width: auto; min-width: 0.9em; margin-right: 2px; font-variant-numeric: tabular-nums; }   /* "–" (unknown order) as wide as "1." */
 /* New Game: one name on two lines (Large text) makes every row as tall. */
 #orderSlots { display: grid; grid-auto-rows: 1fr; grid-template-columns: minmax(0, 1fr); }   /* a long word never widens the rows */
 .order-slot {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: var(--s1);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -2180,7 +2272,7 @@ select:disabled {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   overflow: hidden;
 }
 /* Hidden picker, overlays the info area; tap to open the dropdown */
@@ -2279,10 +2371,24 @@ select:disabled {
 .kbd-help-card    { width: 100%; max-width: 720px; margin: auto; text-align: center; }
 .kbd-help-ico     { font-size: calc(40px * var(--ts)); line-height: 1; }
 .kbd-help-title   { margin-top: 14px; font-size: calc(22px * var(--ts)); font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-.kbd-help-groups  { margin-top: 24px; columns: 3 200px; column-gap: 40px; text-align: left; }
+/* Two columns of about the same height: the pages and the game controls,
+   then the settings and the rest; one column (in that order) on phones. */
+/* Two columns, Pages over During a game and Settings over Other, on a grid so
+   During a game and Other start on the same line; on a narrow screen, one
+   column in that order. */
+.kbd-help-groups  { margin-top: 24px; display: grid; grid-template-columns: repeat(2, minmax(200px, 260px)); grid-auto-flow: dense; justify-content: center; column-gap: 40px; text-align: left; }
+.kbd-help-col     { display: contents; }
+.kbd-help-col:first-child > .kbd-help-group { grid-column: 1; }
+.kbd-help-col:last-child  > .kbd-help-group { grid-column: 2; }
+@media (max-width: 559px) {
+  .kbd-help-groups { grid-template-columns: minmax(0, 260px); }
+  .kbd-help-col > .kbd-help-group { grid-column: 1; }
+  .kbd-help-col:last-child > .kbd-help-group { grid-column: 1; }
+}
 .kbd-help-group   { break-inside: avoid; padding-bottom: 20px; }
 .kbd-help-lbl     { margin-bottom: 8px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .kbd-help-row     { display: flex; align-items: center; gap: 10px; padding: 2px 0; font-size: calc(14px * var(--ts)); color: var(--text); }
+.kbd-help-row.gap-after { margin-bottom: 10px; }
 .kbd-help kbd {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
   min-width: 25px; height: 25px; padding: 0 6px;
@@ -2412,6 +2518,8 @@ select:disabled {
 }
 .claim-date { font-size: calc(14px * var(--ts)); font-weight: 600; margin-bottom: 2px; }
 .claim-meta { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.tn-options-title { margin-top: 12px; }
+.tn-options-title strong { color: var(--text); }
 
 .claim-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
@@ -2446,7 +2554,7 @@ select:disabled {
 .claim-nick.unclaimed { font-style: italic; }
 .claim-share-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 4px 0 14px; }
 /* The creator's Delete game, last on the page. */
-.claim-delete-row { display: flex; justify-content: center; margin-top: 28px; }
+.claim-delete-row { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
 /* Edit lineup: New Game's rows (.order-slot), without dragging or drawing. */
 #lineupSlots { display: flex; flex-direction: column; gap: 4px; }
 #lineupSlots .row-num { margin-right: 0; }
@@ -2455,6 +2563,127 @@ select:disabled {
   font-size: calc(13px * var(--ts));
   color: var(--accent);
   padding: 12px 0 0;
+}
+
+/* ── TOURNAMENTS (tournaments.html) ───────────────────────────────── */
+/* Built from the game page and the game cards: the info box, the action row
+   and the rows (.claim-*), the tables as game cards with their chips. */
+.tn-list, .tn-tables { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+a.tn-card { display: block; color: inherit; text-decoration: none; }
+.tn-card .card-top { margin-bottom: 4px; }
+/* A tournament's status (tournamentStatusHTML): running in the accent with the
+   live game's pulsing dot, its card with the accent border; finished with 🏁. */
+.tn-status.running { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.tn-status.running::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red); margin-right: 5px; vertical-align: middle;
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+.tn-card.running { border-color: var(--accent); }
+/* A tournament's buttons: the organizers' on one row, Share QR under them, larger. */
+.claim-share-row.tn-org-actions { margin-bottom: 8px; }
+.tn-share-btn { min-width: 200px; justify-content: center; }
+/* Options on a tournament's page: folded until their title is tapped. */
+.tn-options-toggle { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: none; background: none; font: inherit; color: inherit; cursor: pointer; }
+/* A finished tournament's box: your place, in the text color. */
+.tn-over-you { color: var(--text); font-weight: 600; margin-top: 2px; }
+.tn-card-meta { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.tn-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.tn-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.tn-row-actions .pf-btn { width: 30px; height: 30px; font-size: calc(12px * var(--ts)); }
+.tn-hint { font-size: calc(13px * var(--ts)); color: var(--muted); margin: 0 0 14px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.tn-seats .chip-seat { width: auto; min-width: 12px; }
+/* The form: each rule's buttons share the row; its explanation under it. */
+.tn-rule-seg { width: 100%; }
+.tn-rule-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
+.tn-rule-hint { margin: 6px 0 0; }
+#tnForm .exclude-toggle + .exclude-body { margin-top: 0; }
+.tn-form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.tn-form-actions .btn { flex: 1; min-width: 0; justify-content: center; text-align: center; }   /* two buttons sharing the row */
+.tn-table .card-actions { justify-content: center; }
+/* Once started: Tables, Standings, Log, a switch across the page. */
+.tn-view-seg { width: 100%; }
+/* Your game, on top of Tables: your table, villain (mover and portrait), turn. */
+.tn-you { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.tn-you-villain { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.tn-you-villain .mover { margin-left: auto; }   /* on the right, the villain page's size (.cs-mover) */
+.tn-you-villain .char-portrait { width: 32px; height: 32px; }
+.tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
+/* Custom scoring: one box per place (1st first), the smaller tables under them. */
+/* Tournament options: an ⓘ after the page intro, and one by each option. */
+.tn-info { border: none; background: none; padding: 0 2px; font: inherit; font-size: calc(12px * var(--ts)); color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.tn-help-section { margin-bottom: 16px; }
+.tn-help-section h4 { margin: 0 0 6px; font-size: calc(14px * var(--ts)); }
+.tn-help-section p { margin: 0 0 8px; font-size: calc(13px * var(--ts)); line-height: 1.5; color: var(--muted); }
+.tn-custom { margin-top: 10px; }
+.tn-custom-grid { display: grid; grid-template-columns: auto repeat(var(--places), minmax(0, 1fr)); gap: 4px 6px; align-items: center; }
+.tn-custom-place { font-size: calc(11px * var(--ts)); color: var(--muted); text-align: center; text-transform: uppercase; }
+.tn-custom-n { font-size: calc(12px * var(--ts)); color: var(--muted); white-space: nowrap; padding-right: 4px; }
+.tn-custom-grid input { width: 100%; min-width: 0; height: 26px; min-height: 26px; padding: 0 2px; border-radius: var(--rs); font-size: calc(12px * var(--ts)); text-align: center; }
+.tn-custom-grid input { -moz-appearance: textfield; appearance: textfield; }
+.tn-custom-grid input::-webkit-inner-spin-button, .tn-custom-grid input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.tn-custom-fill { display: grid; grid-template-columns: auto 1fr 1fr; align-items: center; gap: 6px; margin-bottom: 8px; font-size: calc(12px * var(--ts)); color: var(--muted); }
+.tn-custom-fill .btn { justify-content: center; text-align: center; }
+#tnFormPlayers .lineup-label { display: flex; align-items: center; gap: 10px; }
+#tnFormPlayers .lineup-label .players-legend { margin-left: 0; }
+.tn-view-seg .seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; }
+.tn-hint-center { justify-content: center; text-align: center; }
+.tn-standings { margin-bottom: 10px; }
+.tn-medal { font-size: calc(17px * var(--ts)); line-height: 1; }
+/* A player page's tournaments: the three medals and the tournaments played, one row. */
+.tn-summary { grid-template-columns: repeat(4, 1fr); }
+/* The organizer's Edit result: New Game's rows (.order-slot, dragged by ⠿),
+   the place where New Game has the seat number, 🏳️ for a drop. */
+.tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.tn-edit-row .claim-who { flex: 1; }
+.tn-edit-row .tn-edit-place { width: 28px; }
+.tn-edit-row.winner { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
+.tn-edit-row.winner .claim-name, .tn-edit-row.winner .tn-edit-place { color: var(--gold); }
+.tn-edit-row.dropped .claim-name { color: var(--muted); }
+.pf-btn.drop.on { background: var(--accent-d); border-color: rgba(124, 106, 247, 0.35); }
+/* The table's game in progress: New Game's live panel, then the villains
+   still playing (their movers, at the live row's scale) and the ranking. */
+.live-status.paused::before { animation: none; background: var(--gold); }
+#tnLive .section-label { margin-top: 18px; }
+/* New Game's movers row (.live-mover buttons): the ones still in the game
+   are tapped to place them, the placed ones fade with their place; each with
+   its player's name. */
+/* A free place in the ranking tapped: the movers to tap bounce. */
+.tg-movers.nudge button.live-mover:not(:disabled) { animation: tgNudge 0.5s ease-in-out 2; }
+@keyframes tgNudge {
+  0%, 100% { transform: none; }
+  40%      { transform: translateY(-6px); }
+}
+.tg-mover-name { font-size: calc(10px * var(--ts)); color: var(--muted); max-width: min(72px, 100%); box-sizing: border-box; padding: 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-mover.placed .mover { opacity: 0.3; }
+.tg-mover-place { font-size: calc(11px * var(--ts)); font-weight: 700; color: var(--muted); }
+#tnLive .tn-ranking { margin-top: 6px; }
+.tn-mover-villain { font-size: calc(12px * var(--ts)); font-weight: 600; line-height: 1.2; }
+.tn-mover-name { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-ranking { display: flex; flex-direction: column; gap: 6px; }
+.tn-slot {
+  display: grid; grid-template-columns: 44px 40px 1fr; column-gap: 10px; align-items: center;
+  min-height: 46px; padding: 4px 12px; box-sizing: border-box; width: 100%; text-align: left;
+  font-family: inherit; color: var(--text);
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
+}
+.tn-slot.empty { display: flex; gap: 10px; border-style: dashed; background: none; cursor: pointer; }
+.tn-slot-msg { font-size: calc(11px * var(--ts)); color: var(--accent); }
+.tn-slot-place { grid-row: 1 / span 3; font-size: calc(13px * var(--ts)); font-weight: 700; color: var(--muted); }
+.tn-slot .char-portrait { grid-row: 1 / span 3; justify-self: center; width: 32px; height: 32px; }
+.tn-slot .tn-mover-villain { grid-column: 3; }
+.tn-slot .tn-mover-name { grid-column: 3; }
+.tn-slot-when:empty { display: none; }
+.tn-slot-when { grid-column: 3; font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-slot.winner { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
+.tn-slot.winner .tn-slot-place, .tn-slot.winner .tn-mover-villain { color: var(--gold); }
+.tn-slot.dropped .tn-mover-villain { color: var(--muted); }
+.tn-slot.undo { cursor: pointer; border-color: var(--accent); }
+.tn-place-choices { display: flex; flex-direction: column; gap: 10px; }
+.tn-place-choices .btn { width: 100%; justify-content: center; }
+
+@media (hover: hover) {
+  a.tn-card:not(.running):hover { border-color: var(--s4); }
 }
 
 /* ── CHARACTER STATS PAGE ─────────────────────────────────────────── */
@@ -2539,6 +2768,14 @@ select:disabled {
 .seg-short .stat-mode-seg .seg-btn { padding: 0 4px; }
 /* ...and each option only as wide as its label, so the menu keeps its place. */
 .seg-short .stat-mode-seg { grid-auto-columns: auto; }
+/* A phone narrower than 360px (iPhone SE, first model): five options don't
+   fit at full size (English has no short labels), nor a title with its switch
+   beside it, so the switches shrink. */
+@media (max-width: 359px) {
+  .seg-short .stat-mode-seg .seg-btn { padding: 0 2px; font-size: calc(11px * var(--ts)); }
+  /* The title's switch (Leaderboard's Villains | Players) beside the title. */
+  .page-header > .seg .seg-btn { padding: 0 6px; font-size: calc(11px * var(--ts)); }
+}
 .game-card.solo { border-style: dashed; border-color: var(--s4); }
 .home-section-link.faq-solo-link, .home-faq-item.faq-solo { border: 1px dashed var(--s4); }
 /* New Game: Solo picked in the players menu. */
@@ -2995,6 +3232,25 @@ select:disabled {
   gap: 8px;
 }
 
+/* Upload games (games-csv.js): the columns, an example that scrolls sideways
+   inside the sheet, the file buttons, and what's wrong with a file. */
+.csv-cols { margin: 0 0 12px; font-size: calc(13px * var(--ts)); line-height: 1.45; }
+.csv-cols dt { font-weight: 700; color: var(--text); margin-top: 6px; }
+.csv-cols dd { margin: 0; color: var(--muted); }
+.csv-example-wrap { overflow-x: auto; margin: 0 0 14px; border: 1px solid var(--border); border-radius: var(--rs); }
+.csv-example { border-collapse: collapse; font-size: calc(11px * var(--ts)); font-variant-numeric: tabular-nums; }
+.csv-example th, .csv-example td { padding: 4px 8px; white-space: nowrap; text-align: left; border-bottom: 1px solid var(--border); }
+.csv-example th { color: var(--muted); font-weight: 600; background: var(--s2); }
+.csv-example tr:last-child td { border-bottom: none; }
+.csv-actions { margin-bottom: 12px; }
+.csv-actions label.btn { cursor: pointer; }
+.csv-errors { margin: 6px 0 0; padding-left: 18px; }
+/* Your uploads: a file a row, its name, games and day, and Delete. */
+.acct-uploads-title { margin: 14px 0 6px; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.acct-upload { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
+.acct-upload-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-upload-meta { color: var(--muted); font-size: calc(12px * var(--ts)); white-space: nowrap; margin-left: auto; }
+
 /* ── SIGN-IN PAGE ─────────────────────────────────────────────────── */
 .signin-card {
   max-width: 420px;
@@ -3111,7 +3367,7 @@ select:disabled {
   .nav-brand:hover                          { opacity: 0.65; }
   .nav-avatar:hover                         { opacity: 0.75; }
   .nav-avatar-btn:hover .nav-avatar-guest   { opacity: 0.7; }
-  .nav-icon-btn:hover                       { color: var(--text); background: var(--s2); }
+  .settings-account:hover                   { border-color: var(--muted); }
   a.chip:hover                              { border-color: var(--s4); }
   a.chip.winner:hover                       { border-color: rgba(240, 165, 0, 0.5); }
   .chip-char a.char-link:hover              { text-decoration: underline; text-underline-offset: 2px; }
@@ -3178,13 +3434,16 @@ select:disabled {
      lines inside its button, like the lineup buttons, instead of pushing Done
      (or Reset) to a line of its own. The row's buttons share one height. */
   .filter-actions { flex-wrap: nowrap; align-items: stretch; }
-  .filter-actions .btn { height: auto; min-height: 25px; padding: 1px 8px; font-size: calc(11px * var(--ts)); line-height: 1.18; white-space: normal; text-align: center; justify-content: center; flex: 0 1 auto; min-width: min-content; }   /* 25px, or 30px on two lines */
+  .filter-actions .btn { height: auto; min-height: 25px; padding: 1px 6px; font-size: calc(11px * var(--ts)); line-height: 1.18; white-space: normal; text-align: center; justify-content: center; flex: 0 1 auto; min-width: min-content; }   /* 25px, or 30px on two lines */
+  .filter-actions { gap: 4px; }   /* five actions (Include all and Exclude all both) on one line */
   .home-steps    { grid-template-columns: 1fr; }
   /* New Game rows: a smaller portrait leaves the villain name more room. */
   .order-slot-portrait { width: 26px; height: 26px; }
   .btn.btn-lineup { font-size: calc(11px * var(--ts)); }
   .home-faq-list { grid-template-columns: 1fr; }
-  .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(92px, calc(48% - 60px), 240px); }
+  .lb-head, .lb-row                     { grid-template-columns: 24px minmax(0, 1fr) clamp(var(--lb-val-min, 92px), calc(48% - 60px), 240px); }
+  /* Matchups on a phone: the value column (and its bar) only as wide as the score and its counts. */
+  .lb-mode-matchups .lb-head, .lb-mode-matchups .lb-row { grid-template-columns: 24px minmax(0, 1fr) var(--lb-val-min); }
   .cs-table .lb-head, .cs-table .lb-row { grid-template-columns: 68px 1fr calc(90px * var(--ts)); }   /* the numbers grow with the text, the bar gives way */
   .form-row input { font-size: calc(13px * var(--ts)); }
   .form-row input[type="datetime-local"] { font-size: calc(13px * min(var(--ts), 1.125)); }   /* as above */
@@ -3199,8 +3458,17 @@ select:disabled {
   .chart-card-desc { min-height: 7.3em; }
 }
 
+/* Phones: the nav's icons share the room between the logo and the avatar,
+   each up to 40px wide, so they're as big as the screen allows and never
+   overlap (they don't follow the text size). */
+@media (max-width: 480px) {
+  .nav-right { flex: 1; min-width: 0; justify-content: flex-end; margin-left: 12px; }
+  .nav-links { flex: 1; min-width: 0; justify-content: flex-end; }
+  .nav-links a { flex: 1 1 0; min-width: 0; max-width: 40px; height: 38px; padding: 0; justify-content: center; font-size: 17px; }
+  .nav-avatar, .nav-auth:empty::after { width: 32px; height: 32px; }
+}
+
 @media (max-width: 360px) {
-  .nav-links a { padding: 4px 6px; font-size: 12px; }
   .draw-mode-row                  { gap: 4px; }
   .filter-bulk-row .pace-colors   { gap: 2px; }
   .draw-mode-row .exclude-toggle.exclude-toggle-inline { padding: 0 6px; font-size: calc(11px * var(--ts)); }
@@ -3215,3 +3483,36 @@ select:disabled {
   .lbl-short { display: inline; }
 }
 
+/* Too narrow for the pool's five actions (under 360px, after the phone rule
+   that keeps them on one line): Done goes under them, on the right. */
+@media (max-width: 359px) {
+  .controls.chart-switches { flex-wrap: wrap; row-gap: 6px; }   /* two switches: the second on its own line */
+  .filter-actions { flex-wrap: wrap; }
+  .filter-actions .filter-apply-btn { margin-left: auto; }
+}
+
+/* Strength and skill (strength.html, a test page): plain tables. */
+.st-table-wrap { overflow-x: auto; margin-bottom: 20px; }
+.st-table { width: 100%; border-collapse: collapse; font-size: calc(13px * var(--ts)); font-variant-numeric: tabular-nums; }
+.st-table th { text-align: right; font-size: calc(11px * var(--ts)); font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 6px; white-space: nowrap; }
+.st-table td { text-align: right; padding: 5px 6px; border-top: 1px solid var(--border); white-space: nowrap; }
+.st-table th:nth-child(-n+2), .st-table td:nth-child(-n+2) { text-align: left; }
+.st-table td.st-name { width: 100%; max-width: 0; }
+.st-table td.st-name a { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--text); text-decoration: none; }
+.st-table td.st-name a > span { white-space: normal; overflow-wrap: anywhere; line-height: 1.25; }
+.st-table td.st-name a > :not(span) { flex: none; }
+.st-table td.st-wrap { white-space: normal; }
+@media (max-width: 480px) { .st-table { font-size: calc(12px * var(--ts)); } .st-table th, .st-table td { padding-left: 3px; padding-right: 3px; } .st-table td.st-name a { gap: 4px; } }
+.st-table td.st-name .char-portrait, .st-table td.st-name .player-avatar { width: 22px; height: 22px; }
+.st-table .st-main { font-weight: 700; }
+.st-table .st-sub { color: var(--muted); }
+.st-table.st-seats th:nth-child(2), .st-table.st-seats td:nth-child(2) { text-align: right; }
+
+/* Strength and skill, How it's computed: a formula on its own line. */
+.st-math { font-family: Georgia, 'Times New Roman', serif; font-size: calc(15px * var(--ts)); color: var(--text); text-align: center; margin: -6px 0 16px; line-height: 1.6; }
+.st-math span { white-space: nowrap; }
+
+/* The narrowest phones: Past game's date and time fit their half of the row. */
+@media (max-width: 359px) {
+  .date-field-row input { padding-left: 6px; padding-right: 6px; }
+}

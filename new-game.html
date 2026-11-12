@@ -33,6 +33,7 @@
   <div class="nav-right">
     <div class="nav-links">
       <a class="active" href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
+      <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
       <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -47,7 +48,7 @@
   <div class="page-header">
     <h2><span class="page-ico" aria-hidden="true">⚔️</span><span data-i18n>New Game</span></h2>
   </div>
-  <p class="page-intro" data-i18n>Pick or draw villains, time the game, save and share it.</p>
+  <p class="page-intro" data-i18n>Play a game with the timer or record a past one, then save and share it.</p>
 
   <div class="err" id="err"></div>
 
@@ -74,14 +75,21 @@
 
   <!-- FORM CONTENT, hidden while a live game is running -->
   <div id="formContent">
+    <!-- Play now (a game about to start: the timer sets its date, duration and
+         rounds, and the order is played) or Past game (an earlier one: typed
+         in, the date and the order may be unknown). new-game.js. -->
+    <div class="controls mb-1 ng-mode-row">
+      <div class="seg ng-mode-seg" id="ngModeSeg">
+        <button class="seg-btn on" id="ngModePlay" type="button" onclick="setPastGame(false)" data-i18n>Play now</button>
+        <button class="seg-btn" id="ngModePast" type="button" onclick="setPastGame(true)" data-i18n>Past game</button>
+      </div>
+    </div>
     <!-- The game ended from the live panel: won (a mover tapped) or, in Solo,
          lost (+ after the last round). new-game.js. -->
     <p class="live-end-note hidden" id="liveEndNote" role="status"></p>
-    <div class="form-row">
-      <div class="field">
-        <label data-i18n>Date &amp; Time</label>
-        <input type="datetime-local" id="fDate">
-      </div>
+    <!-- Location first, on its own row; the date (Past game) on the next, with
+         its switch: Set date | No time | No date (new-game.js). -->
+    <div class="form-row one-field">
       <div class="field">
         <label data-i18n>Location <span class="optional"></span></label>
         <div class="ac-wrap">
@@ -90,7 +98,20 @@
         </div>
       </div>
     </div>
-    <div class="form-row">
+    <div class="form-row one-field" id="fDateRow">
+      <div class="field">
+        <label for="fDate" data-i18n>Date &amp; time</label>
+        <div class="date-field-row">
+          <input type="datetime-local" id="fDate">
+          <div class="seg date-mode-seg" id="fDateBtns">
+            <button class="seg-btn" data-mode="full" type="button" onclick="setDateMode('full')" data-i18n>Set date</button>
+            <button class="seg-btn" data-mode="day" type="button" onclick="setDateMode('day')" data-i18n>No time</button>
+            <button class="seg-btn" data-mode="none" type="button" onclick="setDateMode('none')" data-i18n>No date</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row" id="durRoundsRow">
       <div class="field">
         <label data-i18n>Duration <span class="optional">(min)</span></label>
         <input type="number" id="fDur" min="1" max="999" placeholder="optional" data-i18n-attr="placeholder">
@@ -103,7 +124,11 @@
 
     <div class="section-label"><span data-i18n>Villains and Players</span></div>
     <div class="draw-mode-row">
-      <button class="exclude-toggle exclude-toggle-inline" type="button" onclick="toggleExclude()">
+      <!-- Past game: Unknown order | In order, where Play now has the draw pool. -->
+      <div class="header-actions hidden" id="orderBtns">
+        <button class="btn btn-sm btn-lineup" id="orderToggle" type="button" onclick="toggleOrderUnknown()"></button>
+      </div>
+      <button class="exclude-toggle exclude-toggle-inline" id="excludeToggle" type="button" onclick="toggleExclude()">
         <span class="exclude-toggle-label" data-i18n>Draw pool</span>
         <div class="toggle-right">
           <span class="badge" id="exBadge"></span>
@@ -125,6 +150,7 @@
     <div class="exclude-body" id="excludeBody">
       <div class="filter-actions">
         <button class="btn btn-ghost btn-sm" type="button" onclick="excludeAll()" data-i18n>Exclude all</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="includeAllBtn" onclick="includeAll()" disabled data-i18n>Include all</button>
         <button class="btn btn-ghost btn-sm owned-toggle" id="ownedOnlyBtn" type="button" onclick="toggleMine()" data-i18n>My boxes</button>
         <button class="btn btn-ghost btn-sm" id="resetPoolBtn" type="button" onclick="resetPool()" disabled data-i18n>Reset</button>
         <button class="btn btn-primary btn-sm filter-apply-btn" onclick="applyExclude()" data-i18n>Done</button>
@@ -149,6 +175,7 @@
         <button class="btn btn-sm btn-lineup" id="shuffleOrderBtn" type="button" onclick="shuffleOrder()" disabled title="Random order" data-i18n-attr="title" data-i18n>Random order</button>
         <button class="btn btn-sm btn-lineup" id="drawAllBtn" type="button" onclick="drawAll()" title="Draw villains" data-i18n-attr="title" data-i18n>Draw villains</button>
       </div>
+
       <!-- Solo (solo.js): the difficulty level, where the two buttons above stand otherwise. -->
       <div class="hidden" id="soloLevelNg"></div>
       <span class="players-legend" id="playersLegend"><span class="sep-item" data-i18n>🎲 = draw</span> | <span class="sep-item" data-i18n>❌ = remove</span> | <span class="sep-item" data-i18n>👤 = you</span> | <span class="sep-item" data-i18n>👑 = winner</span></span>

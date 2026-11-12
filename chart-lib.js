@@ -66,13 +66,17 @@ const Charts = (() => {
   // (e.g. 100 for a percentage) keeps the window from running past it.
   function niceWindow4(y0, y1, cap = null, floor = 0) {
     const m = Math.max((y1 - y0) * 0.03, 0.5);
+    // The margin above stops at the cap: a 100% win rate sits on the top line,
+    // the axis doesn't double to 200%.
+    const top = cap != null ? Math.min(y1 + m, cap) : y1 + m;
     for (let mag = 1; ; mag *= 10) {
-      for (const st of [1, 2, 5].map(k => k * mag)) {
+      // 2.5 too (whole from 10 up: 25%, 250): 0-100% in 4 steps of 25.
+      for (const st of (mag >= 10 ? [1, 2, 2.5, 5] : [1, 2, 5]).map(k => k * mag)) {
         let lo = Math.floor((y0 - m) / st) * st;
         if (floor != null && lo < floor) lo = floor;
         if (cap != null && lo + 4 * st > cap) lo = Math.max(0, Math.floor((cap - 4 * st) / st) * st);
-        if (lo <= y0 - m && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };
-        if (lo === floor && lo + 4 * st >= y1 + m) return { lo, hi: lo + 4 * st };   // the floor is as low as it goes
+        if (lo <= y0 - m && lo + 4 * st >= top) return { lo, hi: lo + 4 * st };
+        if (lo === floor && lo + 4 * st >= top) return { lo, hi: lo + 4 * st };   // the floor is as low as it goes
       }
     }
   }
@@ -90,32 +94,37 @@ const Charts = (() => {
   // Horizontal bars: data = [{ label, value, color?, meta? }]. The x-axis uses
   // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
-  // `ref` = { value, text }: a dashed line at value (an average to compare the
-  // bars with), with `text` above the plot on the right.
-  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', ref = null } = {}) {
+  // `diverging`: values on both sides of 0 (Δ Wins), the axis from -max to
+  // max with 0 in the middle, each bar drawn from 0. `ref` = { value, text }: a
+  // dashed line at value (an average to compare the bars with), with `text`
+  // above the plot on the right.
+  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null } = {}) {
     if (!data.length) return empty();
-    const dmax = Math.max(...data.map(d => d.value), ref ? ref.value : 0) || 1;
-    const { max, ticks } = niceTicks(dmax, 4);
+    const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value) : d.value), ref ? Math.abs(ref.value) : 0) || 1;
+    const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4);
+    const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
+    const lo = diverging ? -max : 0;
     const top = ref ? 24 : 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
     const rowH = Math.min(36, (H - top - B) / data.length), bw = W - labelW - RM;
+    const sx = v => labelW + (v - lo) / (max - lo) * bw;
     const botY = top + data.length * rowH;   // baseline = bottom of the last bar
     // x-axis: a gridline + label at each nice tick, drawn behind the bars.
     let axis = '';
     for (const v of ticks) {
-      const x = labelW + (v / max) * bw;
-      const anchor = v === 0 ? 'start' : v === max ? 'end' : 'middle';
-      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
+      const x = sx(v);
+      const anchor = v === lo ? 'start' : v === max ? 'end' : 'middle';
+      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
     }
     const rows = data.map((d, i) => {
-      const y = top + i * rowH, len = Math.max(2, (d.value / max) * bw);
+      const y = top + i * rowH, x0 = sx(Math.min(0, d.value)), len = Math.max(2, Math.abs(sx(d.value) - sx(0)));
       const name = d.name != null ? d.name : d.label;
       const meta = d.meta != null ? d.meta : String(d.value);
       return `
         <text x="${labelW - 8}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
-        <rect${hit(name, meta, d.href)} x="${labelW}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>`;
+        <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>`;
     }).join('');
     const refHTML = ref ? (() => {
-      const x = labelW + (ref.value / max) * bw;
+      const x = sx(ref.value);
       return `<line x1="${x.toFixed(1)}" y1="${top - 4}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-median"/>` +
         `<text x="${W - RM}" y="${top - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(ref.text)}</text>`;
     })() : '';
@@ -176,7 +185,9 @@ const Charts = (() => {
     if (avg) include = [...include, avg.value];
     const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys, ...include), y1 = Math.max(...ys, ...include);
     const xpad = (x1 - x0) * 0.08 || 1;
-    const xlo = Math.max(0, x0 - xpad), xhi = x1 + xpad;
+    let xlo = Math.max(0, x0 - xpad), xhi = x1 + xpad;
+    // At least 4 wide, so the 4 steps' whole-number labels differ (few games).
+    if (xhi - xlo < 4) { xlo = Math.max(0, (xlo + xhi) / 2 - 2); xhi = xlo + 4; }
     const { lo: ylo, hi: yhi } = ySymmetric ? symWindow4(Math.max(-y0, y1)) : niceWindow4(y0, y1, yMax, yFloor);   // round gridline values, not 21 28 35 ...
     const sx = x => L + (x - xlo) / (xhi - xlo) * PW;
     const sy = y => (H - B) - (y - ylo) / (yhi - ylo) * PH;

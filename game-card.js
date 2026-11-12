@@ -6,6 +6,8 @@
 // Centralizes "what's this user's relationship to this game?" so callers
 // don't re-derive the same booleans inline. Pass the current user object
 // (typically `getCurrentUser()`); a missing user yields all-false.
+// A tournament game (g.tournament, attachTournaments in db.js) is changed only
+// from its tournament: being its creator (the organizer) gives nothing here.
 function gameUserRole(g, gp, user) {
   if (!user) return { isCreator: false, isClaimant: false, isParticipant: false };
   const isCreator  = g.created_by === user.id && !g.tournament;
@@ -22,6 +24,16 @@ function gameUserRole(g, gp, user) {
 // (solo.js) says Solo and its level where the others give the table size
 // (just the level with `soloLabel: false`, in a list of solo games only), and
 // its rounds out of the level's; its card is dashed.
+// A game's rounds as its card and its page say them: "12 rounds"; a solo game
+// out of its level's ("12/20 rounds") when won, "Game over" when lost (the
+// Phantom's last round came and went), whatever its rounds.
+function gameRoundsLabel(g, seats) {
+  const level = g.variant === 'solo' ? soloLevelOf(g) : null;
+  if (level && !(seats || []).some(p => p.is_winner)) return t('Game over');
+  if (!g.num_turns) return null;
+  return level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds');
+}
+
 function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', locationClickable = false, layout = 'chips', soloLabel = true } = {}) {
   const rows = layout === 'rows';
   if (rows) gp = gp.slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
@@ -35,7 +47,7 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
   const level = g.variant === 'solo' ? soloLevelOf(g) : null;
   const meta = [
     fmtDuration(g.duration_minutes),
-    g.num_turns ? (level ? t('{n}/{max} rounds', { n: g.num_turns, max: SOLO_LEVELS[level].turns }) : tn(g.num_turns, '{n} round', '{n} rounds')) : null,
+    gameRoundsLabel(g, gp),
     locationPart,
     level ? (soloLabel ? t('Solo') : null) : `${gp.length}p`,
     level ? soloLevelTagHTML(level) : null,
@@ -71,11 +83,74 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
     ${actions}`;
 }
 
-// 🏟️ before a tournament game's date (attachTournaments, db.js), its
-// tournament, stage and table on hover. (The beta links it to the tournament.)
+// 🏟️ before a tournament game's date, to its tournament.
 function _tournamentMarkHTML(tour) {
   const title = [tour.name, t('Stage {n}', { n: tour.stage }), t('Table {n}', { n: tour.tableNo })].join(' | ');
-  return `<span class="tn-mark" title="${_esc(title)}">🏟️</span>`;
+  return `<a class="tn-mark" href="tournaments.html?t=${tour.id}" title="${_esc(title)}">🏟️</a>`;
+}
+
+// ── TOURNAMENT CARD ───────────────────────────────────────────────────────────
+// A tournament in a list (tournaments.html, a player page): its name and
+// status, then who organized it (or "Organizer" on the organizer's own page),
+// its players, its date and, on a player page, their final place. A running
+// one has the accent border. tour: a tournaments row with tournament_players(count).
+
+// 1st, 2nd, 3rd… (1º, 2º… in Italian), and the top three's medals.
+function fmtPlace(n) {
+  if (LANG === 'it') return `${n}º`;
+  const tail = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return `${n}${tail}`;
+}
+const TOURNAMENT_MEDALS = ['🥇', '🥈', '🥉'];
+
+// The tournament's day, set by its organizer (the creation day before it had one).
+function fmtTournamentDate(tour) {
+  return tour.event_date ? fmtDayLong(tour.event_date) : fmtDateShort(tour.created_at);
+}
+
+function tournamentStatus(tour) {
+  if (tour.finished_at)    return t('Finished');
+  if (!tour.current_stage) return t('Not started');
+  return tournamentStageName(tour, tour.current_stage);
+}
+
+// A stage's name: "Stage 2 of 3" (of the stage the stages ended at, once
+// ended early; "Stage 2" while open), or "Final" for the final table.
+function tournamentStageName(tour, stage) {
+  if (tournamentIsFinal(tour, stage)) return t('Final');
+  const last = tournamentLastStage(tour);
+  return last ? t('Stage {n} of {m}', { n: stage, m: last }) : t('Stage {n}', { n: stage });
+}
+
+// 'lobby' (not started), 'running' or 'finished'.
+const tournamentState = tour => tour.finished_at ? 'finished' : tour.current_stage ? 'running' : 'lobby';
+
+// The status as cards and the tournament's page show it: running with the
+// live game's pulsing dot, finished with 🏁.
+function tournamentStatusHTML(tour) {
+  const state = tournamentState(tour);
+  return `<span class="tn-status ${state}">${state === 'finished' ? '🏁 ' : ''}${tournamentStatus(tour)}</span>`;
+}
+
+// rank: a player page's final place in it (a medal for the top three).
+function tournamentCardHTML(tour, { organizer = null, isOrganizer = false, rank = null } = {}) {
+  const n = tour.tournament_players?.[0]?.count ?? 0;
+  const meta = [
+    isOrganizer ? t('Organizer') : organizer ? _esc(organizer) : null,
+    tn(n, '{n} player', '{n} players'),
+    fmtTournamentDate(tour),
+    rank ? (rank <= 3 ? TOURNAMENT_MEDALS[rank - 1] : fmtPlace(rank)) : null,
+  ].filter(Boolean).join(' | ');
+  return `
+    <a class="game-card tn-card ${tournamentState(tour)}" href="tournaments.html?t=${tour.id}">
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-date">${_esc(tour.name)}</div>
+          <div class="card-meta">${tournamentStatusHTML(tour)}</div>
+        </div>
+        <div class="tn-card-meta">${meta}</div>
+      </div>
+    </a>`;
 }
 
 // Wrap the HTML in a <div class="game-card"> and attach the optional

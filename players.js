@@ -13,9 +13,10 @@ let pfXp        = null;   // their XP, all time (the Leaderboard's), once the ga
 let pfProfile   = undefined;   // the profile the identity was last drawn with
 let pfOnFire    = false;  // on their max win streak (render): the avatar's ring is gold
 let pfFriends   = [];   // top co-players by shared games (filter-independent)
+let pfTournaments = { list: [] };   // the tournaments they organized or played in, their medals (filter-independent)
 let pfLoaded    = false;  // the filters show before the games: render() waits for them
 
-let pfMode           = 'pct';   // 'pct' | 'count' | 'games'
+let pfMode           = 'pct';   // 'chance' (Δ Wins, first) | 'pct' (the default) | 'count' | 'games'
 let pfWinsOnly       = false;
 let pfAchAll         = false;   // achievements: the earned ones, or (Show all) every one
 let pfLocationFilter = null;
@@ -28,7 +29,8 @@ let pfLocationFilter = null;
 const size   = createSizeFilter('pfSize', { onChange: () => render() });
 const period = createPeriodFilter('pfPeriod', { onChange: () => render() });
 
-let pfDisplayLimit   = PAGE_SIZE;
+let pfDisplayLimit   = PAGE_SIZE;   // the games they played
+let pfRecordedLimit  = PAGE_SIZE;   // the games they recorded without playing
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
@@ -120,16 +122,16 @@ function _renderIdentity(profile) {
 }
 
 async function load() {
-  // The games this nickname played and, on your own profile, the games you
-  // created, even ones you haven't claimed a villain in (e.g. after releasing
-  // your claim): otherwise such a game would vanish from your profile, taking
-  // its manage/QR actions with it. Both at once.
-  const me      = getCurrentUser();
-  const profile = getCurrentProfile();
-  const own     = me && profile && profile.nickname === pfNick;
+  // The games this nickname played and the games they recorded, also those
+  // without their villain claimed (no 👤 in New Game, a claim released, a
+  // tournament's they organized): those go in a list of their own (render).
+  const me        = getCurrentUser();
+  const profile   = getCurrentProfile();
+  const own       = me && profile && profile.nickname === pfNick;
+  const creatorId = own ? me.id : (await fetchProfile({ nickname: pfNick }, 'id'))?.id;
   const [{ rows: myRows, error }, created] = await Promise.all([
     _fetchAllRows(() => db.from('game_players').select('game_id').eq('nickname', pfNick)),
-    own ? _fetchAllRows(() => db.from('games').select('id').eq('created_by', me.id)) : null,
+    creatorId ? _fetchAllRows(() => db.from('games').select('id').eq('created_by', creatorId)) : null,
   ]);
 
   if (error) {
@@ -141,13 +143,8 @@ async function load() {
 
   const gameIds = [...new Set(myRows.map(r => r.game_id).concat((created?.rows || []).map(r => r.id)))];
 
-  const fetched = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
-  // A tournament's games are its organizer's, but only the ones they played
-  // show on their profile.
-  await attachTournaments(fetched.games);
-  const played = new Set(myRows.map(r => r.game_id));
-  const keep   = new Set(fetched.games.filter(g => !g.tournament || played.has(g.id)).map(g => g.id));
-  const all    = { games: fetched.games.filter(g => keep.has(g.id)), players: fetched.players.filter(p => keep.has(p.game_id)) };
+  const all = await fetchGamesWithPlayers(gameIds, { orderByPlayedAtDesc: true, variant: 'any' });
+  await attachTournaments(all.games);   // their cards' tournament tag
   const { games, players } = gamesOfVariant(all);
   pfGames   = games;
   pfPlayers = players;
@@ -161,7 +158,7 @@ async function load() {
   pfXp = players.filter(p => p.nickname === pfNick).reduce((sum, p) => sum + gameXp(claims[p.game_id], p.is_winner), 0)
        + achievementXp(pfAch, pfAllChars, pfBoxInfo, pfGlobal);
   _renderIdentity(pfProfile);
-  pfFriends = await _loadFriends();
+  [pfFriends, pfTournaments] = await Promise.all([_loadFriends(), _loadTournaments()]);
   pfLoaded  = true;
   // Oldest first: the games come newest first, undated ones last.
   period.setFirst(all.games.map(g => g.played_at).filter(Boolean).sort()[0] || null);
@@ -200,6 +197,79 @@ async function _loadFriends() {
     .in('nickname', top.map(f => f.nick));
   const avatarByNick = Object.fromEntries((data || []).map(p => [p.nickname, resolveAvatar(p)]));
   return top.map(f => ({ ...f, avatar: avatarByNick[f.nick] || 'asset/players/default.svg' }));
+}
+
+// The tournaments this player organized or played in (a name they claimed),
+// newest first, with their final place in the finished ones they played (by
+// the tournament's own rules, tournament-rules.js): { list, medals: [gold,
+// silver, bronze], played }. Nothing when there are none or they can't load.
+async function _loadTournaments() {
+  const none = { list: [], medals: [0, 0, 0], played: 0 };
+  try {
+    const prof = await fetchProfile({ nickname: pfNick }, 'id');
+    if (!prof) return none;
+    const [org, played] = await Promise.all([
+      db.from('tournament_organizers').select('tournament_id').eq('user_id', prof.id),
+      db.from('tournament_players').select('id, tournament_id').eq('user_id', prof.id),
+    ]);
+    const myPlayer  = new Map((played.data || []).map(r => [r.tournament_id, r.id]));
+    const organized = new Set((org.data || []).map(r => r.tournament_id));
+    const ids       = [...new Set([...organized, ...myPlayer.keys()])];
+    const tours     = ids.length ? (await db.from('tournaments').select('*, tournament_players!tournament_players_tournament_id_fkey(count), tournament_organizers(user_id, added_at)').in('id', ids)).data || [] : [];
+    // The organizers of the ones they only played, by nickname, the longest-standing first.
+    const orgsOf = x => (x.tournament_organizers || []).slice().sort((a, b) => a.added_at.localeCompare(b.added_at)).map(o => o.user_id);
+    const orgIds = [...new Set(tours.filter(x => !organized.has(x.id)).flatMap(orgsOf))];
+    const nicks  = new Map();
+    if (orgIds.length) {
+      const { data } = await db.from('profiles').select('id, nickname').in('id', orgIds);
+      for (const p of data || []) nicks.set(p.id, p.nickname);
+    }
+    const names = x => new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(orgsOf(x).map(id => nicks.get(id)).filter(Boolean));
+
+    // Final places: the finished tournaments they played, ranked from their tables.
+    const ranks    = new Map();
+    const finished = tours.filter(x => x.finished_at && myPlayer.has(x.id));
+    if (finished.length) {
+      const rows = await _fetchInChunks(finished.map(x => x.id), chunk => db.from('tournament_tables')
+        .select('tournament_id, stage, saved_at, tournament_seats(player_id, position, place, dropped)').in('tournament_id', chunk));
+      for (const tour of finished) {
+        const tables = rows.filter(r => r.tournament_id === tour.id).map(r => ({ ...r, seats: r.tournament_seats || [] }));
+        const me = tournamentStandings(tour, tables).find(r => r.player_id === myPlayer.get(tour.id));
+        if (me) ranks.set(tour.id, me.rank);
+      }
+    }
+    const medals = [1, 2, 3].map(n => [...ranks.values()].filter(r => r === n).length);
+
+    const list = tours.map(x => organized.has(x.id) ? { tour: x, isOrganizer: true } : { tour: x, organizer: names(x) })
+     .map(x => ({ ...x, rank: ranks.get(x.tour.id) || null, played: myPlayer.has(x.tour.id) }))
+     .sort((a, b) => b.tour.created_at.localeCompare(a.tour.created_at));
+    return { list, medals, played: myPlayer.size };
+  } catch (_) {
+    return none;
+  }
+}
+
+// The tournaments, as the games: those they played (organized or not), with
+// the medals and tournaments played as stat boxes, then those they organized
+// without playing; the cards of the tournaments page (game-card.js).
+function _tournamentsSectionHTML() {
+  const list = pfTournaments.list || [];
+  const played = list.filter(x => x.played), organized = list.filter(x => !x.played);
+  const [gold, silver, bronze] = pfTournaments.medals || [0, 0, 0];
+  const cards = xs => `<div class="tn-list">${xs.map(x => tournamentCardHTML(x.tour, x)).join('')}</div>`;
+  return `
+    ${played.length ? `
+      <div class="pf-games-header"><span class="pf-games-title">${t('Tournaments')}</span></div>
+      <div class="summary tn-summary">${statBoxesHTML([
+        { val: gold,   lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[0]}</span>` },
+        { val: silver, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[1]}</span>` },
+        { val: bronze, lbl: `<span class="tn-medal">${TOURNAMENT_MEDALS[2]}</span>` },
+        { val: pfTournaments.played, lbl: t('Played') },
+      ])}</div>
+      ${cards(played)}` : ''}
+    ${organized.length ? `
+      <div class="pf-games-header"><span class="pf-games-title">${t('Organized, not played')}</span></div>
+      ${cards(organized)}` : ''}`;
 }
 
 // The "Played with" section: a ranked list of the top co-players. Empty string
@@ -318,7 +388,8 @@ function pfClearLocationFilter() {
 
 function render() {
   if (!pfLoaded) return;
-  pfDisplayLimit = PAGE_SIZE;
+  pfDisplayLimit  = PAGE_SIZE;
+  pfRecordedLimit = PAGE_SIZE;
   const root = document.getElementById('pfRoot');
 
   const solo    = size.isSolo();
@@ -345,9 +416,19 @@ function render() {
   const { to_ts } = period.range();
   const reachesToday = !to_ts || new Date(to_ts) > new Date();
   const onBestStreak = reachesToday && bestStreak > 0 && streakRun === bestStreak;
-  // On fire: the avatar's ring turns gold with the Max streak box.
+  // On fire: the avatar's ring turns gold with the Wins (streak) box.
   pfOnFire = onBestStreak;
   document.getElementById('pfAvatar')?.classList.toggle('on-fire', pfOnFire);
+
+  // Δ Wins (chanceDelta, stats-table.js): each game by its number of players,
+  // shown from the % Wins minimum, as on the Leaderboard. Not on Solo.
+  const seatsIn = {};
+  for (const p of data.players) seatsIn[p.game_id] = (seatsIn[p.game_id] || 0) + 1;
+  const chance = { wins, exp: 0, vari: 0 };
+  for (const p of mine) { const k = seatsIn[p.game_id]; if (k >= 2) { chance.exp += 1 / k; chance.vari += 1 / k * (1 - 1 / k); } }
+  const chanceBox = nGames >= MIN_GAMES_FOR_PCT
+    ? { chance: fmtChance(chanceDelta(chance)) }
+    : { chanceTitle: t('Shown from {n} games.', { n: MIN_GAMES_FOR_PCT }) };
 
   const avgDur   = avg(games.map(g => g.duration_minutes));
   // Solo: the rounds of the games won (a lost one runs to its last round).
@@ -363,6 +444,33 @@ function render() {
 
   const soloHint = solo ? soloHintHTML() : '';
   const friends  = solo ? '' : _friendsSectionHTML();
+  const tours    = solo ? '' : _tournamentsSectionHTML();
+
+  // The games, under everything else, in two lists (_renderGamesList): those
+  // they played, a villain claimed whoever recorded them, then those they
+  // recorded without playing. The location filter's pill heads the first.
+  const playedIds = new Set(mine.map(p => p.game_id));
+  const nRecorded = games.filter(g => !playedIds.has(g.id)).length;
+  const locPill   = pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : '';
+  const gamesSection = `
+    ${nGames ? `<div class="pf-games-header">
+      <span class="pf-games-title">${t('Games')}</span>
+      ${locPill}
+      <button class="pill${pfWinsOnly ? ' on' : ''}" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
+    </div>
+    <div class="games-list" id="pfGamesList"></div>` : ''}
+    ${nRecorded ? `<div class="pf-games-header">
+      <span class="pf-games-title">${t('Recorded, not played')}</span>
+      ${nGames ? '' : locPill}
+    </div>
+    <div class="games-list" id="pfRecordedList"></div>` : ''}`;
+
+  // Only games they recorded without playing: no stats, just those.
+  if (!nGames && !solo && nRecorded) {
+    root.innerHTML = `${friends}${achHTML}${tours}${gamesSection}`;
+    _renderGamesList(keepIds);
+    return;
+  }
 
   // No games: the sentence takes the place of the stats, the filters stay. A
   // player who never played has no achievements to show either.
@@ -372,37 +480,44 @@ function render() {
       : data.games.length || solo
       ? `${soloHint}${emptyStateHTML('🔍', t('No games for this filter'), t('Try adjusting the filters.'))}
         ${friends}
-        ${achHTML}`
-      : emptyStateHTML('⚔️', t('No games yet'), t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) }));
+        ${achHTML}
+        ${tours}`
+      : emptyStateHTML('⚔️', t('No games yet'), t("{nick} hasn't played any recorded games.", { nick: _esc(pfNick) })) + tours;
     return;
   }
 
   // Character tally
+  // Each villain's games and wins, and for Δ Wins its chances: 1/k a game at k
+  // players (seatsIn, the summary's).
   const charMap = {};
   for (const p of mine) {
-    if (!charMap[p.character]) charMap[p.character] = { character: p.character, games: 0, wins: 0 };
-    charMap[p.character].games++;
-    if (p.is_winner) charMap[p.character].wins++;
+    if (!charMap[p.character]) charMap[p.character] = { character: p.character, games: 0, wins: 0, exp: 0, vari: 0 };
+    const r = charMap[p.character], k = seatsIn[p.game_id];
+    r.games++;
+    if (p.is_winner) r.wins++;
+    if (k >= 2) { r.exp += 1 / k; r.vari += 1 / k * (1 - 1 / k); }
   }
   const charRows = Object.values(charMap);
+  // Δ Wins first (not on Solo), % Wins the default; Δ Wins ranks a villain
+  // from the % Wins minimum (one win at a table of 5 is already +2.0), the
+  // others under the divider.
+  const mode = solo && pfMode === 'chance' ? 'pct' : pfMode;
+  const minGames = mode === 'chance' ? MIN_GAMES_FOR_PCT : 0;
 
   root.innerHTML = `
     ${soloHint}
     <div class="summary">
-      ${statBoxesHTML([
-        { val: nGames,       lbl: t('Games') },
-        { val: avgDur   != null ? Math.round(avgDur) + 'm' : '-', lbl: t('Avg duration') },
-        { val: avgTurns != null ? Math.round(avgTurns)     : '-', lbl: solo ? t('Avg rounds to win') : t('Avg rounds') },
-        { val: winPct + '%', lbl: t('Win rate') },
-        { val: wins,         lbl: t('Wins') },
-        { val: bestStreak,   lbl: t('Max streak'), hot: onBestStreak, title: onBestStreak ? t('Currently on this streak') : '' },
-      ])}
+      ${summaryBoxesHTML({ games: nGames, wins, dur: avgDur, turns: avgTurns, solo, streak: bestStreak, hot: onBestStreak, ...chanceBox })}
     </div>
 
-    ${statModeSegHTML(pfMode, 'pfSetMode')}
+    ${statModeSegHTML(mode, 'pfSetMode', { chance: !solo })}
+    ${statModeHintHTML(mode)}
+    ${mode === 'chance' ? chanceHintHTML() : ''}
+    ${mode === 'chance' && charRows.some(r => r.games < minGames) ? `<p class="results-hint">${t('Ranked only with at least {n} games.', { n: minGames })}</p>` : ''}
 
     ${renderStatTableHTML(charRows, {
-      mode:        pfMode,
+      mode,
+      minGames,
       headLabel:   t('Villain'),
       getKey:      r   => r.character,
       getName:     villainName,
@@ -418,12 +533,9 @@ function render() {
 
     ${achHTML}
 
-    <div class="pf-games-header">
-      <span class="pf-games-title">${t('Games')}</span>
-      ${pfLocationFilter ? locationFilterPillHTML(pfLocationFilter, 'pfClearLocationFilter') : ''}
-      <button class="pill${pfWinsOnly ? ' on' : ''}" id="pfWinsOnlyBtn" onclick="pfToggleWinsOnly()" type="button">${t('Wins only')}</button>
-    </div>
-    <div class="games-list" id="pfGamesList"></div>
+    ${tours}
+
+    ${gamesSection}
   `;
 
   _renderGamesList(keepIds);
@@ -431,39 +543,19 @@ function render() {
 
 let _pfScrollToId = null;
 
+// Both lists of games (render): played (Wins only applies) and recorded
+// without playing, each PAGE_SIZE at a time.
 function _renderGamesList(keepIds = pfFilteredGameIds()) {
-  const data = _pfData();
-  let games = data.games.filter(g => keepIds.has(g.id));
-
-  if (pfWinsOnly) {
-    const winGameIds = new Set(
-      data.players.filter(p => p.nickname === pfNick && p.is_winner).map(p => p.game_id)
-    );
-    games = games.filter(g => winGameIds.has(g.id));
-  }
-
-  // Returning from an opened game: make sure its card is within the rendered
-  // page so we can scroll to it (it may sit beyond the current "Load more" cut).
-  if (_pfScrollToId) {
-    const idx = games.findIndex(g => g.id === _pfScrollToId);
-    if (idx >= pfDisplayLimit) pfDisplayLimit = Math.ceil((idx + 1) / PAGE_SIZE) * PAGE_SIZE;
-  }
-
-  const visible = games.slice(0, pfDisplayLimit);
-  const hasMore = games.length > visible.length;
-
-  const list = document.getElementById('pfGamesList');
-  if (!list) return;
-  list.innerHTML = '';
+  const data   = _pfData();
+  const games  = data.games.filter(g => keepIds.has(g.id));
+  const mine   = data.players.filter(p => p.nickname === pfNick);
+  const played = new Set(mine.map(p => p.game_id));
+  const won    = new Set(mine.filter(p => p.is_winner).map(p => p.game_id));
   // Pre-group players by game_id so each card is an O(1) lookup, not an O(n) scan.
   const byGame = {};
   for (const p of data.players) (byGame[p.game_id] ||= []).push(p);
-  for (const g of visible) {
-    const gp = sortGamePlayers(byGame[g.id] || []);
-    list.appendChild(buildProfileCard(g, gp));
-  }
-  layoutGameCardMeta(list);
-  if (hasMore) appendLoadMore(list, pfLoadMore);
+  pfDisplayLimit  = _fillGamesList('pfGamesList', games.filter(g => played.has(g.id) && (!pfWinsOnly || won.has(g.id))), byGame, pfDisplayLimit, pfLoadMore);
+  pfRecordedLimit = _fillGamesList('pfRecordedList', games.filter(g => !played.has(g.id)), byGame, pfRecordedLimit, pfLoadMoreRecorded);
 
   if (_pfScrollToId) {
     const target = _pfScrollToId;
@@ -474,8 +566,29 @@ function _renderGamesList(keepIds = pfFilteredGameIds()) {
   }
 }
 
+// One list's cards, up to `limit`, then Load more (onMore); returns the
+// limit, grown to reach the game being returned to (_pfScrollToId).
+function _fillGamesList(id, games, byGame, limit, onMore) {
+  const list = document.getElementById(id);
+  if (!list) return limit;
+  if (_pfScrollToId) {
+    const idx = games.findIndex(g => g.id === _pfScrollToId);
+    if (idx >= limit) limit = Math.ceil((idx + 1) / PAGE_SIZE) * PAGE_SIZE;
+  }
+  const visible = games.slice(0, limit);
+  list.innerHTML = '';
+  for (const g of visible) list.appendChild(buildProfileCard(g, sortGamePlayers(byGame[g.id] || [])));
+  layoutGameCardMeta(list);
+  if (games.length > visible.length) appendLoadMore(list, onMore);
+  return limit;
+}
+
 function pfLoadMore() {
   pfDisplayLimit += PAGE_SIZE;
+  _renderGamesList();
+}
+function pfLoadMoreRecorded() {
+  pfRecordedLimit += PAGE_SIZE;
   _renderGamesList();
 }
 function buildProfileCard(g, gp) {

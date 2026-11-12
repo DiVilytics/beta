@@ -33,6 +33,7 @@
   <div class="nav-right">
     <div class="nav-links">
       <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
+      <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
       <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -85,11 +86,17 @@
     </div>
     <div class="sheet-body">
       <div class="err" id="editDetailsErr"></div>
-      <div class="field">
-        <label data-i18n>Location <span class="optional"></span></label>
-        <div class="ac-wrap">
-          <input type="text" id="editLocation" maxlength="60" placeholder="optional" autocomplete="off" data-i18n-attr="placeholder">
-          <div class="cs-dropdown" id="editLocationDropdown"></div>
+      <div class="form-row">
+        <div class="field">
+          <label><span data-i18n>Date &amp; time</span> <button class="label-link" id="editDateToggle" type="button" onclick="cycleEditDate()"></button></label>
+          <input type="datetime-local" id="editDate">
+        </div>
+        <div class="field">
+          <label data-i18n>Location <span class="optional"></span></label>
+          <div class="ac-wrap">
+            <input type="text" id="editLocation" maxlength="60" placeholder="optional" autocomplete="off" data-i18n-attr="placeholder">
+            <div class="cs-dropdown" id="editLocationDropdown"></div>
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -119,8 +126,9 @@
       <button class="sheet-close" onclick="closeLineup()">×</button>
     </div>
     <div class="sheet-body">
-      <p class="modal-hint" id="lineupHint" data-i18n>You can change the villains and the winner until another player claims a villain.</p>
+      <p class="modal-hint" id="lineupHint"></p>
       <div class="err" id="lineupErr"></div>
+      <div class="section-label"><span data-i18n>Villains and Players</span> <button class="label-link" id="lineupOrderToggle" type="button" onclick="toggleLineupOrder()"></button></div>
       <div id="lineupSlots"></div>
     </div>
     <div class="sheet-footer sheet-footer-row">

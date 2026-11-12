@@ -33,6 +33,7 @@
   <div class="nav-right">
     <div class="nav-links">
       <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
+      <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
       <a class="active" href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -80,6 +81,7 @@
       <p class="gl-filter-hint" id="glFilterHint" data-i18n>Shows games played <strong>only</strong> among the included villains (not necessarily all of them).</p>
       <div class="filter-actions">
         <button class="btn btn-ghost btn-sm gl-only" type="button" onclick="glExcludeAll()" data-i18n>Exclude all</button>
+        <button class="btn btn-ghost btn-sm gl-only" id="glIncludeAll" type="button" onclick="glIncludeAll()" disabled data-i18n>Include all</button>
         <button class="btn btn-ghost btn-sm owned-toggle gl-only" id="glMineBtn" type="button" onclick="glToggleMine()" data-i18n>My boxes</button>
         <button class="btn btn-ghost btn-sm" id="glResetBtn" type="button" onclick="glResetFilter()" disabled data-i18n>Reset</button>
       </div>

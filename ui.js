@@ -158,13 +158,87 @@ function fmtDateTime(iso) {
   );
 }
 
-// A game whose day is known but not its time (games.time_unknown: the beta's
-// No time and uploads, the date-only imports): its played_at is that day at
-// 00:00 UTC, so the date is shown alone and read in UTC (local time would move
-// it to the day before west of UTC). The source too, for a query that doesn't
-// fetch the column.
+// A game whose day is known but not its time (games.time_unknown: New Game's
+// Unknown time, an upload's YYYY-MM-DD, the date-only imports): its played_at is
+// that day at 00:00 UTC, so the date is shown alone and read in UTC (local
+// time would move it to the day before west of UTC). The source too, for a
+// query that doesn't fetch the column.
 const DATE_ONLY_SOURCES = new Set(['villainous-italia']);
 function isDateOnly(g) { return !!g && (g.time_unknown === true || DATE_ONLY_SOURCES.has(g.source)); }
+
+// ── A GAME'S DATE FIELD ──────────────────────────────────────────────────────
+// New Game's and Edit details' Date & time: one field, and a link beside its
+// label that steps through three: the date and time (the current ones to start)
+// → Unknown time (the day alone: the same field as a date) → Unknown date (empty) →
+// Today (the current date and time again). dateFieldValue reads it for saving.
+function _localDateTimeValue(d = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+// 'full' (date and time), 'day' (the day alone) or 'none'.
+function dateFieldMode(el) { return !el.value ? 'none' : el.type === 'date' ? 'day' : 'full'; }
+// The field set to a mode; value: its 'YYYY-MM-DDTHH:MM' (full) or 'YYYY-MM-DD' (day).
+// No date: the field empty and off (gray, not tappable), until a date is set.
+// Date fields show no calendar icon (style.css): a click on one opens the
+// system picker instead.
+document.addEventListener('click', e => {
+  const el = e.target;
+  if (!(el instanceof HTMLInputElement) || !['date', 'datetime-local'].includes(el.type) || el.disabled) return;
+  try { el.showPicker(); } catch (_) {}
+});
+
+function setDateField(el, mode, value = '') {
+  el.type  = mode === 'day' ? 'date' : 'datetime-local';
+  el.value = mode === 'none' ? '' : value;
+  el.disabled = mode === 'none';
+}
+function setDateFieldNow(el) { setDateField(el, 'full', _localDateTimeValue()); }
+// The link's next step, then its label (the step after that).
+function cycleDateField(el) {
+  const mode = dateFieldMode(el);
+  if (mode === 'full')     setDateField(el, 'day', el.value.slice(0, 10));
+  else if (mode === 'day') setDateField(el, 'none');
+  else                     setDateFieldNow(el);
+}
+function dateFieldLinkLabel(el) {
+  return { full: t('Unknown time'), day: t('Unknown date'), none: t('Set date') }[dateFieldMode(el)];   // Set date: today, now, to change
+}
+// New Game's switch: Set date ('full': the date and time), No time ('day':
+// the day alone) or No date ('none'). Switching keeps what it can: the day
+// (at the current time), or today when there was no date.
+function setDateFieldMode(el, mode) {
+  const cur = dateFieldMode(el), now = _localDateTimeValue();
+  if (mode === cur) return;
+  if (mode === 'none') setDateField(el, 'none');
+  else if (mode === 'day') setDateField(el, 'day', (el.value || now).slice(0, 10));
+  else setDateField(el, 'full', cur === 'day' ? `${el.value}T${now.slice(11)}` : now);
+}
+// A saved game's date into the field.
+function fillDateField(el, g) {
+  if (!g?.played_at) setDateField(el, 'none');
+  else if (isDateOnly(g)) setDateField(el, 'day', g.played_at.slice(0, 10));
+  else setDateField(el, 'full', _localDateTimeValue(new Date(g.played_at)));
+}
+// The browser's time zone (Europe/Rome), saved with a dated game
+// (games.time_zone) so Charts reads it at the local time where it was played;
+// null when the browser doesn't say.
+function browserTimeZone() {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (_) { return null; }
+}
+
+// What to save: { played_at, time_unknown, time_zone }, or { error } for a date
+// in the future. A day alone is that day at 00:00 UTC.
+function dateFieldValue(el) {
+  const mode = dateFieldMode(el);
+  if (mode === 'none') return { played_at: null, time_unknown: false, time_zone: null };
+  if (mode === 'day') {
+    if (el.value > _localDateTimeValue().slice(0, 10)) return { error: t('Date cannot be in the future.') };
+    return { played_at: `${el.value}T00:00:00.000Z`, time_unknown: true, time_zone: browserTimeZone() };
+  }
+  const d = new Date(el.value);
+  if (d > new Date()) return { error: t('Date cannot be in the future.') };
+  return { played_at: d.toISOString(), time_unknown: false, time_zone: browserTimeZone() };
+}
 
 // A game's date as cards show it: date and time, the date alone for sources
 // without times, or "Date unknown".
@@ -360,6 +434,7 @@ function _pageName(url) {
     case 'players.html':     return p.get('nick') || getCurrentProfile()?.nickname || t('Player');
     case 'claim.html':       return t('Game');
     case 'faq.html':         return 'F.A.Q.';
+    case 'tournaments.html': return p.get('t') ? t('Tournament') : p.has('new') ? null : t('Tournaments');
     default:                 return null;
   }
 }
@@ -599,6 +674,77 @@ function openConfirmSheet({ id, title, bodyHTML = '', confirmLabel = t('Confirm'
   };
 
   openOverlay(id);
+}
+
+// ── DRAG TO REORDER ───────────────────────────────────────────────────────────
+// Rows reordered by their ⠿ handle (.drag-handle): the grabbed row follows the
+// finger, the rows it passes slide out of its way, and on release it settles
+// into its slot before onDrop(from, to) reorders the caller's data and redraws
+// (same feel as dragging a sheet to close). New Game's play order, a
+// tournament table's ranking. canStart(): true to drag, false to ignore the
+// touch, 'block' to swallow it (rows busy).
+function attachRowDrag(container, { rowSelector, canStart = () => true, onDrop }) {
+  let src = null, rows = [], rects = [], si = 0, target = 0, startY = 0, gap = 4, dragH = 0;
+
+  const offsetTo = idx => {
+    let off = 0;
+    if (idx > si) for (let i = si + 1; i <= idx; i++) off += rects[i].height + gap;
+    if (idx < si) for (let i = idx; i < si; i++) off -= rects[i].height + gap;
+    return off;
+  };
+
+  container.addEventListener('pointerdown', e => {
+    const handle = e.target.closest('.drag-handle');
+    if (!handle || src) return;
+    const ok = canStart(e);
+    if (ok === false) return;
+    e.preventDefault();
+    if (ok === 'block') return;
+    src    = handle.closest(rowSelector);
+    rows   = [...container.querySelectorAll(rowSelector)];
+    rects  = rows.map(r => r.getBoundingClientRect());
+    si     = target = rows.indexOf(src);
+    gap    = rows.length > 1 ? rects[1].top - rects[0].bottom : 4;
+    dragH  = rects[si].height + gap;
+    startY = e.clientY;
+    rows.forEach(r => { r.style.transition = r === src ? 'none' : 'transform 0.18s ease'; });
+    src.classList.add('dragging');
+    document.body.style.touchAction = 'none';
+    try { container.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  container.addEventListener('pointermove', e => {
+    if (!src) return;
+    const minDy = rects[0].top - rects[si].top;
+    const maxDy = rects[rects.length - 1].bottom - rects[si].bottom;
+    const dy = Math.max(minDy, Math.min(maxDy, e.clientY - startY));
+    src.style.transform = `translateY(${dy}px)`;
+    const center = rects[si].top + rects[si].height / 2 + dy;
+    target = si;
+    for (let i = si + 1; i < rows.length; i++) if (center >= rects[i].top + rects[i].height / 2) target = i;
+    for (let i = si - 1; i >= 0; i--)          if (center <= rects[i].top + rects[i].height / 2) target = i;
+    rows.forEach((r, i) => {
+      if (r === src) return;
+      const shift = (i > si && i <= target) ? -dragH : (i < si && i >= target) ? dragH : 0;
+      r.style.transform = shift ? `translateY(${shift}px)` : '';
+    });
+  });
+
+  function end() {
+    if (!src) return;
+    const moved = src;
+    src = null;
+    document.body.style.touchAction = '';
+    moved.style.transition = 'transform 0.15s ease';
+    moved.style.transform  = `translateY(${offsetTo(target)}px)`;
+    setTimeout(() => {
+      rows.forEach(r => { r.style.transition = ''; r.style.transform = ''; });
+      moved.classList.remove('dragging');
+      onDrop(si, target);
+    }, 160);
+  }
+  container.addEventListener('pointerup',     end);
+  container.addEventListener('pointercancel', end);
 }
 
 // ── FILTER HELPERS ────────────────────────────────────────────────────────────

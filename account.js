@@ -5,6 +5,7 @@ let _acctNick       = null;
 let _acctFallback   = 'asset/players/default.svg';
 let _acctBoxInfo    = {};
 let _acctOwnedBoxes = new Set();
+let _acctOrganized  = 0;    // tournaments this user organized (their own export)
 let _acctIdentities = [];   // list of { provider, identity_id, email, last_sign_in_at, ... }
 
 // Providers we support, in display order. Keep in sync with sign-in.html.
@@ -20,11 +21,13 @@ async function init() {
   const user = getCurrentUser();
   if (!user) { location.href = 'index.html'; return; }
   // Achievements live on the player page (players.html), not here.
-  const [chars, boxInfo, ownedRes] = await Promise.all([
+  const [chars, boxInfo, ownedRes, organizedRes] = await Promise.all([
     loadCharacters(),
     loadBoxInfo(),
     db.from('profile_boxes').select('box').eq('user_id', user.id),
+    db.from('tournament_organizers').select('tournament_id', { count: 'exact', head: true }).eq('user_id', user.id),
   ]);
+  _acctOrganized = organizedRes.count || 0;
   _acctChars      = chars;
   _acctBoxInfo    = boxInfo;
   _acctOwnedBoxes = new Set((ownedRes.data || []).map(r => r.box));
@@ -116,8 +119,11 @@ function _renderPage() {
       <div id="identitiesList" class="acct-identities">${_renderIdentitiesHTML()}</div>
       <div class="acct-actions">
         <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
+        <button class="btn btn-ghost" onclick="openUploadGames()">${t('Upload games')}</button>
+        <button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()"${_acctOrganized ? '' : ` disabled title="${_esc(t("You haven't organized a tournament"))}"`}>${t('Download my tournaments')}</button>
         <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
+      <div id="myUploads"></div>
     </div>
 
     <div class="acct-section acct-danger">
@@ -127,6 +133,7 @@ function _renderPage() {
   `;
 
   _buildAvatarPicker();
+  renderMyUploads();   // games-csv.js
   avatarBuilder.configure({ getSavedAvatar: () => _acctAvatar, onPreview: _previewBuild });
   avatarBuilder.build('avatarPaneBuilder');
   _buildBoxPicker();
@@ -205,10 +212,6 @@ async function _toggleBox(box) {
 
 // CSV field escaping (RFC 4180): quote and double up internal quotes only
 // when the value contains a comma, quote or newline.
-function _csvField(v) {
-  const s = String(v ?? '');
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 // Sortable "YYYY-MM-DD HH:MM" in local time, deliberately not the locale-
 // formatted `fmtDateTime` (ui.js): a spreadsheet sorts/parses this correctly
@@ -218,6 +221,18 @@ function _csvDateTime(iso) {
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function _downloadCsv(rows, filename) {
+  const csv  = rows.map(r => r.map(csvField).join(',')).join('\r\n');
+  const url  = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 async function exportMyData() {
@@ -238,8 +253,7 @@ async function exportMyData() {
     const playersByGame = {};
     for (const p of players) (playersByGame[p.game_id] ||= []).push(p);
 
-    const header = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Difficulty'];
-    const rows = [header];
+    const rows = [GAMES_CSV_HEADER];   // the file Upload games reads back (games-csv.js)
     for (const g of games) {
       const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
       for (const p of sortGamePlayers(playersByGame[g.id] || [])) {
@@ -254,27 +268,75 @@ async function exportMyData() {
           p.position == null ? '' : p.position + 1,   // empty: play order not recorded
           p.is_winner ? 'yes' : 'no',
           g.variant === 'solo' ? 'yes' : 'no',
-          { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[g.solo_level] || '',   // a solo game's level (solo.js)
+          GAMES_CSV_LEVELS[g.solo_level] || '',   // a solo game's level (solo.js)
         ]);
       }
     }
-    const csv = rows.map(r => r.map(_csvField).join(',')).join('\r\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    const stamp = new Date().toISOString().slice(0, 10);
-    a.href     = url;
-    a.download = `DiVilytics-${_acctNick || user.id}-${stamp}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    _downloadCsv(rows, `DiVilytics-${_acctNick || user.id}-${new Date().toISOString().slice(0, 10)}.csv`);
 
     btn.textContent = t('Downloaded ✓');
     setTimeout(() => { btn.disabled = false; btn.textContent = t('Download my data'); }, 1500);
   } catch (e) {
     console.error('exportMyData failed:', e);
+    btn.disabled    = false;
+    btn.textContent = t('Download failed. Retry');
+  }
+}
+
+// The tournaments you organized, in a file of their own: one row per seat of
+// every table (a bye too), with its stage, table, standard game, place, drop,
+// the time and round it was placed at and its points (tournament-rules.js).
+async function exportMyTournaments() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const btn = document.getElementById('exportTournamentsBtn');
+  btn.disabled    = true;
+  try {
+    const { data: orgRows, error: orgError } = await db.from('tournament_organizers').select('tournament_id').eq('user_id', user.id);
+    if (orgError) throw orgError;
+    const { data: tours, error } = await db.from('tournaments').select('*').in('id', orgRows.map(r => r.tournament_id)).order('created_at');
+    if (error) throw error;
+    const ids = tours.map(x => x.id);
+    const [players, tables] = await Promise.all([
+      _fetchInChunks(ids, chunk => db.from('tournament_players').select('id, name, user_id').in('tournament_id', chunk)),
+      _fetchInChunks(ids, chunk => db.from('tournament_tables').select('*, tournament_seats(*)').in('tournament_id', chunk)),
+    ]);
+    const games = await fetchGamesByIds(tables.map(tb => tb.game_id).filter(Boolean));
+    const gameById = new Map(games.map(g => [g.id, g]));
+    const playerById = new Map(players.map(p => [p.id, p]));
+    const nickById = new Map();
+    const claimed = [...new Set(players.map(p => p.user_id).filter(Boolean))];
+    if (claimed.length) {
+      const { data } = await db.from('profiles').select('id, nickname').in('id', claimed);
+      for (const p of data || []) nickById.set(p.id, p.nickname);
+    }
+
+    const header = ['Tournament', 'Stage', 'Table', 'Game ID', 'Date', 'Duration (min)', 'Rounds', 'Player', 'Nickname', 'Villain', 'Seat', 'Place', 'Dropped', 'Bye', 'Placed at (min)', 'Placed in round', 'Points'];
+    const rows = [header];
+    for (const tour of tours) {
+      const mine = tables.filter(tb => tb.tournament_id === tour.id).sort((a, b) => a.stage - b.stage || a.table_no - b.table_no);
+      for (const tb of mine) {
+        const g = gameById.get(tb.game_id);
+        const seats = (tb.tournament_seats || []).slice().sort((a, b) => a.position - b.position);
+        for (const st of seats) {
+          const p = playerById.get(st.player_id);
+          rows.push([
+            tour.name, tb.stage, tb.table_no, g?.id || '', g ? _csvDateTime(g.played_at) : '',
+            g?.duration_minutes ?? '', g?.num_turns ?? '',
+            p?.name || '', p?.user_id ? nickById.get(p.user_id) || '' : '',
+            st.character, seats.length > 1 ? st.position + 1 : '',
+            st.place ?? '', st.dropped ? 'yes' : 'no', seats.length === 1 ? 'yes' : 'no',
+            st.minutes ?? '', st.round ?? '',
+            st.place != null ? tournamentSeatPoints(tour, seats.length, st) : '',
+          ]);
+        }
+      }
+    }
+    _downloadCsv(rows, `DiVilytics-tournaments-${_acctNick || user.id}-${new Date().toISOString().slice(0, 10)}.csv`);
+    btn.textContent = t('Downloaded ✓');
+    setTimeout(() => { btn.disabled = false; btn.textContent = t('Download my tournaments'); }, 1500);
+  } catch (e) {
+    console.error('exportMyTournaments failed:', e);
     btn.disabled    = false;
     btn.textContent = t('Download failed. Retry');
   }

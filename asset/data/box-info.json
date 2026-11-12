@@ -1,15 +1,15 @@
 {
-  "The Worst Takes It All": { "order": 1, "year": 2018, "slug": "the_worst_takes_it_all" },
-  "Wicked to the Core":     { "order": 2, "year": 2019, "slug": "wicked_to_the_core" },
-  "Evil Comes Prepared":    { "order": 3, "year": 2019, "slug": "evil_comes_prepared" },
-  "Perfectly Wretched":     { "order": 4, "year": 2020, "slug": "perfectly_wretched" },
-  "Despicable Plots":       { "order": 5, "year": 2021, "slug": "despicable_plots" },
-  "Bigger and Badder":      { "order": 6, "year": 2022, "slug": "bigger_and_badder" },
-  "Introduction to Evil":   { "order": 7, "year": 2023, "slug": "introduction_to_evil" },
-  "Filled with Fright":     { "order": 8, "year": 2023, "slug": "filled_with_fright" },
-  "Sugar and Spite":        { "order": 9, "year": 2024, "slug": "sugar_and_spite" },
-  "Treacherous Tides":      { "order": 10, "year": 2025, "slug": "treacherous_tides" },
-  "Success at Any Cost":    { "order": 11, "year": 2026, "slug": "success_at_any_cost" },
-  "Come, We Fly!":          { "order": 12, "year": 2026, "slug": "come_we_fly" },
-  "Darkness Brewing":       { "order": 13, "year": 2026, "slug": "darkness_brewing" }
+  "The Worst Takes It All": { "order": 1, "year": 2018, "slug": "the_worst_takes_it_all", "color": "#4c8a2e" },
+  "Wicked to the Core":     { "order": 2, "year": 2019, "slug": "wicked_to_the_core", "color": "#8a42bd" },
+  "Evil Comes Prepared":    { "order": 3, "year": 2019, "slug": "evil_comes_prepared", "color": "#965d2c" },
+  "Perfectly Wretched":     { "order": 4, "year": 2020, "slug": "perfectly_wretched", "color": "#cc2432" },
+  "Despicable Plots":       { "order": 5, "year": 2021, "slug": "despicable_plots", "color": "#dfaf20" },
+  "Bigger and Badder":      { "order": 6, "year": 2022, "slug": "bigger_and_badder", "color": "#e5682a" },
+  "Introduction to Evil":   { "order": 7, "year": 2023, "slug": "introduction_to_evil", "color": "#2babab" },
+  "Filled with Fright":     { "order": 8, "year": 2023, "slug": "filled_with_fright", "color": "#a1b234" },
+  "Sugar and Spite":        { "order": 9, "year": 2024, "slug": "sugar_and_spite", "color": "#cc3e89" },
+  "Treacherous Tides":      { "order": 10, "year": 2025, "slug": "treacherous_tides", "color": "#309acf" },
+  "Success at Any Cost":    { "order": 11, "year": 2026, "slug": "success_at_any_cost", "color": "#4d73cb" },
+  "Come, We Fly!":          { "order": 12, "year": 2026, "slug": "come_we_fly", "color": "#40bf4a" },
+  "Darkness Brewing":       { "order": 13, "year": 2026, "slug": "darkness_brewing", "color": "#4339ac" }
 }

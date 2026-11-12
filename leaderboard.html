@@ -9,7 +9,7 @@
   <script src="i18n/it.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- A math font for the formulas in the pop-ups (MathML, leaderboard.js). -->
+  <!-- A math font for the formulas in the pop-ups (MathML: leaderboard.js, stats-table.js). -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="/asset/favicon/favicon-96x96.png?v=20260603b" sizes="96x96" />
@@ -35,6 +35,7 @@
   <div class="nav-right">
     <div class="nav-links">
       <a href="new-game.html" title="New Game" data-i18n-attr="title">⚔️</a>
+      <a href="tournaments.html" title="Tournaments" data-i18n-attr="title">🏟️</a>
       <a href="game-log.html" title="Game Log" data-i18n-attr="title">🕒</a>
       <a class="active" href="leaderboard.html" title="Leaderboard" data-i18n-attr="title">🏆</a>
       <a href="villains.html" title="Villains" data-i18n-attr="title">🎭</a>
@@ -79,6 +80,18 @@
       <button class="sheet-close" onclick="closeOverlay('xpOverlay')">×</button>
     </div>
     <div class="sheet-body" id="xpBody"></div>
+  </div>
+</div>
+
+<!-- A villain's matchups (leaderboard.js openMatchups). -->
+<div class="overlay" id="muOverlay" onclick="if(event.target===this) closeOverlay('muOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="muTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('muOverlay')">×</button>
+    </div>
+    <div class="sheet-body" id="muBody"></div>
   </div>
 </div>
 

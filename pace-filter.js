@@ -156,6 +156,16 @@ function createPaceFilter({
     applyPaceSelection();
   }
 
+  // Include all: every villain in, whatever the pace or My boxes picked.
+  function includeAll() {
+    selectedPace = null;
+    mineOn = false;
+    excluded.clear();
+    syncExcludePills();
+    updatePaceUI();
+    onChange();
+  }
+
   function excludeAll() {
     selectedPace = null;
     mineOn = false;
@@ -214,6 +224,7 @@ function createPaceFilter({
     isDefault,
     resetToStart,
     excludeAll,
+    includeAll,
     reset,
     restoreState,
   };

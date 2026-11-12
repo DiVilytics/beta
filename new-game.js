@@ -31,11 +31,26 @@ let _roundsCounted  = false;
 // test by which stopLive fills in the duration and rounds). Its lineup changes
 // only after a yes (_confirmLineup). Kept with the game in progress.
 let _underway       = false;
+// The play order isn't known (Unknown order, above the rows in Past game): the
+// rows go unnumbered (–), Random order is off, and the game is saved without
+// one (position null), as the imported logs. Kept with the draft and the game
+// in progress. Not in Solo (one seat).
+let orderUnknown    = false;
+// Past game (the switch on top) or Play now. Play now is a game about to be
+// played: no date field (the start sets it), no duration and rounds (the timer
+// fills them; Edit details fixes them after), the order always known, and Save
+// only once it has started. Past game records an
+// earlier one: date (or the day alone, or none), duration and rounds typed in,
+// Unknown order, Save only; no timer and nothing to draw (no draw pool, no
+// 🎲, no Random order). Kept with the draft; a game in progress is Play now.
+let pastGame        = false;
 
 // Same order as the row buttons: row actions (draw, remove), then player marks
 // (you, winner), so 👑, the last tap of a game, sits at the edge away from ❌.
 const LEGEND_ITEMS      = [t('🎲 = draw'), t('❌ = remove'), t('👤 = you'), t('👑 = winner')];
 const SOLO_LEGEND_ITEMS = [t('🎲 = draw'), t('👑 = winner')];   // Solo: the row's two buttons
+// Past game: no 🎲 on the rows.
+const _legendItems = () => (soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS).filter(s => !(pastGame && s === LEGEND_ITEMS[0]));
 
 // The draw-pool character filter (excluded set + pace + My-boxes) lives in the
 // shared pace-filter controller; `pace.excluded` is the single source of truth.
@@ -77,10 +92,11 @@ async function init() {
   renderOrderSlots();
   _initLegend();   // before the network awaits too: until it runs, the legend wraps 3 + 1
   for (const id of ['fDate', 'fLocation', 'fDur', 'fTurns']) {
-    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); });
+    for (const ev of ['input', 'change', 'blur']) document.getElementById(id)?.addEventListener(ev, () => { _updateDiscardBtn(); _saveDraft(); _syncDateToggle(); });
   }
+  _syncDateToggle();
   _checkResume();   // a game in progress shows right away, not after an empty form
-  const lines = () => _initButtonLines(['#lineupBtns', '#footerDefault']);   // ui.js
+  const lines = () => _initButtonLines(['#lineupBtns', '#orderBtns', '#footerDefault']);   // ui.js
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', lines, { once: true });
   else lines();
 
@@ -144,7 +160,10 @@ function _saveDraft() {
       slots:     orderSlots.map(s => ({ char: s.char, isMe: s.isMe, isWinner: s.isWinner })),
       solo:      soloMode,
       soloLevel,
-      fDate:     val('fDate') !== _freshDate ? val('fDate') : '',
+      noOrder:   orderUnknown,
+      past:      pastGame,
+      fDate:     pastGame && val('fDate') !== _freshDate ? val('fDate') : '',
+      fDateMode: dateFieldMode(document.getElementById('fDate')),
       fLocation: val('fLocation'),
       fDur:      val('fDur'),
       fTurns:    val('fTurns'),
@@ -179,20 +198,93 @@ function _restoreDraftForm() {
   if (d.slots && (d.slots.length >= 2 || (d.solo && d.slots.length === 1))) {
     orderSlots = d.slots.map(s => ({ id: orderNextId++, char: s.char || '', isMe: !!s.isMe, isWinner: !!s.isWinner }));
     soloMode   = !!d.solo;
+    orderUnknown = !!d.noOrder;
+    // Drafts saved before the switch: a past game if its date, order,
+    // duration or rounds were set by hand.
+    pastGame   = d.past ?? !!(d.noOrder || d.fDate || (d.fDateMode && d.fDateMode !== 'full') || d.noDate || d.fDur || d.fTurns);
+    if (!pastGame) orderUnknown = false;
     soloLevel  = SOLO_LEVELS[d.soloLevel] ? d.soloLevel : SOLO_DEFAULT_LEVEL;
-    if (d.fDate) document.getElementById('fDate').value = d.fDate;
+    // The date as it was left, when it was changed: another date and time,
+    // the day alone, or none (drafts saved before the modes: noDate).
+    const mode = d.fDateMode || (d.noDate ? 'none' : 'full');
+    if (pastGame && (mode !== 'full' || d.fDate)) setDateField(document.getElementById('fDate'), mode, d.fDate);
     document.getElementById('fLocation').value = d.fLocation || '';
-    document.getElementById('fDur').value      = d.fDur      || '';
-    document.getElementById('fTurns').value    = d.fTurns    || '';
+    document.getElementById('fDur').value      = pastGame ? d.fDur   || '' : '';
+    document.getElementById('fTurns').value    = pastGame ? d.fTurns || '' : '';
   }
   return d;
 }
 
+// Play now | Past game. Not while a game is in progress (it's played now):
+// save it or discard it first. Back to Play now, what only a past game has
+// goes: the date, the duration and rounds, Unknown order.
+function setPastGame(on) {
+  if (on === pastGame || liveGame.hasSession) return;
+  pastGame = on;
+  _setDateToNow();
+  if (!on) {
+    orderUnknown = false;
+    document.getElementById('fDur').value   = '';
+    document.getElementById('fTurns').value = '';
+  } else {
+    _cancelShuffle();
+    if (document.getElementById('excludeBody')?.classList.contains('open')) toggleExclude();
+  }
+  clearError('err');
+  renderOrderSlots();
+  _layoutLegend();
+  _saveDraft();
+}
+
+// What Play now and Past game show (setPastGame): the switch, off while a game
+// is in progress; the date field and Unknown order (past only); the duration
+// and rounds (past only: a game played now takes the timer's); the draw pool,
+// the rows' 🎲 and Random order / Draw villains (now only); Start (now) and
+// Save (past, or once started).
+function _syncModeUI() {
+  const session = liveGame.hasSession;
+  for (const [id, on] of [['ngModePlay', !pastGame], ['ngModePast', pastGame]]) {
+    const b = document.getElementById(id);
+    if (!b) continue;
+    b.classList.toggle('on', on);
+    b.disabled = session && !on;
+    b.title    = session && !on ? t('A game is in progress: save it or discard it first.') : '';
+  }
+  setVisible('fDateRow', pastGame);
+  setVisible('durRoundsRow', pastGame);   // Play now: the timer's, fixed in Edit details
+  setVisible('orderBtns', pastGame && !soloMode);
+  setVisible('excludeToggle', !pastGame);
+  setVisible('lineupBtns', !pastGame && !soloMode);
+  setVisible('startBtn', !pastGame);
+  setVisible('submitBtn', pastGame || session);
+}
+
+// Unknown order | In order (orderUnknown): the rows lose or get back their numbers.
+function toggleOrderUnknown() {
+  orderUnknown = !orderUnknown;
+  renderOrderSlots();
+  _saveLiveState();
+  _saveDraft();
+}
+
 function _setDateToNow() {
-  const now = new Date();
-  now.setSeconds(0, 0);
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  document.getElementById('fDate').value = now.toISOString().slice(0, 16);
+  setDateFieldNow(document.getElementById('fDate'));   // ui.js
+  _syncDateToggle();
+}
+
+// The date is optional (a game remembered later): it starts at the current
+// date and time, and the switch beside it picks Set date (the date and time),
+// No time (the day alone) or No date (the field off) (A GAME'S DATE FIELD, ui.js). A game
+// started live takes the start's.
+function setDateMode(mode) {
+  setDateFieldMode(document.getElementById('fDate'), mode);
+  _syncDateToggle();
+  _updateDiscardBtn();
+  _saveDraft();
+}
+function _syncDateToggle() {
+  const mode = dateFieldMode(document.getElementById('fDate'));
+  for (const b of document.querySelectorAll('#fDateBtns .seg-btn')) b.classList.toggle('on', b.dataset.mode === mode);
 }
 
 // ── EXCLUDE CONTROLS ─────────────────────────────────────────────────────────
@@ -217,11 +309,14 @@ function updateExcludeUI() {
 // Bulk pool controls (wired to the filter toolbar) delegate to the shared
 // pace-filter controller.
 function excludeAll()    { pace.excludeAll(); }
+function includeAll()    { pace.includeAll(); }
 function resetPool()     { pace.resetToStart(); }   // back to your boxes (or everyone)
 // Reset is off while the pool is already where it started.
 function _syncResetBtn() {
   const btn = document.getElementById('resetPoolBtn');
   if (btn) btn.disabled = pace.isDefault();
+  const all = document.getElementById('includeAllBtn');   // off with every villain in already
+  if (all) all.disabled = !pace.excluded.size;
 }
 
 function applyExclude() {
@@ -251,7 +346,7 @@ let _legendResizeId = null;
 
 function _layoutLegend() {
   const host = document.getElementById('playersLegend');
-  if (host) layoutSeparatedRows(host, soloMode ? SOLO_LEGEND_ITEMS : LEGEND_ITEMS);   // hidden (live game): keeps the current markup
+  if (host) layoutSeparatedRows(host, _legendItems());   // hidden (live game): keeps the current markup
 }
 
 // Lays out the legend now, again once the web font is in (a first pass may
@@ -350,8 +445,9 @@ function _syncSoloUI() {
   const hint = document.getElementById('soloHintNg');
   if (hint) { hint.innerHTML = soloMode ? soloHintHTML() : ''; setVisible('soloHintNg', soloMode); }
   setVisible('shuffleOrderBtn', !soloMode);
+  setVisible('orderBtns', pastGame && !soloMode);
   setVisible('drawAllBtn', !soloMode);
-  setVisible('lineupBtns', !soloMode);   // its half of the row goes to the level picker
+  setVisible('lineupBtns', !pastGame && !soloMode);   // in Solo its half of the row goes to the level picker
   setVisible('liveHint', !soloMode);
   setVisible('liveHintSolo', soloMode);
   document.getElementById('playerCountSel')?.classList.toggle('solo', soloMode);
@@ -634,7 +730,7 @@ function renderOrderSlots() {
     return `
       <div class="order-slot" data-id="${s.id}">
         <div class="drag-handle">
-          <span class="drag-dots">⠿</span><span class="row-num">${i + 1}.</span>
+          <span class="drag-dots">⠿</span><span class="row-num">${orderUnknown ? '–' : `${i + 1}.`}</span>
           <img class="order-slot-portrait" src="${src}" onerror="this.src='asset/players/default.svg'" alt="">
         </div>
         <div class="order-slot-info">
@@ -645,7 +741,7 @@ function renderOrderSlots() {
           <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
         </div>
         <div class="order-slot-actions">
-          <button class="pf-btn rand" onclick="tapDrawSlot(${s.id})" title="${t('Draw')}">🎲</button>
+          ${pastGame ? '' : `<button class="pf-btn rand" onclick="tapDrawSlot(${s.id})" title="${t('Draw')}">🎲</button>`}
           ${soloMode ? '' : `
           <button class="pf-btn del" onclick="removeOrderSlot(${s.id})" ${orderSlots.length > 2 ? `title="${t('Remove')}"` : `title="${t('A game needs at least 2 players')}" disabled`}>❌</button>
           <button class="pf-btn me${s.isMe ? ' on' : ''}${isAuthed ? '' : ' locked'}" onclick="toggleMe(${s.id})" ${s.char ? `title="${meTitle}"` : `title="${t('Pick a villain first')}" disabled`}>👤</button>`}
@@ -695,9 +791,11 @@ function _updateActionBtns() {
     btn.title    = can ? t('Draw') : t('No villains left in the draw pool');
   }
   if (shuffleBtn) {
-    shuffleBtn.disabled = animating || filled < 2;
-    shuffleBtn.title    = filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
+    shuffleBtn.disabled = animating || filled < 2 || orderUnknown;
+    shuffleBtn.title    = orderUnknown ? t('The play order is unknown') : filled < 2 && !animating ? t('Pick at least 2 villains first') : t('Random order');
   }
+  const orderBtn = document.getElementById('orderToggle');
+  if (orderBtn) _setBtnLabel(orderBtn, orderUnknown ? t('In order') : t('Unknown order'));
   // Start lights up once the lineup is complete, every player has a different
   // character and "me" is marked. Save additionally needs the winner marked.
   // Until then they gray out (with the reason as a tooltip). Date/sign-in are
@@ -712,80 +810,19 @@ function _updateActionBtns() {
 
 // ── DRAG TO REORDER ───────────────────────────────────────────────────────────
 
-let _dragSrc = null;
-
-// Reorder rows by their ⠿ handle: the grabbed row follows the finger, the rows
-// it passes slide out of its way, and on release it settles into its slot
-// before the new order is saved (same feel as dragging a sheet to close).
+// Reorder rows by their ⠿ handle (attachRowDrag, ui.js). Solo has one row, and
+// a draw or a shuffle in progress writes into the rows itself and sets the
+// order when it settles, which would undo the drag.
 function _initDrag() {
-  const container = document.getElementById('orderSlots');
-  let rows = [], rects = [], si = 0, target = 0, startY = 0, gap = 4, dragH = 0;
-
-  const offsetTo = idx => {
-    let off = 0;
-    if (idx > si) for (let i = si + 1; i <= idx; i++) off += rects[i].height + gap;
-    if (idx < si) for (let i = idx; i < si; i++) off -= rects[i].height + gap;
-    return off;
-  };
-
-  container.addEventListener('pointerdown', e => {
-    const handle = e.target.closest('.drag-handle');
-    if (!handle || _dragSrc || soloMode) return;   // Solo: one row, nothing to reorder
-    // Not mid-draw or mid-shuffle: those animations write into the rows and set
-    // the order themselves when they settle, which would undo the drag.
-    if (_shuffleTimer || Object.keys(slotTimers).length) { e.preventDefault(); return; }
-    e.preventDefault();
-    _dragSrc = handle.closest('.order-slot');
-    rows   = [...container.querySelectorAll('.order-slot')];
-    rects  = rows.map(r => r.getBoundingClientRect());
-    si     = target = rows.indexOf(_dragSrc);
-    gap    = rows.length > 1 ? rects[1].top - rects[0].bottom : 4;
-    dragH  = rects[si].height + gap;
-    startY = e.clientY;
-    rows.forEach(r => { r.style.transition = r === _dragSrc ? 'none' : 'transform 0.18s ease'; });
-    _dragSrc.classList.add('dragging');
-    document.body.style.touchAction = 'none';
-    try { container.setPointerCapture(e.pointerId); } catch (_) {}
-  });
-
-  container.addEventListener('pointermove', e => {
-    if (!_dragSrc) return;
-    const minDy = rects[0].top - rects[si].top;
-    const maxDy = rects[rects.length - 1].bottom - rects[si].bottom;
-    const dy = Math.max(minDy, Math.min(maxDy, e.clientY - startY));
-    _dragSrc.style.transform = `translateY(${dy}px)`;
-    const center = rects[si].top + rects[si].height / 2 + dy;
-    target = si;
-    for (let i = si + 1; i < rows.length; i++) if (center >= rects[i].top + rects[i].height / 2) target = i;
-    for (let i = si - 1; i >= 0; i--)          if (center <= rects[i].top + rects[i].height / 2) target = i;
-    rows.forEach((r, i) => {
-      if (r === _dragSrc) return;
-      const shift = (i > si && i <= target) ? -dragH : (i < si && i >= target) ? dragH : 0;
-      r.style.transform = shift ? `translateY(${shift}px)` : '';
-    });
-  });
-
-  function _endDrag() {
-    if (!_dragSrc) return;
-    const src = _dragSrc;
-    _dragSrc = null;
-    document.body.style.touchAction = '';
-    src.style.transition = 'transform 0.15s ease';
-    src.style.transform  = `translateY(${offsetTo(target)}px)`;
-    setTimeout(() => {
-      rows.forEach(r => { r.style.transition = ''; r.style.transform = ''; });
-      src.classList.remove('dragging');
-      if (target !== si) {
-        const moved = orderSlots.splice(si, 1)[0];
-        orderSlots.splice(target, 0, moved);
-      }
+  attachRowDrag(document.getElementById('orderSlots'), {
+    rowSelector: '.order-slot',
+    canStart: () => soloMode ? false : (_shuffleTimer || Object.keys(slotTimers).length) ? 'block' : true,
+    onDrop: (from, to) => {
+      if (to !== from) orderSlots.splice(to, 0, orderSlots.splice(from, 1)[0]);
       renderOrderSlots();
       _saveLiveState();
-    }, 160);
-  }
-
-  container.addEventListener('pointerup',     _endDrag);
-  container.addEventListener('pointercancel', _endDrag);
+    },
+  });
 }
 
 // ── LIVE GAME ─────────────────────────────────────────────────────────────────
@@ -981,12 +1018,13 @@ function _validateLineup() {
   if (orderSlots.some(s => !s.char)) return t('Choose a villain for each player.');
   const names = orderSlots.map(s => s.char);
   if (new Set(names).size !== names.length) return t('Each player must use a different villain.');
-  if (!orderSlots.some(s => s.isMe)) return t('Mark your villain with 👤.');
+  // 👤 is optional: a game you recorded for others is still yours (your page lists it).
   return null;
 }
 
 function startLive() {
   clearError('err');
+  if (pastGame) return;
   const err = _validateLineup();
   if (err) return showErr(err);
 
@@ -1050,8 +1088,10 @@ function _saveLiveState() {
     soloLevel,
     soloRolls: _soloRolls,
     roundsCounted: _roundsCounted,
+    noOrder:   orderUnknown,
     underway:  _underway,
     fDate:     document.getElementById('fDate')?.value     || '',
+    fDateMode: dateFieldMode(document.getElementById('fDate')),
     fLocation: document.getElementById('fLocation')?.value || '',
     fDur:      document.getElementById('fDur')?.value      || '',
     fTurns:    document.getElementById('fTurns')?.value    || '',
@@ -1080,14 +1120,16 @@ function _isFormChanged() {
   const val = id => document.getElementById(id)?.value || '';
   return orderSlots.length !== 2
       || orderSlots.some(s => s.char || s.isMe || s.isWinner)
-      || val('fDate') !== _freshDate
+      || pastGame   // its date, duration and rounds are its own
       || !!(val('fLocation') || val('fDur') || val('fTurns'))
+      || orderUnknown
       || !pace.isDefault();
 }
 
 // Discard is always there; it's enabled as soon as anything changed, or while a
 // game session exists.
 function _updateDiscardBtn() {
+  _syncModeUI();           // the session may have just started or ended
   _balanceButtonLines();   // a footer label may just have changed (Start ↔ Resume)
   const btn = document.getElementById('discardBtn');
   if (btn) btn.disabled = !(liveGame.hasSession || _isFormChanged());
@@ -1130,6 +1172,8 @@ function _doDiscard() {
   soloLevel  = SOLO_DEFAULT_LEVEL;
   _soloRolls = {};
   _roundsCounted = false;
+  orderUnknown   = false;
+  pastGame       = false;
   setVisible('liveEndNote', false);
   addOrderSlot();
   addOrderSlot();
@@ -1155,11 +1199,26 @@ function _checkResume() {
     if (localStorage.getItem(liveGame.KEY)) liveGame.clear();
     return;
   }
+  // A tournament table's game (tournaments.js): it lives on its tournament's
+  // page; New Game only points there, its own form left alone.
+  if (state.tournament) {
+    const g = state.tournament;
+    const card = document.createElement('div');
+    card.innerHTML = emptyStateHTML('🏟️', t('A tournament game is in progress'),
+      t('{name}, table {n}: save it or discard it on its tournament page before starting another game.', { name: _esc(g.tourName), n: g.tableNo }),
+      `<a class="btn btn-primary btn-sm" href="tournament-game.html?table=${g.tableId}">${t('Open it')}</a>`);
+    document.getElementById('formContent').before(card);
+    setVisible('formContent', false);
+    setVisible('footerDefault', false);
+    return;
+  }
   liveGame.restoreFrom(state);
+  pastGame = false;
   document.getElementById('startBtn').textContent = t('Resume game');   // stays purple (btn-primary)
   clearError('err');
 
-  document.getElementById('fDate').value     = state.fDate     || '';
+  setDateField(document.getElementById('fDate'), state.fDateMode || (state.fDate ? 'full' : 'none'), state.fDate || '');
+  _syncDateToggle();
   document.getElementById('fLocation').value = state.fLocation || '';
   document.getElementById('fDur').value      = state.fDur      || '';
   document.getElementById('fTurns').value    = state.fTurns    || '';
@@ -1175,6 +1234,7 @@ function _checkResume() {
   _soloRolls = state.soloRolls || {};
   // Games saved before the flag: the counter was used if it moved past 1.
   _roundsCounted = state.roundsCounted ?? (state.liveTurns > 1 || !!state.fTurns);
+  orderUnknown   = !!state.noOrder;
   // Games saved before the flag: paused with a minute or more, or past round 1.
   _underway = state.underway ?? (state.fDurExactMs >= 60000 || state.liveTurns > 1);
   renderOrderSlots();
@@ -1201,14 +1261,14 @@ function _checkResume() {
 async function submitForm() {
   clearError('err');
 
-  const date     = document.getElementById('fDate').value;
+  const date     = dateFieldValue(document.getElementById('fDate'));   // ui.js
   const dur      = parseInt(document.getElementById('fDur').value)   || null;
   const turns    = parseInt(document.getElementById('fTurns').value) || null;
   const place    = document.getElementById('fLocation').value.trim() || null;   // not `location`: that would hide window.location
   const btn      = document.getElementById('submitBtn');
 
-  if (!date) return showErr(t('Date and time is required.'));
-  if (new Date(date) > new Date()) return showErr(t('Date cannot be in the future.'));
+  if (date.error) return showErr(date.error);
+  if (!pastGame && !liveGame.hasSession) return showErr(t('Start the game first, or pick Past game.'));
 
   const user    = getCurrentUser();
   const profile = getCurrentProfile();
@@ -1225,7 +1285,7 @@ async function submitForm() {
   const ps = soloMode
     ? [{ position: 0, character: orderSlots[0].char, is_winner: orderSlots[0].isWinner, user_id: user.id, nickname: profile.nickname }]
     : orderSlots.map((s, i) => ({
-        position:  i,
+        position:  orderUnknown ? null : i,
         character: s.char,
         is_winner: s.isWinner,
         user_id:   s.isMe ? user.id          : null,
@@ -1235,7 +1295,9 @@ async function submitForm() {
   btn.disabled    = true;
 
   const gameData = {
-    played_at:        new Date(date).toISOString(),
+    played_at:        date.played_at,      // null: undated, as the imports
+    time_unknown:     date.time_unknown,   // the day alone
+    time_zone:        date.time_zone,      // where it's played (Charts)
     duration_minutes: dur,
     num_turns:        turns,
     location:         place,

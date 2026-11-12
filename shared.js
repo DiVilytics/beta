@@ -94,17 +94,18 @@ function setActiveNav(filename) {
   updateLiveGameNavBadge();
 }
 
-// Reads the saved live game from localStorage and tags the New Game nav link
+// Reads the saved live game from localStorage and tags its nav link (New Game's)
 // with `.has-live-game` (red, pulsing) or `.has-paused-game` (gold) so users
 // see at a glance that a game is open. Safe to call repeatedly.
+// A tournament table's game (tournaments.js) puts the dot on 🏟️ instead.
 function updateLiveGameNavBadge() {
-  const link = document.querySelector('.nav-links a[href="new-game.html"]');
-  if (!link) return;
-  link.classList.remove('has-live-game', 'has-paused-game');
+  const links = document.querySelectorAll('.nav-links a[href$="new-game.html"], .nav-links a[href$="tournaments.html"]');
+  links.forEach(a => a.classList.remove('has-live-game', 'has-paused-game'));
 
   const state = liveGame.loadSaved();
   if (!state) return;
-  link.classList.add(state.liveStart ? 'has-live-game' : 'has-paused-game');
+  const page = state.tournament ? 'tournaments.html' : 'new-game.html';
+  document.querySelector(`.nav-links a[href$="${page}"]`)?.classList.add(state.liveStart ? 'has-live-game' : 'has-paused-game');
 }
 
 // Cross-tab sync: another tab may have started/stopped a game.
@@ -249,9 +250,11 @@ function _updateAuthUI() {
   const el = document.getElementById('navAuth');
   if (!el) return;
 
-  const themeBtn = `<button class="nav-icon-btn" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${t('Settings')}" aria-haspopup="true" aria-expanded="false">⚙️</button>`;
+  // The avatar opens the settings panel, the account on top (SETTINGS PANEL).
+  const menuBtn = (cls, title, inner) =>
+    `<button class="${cls}" id="settingsBtn" type="button" onclick="toggleSettings(event)" title="${title}" aria-haspopup="true" aria-expanded="false">${inner}</button>`;
   const avatarLink = src =>
-    `${themeBtn}<a class="nav-avatar-link active" href="account.html" title="${_withShortcut(t('Account'), 'a')}" aria-keyshortcuts="A">${avatarHTML(src, { cls: 'nav-avatar' })}</a>`;
+    menuBtn('nav-avatar-btn nav-avatar-link active', t('Account and settings'), avatarHTML(src, { cls: 'nav-avatar' }));
 
   // Before the session check resolves, fall back to the cached avatar (if any) so
   // a returning user sees their icon immediately rather than a guest flash.
@@ -265,17 +268,35 @@ function _updateAuthUI() {
     el.innerHTML = avatarLink(cached);
   } else {
     if (_authResolved) _setCachedNavAvatar(null);   // confirmed signed out, drop the cache
-    el.innerHTML = `${themeBtn}<button class="nav-avatar-btn" onclick="goToSignIn()" title="${_withShortcut(t('Sign in'), 'a')}" aria-keyshortcuts="A"><img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""></button>`;
+    el.innerHTML = menuBtn('nav-avatar-btn', t('Sign in and settings'), '<img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">');
   }
+  _renderSettingsAccount();
   _updateThemeBtn();
   _updateThemeIcons();
 }
 
 // ── SETTINGS PANEL ───────────────────────────────────────────────────────────
-// The ⚙️ in the nav opens a small panel with the theme (Auto / Light / Dark,
-// theme.js) and the language (EN / IT, lang.js; switching reloads the page).
-// It lives in the nav itself (not in #navAuth, which is repainted on sign-in),
-// and closes after a choice, on a tap outside it, or on Escape (KEYBOARD).
+// The avatar in the nav opens a small panel: the account on top (your avatar
+// and nickname, to the account page; Sign in for a guest), then the theme
+// (Auto / Light / Dark, theme.js), the text size and the language (EN / IT,
+// lang.js; switching reloads the page). It lives in the nav itself (not in
+// #navAuth, which is repainted on sign-in), and closes after a choice, on a tap
+// outside it, or on Escape (KEYBOARD).
+function _settingsAccountHTML() {
+  const cached = (!_currentUser && !_authResolved) ? _cachedNavAvatar() : null;
+  if (!_currentUser && !cached) {
+    return `<button class="settings-account" type="button" onclick="goToSignIn()"><img class="settings-avatar nav-avatar-guest" src="asset/players/default.svg" alt=""><span class="settings-nick">${t('Sign in')}</span><span class="settings-go">›</span></button>`;
+  }
+  const src  = _currentUser ? resolveAvatar(_currentProfile) : cached;
+  const nick = _currentProfile?.nickname;
+  return `<a class="settings-account" href="account.html">${avatarHTML(src, { cls: 'settings-avatar' })}<span class="settings-nick">${nick ? _esc(nick) : t('Account')}</span><span class="settings-go">›</span></a>`;
+}
+
+function _renderSettingsAccount() {
+  const row = document.getElementById('settingsAccount');
+  if (row) row.innerHTML = _settingsAccountHTML();
+}
+
 function _settingsPanel() {
   let panel = document.getElementById('settingsPanel');
   if (panel) return panel;
@@ -289,6 +310,10 @@ function _settingsPanel() {
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', t('Settings'));
   panel.innerHTML = `
+    <div class="settings-row">
+      <span class="settings-lbl">${t('Account')}</span>
+      <div id="settingsAccount">${_settingsAccountHTML()}</div>
+    </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Theme')}</span>
       <div class="seg">${btn('data-theme-opt', 'auto', `<span class="settings-ico">🌗</span>${t('Auto')}`)}${btn('data-theme-opt', 'light', `<span class="settings-ico">☀️</span>${t('Light')}`)}${btn('data-theme-opt', 'dark', `<span class="settings-ico">🌙</span>${t('Dark')}`)}</div>
@@ -369,19 +394,25 @@ _updateAuthUI();
 // new-game-audio.js) aren't characters, so they never match. The match is on
 // the character typed, so it follows the keyboard layout.
 
+// In the help list: Home, Tutorial and F.A.Q. on top, then (after a gap) the
+// pages in the nav's order; Account is listed with the settings, as in the
+// avatar menu.
 const _KBD_PAGES = [
+  ['h', 'index.html',       'Home'],
+  ['!', 'tutorial.html',    'Tutorial'],
+  ['f', 'faq.html',         'F.A.Q.', { gapAfter: true }],
   ['n', 'new-game.html',    'New Game'],
+  ['t', 'tournaments.html', 'Tournaments'],
   ['g', 'game-log.html',    'Game Log'],
   ['l', 'leaderboard.html', 'Leaderboard'],
   ['v', 'villains.html',    'Villains'],
   ['p', 'players.html',     'Players'],
   ['c', 'charts.html',      'Charts'],
-  ['a', 'account.html',     'Account'],
-  ['h', 'index.html',       'Home'],
-  ['t', 'tutorial.html',    'Tutorial'],
-  ['f', 'faq.html',         'F.A.Q.'],
+  ['a', 'account.html',     'Account', { inSettings: true }],
 ];
 // In the order of the settings panel: theme, text size, language.
+// The help list leaves a gap between theme, text size and language.
+const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : '-0='.includes(k) ? 'text' : 'lang';
 const _KBD_SETTINGS = [
   ['[',  'Light theme', () => setTheme('light')],
   [']',  'Dark theme',  () => setTheme('dark')],
@@ -431,7 +462,7 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
   let el = document.getElementById('kbdHelp');
   if (!open) { el?.classList.remove('open'); return; }
   if (!el) {
-    const row = (key, label) => `<div class="kbd-help-row"><kbd>${_esc(key)}</kbd><span>${_esc(label)}</span></div>`;
+    const row = (key, label, gap) => `<div class="kbd-help-row${gap ? ' gap-after' : ''}"><kbd>${_esc(key)}</kbd><span>${_esc(label)}</span></div>`;
     const group = (title, rows, note = '') =>
       `<section class="kbd-help-group"><div class="kbd-help-lbl">${_esc(title)}</div>${rows.map(r => row(...r)).join('')}${note ? `<p class="kbd-help-note">${_esc(note)}</p>` : ''}</section>`;
     el = document.createElement('div');
@@ -445,11 +476,15 @@ function _toggleKbdHelp(open = !_kbdHelpOpen()) {
         <div class="kbd-help-ico">⌨️</div>
         <div class="kbd-help-title">${_esc(t('Keyboard shortcuts'))}</div>
         <div class="kbd-help-groups">
-          ${group(t('Pages'), _KBD_PAGES.map(([k, , label]) => [k.toUpperCase(), t(label)]))}
-          ${group(t('Settings'), _KBD_SETTINGS.map(([k, label]) => [k.toUpperCase(), t(label)]))}
-          ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
+          <div class="kbd-help-col">
+          ${group(t('Pages'), _KBD_PAGES.filter(p => !p[3]?.inSettings).map(([k, , label, o]) => [k.toUpperCase(), t(label), o?.gapAfter]))}
           ${group(t('During a game'), [['⏯︎', t('Pause or resume the timer')], ['⏮︎', t('Previous round')], ['⏭︎', t('Next round')]],
                   t('Media keys, headphones and Bluetooth clickers, on New Game.'))}
+          </div>
+          <div class="kbd-help-col">
+          ${group(t('Settings'), [..._KBD_PAGES.filter(p => p[3]?.inSettings).map(([k, , label]) => [k.toUpperCase(), t(label), true]), ..._KBD_SETTINGS.map(([k, label], i, all) => [k.toUpperCase(), t(label), i + 1 < all.length && _kbdSettingGroup(k) !== _kbdSettingGroup(all[i + 1][0])])])}
+          ${group(t('Other'), [['/', t('Search box')], ['?', t('This list')], ['Esc', t('Close pop-up, or leave text field')]])}
+          </div>
         </div>
         <p class="kbd-help-text">${_esc(t('Click anywhere or press Esc to close.'))}</p>
       </div>`;

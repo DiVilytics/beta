@@ -2,46 +2,36 @@
 // A hub of visualizations: a menu picks a chart, rendered into the card below
 // via the hand-rolled SVG helpers in chart-lib.js. Every chart reads the same
 // games, fetched once: the official games with their seats. The table size
-// (size-filter.js, without Solo) and the period (period-filter.js) filter them
-// here, as on the Leaderboard; a chart whose view is by table size already
-// (sizes: false) grays the size filter out. A chart with `modes` gets a switch
+// (size-filter.js) and the period (period-filter.js) filter them here, as on
+// the Leaderboard; a chart whose view is by table size already (sizes: false)
+// grays the size filter out. Solo (and its Difficulty) shows the solo games
+// instead, in the charts that read them (solo: true: the villains' and the
+// groups' win rates and picks, without Δ Wins, and when, how long and how many
+// games are played); the others (Matchups, no opponents) say they're about
+// official games. A chart with `modes` gets a switch
 // above it (Minutes | Rounds, ...), each mode remembered.
 
-const size   = createSizeFilter('chartSize', { onChange: () => _rerender(), solo: false });
+const size   = createSizeFilter('chartSize', { onChange: () => _rerender() });
 const period = createPeriodFilter('chartPeriod', { onChange: () => _rerender() });
 
 // ── THE GAMES (one fetch, filtered per view) ───────────────────────────────────
 
-// Every official game with its seats, { id, played_at, at (ms, null when
-// undated), duration_minutes, num_turns, source, seats: [{ character, user_id,
-// position, is_winner }] }. Fetched in parallel pages (past PostgREST's
-// 1000-row cap), once per visit; a failed load is retried next time.
-let _allGames = null;
-function _loadGames() {
-  return _allGames ||= (async () => {
-    const sel = 'id, played_at, time_unknown, duration_minutes, num_turns, source, game_players(character, user_id, position, is_winner)';
-    const { count, error } = await db.from('games').select('id', { count: 'exact', head: true }).is('variant', null);
-    if (error) throw error;
-    const PAGE = 1000;
-    const pages = await Promise.all(Array.from({ length: Math.ceil((count || 0) / PAGE) + 1 }, (_, i) =>
-      db.from('games').select(sel).is('variant', null).order('id').range(i * PAGE, i * PAGE + PAGE - 1)));
-    const failed = pages.find(r => r.error);
-    if (failed) throw failed.error;
-    return pages.flatMap(r => r.data || []).map(({ game_players, ...g }) => ({
-      ...g, seats: game_players || [], at: g.played_at ? Date.parse(g.played_at) : null,
-    }));
-  })().catch(e => { _allGames = null; throw e; });
+// Every official game with its seats (loadOfficialGames, db.js), those of the
+// period picked, and of the table size picked unless the chart is by table
+// size itself.
+function _filterGames(all, { sized = true } = {}) {
+  return gamesIn(all, period.range(), sized ? size.value() : 'all');
 }
 
-// The games of the period picked, and of the table size picked unless the
-// chart is by table size itself.
-function _filterGames(all, { sized = true } = {}) {
-  const { from_ts, to_ts } = period.range();
-  const from = from_ts && Date.parse(from_ts), to = to_ts && Date.parse(to_ts);
-  const n = sized ? size.value() : 'all';
-  return all.filter(g =>
-    (!from || (g.at != null && g.at >= from && g.at < to)) &&
-    (n === 'all' || g.seats.length === n));
+// On Solo: the solo games of the period and level picked, in the official
+// games' shape (loadOfficialGames, db.js); null if they couldn't load.
+async function _soloChartGames() {
+  const solo = await loadSoloGames();
+  if (!solo) return null;
+  const { games, players } = soloOfLevel(soloInPeriod(solo, period.range()), size.level());
+  const seatsOf = {};
+  for (const p of players) (seatsOf[p.game_id] ||= []).push(p);
+  return games.map(g => ({ ...g, seats: seatsOf[g.id] || [], at: g.played_at ? Date.parse(g.played_at) : null }));
 }
 
 // A game's [year, month (1-12), day] as it was played: in local time, or the
@@ -51,17 +41,28 @@ function _gameDay(g) {
   return isDateOnly(g) ? [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()] : [d.getFullYear(), d.getMonth() + 1, d.getDate()];
 }
 
-// Each villain's games and wins in `games`, with its pace and box.
+// Each villain's games and wins in `games`, with its pace and box, and the
+// wins equal chances would give with their variance (exp, vari: Δ Wins,
+// chanceDelta in stats-table.js).
 function _villainStats(games, chars) {
   const by = {};
   for (const g of games) for (const s of g.seats) {
-    const r = by[s.character] ||= { games: 0, wins: 0 };
+    const r = by[s.character] ||= { games: 0, wins: 0, exp: 0, vari: 0 };
+    const k = g.seats.length;
     r.games++;
     if (s.is_winner) r.wins++;
+    r.exp  += 1 / k;
+    r.vari += 1 / k * (1 - 1 / k);
   }
   return chars.filter(c => by[c.name]).map(c => ({ name: c.name, pace: c.pace || null, box: c.box || null, ...by[c.name] }));
 }
 
+// Δ Wins first, as on the villains' Leaderboard; then the win rate.
+const _CHANCE_PCT = [{ id: 'chance', label: 'Δ Wins' }, { id: 'pct', label: '% Wins' }];
+// Δ axis labels: whole steps as they are (+2, -1.5), the 0 plain.
+const _fmtDeltaAxis = v => (v > 0 ? '+' : '') + v.toLocaleString(LOCALE);
+// A group of villains (a pace, a box) pooled: its Δ Wins from the sums.
+const _pool = rows => rows.reduce((a, c) => ({ games: a.games + c.games, wins: a.wins + c.wins, exp: a.exp + c.exp, vari: a.vari + c.vari }), { games: 0, wins: 0, exp: 0, vari: 0 });
 // The q-quantile of sorted values (0.5: the median), between the two nearest.
 function _quantile(sorted, q) {
   const at = (sorted.length - 1) * q, i = Math.floor(at);
@@ -76,6 +77,19 @@ function _overallRef(stats) {
   return { value: pct, text: t('Average {pct}%', { pct }) };
 }
 const _PCT_PICKS = [{ id: 'pct', label: '% Wins' }, { id: 'picks', label: 'Picks' }];
+// A box's color (box-info.json: its cover's, set apart from the others), the
+// same in every chart that colors by box; gray for a villain without one.
+const _boxColor = (boxInfo, box) => boxInfo[box]?.color || 'var(--pace-gray)';
+// A box's short name: the initials of its words, small words aside (WTIA, DB).
+const _boxInitials = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
+const _boxYear2 = (boxInfo, b) => String(boxInfo[b]?.year ?? '').slice(-2);
+// The boxes' colors under a chart, in release order, each its initials and
+// year (WTIA 18, as Matchups), a link to its box, the full name on hover.
+function _boxLegendHTML(boxInfo, boxes) {
+  const order = b => boxInfo[b]?.order ?? 99;
+  return `<div class="ch-legend">${[...boxes].sort((a, b) => order(a) - order(b)).map(b =>
+    `<a class="ch-legend-item" href="villains.html?box=${boxAnchorId(b)}" title="${_esc(b)}"><span class="ch-swatch" style="background:${_boxColor(boxInfo, b)}"></span>${_esc(`${_boxInitials(b)} ${_boxYear2(boxInfo, b)}`)}</a>`).join('')}</div>`;
+}
 
 // ── MATCHUPS ──────────────────────────────────────────────────────────────────
 // The grid of who beats whom: villains (by box, as on the Villains page) or
@@ -88,20 +102,9 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   const boxes = group === 'boxes';
   const boxOf = Object.fromEntries(chars.map(c => [c.name, c.box]));
   const boxOrder = b => boxInfo[b]?.order ?? 99;
-  // Per ordered pair: games together, and the row's wins over the column. Two
-  // villains of one box at a table are no box against box.
-  const together = {}, wins = {};
-  for (const g of games) {
-    const keyOf = s => boxes ? boxOf[s.character] : s.character;
-    const sides = [...new Set(g.seats.map(keyOf))].filter(Boolean);
-    const winner = g.seats.find(s => s.is_winner);
-    for (const a of sides) for (const b of sides) {
-      if (a === b) continue;
-      const k = a + '|' + b;
-      together[k] = (together[k] || 0) + 1;
-      if (winner && keyOf(winner) === a) wins[k] = (wins[k] || 0) + 1;
-    }
-  }
+  // Per ordered pair (pairRecords, stats-table.js, as the Leaderboard's
+  // Matchups): games together, and the row's wins over the column.
+  const rec = pairRecords(games, boxes ? s => boxOf[s.character] : s => s.character);
   const played = new Set(games.flatMap(g => g.seats.map(s => s.character)));
   const items = boxes
     ? Object.keys(boxInfo).filter(b => chars.some(c => c.box === b && played.has(c.name))).sort((a, b) => boxOrder(a) - boxOrder(b))
@@ -110,11 +113,9 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
         .sort((a, b) => boxOrder(a.box) - boxOrder(b.box) || (a.sort_order ?? 0) - (b.sort_order ?? 0))
         .map(c => ({ key: c.name, name: villainName(c.name), group: c.box, href: `villains.html?vil=${encodeURIComponent(c.name)}` }));
   if (items.length < 2) return Charts.barsV([]);
-  // A box's short name: the initials of its words, small words aside (WTIA, DB).
-  const short = b => b.split(/[\s,!]+/).filter(w => w && !/^(the|to|and|at|with|a|of)$/i.test(w)).map(w => w[0].toUpperCase()).join('');
   // A box: its initials over its year's two digits.
   const label = it => boxes
-    ? `<span class="vs-abbr">${_esc(short(it.key))}<br>${_esc(String(boxInfo[it.key]?.year ?? '').slice(-2))}</span>`
+    ? `<span class="vs-abbr" style="color:${_boxColor(boxInfo, it.key)}">${_esc(_boxInitials(it.key))}<br>${_esc(_boxYear2(boxInfo, it.key))}</span>`
     : charImgHTML(it.key);
   const newGroup = i => !boxes && i > 0 && items[i].group !== items[i - 1].group;
   const head = (it, i) => `<th class="vs-head${newGroup(i) ? ' vs-box' : ''}" title="${_esc(it.name)}">${label(it)}</th>`;
@@ -122,13 +123,12 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
     const cells = items.map((c, ci) => {
       const cls = newGroup(ci) ? ' vs-box' : '';
       if (r.key === c.key) return `<td class="vs-self${cls}"></td>`;
-      const n = together[r.key + '|' + c.key] || 0;
-      const w = wins[r.key + '|' + c.key] || 0, l = wins[c.key + '|' + r.key] || 0;
+      const { n, w, l } = pairRecord(rec, r.key, c.key);
       const name = `${r.name} vs ${c.name}`;
       // The caption links both: the row's page, " vs ", the column's.
       const links = ` data-name="${_esc(r.name)}" data-href="${_esc(r.href)}" data-box="${_esc(c.name)}" data-boxhref="${_esc(c.href)}" data-join=" vs "`;
       const meta = `${t('{a} won {w}, {b} won {l}', { a: r.name, w, b: c.name, l })} | ${tn(n, '{n} game together', '{n} games together')}`;
-      if (w + l < MIN_PAIR_GAMES) return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
+      if (matchupClass({ n, w, l }) === 'few') return `<td class="vs-few ch-hit${cls}"${links} data-meta="${_esc(meta)}" title="${_esc(name)}"></td>`;
       const v = cell({ pct: w / (w + l), w, l });
       return `<td class="ch-hit${cls}" style="background:${Charts.heatColor(v.heat)}"${links} data-meta="${_esc(`${v.meta} | ${meta}`)}" title="${_esc(name)}">${v.label}</td>`;
     }).join('');
@@ -137,8 +137,74 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
   return `<div class="vs-wrap"><table class="vs-grid${boxes ? ' vs-boxes' : ''}"><thead><tr><th class="vs-corner"></th>${items.map(head).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+// A game's weekday (0 = Sunday), hour (0-23) and minute at the local time where it was
+// played (its time_zone), or null for a zone the browser doesn't know. One
+// formatter per zone.
+const _zoneFmt = {};
+function _localTime(g) {
+  const z = g.time_zone;
+  if (!(z in _zoneFmt)) {
+    try { _zoneFmt[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, weekday: 'short', hour: 'numeric', minute: '2-digit', hourCycle: 'h23' }); }
+    catch (_) { _zoneFmt[z] = null; }
+  }
+  const f = _zoneFmt[z];
+  if (!f) return null;
+  const parts = f.formatToParts(new Date(g.at));
+  const get = type => parts.find(p => p.type === type)?.value;
+  return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), hour: Number(get('hour')) % 24, minute: Number(get('minute')) || 0 };
+}
+
+// By pace or box: each pace's bars, or each box's (in its color).
+function _byBoxHTML({ games, chars, boxInfo, mode }) {
+  const byBox = {};
+  for (const c of _villainStats(games, chars)) if (c.box) (byBox[c.box] ||= []).push(c);
+  const total = Object.values(byBox).flat().reduce((a, c) => a + c.games, 0) || 1;
+  const data = Object.entries(byBox)
+    .map(([box, rows]) => {
+      const v = _pool(rows), d = chanceDelta(v);
+      const pct  = Math.round(v.wins / v.games * 100);
+      const year = boxInfo[box]?.year;
+      return {
+        label: box,
+        color: _boxColor(boxInfo, box),
+        value: mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? v.games : pct,
+        games: v.games,
+        href: `villains.html?box=${boxAnchorId(box)}`,
+        meta: mode === 'picks'
+          ? `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / total * 100) })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+          : `${year ? year + ' | ' : ''}${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`,
+      };
+    })
+    .filter(d => d.games > 0)
+    .sort((a, b) => b.value - a.value);
+  return mode === 'chance' ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 152, diverging: true })
+    : mode === 'picks' ? Charts.barsH(data, { labelW: 152 })
+    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
+}
+
+function _byPaceHTML({ games, chars, mode }) {
+  const cs = _villainStats(games, chars);
+  const total = cs.reduce((a, c) => a + c.games, 0) || 1;
+  const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
+  const data = bands.map(b => {
+    const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
+    const sum   = _pool(rows), d = chanceDelta(sum);
+    const pct   = sum.games ? Math.round(sum.wins / sum.games * 100) : 0;
+    const share = Math.round(sum.games / total * 100);
+    const meta  = mode === 'picks'
+      ? `${tn(sum.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
+      : `${mode === 'chance' ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })} | ${tn(sum.games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
+    const value = mode === 'chance' ? Math.round((d ?? 0) * 100) / 100 : mode === 'picks' ? share : pct;
+    return { label: t(b[0].toUpperCase() + b.slice(1)), value, games: sum.games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
+  }).filter(d => d.games > 0);
+  return mode === 'chance'
+    ? Charts.barsH(data, { axisFmt: _fmtDeltaAxis, labelW: 80, diverging: true })
+    : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 80, ref: mode === 'pct' ? _overallRef(cs) : null });
+}
+
 // ── CHART REGISTRY ─────────────────────────────────────────────────────────────
-// Each: { id, icon, label, desc (a string, or per mode { mode: string }),
+// Each: { id, icon, label, desc (a string, or per mode { mode: string }, or per
+// mode and second switch { mode: { group: string } }), groups? (that switch),
 // modes?: [{ id, label }], sizes?: false, render(ctx) -> SVG/HTML string },
 // ctx = { games (filtered), chars, boxInfo, mode }. label, desc and the mode
 // labels are English keys, translated where they are shown.
@@ -146,103 +212,88 @@ function _matchupsHTML({ games, chars, boxInfo, group, cell }) {
 const CHARTS = [
   {
     id: 'scatter', icon: '✨', label: 'Wins vs games',
-    desc: 'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
-    render({ games, chars }) {
-      const points = _villainStats(games, chars).map(c => {
+    solo: true,   // also on Solo: the solo games (% Wins, no Δ Wins)
+    modes: _CHANCE_PCT,
+    // The dots' colors: each villain's pace, or its box's.
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
+    desc: {
+      chance: 'Each villain by games played (x) and Δ Wins (y): how far its wins are from what equal chances give. 0 is as expected; past the dashed ±2 lines, luck alone rarely goes.',
+      pct:    'Each villain by games played (x) and win rate (y); the axes zoom to the data. Up-left is strong but rarely picked, down-right is popular but weak. Tap a dot to open it.',
+    },
+    render({ games, chars, boxInfo, mode, group }) {
+      const chance = mode === 'chance';
+      const byBox  = group === 'box';
+      const stats  = _villainStats(games, chars);
+      const points = stats.map(c => {
         const pct = Math.round(c.wins / c.games * 100);
+        const d = chanceDelta(c);
         return {
           x: c.games,
-          y: pct,
+          y: chance ? (d ?? 0) : pct,
           label: villainName(c.name),
-          color: c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
+          color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           box: c.box || null,
           boxHref: c.box ? `villains.html?box=${boxAnchorId(c.box)}` : null,
-          meta: `${tn(c.games, '{n} game', '{n} games')} | ${t('{pct}% win rate', { pct })}`,
+          meta: `${tn(c.games, '{n} game', '{n} games')} | ${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win rate', { pct })}`,
         };
       });
-      return Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100, avg: _overallRef(_villainStats(games, chars)) });
+      const chart = chance
+        ? Charts.scatter(points, { xLabel: t('Games played'), ySymmetric: true, refs: [-2, 0, 2], include: [-2, 2] })
+        : Charts.scatter(points, { xLabel: t('Games played'), ySuffix: '%', yMax: 100, avg: _overallRef(stats) });
+      return byBox ? chart + _boxLegendHTML(boxInfo, new Set(stats.map(c => c.box).filter(Boolean))) : chart;
     },
+  },
+  {
+    // The id stays 'box': it was the win rate chart; Box popularity is its
+    // Picks; By pace joined it as its Pace switch.
+    id: 'box', icon: '🗂️', label: 'Pace and boxes',
+    solo: true,   // also on Solo: the solo games (% Wins, no Δ Wins)
+    modes: [..._CHANCE_PCT, { id: 'picks', label: 'Picks' }],
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
+    desc: {
+      chance: {
+        box:  "Each box's Δ Wins, pooling its villains: how far their wins are from what equal chances give (0: as expected), strongest first. Tap a bar for its games.",
+        pace: "Each pace's Δ Wins, pooling every villain of that color: how far their wins are from what equal chances give (0: as expected). Tap a bar for its games and villains.",
+      },
+      pct: {
+        box:  "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
+        pace: "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
+      },
+      picks: {
+        box:  "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
+        pace: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
+      },
+    },
+    render(ctx) { return ctx.group === 'pace' ? _byPaceHTML(ctx) : _byBoxHTML(ctx); },
   },
   {
     id: 'versus', icon: '🆚', label: 'Matchups',
     groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
-    desc: "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
-    render({ games, chars, boxInfo, group }) {
-      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct }) => ({ heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` }) });
-    },
-  },
-  {
-    // The id stays 'box': it was the win rate chart; Box popularity is its Picks.
-    id: 'box', icon: '📦', label: 'By box',
-    modes: _PCT_PICKS,
+    modes: _CHANCE_PCT,
     desc: {
-      pct:   "Each expansion box's overall win rate, pooling every villain in the box (total wins over total games); bars are sorted strongest first. Tap a box for its total games.",
-      picks: "How often each box's villains are picked across all recorded games, most-played first. Tap a bar for its share of all picks, or to open the box.",
+      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
+      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
     },
-    render({ games, chars, boxInfo, mode }) {
-      const byBox = {};
-      let total = 0;
-      for (const c of _villainStats(games, chars)) {
-        if (!c.box) continue;
-        (byBox[c.box] ||= { games: 0, wins: 0, villains: 0 });
-        byBox[c.box].games += c.games;
-        byBox[c.box].wins  += c.wins;
-        byBox[c.box].villains++;
-        total += c.games;
-      }
-      const picks = mode === 'picks';
-      const data = Object.entries(byBox)
-        .filter(([, v]) => v.games > 0)
-        .map(([box, v]) => {
-          const pct  = Math.round(v.wins / v.games * 100);
-          const year = boxInfo[box]?.year;
-          return {
-            label: box,
-            value: picks ? v.games : pct,
-            games: v.games,
-            href: `villains.html?box=${boxAnchorId(box)}`,
-            meta: picks
-              ? `${year ? year + ' | ' : ''}${tn(v.games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: Math.round(v.games / (total || 1) * 100) })} | ${tn(v.villains, '{n} villain', '{n} villains')}`
-              : `${year ? year + ' | ' : ''}${t('{pct}% win rate', { pct })} | ${tn(v.games, '{n} game', '{n} games')} | ${tn(v.villains, '{n} villain', '{n} villains')}`,
-          };
-        })
-        .sort((a, b) => b.value - a.value);
-      return picks ? Charts.barsH(data, { labelW: 152 })
-        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 152, ref: _overallRef(_villainStats(games, chars)) });
-    },
-  },
-  {
-    id: 'pace', icon: '🌈', label: 'By pace',
-    modes: _PCT_PICKS,
-    desc: {
-      pct:   "Each pace band's overall win rate, pooling every villain of that color (total wins over total games). Tap a band for its games and villains.",
-      picks: "How often villains of each pace are picked across all recorded games, as a share of all picks. Tap a band for its picks and villains.",
-    },
-    render({ games, chars, mode }) {
-      const cs = _villainStats(games, chars);
-      const total = cs.reduce((a, c) => a + c.games, 0) || 1;
-      const bands = ['green', 'yellow', 'orange', 'red', 'gray'];
-      const data = bands.map(b => {
-        const rows  = b === 'gray' ? cs.filter(c => !c.pace) : cs.filter(c => c.pace === b);
-        const games = rows.reduce((a, c) => a + c.games, 0);
-        const wins  = rows.reduce((a, c) => a + c.wins,  0);
-        const pct   = games ? Math.round(wins / games * 100) : 0;
-        const share = Math.round(games / total * 100);
-        const meta  = mode === 'picks'
-          ? `${tn(games, '{n} pick', '{n} picks')} | ${t('{pct}% of all picks', { pct: share })} | ${tn(rows.length, '{n} villain', '{n} villains')}`
-          : `${t('{pct}% win rate', { pct })} | ${tn(games, '{n} game', '{n} games')} | ${tn(rows.length, '{n} villain', '{n} villains')}`;
-        return { label: t(b[0].toUpperCase() + b.slice(1)), value: mode === 'picks' ? share : pct, games, color: `var(--pace-${b})`, href: `villains.html?pace=${b}`, meta };
-      }).filter(d => d.games > 0);
-      return mode === 'picks' ? Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60 })
-        : Charts.barsH(data, { axisFmt: v => `${v}%`, labelW: 60, ref: _overallRef(cs) });
+    render({ games, chars, boxInfo, group, mode }) {
+      const chance = mode === 'chance';
+      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
+        const d = pairDelta(w, l);
+        return chance
+          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
+          : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
+      } });
     },
   },
   {
     id: 'seatorder', icon: '🪑', label: 'Play order',
     sizes: false,
-    desc: "Win rate of each seat in play order (seat 1 plays first) by number of players. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
-    render({ games }) {
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Δ Wins of each seat in play order (seat 1 plays first) by number of players: how far its wins are from its fair share. Warmer cells win more. Recorded play order only.",
+      pct:    "Win rate of each seat in play order (seat 1 plays first) by number of players. Warmer cells are above the fair share (1 / players); the cell shows the win rate. Recorded-seating games only.",
+    },
+    render({ games, mode }) {
       // Only games with a recorded play order (every seat its own position) and
       // one winner; a seat is its rank in the play order, 1 first.
       const bySize = {};
@@ -265,12 +316,15 @@ const CHARTS = [
         const cell = bySize[s] && bySize[s][seat];
         if (!cell || !cell.games) return null;
         const pct = cell.wins / cell.games, fair = 1 / s;
-        const heat = (pct / fair - 0.5) / 1.5;    // 0.5x..2x of fair -> 0..1 on the ramp
+        const d = chanceDelta({ wins: cell.wins, exp: cell.games * fair, vari: cell.games * fair * (1 - fair) });
+        const chance = mode === 'chance';
+        const heat = chance ? ((d ?? 0) + 3) / 6        // -3..+3 -> 0..1 on the ramp
+                            : (pct / fair - 0.5) / 1.5; // 0.5x..2x of fair -> 0..1
         return {
           value: heat,
-          label: `${Math.round(pct * 100)}%`,
+          label: chance ? fmtChance(d) : `${Math.round(pct * 100)}%`,
           name:  t('{size}p, seat {seat}', { size: s, seat }),
-          meta:  `${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
+          meta:  `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
         };
       });
     },
@@ -278,6 +332,7 @@ const CHARTS = [
   {
     // The id stays 'duration': it was the minutes-only chart.
     id: 'duration', icon: '⏳', label: 'Game length',
+    solo: true,   // also on Solo: the solo games
     modes: _MINUTES_ROUNDS,
     desc: {
       minutes: 'How many games fall into each 15-minute band. The dashed line is the median game, the shaded part the middle half of the games. Only games with a recorded duration.',
@@ -342,6 +397,7 @@ const CHARTS = [
   },
   {
     id: 'time', icon: '📈', label: 'Games over time',
+    solo: true,   // also on Solo: the solo games
     modes: [{ id: 'games', label: 'Games' }, { id: 'players', label: 'Players' }],
     desc: {
       games:   'Games played each month, by play date. All time shows the latest 12 months (drag sideways for earlier ones); a year shows its months, a month its days.',
@@ -391,23 +447,56 @@ const CHARTS = [
     },
   },
   {
-    id: 'weekday', icon: '📅', label: 'Games by weekday',
-    desc: 'Games played on each weekday, by play date, Monday first. The weekday follows your time zone (or the recorded day, for games saved without a time).',
-    render({ games }) {
-      const counts = new Array(7).fill(0);   // 0 = Sunday
-      for (const g of games) {
-        if (g.at == null) continue;
-        const d = new Date(g.at);
-        counts[isDateOnly(g) ? d.getUTCDay() : d.getDay()]++;   // date-only: the recorded day
+    // id kept from Games by weekday (a saved view).
+    id: 'weekday', icon: '📅', label: 'Day and hour',
+    solo: true,   // also on Solo: the solo games
+    modes: [{ id: 'weekday', label: 'Weekday' }, { id: 'part', label: 'Part of day' }, { id: 'hour', label: 'Hour' }],
+    desc: {
+      weekday: 'Games played on each weekday, Monday first, at the local time where each was played. Only games saved with their time zone count.',
+      part:    'Games by the part of the day they started: morning 6-12, afternoon 12-18, evening 18-24, night 0-6, local time. Only games saved with their time and time zone count.',
+      hour:    'Games by the hour they started, from 6:00 to 6:00, at the local time where each was played; the shading is the middle half. Only games saved with their time and time zone count.',
+    },
+    render({ games, mode }) {
+      // Only the games that know where they were played (games.time_zone); the
+      // hours also need a time (not a day alone).
+      const known = games.filter(g => g.at != null && g.time_zone && (mode === 'weekday' || !isDateOnly(g)));
+      if (!known.length) return `<div class="chart-note">${t('No games with a time zone yet: games saved from now on have one.')}</div>`;
+      const local = known.map(g => ({ g, p: _localTime(g) })).filter(x => x.p);
+      const total = local.length || 1;
+      const pct   = c => Math.round(c / total * 100);
+      const meta  = c => `${tn(c, '{n} game', '{n} games')} | ${pct(c)}%`;
+      // The hours and the parts of the day run from 6:00 to 6:00, so a game
+      // past midnight is a late one (night after evening), and the median and
+      // middle half of the start times, shaded as on Game length, never wrap.
+      const since6 = ({ p }) => (p.hour + p.minute / 60 - 6 + 24) % 24;   // hours since 6:00
+      const starts = local.map(since6).sort((a, b) => a - b);
+      const clock  = h => { const m = Math.round((h + 6) * 12) * 5 % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+      const spread = width => {
+        const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(starts, q));
+        return { mid: mid / width, lo: q1 / width, hi: q3 / width, text: t('Median {m} | middle half {a}-{b}', { m: clock(mid), a: clock(q1), b: clock(q3) }) };
+      };
+      if (mode === 'hour') {
+        const counts = new Array(24).fill(0);   // 0: 6:00-7:00
+        for (const x of local) counts[Math.floor(since6(x))]++;
+        const hh = i => `${String((i + 6) % 24).padStart(2, '0')}:00`;
+        const data = counts.map((c, i) => ({ value: c, name: `${hh(i)}-${hh(i + 1)}`, meta: meta(c) }));
+        return Charts.barsV(data, { xTick: i => String((i + 6) % 24), xEvery: 3, spread: spread(1) });
       }
+      if (mode === 'part') {
+        // Morning 6-12, afternoon 12-18, evening 18-24, night 0-6.
+        const parts  = ['Morning', 'Afternoon', 'Evening', 'Night'];
+        const counts = parts.map((_, i) => starts.filter(h => h >= i * 6 && h < i * 6 + 6).length);
+        const data   = parts.map((label, i) => ({ value: counts[i], name: t(label), meta: meta(counts[i]) }));
+        return Charts.barsV(data, { xTick: i => t(parts[i]), xEvery: 1, spread: spread(6) });
+      }
+      const counts = new Array(7).fill(0);   // 0 = Sunday
+      for (const { g, p } of local) counts[isDateOnly(g) ? new Date(g.at).getUTCDay() : p.day]++;   // date-only: the recorded day
       const order  = [1, 2, 3, 4, 5, 6, 0];   // Monday first
       // Weekday names in the current language (5 Jan 2025 was a Sunday).
       const day    = (d, weekday) => new Date(2025, 0, 5 + d).toLocaleDateString(LOCALE, { weekday });
       const labels = order.map(d => day(d, 'short').replace('.', ''));
       const full   = order.map(d => { const s = day(d, 'long'); return s[0].toUpperCase() + s.slice(1); });
-      const total = counts.reduce((a, c) => a + c, 0) || 1;
-      const pct = c => Math.round(c / total * 100);
-      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: `${tn(counts[d], '{n} game', '{n} games')} | ${pct(counts[d])}%` }));
+      const data = order.map((d, i) => ({ value: counts[d], name: full[i], meta: meta(counts[d]) }));
       return Charts.barsV(data, { xTick: i => labels[i], xEvery: 1, note: t('Weekends {pct}%', { pct: pct(counts[6] + counts[0]) }) });
     },
   },
@@ -428,16 +517,24 @@ function _renderPicker() {
 // row, flush right: Matchups' Villains | Boxes), the first one until picked.
 const _modes = {}, _groups = {};
 const _pick = (opts, saved) => opts ? (opts.some(m => m.id === saved) ? saved : opts[0].id) : null;
-const _modeOf  = c => _pick(c.modes, _modes[c.id]);
+// On Solo (a chart that reads solo games, not one by table size) there's no
+// Δ Wins: one player against the game shares the chances with nobody. Its
+// switch goes, as on the Leaderboard, and % Wins shows (the pick is kept for All).
+const _onSolo  = c => size.isSolo() && c.sizes !== false;
+const _modesOf = c => _onSolo(c) && c.modes ? c.modes.filter(m => m.id !== 'chance') : c.modes;
+const _modeOf  = c => _pick(_modesOf(c), _modes[c.id]);
 const _groupOf = c => _pick(c.groups, _groups[c.id]);
 
 // The switches, on one row. A chart without one keeps its place, empty, so
 // every chart starts at the same height.
 function _modesHTML(c) {
   if (!c.modes && !c.groups) return `<div class="controls mb-1 chart-modes-none" aria-hidden="true"><div class="seg"><button class="seg-btn" type="button" tabindex="-1">&nbsp;</button></div></div>`;
+  // A mode's short label where the language has one ('% Wins:short': "% Vitt."),
+  // so two switches fit side by side on a phone.
+  const label = l => { const s = t(l + ':short'); return s.endsWith(':short') ? t(l) : s; };
   const seg = (opts, on, fn) => `<div class="seg">${opts.map(m =>
-    `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(t(m.label))}</button>`).join('')}</div>`;
-  return `<div class="controls mb-1 chart-switches">${c.modes ? seg(c.modes, _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
+    `<button class="seg-btn${m.id === on ? ' on' : ''}" type="button" onclick="${fn}('${m.id}')">${_esc(label(m.label))}</button>`).join('')}</div>`;
+  return `<div class="controls mb-1 chart-switches">${c.modes ? seg(_modesOf(c), _modeOf(c), 'setChartMode') : ''}${c.groups ? seg(c.groups, _groupOf(c), 'setChartGroup').replace('class="seg"', 'class="seg chart-group-seg"') : ''}</div>`;
 }
 
 function setChartMode(mode) {
@@ -469,17 +566,27 @@ async function _rerender() {
   size.setDisabled(c.sizes === false);
   // Every mode's description in the same spot, only the picked one visible:
   // the card is as tall as the longest, so a switch never moves the chart.
+  // A mode's description may also depend on the second switch ({ box, pace }).
+  const descOf = d => typeof d === 'string' ? d : d[_groupOf(c)];
   document.getElementById('chartDesc').innerHTML = typeof c.desc === 'string' ? _esc(t(c.desc))
-    : Object.entries(c.desc).map(([m, d]) => `<span${m === mode ? '' : ' class="chart-desc-off" aria-hidden="true"'}>${_esc(t(d))}</span>`).join('');
+    : Object.entries(c.desc).map(([m, d]) => `<span${m === mode ? '' : ' class="chart-desc-off" aria-hidden="true"'}>${_esc(t(descOf(d)))}</span>`).join('');
   document.getElementById('chartModes').innerHTML = _modesHTML(c);
   const cap = document.getElementById('chartCaption');
   if (cap) cap.textContent = '';
   const stage = document.getElementById('chartStage');
-  if (!_allGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
+  if (!_officialGames) stage.innerHTML = `<div class="chart-note">${t('Loading…')}</div>`;
   try {
-    const [all, chars, boxInfo] = await Promise.all([_loadGames(), loadCharacters(), loadBoxInfo()]);
+    // Solo picked: the solo games, in a chart that reads them (solo: true);
+    // a chart by table size (sizes: false) ignores the filter, Solo too.
+    const onSolo = _onSolo(c);
+    if (onSolo && !c.solo) {
+      stage.innerHTML = `<div class="chart-note">${t('A solo game has no opponents, so no matchups: pick All or a number of players.')}</div>`;
+      return;
+    }
+    const [all, chars, boxInfo] = await Promise.all([onSolo ? _soloChartGames() : loadOfficialGames(), loadCharacters(), loadBoxInfo()]);
     if (token !== _renderToken) return;
-    stage.innerHTML = c.render({ games: _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
+    if (!all) throw new Error('solo games');
+    stage.innerHTML = c.render({ games: onSolo ? all : _filterGames(all, { sized: c.sizes !== false }), chars, boxInfo, mode, group: _groupOf(c) });
     const z = stage.querySelector('.ch-zoomable');
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
@@ -736,9 +843,10 @@ async function init() {
     Object.assign(_modes, saved.modes);
     Object.assign(_groups, saved.groups);
     size.set(saved.size);
+    if (saved.level) size.setLevel(saved.level);
     period.set(saved.period);
   }
-  keepViewState(() => ({ chart: _selected, modes: _modes, groups: _groups, size: size.value(), period: period.get() }));
+  keepViewState(() => ({ chart: _selected, modes: _modes, groups: _groups, size: size.value(), level: size.level(), period: period.get() }));
   period.load();
   selectChart(CHARTS.some(c => c.id === saved?.chart) ? saved.chart : CHARTS[0].id);
 }
