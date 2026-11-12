@@ -159,17 +159,37 @@ function startNewGameTour() {
   const pool = _tourPool();
   orderSlots = Array.from({ length: 4 }, (_, i) => ({ id: orderNextId++, char: pool[i] || '', isMe: i === 0 && !!getCurrentUser(), isWinner: false }));
   orderUnknown = false;
+  document.getElementById('fLocation').value = t('Forbidden Mountain');
   renderOrderSlots();
   _layoutLegend();
-  const past = on => () => { if (pastGame !== on) setPastGame(on); };
+  // Each step sets the form or the demo game it shows (also going Back).
+  const past = on => () => { _tourLive(false); if (pastGame !== on) setPastGame(on); };
+  const form = () => _tourLive(false);
+  const live = (lock = false) => () => { _tourLive(true); setVisible('tapResume', lock); };
   startTour([
     { el: '#ngModeSeg', prep: past(false), text: t('<b>Play now</b> is for a game about to start: the timer sets its date and how long it lasted. <b>Past game</b> records one played earlier. Switching keeps the villains, the players and their order.') },
     { el: ['#fDateRow', '#durRoundsRow'], prep: past(true), text: t('In <b>Past game</b>, the date and time: <b>No time</b> if you only remember the day, <b>No date</b> if not even that. The duration and rounds are optional.') },
     { el: '.draw-mode-row', prep: past(false), text: t('The <b>draw pool</b>: the villains that can be drawn (narrow it to your boxes or to a pace), and how many play.') },
-    { el: '#orderSlots', text: t('A row per player, in play order. Pick the villain or tap 🎲 to draw one; ❌ removes the row, 👤 marks you and 👑 the winner; ⠿ drags a row to another seat.') },
-    { el: '#lineupBtns', text: t('<b>Random order</b> shuffles the seats; <b>Draw villains</b> fills the rows from the draw pool (<b>Redraw all</b> once every row has one).') },
-    { el: '#footerDefault', text: t('<b>Start game</b> opens the timer: tap + after each round, and the winner\'s mover when someone wins; then save. In Past game, <b>Save game</b> right away.') },
+    { el: '#orderSlots', prep: form, text: t('A row per player, in play order. Pick the villain or tap 🎲 to draw one; ❌ removes the row, 👤 marks you and 👑 the winner; ⠿ drags a row to another seat.') },
+    { el: '#lineupBtns', prep: form, text: t('<b>Random order</b> shuffles the seats; <b>Draw villains</b> fills the rows from the draw pool (<b>Redraw all</b> once every row has one).') },
+    { el: '#footerDefault', prep: form, text: t('<b>Start game</b> starts the timer, as in the next steps. In Past game, <b>Save game</b> saves it right away.') },
+    { el: ['#liveTime', '.live-turns'], prep: live(), text: t('The game is on: the timer runs from the start. A round ends when every player has had their turn: tap + when the first player is up again (− fixes a wrong tap).') },
+    { el: '#liveMovers', prep: live(), text: t('When a villain wins, tap their mover: the game stops, with the winner, the duration and the rounds filled in, ready to save.') },
+    { el: '.tap-resume-card', prep: live(true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
+    { el: '#footerLive', prep: live(), text: t('<b>Pause game</b> stops the timer: from there you save the game, or start it again.') },
   ], { onEnd: () => location.replace(location.pathname) });
+}
+
+// The demo game in progress (or back to the form): the live panel drawn with
+// made-up time and rounds, no game started, nothing saved.
+function _tourLive(on) {
+  if (!on) { setVisible('tapResume', false); return setLiveUI(false); }
+  _renderLiveInfo();
+  document.getElementById('liveTime').textContent = '23:47';
+  document.getElementById('liveTurnCount').textContent = '4';
+  document.getElementById('liveTurnMax').textContent = '';
+  document.getElementById('liveMinusBtn').disabled = false;
+  setLiveUI(true);
 }
 
 // The demo's villains: four from the draw pool, at random.

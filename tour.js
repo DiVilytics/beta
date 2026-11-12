@@ -28,8 +28,13 @@ function startTour(steps, { onEnd } = {}) {
   shade.className = 'tour-shade';
   shade.addEventListener('click', () => endTour());
   document.body.append(shade, spot, bubble);
-  _tour = { steps, i: -1, onEnd, spot, bubble, shade };
+  // The page's layout can move without a scroll (a panel shown, an image
+  // loaded): the lit box follows it too.
+  const resize = new ResizeObserver(() => _tourPlace());
+  resize.observe(document.body);
+  _tour = { steps, i: -1, onEnd, spot, bubble, shade, resize };
   document.addEventListener('keydown', _tourKey, true);
+  document.addEventListener('load', _tourPlace, true);   // an image above the step loaded: it moved
   window.addEventListener('resize', _tourPlace);
   window.addEventListener('scroll', _tourPlace, true);
   _tourGo(1);
@@ -37,10 +42,12 @@ function startTour(steps, { onEnd } = {}) {
 
 function endTour(callOnEnd = true) {
   if (!_tour) return;
-  const { spot, bubble, shade, onEnd } = _tour;
+  const { spot, bubble, shade, onEnd, resize } = _tour;
   _tour = null;
+  resize.disconnect();
   spot.remove(); bubble.remove(); shade.remove();
   document.removeEventListener('keydown', _tourKey, true);
+  document.removeEventListener('load', _tourPlace, true);
   window.removeEventListener('resize', _tourPlace);
   window.removeEventListener('scroll', _tourPlace, true);
   if (callOnEnd) onEnd?.();
@@ -82,6 +89,7 @@ function _tourRender() {
   const el = _tourEl(steps[i]);
   el.scrollIntoView({ block: 'center', behavior: 'instant' });
   _tourPlace();
+  requestAnimationFrame(() => { el.scrollIntoView({ block: 'center', behavior: 'instant' }); _tourPlace(); });   // once the step's layout has settled
   bubble.querySelector('.tour-next').focus({ preventScroll: true });
 }
 
