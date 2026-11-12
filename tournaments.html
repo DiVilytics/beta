@@ -48,7 +48,9 @@
   <div class="page-header">
     <h2><span class="page-ico" aria-hidden="true">🏟️</span><span data-i18n>Tournaments</span></h2>
   </div>
+  <!-- ⓘ: Show me around, the organizers' tour over a demo (startTournamentTour, tour.js). -->
   <p class="page-intro"><span data-i18n>Organize a tournament: the players, the tables and the villains of every stage, and the points.</span>
+    <button class="tn-info" id="tnTourBtn" type="button" onclick="startTournamentTour()" title="Show me around" data-i18n-attr="title">ⓘ</button>
     <br><button class="char-guide-link hidden" id="tnIntroHelp" type="button" onclick="tnHelp()" data-i18n>How the tournament options work ›</button></p>
 
   <a class="back-link hidden" id="tnBack" href="tournaments.html"></a>
@@ -285,6 +287,7 @@
   <script src="shared.js"></script>
 <script src="pace-filter.js"></script>
 <script src="tournament-rules.js"></script>
+<script src="tour.js"></script>
 <script src="tournament-form.js"></script>
 <script src="tournaments.js"></script>
 </body>

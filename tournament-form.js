@@ -25,7 +25,7 @@ const _tnAllOpen = tour => !tour || (tour.current_stage <= 1 && !tnTables.some(t
 
 async function tnOpenForm(tour) {
   tnFormFor = tour;
-  if (!getCurrentUser() && !tour) return goToSignIn();
+  if (!getCurrentUser() && !tour && !tnTouring) return goToSignIn();   // the tour's demo form: signed in or not
   clearTimeout(tnPollTimer);
   setVisible('tnRoot', false);
   setVisible('tnForm', true);
@@ -66,7 +66,7 @@ async function tnOpenForm(tour) {
   // New: Discard (the Back link keeps the draft); Edit tournament: Cancel.
   setVisible('tnFormDiscard', !tour);
   setVisible('tnFormCancel', !!tour);
-  _tnDraftReady = !tour;
+  _tnDraftReady = !tour && !tnTouring;   // the tour's demo is never kept
   _tnUpdateDiscard();
 }
 
@@ -121,7 +121,7 @@ function _tnFillPool(tour) {
     tnPool.reset();
   }
   tnCopies = Object.fromEntries(Object.entries(tournamentPoolCopies(tour?.villain_pool)).filter(([, n]) => n > 1));
-  const draft = tour ? null : _tnLoadDraft();
+  const draft = tour || tnTouring ? null : _tnLoadDraft();
   if (draft?.pool) tnPool.restoreState(draft.pool);
   if (draft?.copies) tnCopies = { ...draft.copies };
   else if (!tour) tnPool.defaultToMine();   // your boxes, when you've marked some

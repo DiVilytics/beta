@@ -35,6 +35,7 @@ async function init() {
   const params = new URLSearchParams(location.search);
   await initAuth(() => _tnAuthChanged());
   [tnChars, tnBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  if (params.has('tour')) { history.replaceState(null, '', location.pathname); return startTournamentTour(); }   // the Tutorial's Show me around
   if (params.has('new')) return tnOpenForm(null);
   const id = params.get('t');
   if (id) {
@@ -60,11 +61,13 @@ function _tnSetBack() {
 // Back to a tournament, from a table's game or another page (the browser's
 // back can show it as it was): reloaded quietly.
 window.addEventListener('pageshow', e => {
+  if (tnTouring) return;
   if (e.persisted && tnTour && !_tnFormOpen()) tnLoad(tnTour.id, { quiet: true });
   else if (e.persisted && tnList) tnLoadList();
 });
 
 function _tnAuthChanged() {
+  if (tnTouring) return;   // the tour's demo stays as it is
   if (!_tnFormOpen() && tnTour) tnRenderTournament();
   else if (!_tnFormOpen() && tnList) tnLoadList();   // yours on top change with who's signed in
   if (_tnFormOpen() && tnPool) tnPool.loadOwnedBoxes().then(() => tnPool.updatePaceUI());
@@ -250,14 +253,14 @@ async function tnLoad(id, { quiet = false } = {}) {
 // settings are being edited; and at once when the page comes back into view.
 function _tnSchedulePoll() {
   clearTimeout(tnPollTimer);
-  if (!tnTour || tnTour.finished_at) return;
+  if (!tnTour || tnTour.finished_at || tnTouring) return;
   tnPollTimer = setTimeout(() => {
     if (document.visibilityState === 'visible' && !_tnBusy()) tnLoad(tnTour.id, { quiet: true });
     else _tnSchedulePoll();
   }, TN_POLL_MS);
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && tnTour && !tnTour.finished_at && !_tnBusy()) tnLoad(tnTour.id, { quiet: true });
+  if (document.visibilityState === 'visible' && tnTour && !tnTour.finished_at && !_tnBusy() && !tnTouring) tnLoad(tnTour.id, { quiet: true });
 });
 
 function _tnBusy() {
@@ -319,7 +322,7 @@ function tnRenderTournament() {
         : !mine && !isOrg && !_tnCode() && tnPlayers.some(p => !p.user_id) ? `<p class="tn-hint">${t('To claim your name, scan the tournament\'s QR code from an organizer, or open its link.')}</p>` : ''}
       ${_tnOrganizersHTML(user, isOrg)}`
       : tnView === 'standings' ? (ko ? _tnBracketHTML(mine) : _tnStandingsHTML(mine)) : _tnTablesHTML(mine)}
-    ${isOrg ? `<div class="claim-delete-row">
+    ${isOrg ? `<div class="claim-delete-row" id="tnLobbyActions">
       <button class="btn btn-danger btn-sm" type="button" onclick="tnDelete()">${t('Delete tournament')}</button>
       ${lobby ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnStart()">${t('Start tournament')}</button>` : ''}
     </div>` : ''}`;
@@ -541,7 +544,7 @@ function _tnNextStageHTML(tables) {
     more  ? btn('btn-primary', 'tnNextStage', ko && next === tnTour.stages ? t('Draw the final') : t('Draw stage {n}', { n: next })) : '',
   ].join('');
   return `
-    <div class="claim-share-row">
+    <div class="claim-share-row" id="tnNextRow">
       <button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()"${canUndo ? '' : ` disabled title="${_esc(t('A game of this stage is saved: its draw stays.'))}"`}>${t('Undo draw')}</button>
       ${draws}
     </div>
@@ -1230,6 +1233,88 @@ function tnToggleDrop(position) {
   const firstDrop = tnEdit.rows.findIndex(r => r.dropped);
   tnEdit.rows.splice(firstDrop < 0 ? tnEdit.rows.length : firstDrop, 0, row);
   _tnRenderEditRows();
+}
+
+// ── TOUR (organizers) ─────────────────────────────────────────────────────────
+// Show me around (ⓘ by the intro, or the Tutorial's link): New tournament's
+// form, then a tournament's page, over a demo (tour.js). Nothing is saved or
+// loaded while it runs (tnTouring: no draft, no refresh, no database call),
+// and the page reloads at the end, as it was. Signed out, a stand-in organizer.
+let tnTouring = false;
+const TN_TOUR_NAMES = ['Ada', 'Bea', 'Cleo', 'Dario', 'Elio', 'Fede', 'Gaia', 'Leo'];
+let _tnTourDrawn = null;   // stage 1's demo tables, drawn once: the same at every step
+
+async function startTournamentTour() {
+  if (tnTouring) return;
+  const back = location.pathname + location.search.replace(/[?&]tour\b/, '').replace(/^&/, '?');
+  tnTouring = true;
+  clearTimeout(tnPollTimer);
+  tnTour = null; tnPlayers = []; tnTables = [];
+  if (!tnChars.length) [tnChars, tnBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  await tnOpenForm(null);
+  _tnTourForm();
+  // Signed out: a stand-in organizer for the demo page, set only now (the
+  // form's pool asks the database for your boxes); the page reloads at the end.
+  if (!getCurrentUser()) window.getCurrentUser = () => ({ id: 'tn-tour-organizer' });
+  const orgId = getCurrentUser().id;
+  tnOrganizers = [orgId];
+  tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || t('You') }]]);
+  const form = () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); };
+  const page = (stage, view = 'tables') => () => { _tnTourPage(stage); tnView = view; tnRenderTournament(); };
+  const field = id => () => document.querySelector(`#tnForm [data-help="${id}"]`);
+  startTour([
+    { el: () => document.getElementById('tnName').closest('.form-row'), prep: form, text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
+    { el: field('format'), prep: form, text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
+    { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form, text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
+    { el: ['#tnForm [data-help="tables"]', '#tnForm [data-help="order"]'], prep: form, text: t('How the tables are made (<b>Tables</b>, <b>Pairing</b>) and who plays first at each (<b>Play order</b>). Every ⓘ explains the choices, with examples.') },
+    { el: ['#tnForm [data-help="scoring"]', '#tnForm [data-help="final"]'], prep: form, text: t('The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and whether the top players play a <b>Final table</b>.') },
+    { el: field('villains'), prep: form, text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
+    { el: '#tnFormPlayers', prep: form, text: t('The players\' names (👤 marks you, if you play too). They claim their names later, with the tournament\'s QR code.') },
+    { el: '.tn-form-actions', prep: form, text: t('<b>Create tournament</b>: its page opens. Everything can still change until the first game starts.') },
+    { el: ['.tn-org-actions', '.tn-share-btn'], prep: page(0, 'players'), text: t('<b>Edit tournament</b> changes it until the first game starts; <b>Organizer QR</b> adds other organizers. <b>Share QR</b> is for the players: they scan it and claim their name.') },
+    { el: '#tnLobbyActions', prep: page(0, 'players'), text: t('<b>Start tournament</b> draws stage 1: the tables and a villain for everyone.') },
+    { el: '.tn-view-seg', prep: page(1), text: t('Once started: <b>Players</b> (claims, and Withdraw for a player who leaves), <b>Tables</b> and <b>Standings</b>.') },
+    { el: () => document.querySelector('#tnRoot .tn-table'), prep: page(1), text: t('Each table is played on one phone: <b>Start game</b> runs it with New Game\'s timer (an organizer\'s phone, or a seated player\'s). <b>Enter result</b> types it in afterwards; a saved table has <b>Edit result</b>.') },
+    { el: '#tnNextRow', prep: page(1), text: t('Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
+    { el: '.tn-standings', prep: page(1, 'standings'), text: t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.') },
+  ], { onEnd: () => location.replace(back) });
+}
+
+// The form's demo: a name, 8 players, Swiss pairing and Rotation (not saved).
+function _tnTourForm() {
+  document.getElementById('tnName').value = t('Forbidden Mountain Cup');
+  document.getElementById('tnStages').value = '3';
+  tnRule.pairing = 'swiss';
+  tnRule.play_order = 'rotation';
+  tnFormPlayers = TN_TOUR_NAMES.map(name => ({ name, isMe: false }));
+  _tnRenderRules();
+  _tnSyncFormat();
+  _tnPoolChanged();
+}
+
+// The page's demo: the same tournament not started (stage 0), or with stage 1
+// drawn, table 2 saved and table 1 to play.
+function _tnTourPage(stage) {
+  setVisible('tnForm', false);
+  setVisible('tnRoot', true);
+  setVisible('tnIntroHelp', false);   // New tournament's own link
+  const pool = tnChars.map(c => c.name);
+  tnTour = { id: 'tn-tour', name: t('Forbidden Mountain Cup'), event_date: _tnToday(), created_at: new Date().toISOString(),
+    format: 'points', table_size: 4, stages: 3, pairing: 'swiss', scoring: 'borda', table_split: 'even', play_order: 'rotation',
+    bye: 'half', final_table: false, villain_pool: pool, current_stage: 0, finished_at: null, ended_stage: null };
+  tnPlayers = TN_TOUR_NAMES.map((name, i) => ({ id: `tn-tour-p${i}`, name, user_id: null, withdrawn_after: null, joined_stage: null }));
+  tnTables = [];
+  if (!stage) return;
+  if (!_tnTourDrawn) {
+    const drawn = tournamentDrawStage(tnTour, tnPlayers, []);
+    _tnTourDrawn = { drawn, villains: tournamentStageVillains(tnTour, drawn, []) || [] };
+  }
+  const { drawn } = _tnTourDrawn;
+  const vOf = new Map(_tnTourDrawn.villains.map(v => [v.player_id, v.character]));
+  tnTables = drawn.map((ids, j) => ({ id: `tn-tour-t${j + 1}`, stage: 1, table_no: j + 1, recorder: null, started_at: null,
+    saved_at: j ? new Date().toISOString() : null, game_id: j ? 'tn-tour-game' : null,
+    seats: ids.map((player_id, position) => ({ player_id, position, character: vOf.get(player_id), place: j ? position + 1 : null, minutes: null, round: null, dropped: false })) }));
+  tnTour.current_stage = 1;
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
