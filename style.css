@@ -603,15 +603,18 @@ main {
    buttons split that width; their labels go on two lines together when one
    doesn't fit (_balanceButtonLines, new-game.js). */
 #lineupBtns, #orderBtns { width: calc((100% - 10px) / 2); }
-/* Past game's date: the field, then its button (No time, No date, Today). */
-.date-field-row { display: flex; gap: 8px; align-items: stretch; }
-.date-field-row input { flex: 1; min-width: 0; }
-.date-field-row .btn.btn-lineup { flex: 0 0 auto; padding: 2px 10px; width: 7.5em; white-space: normal; }   /* as wide for each label: the field doesn't shift */
+/* Past game's date: the field and its button (Unknown time, Unknown date,
+   Set date), half the row each, like Duration and Rounds. */
+.date-field-row { display: flex; gap: 10px; align-items: stretch; }
+.date-field-row input { flex: 1 1 0; min-width: 0; }
+.date-field-row .btn.btn-lineup { flex: 1 1 0; padding: 2px 10px; white-space: normal; }
 .btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
   flex: 1 1 0; min-width: 0; white-space: nowrap; justify-content: center; text-align: center;
   background: var(--s3); border: 1px solid var(--border); color: var(--muted); }
-/* New Game: the player count sits on the Draw pool row, at its right end. */
-.count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; }
+/* New Game: the player count sits on the Draw pool row, at its right end,
+   the other half of it (the Draw pool box, or the order button, the first). */
+.count-select-wrap.draw-mode-count { margin-left: auto; position: relative; display: inline-flex; align-items: center; width: calc((100% - 10px) / 2); }
+.count-select-wrap.draw-mode-count .players-count-select { width: 100%; }
 /* The same ▼ as the Draw pool box, instead of the select's line chevron. */
 .count-select-wrap .players-count-select { height: 30px; min-height: 30px; max-height: 30px; background-image: none; padding-right: 24px; }
 .count-select-wrap .chevron { position: absolute; right: 10px; pointer-events: none; }
@@ -2138,12 +2141,10 @@ select:disabled {
 
 /* Inline variant, sits in the same row as the mode select */
 /* As wide as the Duration box (the form's left column), like the lineup
-   buttons under it; wider only when its label needs it (Riserva cattivi,
-   Large text), up to the player count's room. */
+   buttons under it and the player count beside it. */
 .exclude-toggle.exclude-toggle-inline {
-  width: auto;
-  min-width: calc((100% - 10px) / 2);
-  max-width: calc(100% - 90px);
+  width: calc((100% - 10px) / 2);
+  min-width: 0;
   justify-content: space-between;
   padding: 0 10px;
   font-size: calc(12px * var(--ts));

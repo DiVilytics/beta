@@ -555,7 +555,7 @@ window.I18N.it = {
     "Play a game with the timer or record a past one, then save and share it.": "Gioca una partita con il timer o registrane una passata, poi salvala e condividila.",
     "round": "round",
     "When a villain wins, tap their mover: the game stops, with the winner and the duration filled in. A round ends when every player has had their turn: tap + when the first player is up again.": "Quando un cattivo vince, tocca la sua pedina: la partita si ferma, con il vincitore e la durata già inseriti. Un round finisce quando tutti i giocatori hanno fatto il proprio turno: tocca + quando tocca di nuovo al primo giocatore.",
-    "Date/Time": "Data/ora",
+    "Date &amp; time": "Data e ora",
     "Villains and Players": "Cattivi e giocatori",
     "Draw pool": "Riserva cattivi",
     "Draw villains": "Pesca i cattivi",
