@@ -7,8 +7,8 @@
 //     steps: [{ el: selector, [selectors] (lit together) or () => element, text,
 //     prep?: () => void }],
 //     prep runs before its step is shown (a step whose element is missing or
-//     hidden is skipped); onEnd runs once, however the tour stops (Done, ×,
-//     Esc, a tap on the dimmed page).
+//     hidden is skipped); onEnd runs once, however the tour stops (Done, ×
+//     or Esc; a tap on the dimmed page does nothing).
 //
 // Keys: → / Enter next, ← back, Esc stops. Follows the page's scroll, size and
 // text size; colors from the theme's tokens (style.css, .tour-*).
@@ -23,10 +23,10 @@ function startTour(steps, { onEnd } = {}) {
   bubble.className = 'tour-bubble';
   bubble.setAttribute('role', 'dialog');
   bubble.setAttribute('aria-live', 'polite');
-  // A tap on the dimmed page (outside the bubble) stops the tour.
+  // The dimmed page takes the taps outside the bubble and ignores them: only ×
+  // and Esc stop the tour (a stray tap shouldn't end it).
   const shade = document.createElement('div');
   shade.className = 'tour-shade';
-  shade.addEventListener('click', () => endTour());
   document.body.append(shade, spot, bubble);
   // The page's layout can move without a scroll (a panel shown, an image
   // loaded): the lit box follows it too.
