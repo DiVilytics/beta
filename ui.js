@@ -178,9 +178,11 @@ function _localDateTimeValue(d = new Date()) {
 // 'full' (date and time), 'day' (the day alone) or 'none'.
 function dateFieldMode(el) { return !el.value ? 'none' : el.type === 'date' ? 'day' : 'full'; }
 // The field set to a mode; value: its 'YYYY-MM-DDTHH:MM' (full) or 'YYYY-MM-DD' (day).
+// No date: the field empty and off (gray, not tappable), until a date is set.
 function setDateField(el, mode, value = '') {
   el.type  = mode === 'day' ? 'date' : 'datetime-local';
   el.value = mode === 'none' ? '' : value;
+  el.disabled = mode === 'none';
 }
 function setDateFieldNow(el) { setDateField(el, 'full', _localDateTimeValue()); }
 // The link's next step, then its label (the step after that).
@@ -193,8 +195,8 @@ function cycleDateField(el) {
 function dateFieldLinkLabel(el) {
   return { full: t('Unknown time'), day: t('Unknown date'), none: t('Set date') }[dateFieldMode(el)];   // Set date: today, now, to change
 }
-// New Game's switch: No time ('day': the day alone), No date ('none') or
-// Set date ('full': the date and time). Switching keeps what it can: the day
+// New Game's switch: Set date ('full': the date and time), No time ('day':
+// the day alone) or No date ('none'). Switching keeps what it can: the day
 // (at the current time), or today when there was no date.
 function setDateFieldMode(el, mode) {
   const cur = dateFieldMode(el), now = _localDateTimeValue();

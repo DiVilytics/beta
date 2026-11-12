@@ -273,8 +273,8 @@ function _setDateToNow() {
 }
 
 // The date is optional (a game remembered later): it starts at the current
-// date and time, and the switch beside it picks No time (the day alone), No
-// date or Set date, the date and time (A GAME'S DATE FIELD, ui.js). A game
+// date and time, and the switch beside it picks Set date (the date and time),
+// No time (the day alone) or No date (the field off) (A GAME'S DATE FIELD, ui.js). A game
 // started live takes the start's.
 function setDateMode(mode) {
   setDateFieldMode(document.getElementById('fDate'), mode);

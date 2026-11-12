@@ -603,10 +603,14 @@ main {
    buttons split that width; their labels go on two lines together when one
    doesn't fit (_balanceButtonLines, new-game.js). */
 #lineupBtns, #orderBtns { width: calc((100% - 10px) / 2); }
-/* Past game's date: the field and its switch (No time | No date | Set date),
+/* Past game's date: the field and its switch (Set date | No time | No date),
    half the row each, like Duration and Rounds; a label goes on two lines
    when it doesn't fit. */
 .date-field-row { display: flex; gap: 10px; align-items: stretch; }
+/* No date: the field gray and empty, its placeholder and calendar icon hidden. */
+.date-field-row input:disabled, input[type="datetime-local"]:disabled { opacity: 0.55; cursor: not-allowed; background-color: var(--s3); color: transparent; user-select: none; }
+input[type="datetime-local"]:disabled::-webkit-datetime-edit,
+input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visibility: hidden; }
 .date-field-row input, .date-field-row .date-mode-seg { flex: 0 0 calc((100% - 10px) / 2); min-width: 0; box-sizing: border-box; }
 .date-mode-seg .seg-btn { flex: 1 1 auto; min-width: 0; height: auto; padding: 0 3px; justify-content: center; white-space: normal; line-height: 1.1; text-align: center; }
 .btn.btn-lineup { height: auto; min-height: 30px; border-radius: var(--rs); padding: 2px 8px; font-size: calc(12px * var(--ts)); line-height: 1.15;
