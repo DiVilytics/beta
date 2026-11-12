@@ -1,4 +1,4 @@
-// What's new: the release notes (asset/data/changelog.json, via loadChangelog),
+// What's new: the release notes (asset/data/changelog.json, the beta changelog.beta.json; via loadChangelog),
 // newest first, one entry a week (keyed by its Monday), a title and up to three
 // short points (`items`): what changed that week, in a few words. Entries
 // added (or extended) since the last visit are tinted purple; opening the page

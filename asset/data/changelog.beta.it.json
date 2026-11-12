@@ -1,0 +1,110 @@
+{
+  "2026-11-09": {
+    "title": "Tornei: copie e subentri",
+    "items": [
+      "Tornei: indica quante copie di ogni cattivo sono disponibili; due cattivi uguali non siedono mai allo stesso tavolo.",
+      "Tornei: un organizzatore può aggiungere un giocatore a torneo in corso; gioca dalla fase successiva, partendo da 0 punti.",
+      "Tornei: il risultato inserito da un organizzatore può includere durata e round."
+    ]
+  },
+  "2026-11-02": {
+    "title": "Partite passate, Scontri e caricamenti",
+    "items": [
+      "Nuova partita: Gioca ora o Partita giocata; una partita giocata si salva anche senza ora, data o ordine di gioco.",
+      "Classifica: Scontri per i cattivi e Δ Vittorie per i giocatori; Grafici: Quando si gioca (giorno, fascia oraria, ora), e ogni scatola con il suo colore.",
+      "Account: Carica partite da un file; le pagine giocatore elencano i loro tornei, le partite giocate e quelle registrate."
+    ]
+  },
+  "2026-10-26": {
+    "title": "Tre dimensioni del testo",
+    "items": [
+      "Dimensione del testo: Piccola, Media (la nuova predefinita) e Grande, sotto il tuo avatar; Grande è più grande di prima, e Nuova partita e le pagine dei cattivi le fanno spazio sui telefoni piccoli."
+    ]
+  },
+  "2026-10-19": {
+    "title": "Organizzatori, Δ Vittorie nelle pagine dei cattivi e tocca il vincitore",
+    "items": [
+      "Tornei: quanti organizzatori vuoi, aggiunti con il QR organizzatori; i tuoi tornei in corso vengono prima, con uno stato più chiaro e il risultato finale.",
+      "Δ Vittorie in ogni pagina dei cattivi, per ogni numero di giocatori; e ogni pagina giocatore mostra gli XP totali del giocatore.",
+      "Nuova partita: quando un cattivo vince, tocca la sua pedina; la partita si ferma con il vincitore segnato, pronta da salvare."
+    ]
+  },
+  "2026-10-12": {
+    "title": "Tornei, Δ Vittorie e nuovi grafici",
+    "items": [
+      "Tornei: crealo con i suoi giocatori e le sue opzioni, e DiVilytics sorteggia tavoli e cattivi di ogni fase e tiene la classifica; i giocatori rivendicano il proprio nome con il suo codice QR, e un telefono registra la partita di ogni tavolo.",
+      "Δ Vittorie: quanto le vittorie di ogni cattivo si scostano da quelle attese con pari probabilità, nella classifica dei cattivi e nei grafici.",
+      "Grafici: i filtri della Classifica su ogni grafico, viste da alternare, medie e mediane, e Scontri: chi batte chi; e il Solitario ti avvisa all'ultimo round."
+    ]
+  },
+  "2026-10-05": {
+    "title": "Solitario, XP, guide e una Nuova partita più fluida",
+    "items": [
+      "Il Solitario, una variante non ufficiale per un giocatore contro un giocatore Fantasma, con classifiche proprie; e gli XP, guadagnati con le partite rivendicate e i traguardi.",
+      "Sempre, Anno e Mese in Classifica, nel Registro e nelle pagine dei giocatori; una guida per ogni cattivo; le pedine; e questa pagina.",
+      "Nuova partita conserva la partita in corso e la riserva cattivi; chi ha registrato una partita può correggerla o eliminarla; dimensione del testo, Installa, scorciatoie da tastiera e le impostazioni sotto il tuo avatar."
+    ]
+  },
+  "2026-09-28": {
+    "title": "DiVilytics in italiano, Tutorial e F.A.Q.",
+    "items": [
+      "DiVilytics in italiano, con carte, obiettivi e guide come nell'edizione italiana.",
+      "Un Tutorial, le F.A.Q. con il regolamento ufficiale riassunto, e i mazzi di ogni cattivo carta per carta."
+    ]
+  },
+  "2026-08-03": {
+    "title": "Introduction to Evil e Darkness Brewing",
+    "items": [
+      "I cattivi rivisti di Introduction to Evil con statistiche proprie, e Darkness Brewing tra le tue scatole.",
+      "Scarica tutte le tue partite in CSV dal tuo Account."
+    ]
+  },
+  "2026-07-20": {
+    "title": "Tre nuovi cattivi",
+    "items": [
+      "Ernesto de la Cruz, il Principe Hans e le Sorelle Sanderson."
+    ]
+  },
+  "2026-06-22": {
+    "title": "Grafici e la pagina Giocatori",
+    "items": [
+      "Grafici: una dozzina di modi per esplorare ogni partita registrata.",
+      "Giocatori: cerca qualsiasi giocatore, o condividi il tuo profilo con un codice QR."
+    ]
+  },
+  "2026-06-15": {
+    "title": "Nuova pagina Account, rivalità e nuovi traguardi",
+    "items": [
+      "Una nuova pagina Account, filtri dei cattivi in Nuova partita e nel Registro, e tanti nuovi traguardi.",
+      "Le pagine dei cattivi mostrano le loro rivalità, e quelle dei giocatori con chi giocano di più."
+    ]
+  },
+  "2026-06-01": {
+    "title": "Rivendica il tuo cattivo, e crea il tuo avatar",
+    "items": [
+      "Il codice QR di una partita apre la sua pagina: rivendica il tuo cattivo, o correggi i dettagli della partita.",
+      "Crea il tuo avatar, e i luoghi già usati vengono suggeriti mentre scrivi."
+    ]
+  },
+  "2026-05-11": {
+    "title": "Le mie scatole, i traguardi e Google",
+    "items": [
+      "Segna le scatole che possiedi, e ottieni traguardi di bronzo, argento e oro per ogni cattivo.",
+      "Accedi con Google oltre che con Discord, e scegli la tua icona."
+    ]
+  },
+  "2026-05-04": {
+    "title": "Un nuovo nome, Nuova partita e il Registro",
+    "items": [
+      "DVS diventa DiVilytics, e le pagine dei cattivi mostrano i chiarimenti sulle regole.",
+      "Registrare una partita ha una pagina sua, Nuova partita, con il sorteggio, e lo storico diventa il Registro."
+    ]
+  },
+  "2026-04-20": {
+    "title": "DVS va online",
+    "items": [
+      "Registra le tue partite con un timer, e condividi un codice QR perché ogni giocatore rivendichi il suo cattivo.",
+      "Storico delle partite, classifiche, e una pagina per ogni cattivo e ogni giocatore."
+    ]
+  }
+}
