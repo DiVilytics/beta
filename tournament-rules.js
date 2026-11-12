@@ -27,14 +27,29 @@
 //                                            have different villains from the pool
 //   tournamentPoolCopies(pool)               { villain: copies }
 //   tournamentDrawFinal(tour, players, tables) the final table, when there is one
+//   tournamentLastStage(tour)                the last stage (null: open, not ended)
+//   tournamentIsFinal(tour, stage)           whether a stage is the final table's
+//   tournamentMoreStages(tour)               whether a stage can still be drawn
 //   fmtTournamentPoints(p)                   "1.5" / "1,5"
 //
-// A tour is a tournaments row ({ table_size, stages, pairing, scoring,
+// A tour is a tournaments row ({ table_size, stages (null: open), ended_stage
+// (the stages ended there, early), pairing, scoring,
 // villain_pool: a villain once per copy at hand }); a table is { stage, saved_at, seats: [{ player_id,
 // position, character, place, minutes, round, dropped }] }; a player is a
 // tournament_players row ({ id, name, user_id, withdrawn_after, joined_stage
 // (a late player: the first stage they play) }): players are
 // their ids here, claimed or not.
+
+// ── Stages ───────────────────────────────────────────────────────────────────
+// Stages: a number, or open (null: drawn one after the other, up to
+// TN_OPEN_STAGES, until an organizer ends them). The stages can end early,
+// after any stage (ended_stage): Draw the final, or End tournament without one.
+
+const TN_OPEN_STAGES = 50;
+const tournamentLastStage = tour => tour.ended_stage ?? tour.stages ?? null;
+const tournamentIsFinal = (tour, stage) => { const last = tournamentLastStage(tour); return last != null && stage > last; };
+const tournamentMoreStages = tour => !tour.finished_at && tour.ended_stage == null && tour.current_stage > 0
+  && tour.current_stage < (tour.stages ?? TN_OPEN_STAGES);
 
 // ── Random ───────────────────────────────────────────────────────────────────
 
@@ -483,7 +498,7 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
   };
   for (const p of players) row(p.id);
   // The stages' tables (a final table scores no points: it ranks the finalists).
-  const counted = tables.filter(tb => tb.saved_at && tb.stage <= stage && tb.stage <= tour.stages);
+  const counted = tables.filter(tb => tb.saved_at && tb.stage <= stage && !tournamentIsFinal(tour, tb.stage));
   for (const tb of counted) {
     const n = tb.seats.length;
     const notPlayed = tournamentTableNotPlayed(tb);
@@ -510,7 +525,7 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
 
   // A saved final table decides the top places: its finalists by its ranking
   // (r.final: their place in it), then everyone else as they stood, after them.
-  const final = tour.final_table && stage > tour.stages && tables.find(tb => tb.stage > tour.stages && tb.saved_at);
+  const final = tour.final_table && tournamentIsFinal(tour, stage) && tables.find(tb => tournamentIsFinal(tour, tb.stage) && tb.saved_at);
   if (final) {
     const place = new Map(final.seats.map(s => [s.player_id, s.place]));
     const top  = sorted.filter(r => place.has(r.player_id)).sort((a, b) => place.get(a.player_id) - place.get(b.player_id));
@@ -522,14 +537,15 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
   return sorted;
 }
 
-// The final table: the top of the standings after the last stage (as many as
+// The final table: the top of the standings after the stage just played (the
+// last, or the one the stages end at) (as many as
 // a table holds, among those still playing; ties in the standings' order),
 // each with a villain from the pool they haven't played yet in the tournament
 // when possible, all different, seated by the play order rule. Returns
 // { players: [ids in play order], villains: [{ player_id, character }] }.
 function tournamentDrawFinal(tour, players, tables) {
-  const playing = new Set(tournamentPlaying(players, tour.stages + 1).map(p => p.id));
-  const finalists = tournamentStandings(tour, tables, { players, stage: tour.stages })
+  const playing = new Set(tournamentPlaying(players, tour.current_stage + 1).map(p => p.id));
+  const finalists = tournamentStandings(tour, tables, { players, stage: tour.current_stage })
     .filter(r => playing.has(r.player_id)).slice(0, tour.table_size).map(r => r.player_id);
   const played = new Map(finalists.map(id => [id, new Set()]));
   for (const tb of tables) for (const s of tb.seats) played.get(s.player_id)?.add(s.character);

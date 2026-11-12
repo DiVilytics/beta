@@ -111,8 +111,15 @@ function fmtTournamentDate(tour) {
 function tournamentStatus(tour) {
   if (tour.finished_at)    return t('Finished');
   if (!tour.current_stage) return t('Not started');
-  if (tour.current_stage > tour.stages) return t('Final');
-  return t('Stage {n} of {m}', { n: tour.current_stage, m: tour.stages });
+  return tournamentStageName(tour, tour.current_stage);
+}
+
+// A stage's name: "Stage 2 of 3" (of the stage the stages ended at, once
+// ended early; "Stage 2" while open), or "Final" for the final table.
+function tournamentStageName(tour, stage) {
+  if (tournamentIsFinal(tour, stage)) return t('Final');
+  const last = tournamentLastStage(tour);
+  return last ? t('Stage {n} of {m}', { n: stage, m: last }) : t('Stage {n}', { n: stage });
 }
 
 // 'lobby' (not started), 'running' or 'finished'.

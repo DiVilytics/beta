@@ -293,7 +293,7 @@ function tnRenderTournament() {
   const options = [
     opt('Table size', tnTour.table_size),
     opt('Tables', t((TOURNAMENT_SPLITS[tnTour.table_split] || TOURNAMENT_SPLITS.even).name)),
-    opt('Stages', tnTour.stages),
+    opt('Stages', [tnTour.stages ?? t('Open-ended'), tnTour.ended_stage ? t('ended after stage {n}', { n: tnTour.ended_stage }) : null].filter(Boolean).join(' | ')),
     opt('Pairing', pairing ? t(pairing.name) : _esc(tnTour.pairing)),
     opt('Play order', t((TOURNAMENT_PLAY_ORDERS[tnTour.play_order] || TOURNAMENT_PLAY_ORDERS.random).name)),
     opt('Scoring', scoring ? t(scoring.name) : _esc(tnTour.scoring)),
@@ -333,7 +333,7 @@ function tnRenderTournament() {
     ${lobby || tnView === 'players' ? `
       ${lobby ? `<div class="section-label">${t('Players')}</div>` : ''}
       ${tnPlayers.length ? `<div class="tn-player-rows">${rows}</div>` : `<p class="tn-hint">${t('No players yet.')}</p>`}
-      ${isOrg && !lobby && !tnTour.finished_at && tnTour.current_stage < tnTour.stages
+      ${isOrg && !lobby && tournamentMoreStages(tnTour)
         ? `<button class="add-row-btn tn-late-btn" type="button" onclick="tnAddLatePlayer()">${t('+ Add player')}</button>
            <p class="tn-hint">${t('A player added now plays from stage {n}, starting from 0 points.', { n: tnTour.current_stage + 1 })}</p>` : ''}
       ${!user ? `<p class="tn-hint">${t('Sign in to claim your name.')} <button class="btn btn-ghost btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button></p>`
@@ -434,12 +434,16 @@ function _tnOverHTML(mine) {
   const winners = rows.filter(r => r.rank === 1).map(r => `<strong class="text-emph">${_esc(tnPlayerName(byId.get(r.player_id)))}</strong>`);
   const me = mine ? rows.find(r => r.player_id === mine.id) : null;
   const medal = me && me.rank <= 3 ? `${TOURNAMENT_MEDALS[me.rank - 1]} ` : '';
+  // Ended by an organizer, without a final: theirs to reopen.
+  const reopen = _tnIsOrg(getCurrentUser()) && !tnTour.final_table && tnTour.ended_stage === tnTour.current_stage;
   return `
     <div class="claim-game-info tn-you">
       <div class="claim-date">🏁 ${t('Tournament over')}</div>
       ${winners.length ? `<div class="claim-meta">${tn(winners.length, 'Winner: {names}', 'Winners: {names}', { names: new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(winners) })}</div>` : ''}
       ${me ? `<div class="claim-meta tn-over-you">${medal}${t('You finished {place}', { place: fmtPlace(me.rank) })} | ${_tnPointsLabel(me.points)}</div>` : ''}
-    </div>`;
+    </div>
+    ${reopen ? `<div class="claim-share-row"><button class="btn btn-ghost btn-sm" type="button" onclick="tnReopen()">${t('Reopen')}</button></div>
+      <p class="tn-hint tn-hint-center">${t('Ended by an organizer after stage {n}: Reopen and the stages go on.', { n: tnTour.ended_stage })}</p>` : ''}`;
 }
 
 // Your game in the current stage, on top: your table, your villain and your
@@ -449,7 +453,7 @@ function _tnYourGameHTML(mine) {
   const tb = tnTables.find(x => x.stage === tnTour.current_stage && x.seats.some(s => s.player_id === mine.id));
   if (!tb) return '';
   const seat = tb.seats.find(s => s.player_id === mine.id);
-  const head = `${t('Your game')} | ${tb.stage > tnTour.stages ? t('Final') : t('Stage {n}', { n: tb.stage })}`;
+  const head = `${t('Your game')} | ${tournamentIsFinal(tnTour, tb.stage) ? t('Final') : t('Stage {n}', { n: tb.stage })}`;
   if (tb.seats.length === 1) {
     return `<div class="claim-game-info tn-you"><div class="claim-date">${head}</div><div class="claim-meta">${t('You have a bye in this stage (it counts as last).')}</div></div>`;
   }
@@ -484,25 +488,32 @@ function _tnStageHTML(mine) {
 
 // The organizer's Draw stage (once every table of the stage is saved) and
 // Undo draw (while none of its games is saved, a bye isn't a game: after,
-// it stays, off, the reason on hover).
+// it stays, off, the reason on hover). The stages can end after any stage:
+// Draw the final (with one; at the last stage it's the only way on), End
+// tournament (without; the last stage ends it by itself).
 function _tnNextStageHTML(tables) {
   const user = getCurrentUser();
   if (!_tnIsOrg(user)) return '';
   const canUndo = !tables.some(tb => tb.game_id);
-  const open  = !tnTour.finished_at;
-  const more  = open && tnTour.current_stage < tnTour.stages;
-  const final = open && tnTour.final_table && tnTour.current_stage === tnTour.stages;
+  const more  = tournamentMoreStages(tnTour);
+  const atEnd = !tnTour.finished_at && tnTour.ended_stage == null && !tournamentIsFinal(tnTour, tnTour.current_stage);
+  const final = atEnd && tnTour.final_table;
+  const end   = more && !tnTour.final_table;
   const ready = tables.every(tb => tb.saved_at);
   if (!more && !final && !canUndo) return '';
-  const draw = more
-    ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnNextStage()"${ready ? '' : ' disabled'}>${t('Draw stage {n}', { n: tnTour.current_stage + 1 })}</button>`
-    : final ? `<button class="btn btn-primary btn-sm" type="button" onclick="tnDrawFinal()"${ready ? '' : ' disabled'}>${t('Draw the final')}</button>` : '';
+  const off = ready ? '' : ' disabled';
+  const btn = (cls, fn, label) => `<button class="btn ${cls} btn-sm" type="button" onclick="${fn}()"${off}>${label}</button>`;
+  const draws = [
+    final ? btn(more ? 'btn-ghost' : 'btn-primary', 'tnDrawFinal', t('Draw the final')) : '',
+    end   ? btn('btn-ghost', 'tnEndStages', t('End tournament')) : '',
+    more  ? btn('btn-primary', 'tnNextStage', t('Draw stage {n}', { n: tnTour.current_stage + 1 })) : '',
+  ].join('');
   return `
     <div class="claim-share-row">
       <button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()"${canUndo ? '' : ` disabled title="${_esc(t('A game of this stage is saved: its draw stays.'))}"`}>${t('Undo draw')}</button>
-      ${draw}
+      ${draws}
     </div>
-    ${draw && !ready ? `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>` : ''}`;
+    ${draws && !ready ? `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>` : ''}`;
 }
 
 // What the next draw makes: "Stage 3 of 5: 2 tables and 1 bye, Swiss pairing."
@@ -513,12 +524,15 @@ function _tnDrawSummary(stage) {
   const tables = sizes.filter(n => n > 1).length, byes = sizes.length - tables;
   const what = byes ? t('{tables} and {byes}', { tables: tn(tables, '{n} table', '{n} tables'), byes: tn(byes, '{n} bye', '{n} byes') }) : tn(tables, '{n} table', '{n} tables');
   const pairing = (TOURNAMENT_PAIRINGS[tnTour.pairing] || TOURNAMENT_PAIRINGS.random).name;
-  return `${t('Stage {n} of {m}: {what}, {pairing} pairing.', { n: stage, m: tnTour.stages, what, pairing: t(pairing) })} ${t('It can be undone until a game is saved (a bye isn\'t a game).')}`;
+  const head = tnTour.stages ? t('Stage {n} of {m}: {what}, {pairing} pairing.', { n: stage, m: tnTour.stages, what, pairing: t(pairing) })
+    : t('Stage {n}: {what}, {pairing} pairing.', { n: stage, what, pairing: t(pairing) });
+  return `${head} ${t('It can be undone until a game is saved (a bye isn\'t a game).')}`;
 }
 
-// A stage's name: "Stage 2 of 3", or "Final" for the final table.
+// A stage's name: "Stage 2 of 3" ("Stage 2" while open; of the stage they
+// ended at, once ended early), or "Final" for the final table.
 function tnStageLabel(stage) {
-  return stage > tnTour.stages ? t('Final') : t('Stage {n} of {m}', { n: stage, m: tnTour.stages });
+  return tournamentStageName(tnTour, stage);
 }
 
 // The final: the top of the standings play one last table (tournament-rules.js).
@@ -531,10 +545,13 @@ function tnDrawFinal() {
     ? `${t('The top {n} of the standings play one last table, and its ranking decides the tournament\'s top places: {names}.', { n: players.length, names: `<strong class="text-emph">${new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(names)}</strong>` })} ${t('It can be undone until it is saved.')}`
     : players.length ? t('Only {name} is still playing: they win the final and the tournament ends.', { name: `<strong class="text-emph">${names[0]}</strong>` })
     : t('Nobody is still playing: there is no final and the tournament ends on the standings as they are.');
+  // Before the planned last stage (or open): the stages end here.
+  const early = tnTour.current_stage !== tnTour.stages
+    ? `<p class="confirm-text">${t('The stages end with stage {n}: no stage is drawn after it.', { n: tnTour.current_stage })}</p>` : '';
   openConfirmSheet({
     id:           'tnFinalSheet',
     title:        players.length > 1 ? t('Draw the final?') : t('End the tournament?'),
-    bodyHTML:     `<p class="confirm-text">${body}</p>`,
+    bodyHTML:     `${early}<p class="confirm-text">${body}</p>`,
     confirmLabel: players.length > 1 ? t('Draw the final') : t('End tournament'),
     onConfirm:    async () => {
       const { error } = await db.rpc('draw_tournament_final', { target: tnTour.id, villains, players });
@@ -548,10 +565,13 @@ function tnDrawFinal() {
 // tournament is back at the stage before, or in the lobby from stage 1.
 function tnUndoStage() {
   const st = tnTour.current_stage;
+  const isFinal = tournamentIsFinal(tnTour, st);
   openConfirmSheet({
     id:           'tnUndoSheet',
-    title:        t('Undo the draw of stage {n}?', { n: st }),
-    bodyHTML:     `<p class="confirm-text">${st === 1
+    title:        isFinal ? t('Undo the draw of the final?') : t('Undo the draw of stage {n}?', { n: st }),
+    bodyHTML:     `<p class="confirm-text">${isFinal
+      ? t('Its table is cancelled, a game in progress included, and the tournament goes back to the end of stage {n}: the stages go on, or the final is drawn again.', { n: st - 1 })
+      : st === 1
       ? t('Its tables are cancelled, games in progress included, and the tournament goes back to before the start: the settings and the players change in Edit tournament, and Start draws everything again.')
       : t('Its tables are cancelled, games in progress included, and the tournament goes back to stage {n}: you can bring players back, then draw again.', { n: st - 1 })}</p>`,
     confirmLabel: t('Undo draw'),
@@ -562,6 +582,26 @@ function tnUndoStage() {
       await _tnAfter(error);
     },
   });
+}
+
+// End tournament, without a final table: the stages end after this one, the
+// standings as they are. Reopen takes it back while nothing else is drawn.
+function tnEndStages() {
+  openConfirmSheet({
+    id:           'tnEndSheet',
+    title:        t('End the tournament?'),
+    bodyHTML:     `<p class="confirm-text">${t('The stages end with stage {n}, and the tournament ends on the standings as they are. Reopen takes it back.', { n: tnTour.current_stage })}</p>`,
+    confirmLabel: t('End tournament'),
+    onConfirm:    async () => {
+      const { error } = await db.rpc('end_tournament_stages', { target: tnTour.id, ended: true });
+      await _tnAfter(error);
+    },
+  });
+}
+
+async function tnReopen() {
+  const { error } = await db.rpc('end_tournament_stages', { target: tnTour.id, ended: false });
+  await _tnAfter(error);
 }
 
 // A table, drawn like a game card: its players in play order with their
@@ -765,7 +805,7 @@ async function tnOpenForm(tour) {
   document.getElementById('tnName').value   = tour?.name || '';
   document.getElementById('tnDate').value   = tour?.event_date || _tnToday();
   document.getElementById('tnSize').value   = String(tour?.table_size || 4);
-  document.getElementById('tnStages').value = String(tour?.stages || 3);
+  document.getElementById('tnStages').value = tour ? String(tour.stages ?? 'open') : '3';
   tnRule.table_split = tour?.table_split || 'even';
   tnRule.pairing     = tour?.pairing || 'random';
   tnRule.play_order  = tour?.play_order || 'random';
@@ -1004,7 +1044,8 @@ const TN_HELP = [
     'Fixed once the first game starts.',
   ]],
   ['stages', 'Stages', [
-    'How many rounds of tables the tournament plays. In every stage, each player still in the tournament plays one game, or has a bye. The final table, when on, comes after the last stage.',
+    'How many rounds of tables the tournament plays, or Open-ended: as many as the organizers want. In every stage, each player still in the tournament plays one game, or has a bye. The final table, when on, comes after the last stage.',
+    'The stages can end early: after any stage, once all its tables are saved, an organizer taps Draw the final (with a final table) or End tournament (without one). Undo draw takes the final back until its game is saved; without a final, Reopen takes the end back.',
     'Fixed once the first game starts.',
   ]],
   ['tables', 'Tables', [
@@ -1349,10 +1390,11 @@ async function tnSaveForm() {
     return tnLoad(tnFormFor.id);
   }
   const name   = document.getElementById('tnName').value.trim();
-  const stages = Number(document.getElementById('tnStages').value);
+  const stagesVal = document.getElementById('tnStages').value;
+  const stages = stagesVal === 'open' ? null : Number(stagesVal);
   if (new Set(names.map(n => n.toLowerCase())).size !== names.length) return showError('tnFormErr', t('Every player needs a different name.'));
   if (!name) return showError('tnFormErr', t('Give the tournament a name.'));
-  if (!Number.isInteger(stages) || stages < 1 || stages > 20) return showError('tnFormErr', t('Stages: from 1 to 20.'));
+  if (stages !== null && (!Number.isInteger(stages) || stages < 1 || stages > 20)) return showError('tnFormErr', t('Stages: from 1 to 20.'));
   if (new Set(pool).size < 2) return showError('tnFormErr', t('The draw pool needs at least 2 villains.'));
   const total = names.length;
   if (total > pool.length) return showError('tnFormErr', t('The draw pool has {v} copies of villains for {n} players: every player needs one.', { v: pool.length, n: total }));
@@ -1491,7 +1533,7 @@ async function tnStartTable(tableId) {
   if (error) return _tnAfter(error);
   const byId = new Map(tnPlayers.map(p => [p.id, p]));
   const game = {
-    tourId: tnTour.id, tableId, stage: tb.stage, tableNo: tb.table_no, tourName: tnTour.name, isFinal: tb.stage > tnTour.stages,
+    tourId: tnTour.id, tableId, stage: tb.stage, tableNo: tb.table_no, tourName: tnTour.name, isFinal: tournamentIsFinal(tnTour, tb.stage),
     startedAt: Date.now(),
     seats: tb.seats.map(s => ({ position: s.position, player_id: s.player_id, character: s.character, name: tnPlayerName(byId.get(s.player_id)) })),
     // Who withdrew before the game: dropped from the start (the last places).
