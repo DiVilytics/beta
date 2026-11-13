@@ -30,6 +30,7 @@ const LIVE_GAME_MAX_AGE_MS = 48 * 60 * 60 * 1000;   // 48h: a paused game since 
 // ── STATIC DATA ──────────────────────────────────────────────────────────────
 const DATA_OBJECTIVES_URL    = 'asset/data/objectives.json';
 const DATA_FAQ_URL           = 'asset/data/faq.json';
+const DATA_TOURNAMENT_HELP_URL = 'asset/data/tournament-help.json';   // Tournament options (the ⓘ sheet)
 // What's new: the beta keeps its own (changelog.beta.json, .beta.it.json), the
 // release's written on main and the beta's on solo, so merges never meet.
 const DATA_CHANGELOG_URL     = IS_BETA ? 'asset/data/changelog.beta.json' : 'asset/data/changelog.json';

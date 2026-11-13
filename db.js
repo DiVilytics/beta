@@ -261,6 +261,14 @@ async function loadObjectives() {
 // Shown on faq.html. In Italian, faq.it.json (same shape) replaces what it
 // covers, a rulebook or a villain at a time; what it lacks stays English.
 let _faq = null;
+// Tournament options (tournaments.js, the ⓘ sheet): { id: { title, paras } }
+// in order, each section translated whole by tournament-help.it.json.
+let _tnHelp = null;
+async function loadTournamentHelp() {
+  if (!_tnHelp) _tnHelp = await _fetchJsonLocalized(DATA_TOURNAMENT_HELP_URL);
+  return _tnHelp;
+}
+
 async function loadFaq() {
   if (!_faq) _faq = await _fetchJsonLocalized(DATA_FAQ_URL, 2);
   return _faq;

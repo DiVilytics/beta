@@ -21,7 +21,13 @@
 //   tournamentStandings(tour, tables, opts)  the ranking, from saved tables
 //   tournamentDrawStage(tour, players, tables)  the next stage's tables, play
 //                                            order included (start: no tables)
-//   tournamentPlaying(players, stage)        who plays a stage (late ones once joined)
+//   tournamentPlaying(players, stage, tour, tables)  who plays a stage (late ones
+//                                            once joined; a knockout's: who advanced)
+//   TOURNAMENT_FORMATS[id]                   { name, hint }: points | knockout
+//   tournamentIsLastTable(tour, stage)       the final table's stage, or a knockout's last
+//   tournamentIsKnockout(tour), tournamentKoTables(tour, stage), tournamentKoMin(tour),
+//   tournamentKoMax(tour), tournamentKoValid(size, advance, stages),
+//   tournamentKoStartSizes(tour, n)          the knockout format's bracket
 //   tournamentStageVillains(tour, tables, before) a stage's villains, for its tables
 //   tournamentVillainsFit(pool, sizes)       whether tables of these sizes can all
 //                                            have different villains from the pool
@@ -32,7 +38,8 @@
 //   tournamentMoreStages(tour)               whether a stage can still be drawn
 //   fmtTournamentPoints(p)                   "1.5" / "1,5"
 //
-// A tour is a tournaments row ({ table_size, stages (null: open), ended_stage
+// A tour is a tournaments row ({ format ('points' | 'knockout'), advance (a
+// knockout's: how many advance from each table), table_size, stages (null: open), ended_stage
 // (the stages ended there, early), pairing, scoring,
 // villain_pool: a villain once per copy at hand }); a table is { stage, saved_at, seats: [{ player_id,
 // position, character, place, minutes, round, dropped }] }; a player is a
@@ -50,6 +57,68 @@ const tournamentLastStage = tour => tour.ended_stage ?? tour.stages ?? null;
 const tournamentIsFinal = (tour, stage) => { const last = tournamentLastStage(tour); return last != null && stage > last; };
 const tournamentMoreStages = tour => !tour.finished_at && tour.ended_stage == null && tour.current_stage > 0
   && tour.current_stage < (tour.stages ?? TN_OPEN_STAGES);
+
+// ── Knockout ─────────────────────────────────────────────────────────────────
+// A fixed bracket: table size T, the top P of each table advance (P divides T)
+// and F stages, the last one the final. Each stage has (T/P)^(F - stage)
+// tables; table j takes those who advanced from tables (j - 1)·T/P + 1 …
+// j·T/P before it (table_no). Stage 1 is drawn at random, with empty seats
+// spread out when fewer than T × (T/P)^(F - 1) play (at least P + 1 a table).
+
+const TOURNAMENT_FORMATS = {
+  points:   { name: 'Points',   hint: 'Every stage, everyone still in plays and scores points by their place; the standings decide.' },
+  knockout: { name: 'Knockout', hint: 'A bracket: the top of each table go on to the next stage, down to the final.' },
+};
+const tournamentIsKnockout = tour => tour?.format === 'knockout';
+// The tournament's last table: the final table's stage, or a knockout's last.
+const tournamentIsLastTable = (tour, stage) => tournamentIsFinal(tour, stage) || (tournamentIsKnockout(tour) && stage === tour.stages);
+const _tnKoGroup = tour => tour.table_size / tour.advance;   // the tables that feed one
+const tournamentKoTables = (tour, stage) => _tnKoGroup(tour) ** (tour.stages - stage);
+const tournamentKoMax = tour => tour.table_size * tournamentKoTables(tour, 1);
+const tournamentKoMin = tour => (tour.advance + 1) * tournamentKoTables(tour, 1);
+// Whether a knockout's T, P and F make a bracket (and how many play it, at
+// most): P divides T, below it, 2 stages or more.
+const tournamentKoValid = (size, advance, stages) => advance >= 1 && advance < size && size % advance === 0 && stages >= 2;
+// Stage 1's tables for n players: as even as they come.
+const tournamentKoStartSizes = (tour, n) => _tnEvenSizes(n, tournamentKoTables(tour, 1));
+
+// A knockout stage's tables in bracket order (an empty one keeps its place).
+function _tnKnockoutTables(tour, players, tables, stage) {
+  const n = tournamentKoTables(tour, stage);
+  if (stage === 1) {
+    const ids = _tnShuffle(tournamentPlaying(players, 1).map(p => p.id));
+    let i = 0;
+    return _tnShuffle(tournamentKoStartSizes(tour, ids.length).map(m => ids.slice(i, i += m)));   // the larger tables anywhere in the bracket
+  }
+  const playing = new Set(tournamentPlaying(players, stage, tour, tables).map(p => p.id));
+  const k = _tnKoGroup(tour);
+  const prev = tables.filter(tb => tb.stage === stage - 1).sort((a, b) => a.table_no - b.table_no);
+  return Array.from({ length: n }, (_, j) => prev.filter(tb => Math.floor((tb.table_no - 1) / k) === j)
+    .flatMap(tb => [...tb.seats].sort((a, b) => (a.place ?? 99) - (b.place ?? 99)).map(s => s.player_id))
+    .filter(id => playing.has(id)));
+}
+
+// A knockout's ranking: whoever went furthest first, then by their place at
+// their last table (a shared rank for the same stage and place). Rows as
+// tournamentStandings' (no points): { player_id, points: 0, firsts, played,
+// byes, opponents: 0, reached, place, rank }.
+function _tnKnockoutRanking(tour, tables, players, stage) {
+  const rows = new Map();
+  const row = id => rows.get(id) || rows.set(id, { player_id: id, points: 0, firsts: 0, played: 0, byes: 0, opponents: 0, reached: 0, place: null }).get(id);
+  for (const p of players) row(p.id);
+  for (const tb of tables.filter(x => x.saved_at && x.stage <= stage)) {
+    for (const s of tb.seats) {
+      const r = row(s.player_id);
+      if (tb.seats.length === 1) r.byes++;
+      else if (!tournamentTableNotPlayed(tb)) { r.played++; if (s.place === 1) r.firsts++; }
+      if (tb.stage >= r.reached) { r.reached = tb.stage; r.place = s.place; }
+    }
+  }
+  const cmp = (a, b) => b.reached - a.reached || (a.place ?? 99) - (b.place ?? 99);
+  const sorted = [...rows.values()].sort(cmp);
+  sorted.forEach((r, i) => { r.rank = i && cmp(sorted[i - 1], r) === 0 ? sorted[i - 1].rank : i + 1; });
+  return sorted;
+}
 
 // ── Random ───────────────────────────────────────────────────────────────────
 
@@ -80,11 +149,7 @@ const TOURNAMENT_SPLITS = {
   even: {
     name: 'Balanced',
     hint: 'As many tables as needed, as balanced as possible (9 players at tables of 4: 3, 3, 3).',
-    sizes(n, size) {
-      const k = Math.ceil(n / size);
-      const base = Math.floor(n / k), extra = n % k;
-      return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
-    },
+    sizes: (n, size) => _tnEvenSizes(n, Math.ceil(n / size)),
   },
   // Every table full; whoever is left has a bye (9 at 4 → 4, 4, 1; up
   // to size - 1 byes). Fewer players than a table: they all play together.
@@ -98,6 +163,12 @@ const TOURNAMENT_SPLITS = {
     },
   },
 };
+
+// n players at k tables, as even as they come, the larger first (10 at 3: 4, 3, 3).
+function _tnEvenSizes(n, k) {
+  const base = Math.floor(n / k), extra = n % k;
+  return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
+}
 
 function tournamentSplit(n, size, split = 'even') {
   if (n < 1) return [];
@@ -121,18 +192,20 @@ function _tnSeat(order, { size, split, byes }) {
 
 // ── History ──────────────────────────────────────────────────────────────────
 
-// Who met whom (how many times) and who had a bye, over the given tables.
+// Over the given tables: who met whom (how many times), who had a bye, and
+// where each player sat (0 = first, 1 = last, at any table size; byes aside).
 function _tnHistory(tables) {
-  const met = new Map(), byes = new Map();
+  const met = new Map(), byes = new Map(), seats = new Map();
   for (const tb of tables) {
     const ids = tb.seats.map(s => s.player_id);
     if (ids.length === 1) byes.set(ids[0], (byes.get(ids[0]) || 0) + 1);
+    else for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (ids.length - 1));
     for (const a of ids) {
       if (!met.has(a)) met.set(a, new Map());
       for (const b of ids) if (a !== b) met.get(a).set(b, (met.get(a).get(b) || 0) + 1);
     }
   }
-  return { met, byes };
+  return { met, byes, seats };
 }
 
 // How many pairs at the same table already met (each meeting counted).
@@ -288,6 +361,13 @@ function tournamentSeatPoints(tour, n, seat) {
   return scoring.points(seat.place, n, tour.table_size, seat, tour);
 }
 
+// ── Final table ──────────────────────────────────────────────────────────────
+// The final table, an on / off option drawn like the rules.
+const TN_FINAL = {
+  off: { name: 'Off', hint: 'The standings after the last stage are the final ranking.' },
+  on:  { name: 'On',  hint: 'After the last stage, the top of the standings play one final table, which decides the top places.' },
+};
+
 // ── Play order ───────────────────────────────────────────────────────────────
 // order(table, ctx): a table's players in their play order; ctx.seats maps a
 // player to where they sat so far (0 = first, 1 = last, at any table size),
@@ -336,6 +416,7 @@ const TN_ERRORS = {
   not_organizer:          'Only an organizer can do this.',
   already_started:        'The tournament has already started.',
   too_few_players:        'A tournament needs at least 2 players.',
+  too_many_players:       'Too many players for this knockout: Edit tournament changes its table size or stages.',
   invalid_pool:           'The draw pool needs at least as many copies of villains as there are players.',
   invalid_villains:       "The villains couldn't be drawn. Try again.",
   invalid_tables:         "The tables couldn't be drawn. Try again.",
@@ -468,8 +549,13 @@ function tournamentVillainsFit(pool, sizes) {
 
 // Who plays a stage: not withdrawn, and joined by then (a late player plays
 // from their joined_stage).
-function tournamentPlaying(players, stage) {
-  return players.filter(p => p.withdrawn_after == null && (p.joined_stage ?? 1) <= stage);
+function tournamentPlaying(players, stage, tour = null, tables = []) {
+  const on = players.filter(p => p.withdrawn_after == null && (p.joined_stage ?? 1) <= stage);
+  if (!tournamentIsKnockout(tour) || stage === 1) return on;
+  // A knockout's, after stage 1: the top `advance` of each table before.
+  const advanced = new Set(tables.filter(tb => tb.stage === stage - 1 && tb.saved_at)
+    .flatMap(tb => tb.seats.filter(s => s.place != null && s.place <= tour.advance).map(s => s.player_id)));
+  return on.filter(p => advanced.has(p.id));
 }
 
 // ── Standings ────────────────────────────────────────────────────────────────
@@ -491,6 +577,7 @@ function tournamentTableNotPlayed(tb) {
 // player: { player_id, points, firsts, played, byes, opponents, rank } with
 // rank shared by rows equal on points and every tiebreak (1, 1, 3).
 function tournamentStandings(tour, tables, { players = [], stage = Infinity } = {}) {
+  if (tournamentIsKnockout(tour)) return _tnKnockoutRanking(tour, tables, players, stage);
   const rows = new Map();
   const row = id => {
     if (!rows.has(id)) rows.set(id, { player_id: id, points: 0, firsts: 0, played: 0, byes: 0, opponents: 0, faced: [] });
@@ -556,10 +643,7 @@ function tournamentDrawFinal(tour, players, tables) {
     taken.add(pick);
     return { player_id: id, character: pick };
   });
-  const seats = new Map();
-  for (const tb of tables.filter(x => x.saved_at && x.seats.length > 1)) {
-    for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (tb.seats.length - 1));
-  }
+  const { seats } = _tnHistory(tables.filter(x => x.saved_at));
   const order = (TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random).order(finalists, { seats, size: tour.table_size });
   return { players: order, villains };
 }
@@ -567,20 +651,19 @@ function tournamentDrawFinal(tour, players, tables) {
 // ── Draws ────────────────────────────────────────────────────────────────────
 
 // The next stage's tables, each in its play order (the tournament's play
-// order rule): the players still playing, paired by its pairing rule.
+// order rule): the players still playing, paired by its pairing rule (a
+// knockout: by its bracket).
 function tournamentDrawStage(tour, players, tables = []) {
   const pairing = TOURNAMENT_PAIRINGS[tour.pairing] || TOURNAMENT_PAIRINGS.random;
   const stage = Math.max(0, ...tables.map(tb => tb.stage)) + 1;
   const playing = tournamentPlaying(players, stage).map(p => p.id);
-  const { met, byes } = _tnHistory(tables.filter(tb => tb.saved_at));
+  const { met, byes, seats } = _tnHistory(tables.filter(tb => tb.saved_at));
   const standings = tournamentStandings(tour, tables, { players });
   const playOrder = TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random;
-  const seats = new Map();   // where each player sat so far, 0 (first) to 1 (last)
-  for (const tb of tables.filter(x => x.saved_at && x.seats.length > 1)) {
-    for (const s of tb.seats) (seats.get(s.player_id) || seats.set(s.player_id, []).get(s.player_id)).push(s.position / (tb.seats.length - 1));
-  }
-  return pairing.tables(playing, { size: tour.table_size, split: tour.table_split || 'even', stage, standings, met, byes })
-    .map(tb => playOrder.order(tb, { seats, size: tour.table_size }));
+  // A knockout: its bracket (in order, an empty table kept in its place).
+  const drawn = tournamentIsKnockout(tour) ? _tnKnockoutTables(tour, players, tables, stage)
+    : pairing.tables(playing, { size: tour.table_size, split: tour.table_split || 'even', stage, standings, met, byes });
+  return drawn.map(tb => tb.length ? playOrder.order(tb, { seats, size: tour.table_size }) : tb);
 }
 
 

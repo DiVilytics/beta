@@ -1667,18 +1667,18 @@ select:disabled {
 .bar-diverge::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--dim); }
 .bar-diverge .bar-fill { position: absolute; top: 0; }
 .bar-fill.neg { background: var(--red); }
-/* Matchups (stats-table.js): winning | even | losing, bold in the bar's colors
-   (in the table and its legend); the numbers are a button that opens the
-   villain's opponents (leaderboard.js). */
-.mu-win, .mu-even, .mu-lose { font-weight: 700; }
+/* Matchups (stats-table.js): winning | even | losing | too few, each in its
+   color, not bold (in the table, its legend and the opponents' sheet): the
+   accent, the text's, red, and gray for too few (no result yet). The numbers
+   are a button that opens the villain's opponents (leaderboard.js). */
 /* Matchups: the score in bold, its counts in the parentheses, as small as the games elsewhere. */
 .sv-main.mu-score { font-weight: 700; }
 .lb-mode-matchups .sv { gap: 2px; }   /* the score close to its parentheses */
 .lb-mode-matchups .sv-games { text-align: left; }   /* "(" right after the score, whatever its digits */
-.sv-games .mu-win, .sv-games .mu-even, .sv-games .mu-lose { font-weight: 600; }
 .mu-win  { color: var(--accent); }
-.mu-even { color: var(--muted); }
+.mu-even { color: var(--text); }
 .mu-lose { color: var(--red); }
+.mu-few  { color: var(--muted); }
 .row-val-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: inherit; cursor: pointer; width: 100%; }
 .mu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(52px * var(--ts)), 1fr)); gap: 10px 6px; }
 .mu-opp { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--text); font-size: calc(12px * var(--ts)); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -2609,6 +2609,47 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-villain .mover { margin-left: auto; }   /* on the right, the villain page's size (.cs-mover) */
 .tn-you-villain .char-portrait { width: 32px; height: 32px; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
+/* Under your game: how the table's game works, and its tour (tournament-game.html?tour). */
+.tn-you-how { margin: 10px 0 0; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.4; }
+.tn-you-how .tn-info { text-decoration: none; }
+/* Beta-only features (CODEBASE_MAP "Beta-only"): html[data-beta] is set on
+   the beta (lang.js); .beta-only shows there only, .release-only on the release only. */
+html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none !important; }
+
+/* Guided tour (tour.js): the page dimmed but the lit element (.tour-spot,
+   its shadow is the dimming), a bubble with the step's text. */
+.tour-shade { position: fixed; inset: 0; z-index: 1000; }
+.tour-spot { position: fixed; z-index: 1001; border-radius: var(--r); box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.6), 0 0 0 2px var(--accent);
+  pointer-events: none; transition: left 0.2s, top 0.2s, width 0.2s, height 0.2s; }
+.tour-bubble { position: fixed; z-index: 1002; width: min(340px, calc(100vw - 16px)); box-sizing: border-box; padding: 14px 14px 12px;
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); color: var(--text); }
+.tour-text { margin: 0 22px 12px 0; font-size: calc(14px * var(--ts)); line-height: 1.45; }
+.tour-close { position: absolute; top: 6px; right: 8px; border: none; background: none; color: var(--muted); font-size: calc(20px * var(--ts)); line-height: 1; cursor: pointer; padding: 2px 4px; }
+.tour-actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.tour-count { margin-right: auto; font-size: calc(12px * var(--ts)); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }
+
+/* A knockout's bracket (tournaments.js, _tnBracketHTML): a column per stage,
+   each table centered on those feeding it, the lines (svg) drawn behind. */
+.tn-bracket-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px 6px; }
+.tn-bracket { --tn-bk-w: calc(118px * var(--ts)); position: relative; display: grid; column-gap: 22px; row-gap: 8px; width: max-content; min-width: 100%; }
+.tn-bk-lines { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.tn-bk-lines path { fill: none; stroke: var(--dim); stroke-width: 1.5; }
+.tn-bk-head { grid-row: 1; font-size: calc(11px * var(--ts)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tn-bk-box { position: relative; align-self: center; display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 6px 8px; text-align: left;
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--rs); color: var(--text); font: inherit; cursor: pointer; }
+.tn-bk-box:disabled { cursor: default; }
+.tn-bk-box.live { border-color: var(--accent); }
+.tn-bk-box.self { box-shadow: inset 0 0 0 1px var(--accent); }
+.tn-bk-title { font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-bk-name { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: calc(13px * var(--ts)); }
+.tn-bk-name .char-portrait { width: 18px; height: 18px; flex-shrink: 0; }
+.tn-bk-name.won { font-weight: 600; }
+.tn-bk-name.waiting { color: var(--muted); }
+.tn-bk-name.self .tn-bk-text { color: var(--accent); }
+.tn-bk-place { flex-shrink: 0; font-size: calc(11px * var(--ts)); color: var(--muted); }
+.tn-bk-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tn-bk-empty { font-size: calc(12px * var(--ts)); color: var(--muted); }
 /* Custom scoring: one box per place (1st first), the smaller tables under them. */
 /* Tournament options: an ⓘ after the page intro, and one by each option. */
 .tn-info { border: none; background: none; padding: 0 2px; font: inherit; font-size: calc(12px * var(--ts)); color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }

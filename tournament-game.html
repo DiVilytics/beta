@@ -46,7 +46,9 @@
 
 <main>
   <div class="page-header">
-    <h2><span class="page-ico" aria-hidden="true">🏟️</span><span data-i18n>Tournaments</span></h2>
+    <!-- ⓘ: Show me around, a tour over a demo game (startTableTour, tour.js). -->
+    <h2><span class="page-ico" aria-hidden="true">🏟️</span><span data-i18n>Tournaments</span>
+      <button class="tn-info" id="tgTourBtn" type="button" onclick="startTableTour()" title="Show me around" data-i18n-attr="title">ⓘ</button></h2>
   </div>
   <!-- A tournament table's game in progress (tournament-game.js): New Game's
        live panel, then the ranking as it fills. -->
@@ -114,6 +116,7 @@
   <script src="game-card.js"></script>
   <script src="shared.js"></script>
 <script src="tournament-rules.js"></script>
+<script src="tour.js"></script>
 <script src="tournament-game.js"></script>
 <script src="new-game-audio.js"></script>
 </body>

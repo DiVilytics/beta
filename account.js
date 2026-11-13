@@ -327,7 +327,7 @@ async function exportMyTournaments() {
             st.character, seats.length > 1 ? st.position + 1 : '',
             st.place ?? '', st.dropped ? 'yes' : 'no', seats.length === 1 ? 'yes' : 'no',
             st.minutes ?? '', st.round ?? '',
-            st.place != null ? tournamentSeatPoints(tour, seats.length, st) : '',
+            st.place != null && !tournamentIsKnockout(tour) ? tournamentSeatPoints(tour, seats.length, st) : '',   // a knockout has no points
           ]);
         }
       }

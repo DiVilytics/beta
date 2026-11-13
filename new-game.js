@@ -135,6 +135,76 @@ async function init() {
   updateExcludeUI();   // show the pool size from the start
   _initDrag();
   attachLocationAutocomplete('fLocation', 'fLocationDropdown');
+  // Show me around (the Tutorial's link): the tour, once the page is ready.
+  if (new URLSearchParams(location.search).has('tour')) {
+    history.replaceState(null, '', location.pathname);
+    startNewGameTour();
+  }
+}
+
+// ── TOUR ──────────────────────────────────────────────────────────────────────
+// Show me around (ⓘ by the intro, or the Tutorial's link): a few steps over a
+// demo game (tour.js). The demo is never saved (_touring stops the draft and
+// the live state), and the page reloads at the end, so your form and draw
+// pool come back as they were. Not over a game in progress.
+let _touring = false;
+
+function startNewGameTour() {
+  if (liveGame.hasSession) return showError('err', t('A game is in progress: finish or discard it first, then the tour can start.'));
+  _touring = true;
+  // The demo: Play now, 4 players with villains from your draw pool, you on the first row.
+  if (pastGame) setPastGame(false);
+  if (soloMode) _setSolo(false);
+  if (document.getElementById('excludeBody')?.classList.contains('open')) toggleExclude();
+  const pool = _tourPool();
+  orderSlots = Array.from({ length: 4 }, (_, i) => ({ id: orderNextId++, char: pool[i] || '', isMe: i === 0 && !!getCurrentUser(), isWinner: false }));
+  orderUnknown = false;
+  document.getElementById('fLocation').value = t('Forbidden Mountain');
+  renderOrderSlots();
+  _layoutLegend();
+  // Each step sets the form or the demo game it shows (also going Back).
+  const past = on => () => { _tourLive(false); _tourPaused(false); if (pastGame !== on) setPastGame(on); };
+  const form = () => { _tourLive(false); _tourPaused(false); };
+  const live = (lock = false) => () => { _tourPaused(false); _tourLive(true); setVisible('tapResume', lock); };
+  const paused = () => { _tourLive(false); _tourPaused(true); };
+  startTour([
+    { el: '#ngModeSeg', prep: past(false), text: t('<b>Play now</b> is for a game about to start: the timer sets its date and how long it lasted. <b>Past game</b> records one played earlier. Switching keeps the villains, the players and their order.') },
+    { el: ['#fDateRow', '#durRoundsRow'], prep: past(true), text: t('In <b>Past game</b>, the date and time: <b>No time</b> if you only remember the day, <b>No date</b> if not even that. The duration and rounds are optional.') },
+    { el: '.draw-mode-row', prep: past(false), text: t('The <b>draw pool</b>: the villains that can be drawn (narrow it to your boxes or to a pace). Beside it, the number of players.') },
+    { el: '#lineupBtns', prep: form, text: t('<b>Draw villains</b> fills the rows from the draw pool (<b>Redraw all</b> once every row has one); <b>Random order</b> then shuffles the seats.') },
+    { el: ['#orderSlots', '#orderAddBtn'], prep: form, text: t('A row per player, in play order. Pick the villain or tap 🎲 to draw one; ❌ removes the row, 👤 marks you and 👑 the winner; ⠿ drags a row to another seat. <b>+ Add player</b> adds a row.') },
+    { el: '#footerDefault', prep: form, text: t('<b>Start game</b> starts the timer, as in the next steps. In Past game, <b>Save game</b> saves it right away.') },
+    { el: ['#liveTime', '.live-turns'], prep: live(), text: t('The game is on: the timer runs from the start. A round ends when every player has had their turn: tap + when the first player is up again (− fixes a wrong tap).') },
+    { el: '#liveMovers', prep: live(), text: t('When a villain wins, tap their mover: the game stops, with the winner, the duration and the rounds filled in, ready to save.') },
+    { el: '.tap-resume-card', prep: live(true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
+    { el: '#footerLive', prep: live(), text: t('<b>Pause game</b> stops the timer: from there you save the game, or start it again.') },
+    { el: '#footerDefault', prep: paused, text: t('Paused: <b>Resume game</b> starts the timer again; <b>Save game</b> saves the game with its duration and rounds (Edit details fixes them later), then you share it so the others claim their villains.') },
+  ], { onEnd: () => location.replace(location.pathname) });
+}
+
+// The demo game paused (or not): Resume game and Save game, as after Pause game.
+function _tourPaused(on) {
+  document.getElementById('startBtn').textContent = on ? t('Resume game') : t('Start game');
+  setVisible('submitBtn', on || pastGame);
+}
+
+// The demo game in progress (or back to the form): the live panel drawn with
+// made-up time and rounds, no game started, nothing saved.
+function _tourLive(on) {
+  if (!on) { setVisible('tapResume', false); return setLiveUI(false); }
+  _renderLiveInfo();
+  document.getElementById('liveTime').textContent = '23:47';
+  document.getElementById('liveTurnCount').textContent = '4';
+  document.getElementById('liveTurnMax').textContent = '';
+  document.getElementById('liveMinusBtn').disabled = false;
+  setLiveUI(true);
+}
+
+// The demo's villains: four from the draw pool, at random.
+function _tourPool() {
+  const pool = _slotPool(null).map(c => c.name);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool;
 }
 
 // ── DRAFT ─────────────────────────────────────────────────────────────────────
@@ -151,7 +221,7 @@ let _draftReady = false;   // nothing is saved until init has restored (or not) 
 
 // Saves the draft, or drops it when the page is back to a fresh one (nothing to keep).
 function _saveDraft() {
-  if (!_draftReady) return;
+  if (!_draftReady || _touring) return;
   if (!_isFormChanged()) { _dropDraft(); return; }
   const val = id => document.getElementById(id)?.value || '';
   try {
@@ -1082,6 +1152,7 @@ function stopLive() {
 // ── LIVE STATE PERSISTENCE ────────────────────────────────────────────────────
 
 function _saveLiveState() {
+  if (_touring) return;   // the tour's demo is never saved
   liveGame.persist({
     slots:     orderSlots,
     solo:      soloMode,

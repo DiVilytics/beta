@@ -161,10 +161,10 @@ function statValueLabel(mode) {
 // Matchups the counts, winning | even | losing | too few (_muSubHTML).
 const _statSub = (r, mode) => mode === 'xp' ? (r.xpAch || 0) : r.games;
 const _muSubText = r => `${r.mu?.win ?? 0}|${r.mu?.even ?? 0}|${r.mu?.lose ?? 0}|${r.mu?.few ?? 0}`;
-const _muSubHTML = r => `<span class="mu-win">${r.mu?.win ?? 0}</span>|<span class="mu-even">${r.mu?.even ?? 0}</span>|<span class="mu-lose">${r.mu?.lose ?? 0}</span>|${r.mu?.few ?? 0}`;
-// Winning | even | losing matchups, each in its color (the bar's: the accent,
-// gray, red).
-const muCountsHTML = mu => `<span class="mu-win">${mu?.win ?? 0}</span> | <span class="mu-even">${mu?.even ?? 0}</span> | <span class="mu-lose">${mu?.lose ?? 0}</span>`;
+const _muSubHTML = r => `<span class="mu-win">${r.mu?.win ?? 0}</span>|<span class="mu-even">${r.mu?.even ?? 0}</span>|<span class="mu-lose">${r.mu?.lose ?? 0}</span>|<span class="mu-few">${r.mu?.few ?? 0}</span>`;
+// Winning | even | losing | too few matchups, each in its color (style.css:
+// the accent, the text's, red, gray).
+const muCountsHTML = mu => `<span class="mu-win">${mu?.win ?? 0}</span> | <span class="mu-even">${mu?.even ?? 0}</span> | <span class="mu-lose">${mu?.lose ?? 0}</span>${mu?.few != null ? ` | <span class="mu-few">${mu.few}</span>` : ''}`;
 function statCellHTML(r, mode) {
   if ((mode === 'pct' || mode === 'chance' || mode === 'matchups') && !r.games) return '-';   // no games, no win rate
   const v = `<span class="sv-main${mode === 'matchups' ? ' mu-score' : ''}">${statValueDisplay(r, mode)}</span>`;

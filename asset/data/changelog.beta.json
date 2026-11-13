@@ -1,10 +1,10 @@
 {
   "2026-11-09": {
-    "title": "Tournaments: copies and late players",
+    "title": "Tournaments: knockout, open stages and copies",
     "items": [
-      "Tournaments: set how many copies of each villain are at hand; two equal villains never sit at the same table.",
-      "Tournaments: an organizer can add a player while the tournament runs; they play from the next stage, from 0 points.",
-      "Tournaments: a result entered by an organizer can include the duration and the rounds."
+      "Tournaments: a Knockout format, with its bracket: the top of each table go on to the next stage, down to the final.",
+      "Tournaments: the stages can be open-ended and end after any stage; set how many copies of each villain are at hand, and two equal villains never sit at the same table.",
+      "Tournaments: an organizer can add a player while it runs, and enter a result with its duration and rounds; Show me around (ⓘ, or the Tutorial): a short tour of New Game and, for organizers, of Tournaments."
     ]
   },
   "2026-11-02": {
