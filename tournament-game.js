@@ -22,11 +22,12 @@ let tnSaveTimer = null;
 async function init() {
   setActiveNav('tournaments.html');
   await initAuth(() => {});
-  // The Tutorial's Show me around: the tour over a demo game, whatever runs here.
+  // Show me around from a link (the Tutorial, a tournament's Your game): the
+  // tour over a demo game, whatever runs here; at the end, back to the link.
   if (new URLSearchParams(location.search).has('tour')) {
     history.replaceState(null, '', location.pathname);
     document.getElementById('tgRoot').className = '';
-    return startTableTour({ fromTutorial: true });
+    return startTableTour({ fromLink: true });
   }
   const table = new URLSearchParams(location.search).get('table');
   const saved = liveGame.loadSaved();
@@ -268,13 +269,14 @@ function tnDiscardGame() {
 }
 
 // ── TOUR ──────────────────────────────────────────────────────────────────────
-// Show me around (ⓘ by the title, or the Tutorial's link): the table's game
+// Show me around (ⓘ by the title, the Tutorial's link, or Your game's on the
+// tournament page): the table's game
 // over a demo (tour.js), a few placements set by each step. Nothing is saved
 // (_tnPersist), no timer runs, and the page reloads at the end (or goes back
 // to the Tutorial), so a real game on this phone is as it was.
 let tgTouring = false;
 
-function startTableTour({ fromTutorial = false } = {}) {
+function startTableTour({ fromLink = false } = {}) {
   if (tgTouring) return;
   tgTouring = true;
   clearInterval(liveTimerId); liveTimerId = null;
@@ -313,7 +315,7 @@ function startTableTour({ fromTutorial = false } = {}) {
     { el: ['#liveTime', '.live-turns'], prep: state([won, drop]), text: t('As in New Game: the timer runs from the start; tap + when the first player is up again.') },
     { el: '.tap-resume-card', prep: state([won, drop], false, true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
     { el: ['#tnRanking', '#tgFooter'], prep: state([won, drop, { position: 3, place: 2, minutes: 34, round: 6, dropped: false }]), text: t('With one villain left, it takes the free place and the game stops (an undo starts it again). <b>Save game</b> sends the result to the tournament; <b>Discard game</b> frees the table for another phone.') },
-  ], { onEnd: () => fromTutorial && history.length > 1 ? history.back() : location.replace(back) });
+  ], { onEnd: () => fromLink && history.length > 1 ? history.back() : location.replace(back) });
 }
 
 init();
