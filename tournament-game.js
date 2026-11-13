@@ -22,6 +22,12 @@ let tnSaveTimer = null;
 async function init() {
   setActiveNav('tournaments.html');
   await initAuth(() => {});
+  // The Tutorial's Show me around: the tour over a demo game, whatever runs here.
+  if (new URLSearchParams(location.search).has('tour')) {
+    history.replaceState(null, '', location.pathname);
+    document.getElementById('tgRoot').className = '';
+    return startTableTour({ fromTutorial: true });
+  }
   const table = new URLSearchParams(location.search).get('table');
   const saved = liveGame.loadSaved();
   const root  = document.getElementById('tgRoot');
@@ -53,7 +59,7 @@ async function init() {
 }
 
 function _tnPersist() {
-  if (!tnGame) return;
+  if (!tnGame || tgTouring) return;   // the tour's demo is never saved
   liveGame.persist({ slots: tnGame.seats, tournament: tnGame });
   updateLiveGameNavBadge();
 }
@@ -259,6 +265,55 @@ function tnDiscardGame() {
       _tnLeave();
     },
   });
+}
+
+// ── TOUR ──────────────────────────────────────────────────────────────────────
+// Show me around (ⓘ by the title, or the Tutorial's link): the table's game
+// over a demo (tour.js), a few placements set by each step. Nothing is saved
+// (_tnPersist), no timer runs, and the page reloads at the end (or goes back
+// to the Tutorial), so a real game on this phone is as it was.
+let tgTouring = false;
+
+function startTableTour({ fromTutorial = false } = {}) {
+  if (tgTouring) return;
+  tgTouring = true;
+  clearInterval(liveTimerId); liveTimerId = null;
+  clearInterval(tnSaveTimer);
+  const back = location.href;
+  tnGame = {
+    tourId: 'tg-tour', tableId: 'tg-tour', stage: 2, tableNo: 1, tourName: t('Forbidden Mountain Cup'), isFinal: false,
+    startedAt: Date.now(), roundsCounted: true, autoStopped: false, actions: [],
+    seats: [['Maleficent', 'Ada'], ['Ursula', 'Bea'], ['Jafar', 'Cleo'], ['Hades', 'Dario']]
+      .map(([character, name], position) => ({ position, character, name })),
+  };
+  document.getElementById('tgRoot').innerHTML = '';
+  setVisible('tnLive', true);
+  // Each step's placements: none, two (a win and a drop), or all (the game over).
+  const won = { position: 2, place: 1, minutes: 28, round: 5, dropped: false };
+  const drop = { position: 0, place: 4, minutes: 19, round: 3, dropped: true };
+  const state = (actions, sheet = false, lock = false) => () => {
+    tnGame.actions = actions.map(a => ({ ...a }));
+    closeOverlay('tnPlaceSheet');
+    setVisible('tapResume', lock);
+    _tnRenderLive();
+    const over = _tnPlaces().done;
+    document.getElementById('tnLiveStatus').textContent = over ? t('Game over') : t('Game in progress');
+    document.getElementById('tnLiveStatus').classList.toggle('paused', over);
+    document.getElementById('liveTime').textContent = over ? '34:12' : '31:05';
+    document.getElementById('liveTurnCount').textContent = '6';
+    document.getElementById('liveMinusBtn').disabled = false;
+    if (!over) _setBtnLabel(document.getElementById('tnPauseBtn'), t('Pause game'));   // the demo is "running"
+    if (sheet) tnTapPlaying(1);
+  };
+  startTour([
+    { el: ['#tnLiveStatus', '#liveInfo'], prep: state([]), text: t('Your table\'s game, on this phone only: the tournament, the stage and the table. A reload comes back to it.') },
+    { el: '#liveMovers', prep: state([]), text: t('The villains in play order, each with its player. Tap a mover when that villain <b>wins</b> or <b>drops out</b>.') },
+    { el: '.tn-place-choices', prep: state([], true), text: t('<b>Won</b> takes the next place from the top (1st, then 2nd…); <b>Dropped</b> the next from the bottom (last, then the one above).') },
+    { el: '#tnRanking', prep: state([won, drop]), text: t('The ranking fills as you go, each place with its time and round. Tapped by mistake? Tap the last one placed to undo it.') },
+    { el: ['#liveTime', '.live-turns'], prep: state([won, drop]), text: t('As in New Game: the timer runs from the start; tap + when the first player is up again.') },
+    { el: '.tap-resume-card', prep: state([won, drop], false, true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
+    { el: ['#tnRanking', '#tgFooter'], prep: state([won, drop, { position: 3, place: 2, minutes: 34, round: 6, dropped: false }]), text: t('With one villain left, it takes the free place and the game stops (an undo starts it again). <b>Save game</b> sends the result to the tournament; <b>Discard game</b> frees the table for another phone.') },
+  ], { onEnd: () => fromTutorial && history.length > 1 ? history.back() : location.replace(back) });
 }
 
 init();

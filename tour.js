@@ -35,6 +35,7 @@ function startTour(steps, { onEnd } = {}) {
   _tour = { steps, i: -1, onEnd, spot, bubble, shade, resize };
   document.addEventListener('keydown', _tourKey, true);
   document.addEventListener('load', _tourPlace, true);   // an image above the step loaded: it moved
+  for (const ev of ['transitionend', 'animationend']) document.addEventListener(ev, _tourSettled, true);   // a sheet slid in
   window.addEventListener('resize', _tourPlace);
   window.addEventListener('scroll', _tourPlace, true);
   _tourGo(1);
@@ -48,6 +49,7 @@ function endTour(callOnEnd = true) {
   spot.remove(); bubble.remove(); shade.remove();
   document.removeEventListener('keydown', _tourKey, true);
   document.removeEventListener('load', _tourPlace, true);
+  for (const ev of ['transitionend', 'animationend']) document.removeEventListener(ev, _tourSettled, true);
   window.removeEventListener('resize', _tourPlace);
   window.removeEventListener('scroll', _tourPlace, true);
   if (callOnEnd) onEnd?.();
@@ -111,6 +113,11 @@ function _tourPlace() {
   const top = below + bh <= vh - 8 || above < 8 ? Math.min(below, vh - bh - 8) : above;
   const left = Math.max(8, Math.min(r.left + r.width / 2 - bw / 2, vw - bw - 8));
   Object.assign(b.style, { left: `${left}px`, top: `${Math.max(8, top)}px` });
+}
+
+// The page's own movement ended (not the lit box's): place it again.
+function _tourSettled(e) {
+  if (_tour && !e.target.closest?.('.tour-spot, .tour-bubble')) _tourPlace();
 }
 
 function _tourKey(e) {
