@@ -75,7 +75,7 @@
     </div>
     <!-- Points (stages scored by places) or Knockout (a fixed bracket): each
          shows its own options (tn-points-only, tn-ko-only; tournaments.js). -->
-    <div class="field tn-fixed" data-help="format">
+    <div class="field tn-fixed beta-only" data-help="format">   <!-- knockout: beta only -->
       <label data-i18n>Format</label>
       <div class="seg seg-sm tn-rule-seg" id="tnFormat"></div>
       <p class="modal-hint tn-rule-hint" id="tnFormatHint"></p>
@@ -118,7 +118,7 @@
         </select>
       </div>
     </div>
-    <div class="field tn-fixed tn-ko-only" data-help="advance">
+    <div class="field tn-fixed tn-ko-only beta-only" data-help="advance">
       <label for="tnAdvance" data-i18n>Advance from each table</label>
       <select id="tnAdvance" onchange="_tnSyncFormat()"></select>
       <p class="modal-hint tn-rule-hint" id="tnAdvanceHint"></p>

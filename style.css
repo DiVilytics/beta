@@ -2612,6 +2612,10 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 /* Under your game: how the table's game works, and its tour (tournament-game.html?tour). */
 .tn-you-how { margin: 10px 0 0; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.4; }
 .tn-you-how .tn-info { text-decoration: none; }
+/* Beta-only features (CODEBASE_MAP "Beta-only"): html[data-beta] is set on
+   the beta (lang.js); .beta-only shows there only, .release-only on the release only. */
+html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none !important; }
+
 /* Guided tour (tour.js): the page dimmed but the lit element (.tour-spot,
    its shadow is the dimming), a bubble with the step's text. */
 .tour-shade { position: fixed; inset: 0; z-index: 1000; }
