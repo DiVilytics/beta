@@ -412,7 +412,7 @@ const _KBD_PAGES = [
 ];
 // In the order of the settings panel: theme, text size, language.
 // The help list leaves a gap between theme, text size and language.
-const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : '-0='.includes(k) ? 'text' : 'lang';
+const _kbdSettingGroup = k => '[]\\'.includes(k) ? 'theme' : '-0='.includes(k) ? 'text' : k === 'b' ? 'beta' : 'lang';
 const _KBD_SETTINGS = [
   ['[',  'Light theme', () => setTheme('light')],
   [']',  'Dark theme',  () => setTheme('dark')],
@@ -422,6 +422,8 @@ const _KBD_SETTINGS = [
   ['=',  'Large text',  () => setTextSize('large')],
   ['e',  'English',     () => setLang('en')],
   ['i',  'Italiano',    () => setLang('it')],
+  // The other version: Account's Join / Leave the beta (lang.js), the same page.
+  ['b',  IS_BETA ? 'Leave the beta' : 'Join the beta', () => switchBeta()],
 ];
 
 function _withShortcut(title, key) { return `${title} (${key.toUpperCase()})`; }

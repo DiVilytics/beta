@@ -533,9 +533,9 @@ function _betaSectionHTML() {
 }
 
 function setBeta(join) {
-  try { if (join) localStorage.setItem(BETA_KEY, '1'); else localStorage.removeItem(BETA_KEY); } catch (_) {}
+  setBetaJoined(join);   // lang.js
   if (join === IS_BETA) { document.getElementById('betaSection').innerHTML = _betaSectionHTML(); return; }
-  location.href = join ? `/beta${location.pathname}` : (location.pathname.replace(/^\/beta/, '') || '/');
+  goToBeta(join);
 }
 
 // ── LINKED IDENTITIES ─────────────────────────────────────────────────────────

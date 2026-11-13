@@ -53,6 +53,21 @@ if (!IS_BETA && ['divilytics.github.io', 'localhost'].includes(location.hostname
   location.replace(`/beta${location.pathname}${location.search}${location.hash}`);
 }
 
+// Join or leave the beta (Account's button, the B key): this browser opens it,
+// or the release again, from now on; going there keeps the same page.
+function setBetaJoined(join) {
+  try { if (join) localStorage.setItem(BETA_KEY, '1'); else localStorage.removeItem(BETA_KEY); } catch (_) {}
+}
+function goToBeta(join) {
+  const here = `${location.search}${location.hash}`;
+  location.href = join ? `/beta${location.pathname}${here}` : `${location.pathname.replace(/^\/beta/, '') || '/'}${here}`;
+}
+// B: the other version, joining the beta from the release, leaving it from the beta.
+function switchBeta() {
+  setBetaJoined(!IS_BETA);
+  goToBeta(!IS_BETA);
+}
+
 // Pick a language (home page switch): remember it and redraw every page in it.
 // The page reloads; nothing else should change (see THE PAGE ACROSS A SWITCH).
 function setLang(lang) {
