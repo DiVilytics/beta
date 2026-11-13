@@ -339,7 +339,6 @@ window.I18N.it = {
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
     "One phone at the table records the game: tap a villain's mover when it wins or drops out, and the ranking fills up.": "Un solo telefono al tavolo registra la partita: tocca la pedina di un cattivo quando vince o abbandona, e la classifica si riempie.",
-    "How the table's game works ›": "Come funziona la partita del tavolo ›",
     "Your table's game, on this phone only: the tournament, the stage and the table. A reload comes back to it.": "La partita del tuo tavolo, solo su questo telefono: il torneo, la fase e il tavolo. Se ricarichi la pagina, la ritrovi.",
     "The villains in play order, each with its player. Tap a mover when that villain <b>wins</b> or <b>drops out</b>.": "I cattivi in ordine di gioco, ognuno con il suo giocatore. Tocca una pedina quando quel cattivo <b>vince</b> o <b>abbandona</b>.",
     "<b>Won</b> takes the next place from the top (1st, then 2nd…); <b>Dropped</b> the next from the bottom (last, then the one above).": "<b>Vince</b> prende il prossimo posto dall'alto (1º, poi 2º…); <b>Abbandona</b> il prossimo dal basso (l'ultimo, poi quello sopra).",

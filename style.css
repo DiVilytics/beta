@@ -2611,7 +2611,7 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
 .tn-you-actions { display: flex; gap: 8px; margin-top: 10px; }
 /* Under your game: how the table's game works, and its tour (tournament-game.html?tour). */
 .tn-you-how { margin: 10px 0 0; font-size: calc(13px * var(--ts)); color: var(--muted); line-height: 1.4; }
-.tn-you-how .char-guide-link { display: inline-block; margin-top: 2px; }
+.tn-you-how .tn-info { text-decoration: none; }
 /* Guided tour (tour.js): the page dimmed but the lit element (.tour-spot,
    its shadow is the dimming), a bubble with the step's text. */
 .tour-shade { position: fixed; inset: 0; z-index: 1000; }

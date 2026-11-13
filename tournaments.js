@@ -503,7 +503,7 @@ function _tnYourGameHTML(mine) {
       </div>
       ${action ? `<div class="tn-you-actions">${action}</div>` : ''}
       ${tb.saved_at ? '' : `<p class="tn-you-how">${t('One phone at the table records the game: tap a villain\'s mover when it wins or drops out, and the ranking fills up.')}
-        <a class="char-guide-link" href="tournament-game.html?tour">${t('How the table\'s game works ›')}</a></p>`}
+        <a class="tn-info" href="tournament-game.html?tour" title="${_esc(t('Show me around'))}">ⓘ</a></p>`}
     </div>`;
 }
 
