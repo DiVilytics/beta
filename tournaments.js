@@ -602,10 +602,17 @@ function tnEditDraw() {
     attachRowDrag(box, {
       rowSelector: '.tn-draw-item',
       onDrop: (from, to) => {
-        if (to !== from) tnDraw.items.splice(to, 0, tnDraw.items.splice(from, 1)[0]);
+        const items = tnDraw.items.slice();
+        if (to !== from) items.splice(to, 0, items.splice(from, 1)[0]);
         // A seat dropped above the first table goes to it.
-        if (!('head' in tnDraw.items[0])) { const i = tnDraw.items.findIndex(x => 'head' in x); tnDraw.items.unshift(tnDraw.items.splice(i, 1)[0]); }
+        if (!('head' in items[0])) { const i = items.findIndex(x => 'head' in x); items.unshift(items.splice(i, 1)[0]); }
+        // Never more than a table holds: a drop that would overfill one goes back.
+        const was = tnDraw.items;
+        tnDraw.items = items;
+        const full = _tnDrawTables().find(tb => tb.seats.length > tnTour.table_size);
+        if (full) tnDraw.items = was;
         _tnRenderDraw();
+        if (full) showError('tnDrawErr', t('Table {n} is full: {size} players at most.', { n: full.table_no, size: tnTour.table_size }));
       },
     });
   }
@@ -658,7 +665,18 @@ function _tnDrawProblem() {
 function _tnRenderDraw() {
   const ko = tournamentIsKnockout(tnTour);
   const pool = tnChars.filter(c => tnTour.villain_pool.includes(c.name));
-  const sizeOf = new Map(_tnDrawTables().map(tb => [tb.table_no, tb.seats.length]));
+  const tables = _tnDrawTables();
+  const sizeOf = new Map(tables.map(tb => [tb.table_no, tb.seats.length]));
+  // A seat's menu: the villains it can take, its own, plus those not at its
+  // table and with a copy left in the stage (the locked tables counted).
+  const copies = tournamentPoolCopies(tnTour.villain_pool);
+  const used = {};
+  for (const s of [...tnDraw.locked.flatMap(tb => tb.seats), ...tables.flatMap(tb => tb.seats)]) used[s.character] = (used[s.character] || 0) + 1;
+  const tableOf = new Map(tables.flatMap(tb => tb.seats.map(s => [s.player_id, tb])));
+  const choices = x => {
+    const here = new Set(tableOf.get(x.player_id).seats.map(s => s.character));
+    return pool.filter(c => c.name === x.character || (!here.has(c.name) && (used[c.name] || 0) < (copies[c.name] || 0)));
+  };
   let seat = 0;
   document.getElementById('tnDrawRows').innerHTML = tnDraw.items.map((x, i) => {
     if ('head' in x) {
@@ -676,7 +694,7 @@ function _tnRenderDraw() {
       <div class="drag-handle"><span class="drag-dots">⠿</span><span class="row-num">${seat}.</span>
         <img class="order-slot-portrait" src="${charImgSrc(x.character)}" onerror="this.src='asset/players/default.svg'" alt=""></div>
       <div class="order-slot-info">
-        <select class="order-slot-select" onchange="tnDrawVillain(${i}, this.value)" aria-label="${_esc(t('Pick villain'))}">${charSelectHTML(pool, x.character, tnBoxInfo)}</select>
+        <select class="order-slot-select" onchange="tnDrawVillain(${i}, this.value)" aria-label="${_esc(t('Pick villain'))}">${charSelectHTML(choices(x), x.character, tnBoxInfo)}</select>
         <div class="order-slot-name">${villainNameHTML(x.character)}<span class="tn-draw-player">${_esc(name)}${x.dropped ? ` | 🏳️ ${t('Withdrawn')}` : ''}</span></div>
         <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
       </div>

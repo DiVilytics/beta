@@ -338,6 +338,7 @@ window.I18N.it = {
     "Winner picked": "Vincitore indovinato",
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
+    "Table {n} is full: {size} players at most.": "Il tavolo {n} è pieno: al massimo {size} giocatori.",
     "<b>Edit draw</b> changes the tables by hand until their game starts: drag the players by ⠿ to other seats or tables, pick each seat's villain, add a table. The draw's rules are still checked.": "<b>Modifica sorteggio</b> cambia a mano i tavoli finché la loro partita non inizia: trascina i giocatori per ⠿ ad altri posti o tavoli, scegli il cattivo di ogni posto, aggiungi un tavolo. Le regole del sorteggio restano controllate.",
     "Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.": "Quando tutti i tavoli sono salvati, <b>Sorteggia la fase 2</b>, oppure <b>Concludi torneo</b> per fermarsi dopo questa fase. <b>Annulla sorteggio</b> ritira un sorteggio finché nessuna delle sue partite è salvata.",
     "Edit draw": "Modifica sorteggio",

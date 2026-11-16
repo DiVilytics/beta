@@ -111,10 +111,28 @@ function _tourRender() {
   bubble.querySelector('.tour-back')?.addEventListener('click', () => _tourGo(-1));
   bubble.querySelector('.tour-next').onclick = () => _tourGo(1);
   const el = _tourEl(steps[i]);
-  el.scrollIntoView({ block: 'center', behavior: 'instant' });
-  _tourPlace();
-  requestAnimationFrame(() => { el.scrollIntoView({ block: 'center', behavior: 'instant' }); _tourPlace(); });   // once the step's layout has settled
-  bubble.querySelector('.tour-next').focus({ preventScroll: true });
+  const show = () => {
+    if (!_tour || _tour.i !== i) return;
+    const spot = _tour.spot, waited = spot.style.visibility === 'hidden';
+    el.scrollIntoView({ block: 'center', behavior: 'instant' });
+    if (waited) spot.style.transition = 'none';   // it appears in place, not sliding from the step before
+    _tourPlace();
+    if (waited) { void spot.offsetWidth; spot.style.transition = ''; }
+    spot.style.visibility = _tour.bubble.style.visibility = '';
+    bubble.querySelector('.tour-next').focus({ preventScroll: true });
+  };
+  // The step's element still moving (a sheet sliding in): the lit box and the
+  // bubble wait for it, so they don't jump once it lands.
+  const moving = document.getAnimations().filter(a => a.playState === 'running' && a.effect?.target instanceof Element
+    && a.effect.target !== _tour.spot && !a.effect.target.closest('.tour-bubble') && a.effect.target.contains(el));
+  if (moving.length) {
+    _tour.spot.style.visibility = _tour.bubble.style.visibility = 'hidden';
+    // At most 600 ms: an animation that never ends (a tab in the background) doesn't hide the step.
+    Promise.race([Promise.all(moving.map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 600))]).then(show);
+  } else {
+    show();
+    requestAnimationFrame(show);   // once the step's layout has settled
+  }
 }
 
 // The lit box around the element, and the bubble under it (above it when
