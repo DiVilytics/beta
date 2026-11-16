@@ -1412,7 +1412,8 @@ async function startTournamentTour() {
   tnOrganizers = [orgId];
   tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || t('You') }]]);
   const form = () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); };
-  const page = (stage, view = 'tables') => () => { _tnTourPage(stage); tnView = view; tnRenderTournament(); };
+  const page = (stage, view = 'tables') => () => { _tnTourDrawClose(); _tnTourPage(stage); tnView = view; tnRenderTournament(); };
+  const drawEditor = () => { page(1)(); tnEditDraw(); };
   const field = id => () => document.querySelector(`#tnForm [data-help="${id}"]`);
   startTour([
     { el: () => document.getElementById('tnName').closest('.form-row'), prep: form, text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
@@ -1427,11 +1428,17 @@ async function startTournamentTour() {
     { el: '#tnLobbyActions', prep: page(0, 'players'), text: t('<b>Start tournament</b> draws stage 1: the tables and a villain for everyone.') },
     { el: '.tn-view-seg', prep: page(1), text: t('Once started: <b>Players</b> (claims, and Withdraw for a player who leaves), <b>Tables</b> and <b>Standings</b>.') },
     { el: () => document.querySelector('#tnRoot .tn-table'), prep: page(1), text: t('Each table is played on one phone: <b>Start game</b> runs it with New Game\'s timer (an organizer\'s phone, or a seated player\'s). <b>Enter result</b> types it in afterwards; a saved table has <b>Edit result</b>.') },
-    { el: '#tnNextRow', prep: page(1), text: t('<b>Edit draw</b> changes the tables by hand until they start. Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
+    { el: '#tnDrawRows', prep: drawEditor, text: t('<b>Edit draw</b> changes the tables by hand until their game starts: drag the players by ⠿ to other seats or tables, pick each seat\'s villain, add a table. The draw\'s rules are still checked.') },
+    { el: '#tnNextRow', prep: page(1), text: t('Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
     { el: '.tn-standings', prep: page(1, 'standings'), text: IS_BETA
       ? t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.')
       : t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points.') },
   ].filter(s => IS_BETA || !s.betaOnly), { onEnd: () => location.replace(back) });
+}
+
+// The tour's Edit draw sheet, when a step left it open.
+function _tnTourDrawClose() {
+  if (document.getElementById('tnDrawSheet')?.classList.contains('open')) closeOverlay('tnDrawSheet');
 }
 
 // The form's demo: a name, 8 players, Swiss pairing and Rotation (not saved).
