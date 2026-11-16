@@ -127,6 +127,7 @@
     "title": "After the start",
     "paras": [
       "Until the first game starts (a bye isn't a game) every setting can change, in Edit tournament; changing the tables, the stages, the pool or the players draws stage 1 again. Once a game has started, only the name and the date change, nothing about the rules. Undo draw cancels the current stage's draw while none of its games is saved (undoing stage 1 goes back to before the start, and Start draws everything again).",
+      "Edit draw changes the current stage's draw by hand, at every table whose game hasn't started: drag the players to other seats or tables (the order at a table is its play order), pick each seat's villain, add a table. The draw's rules still hold: no table over the table size, and no villain twice at a table or over its copies in the stage.",
       "An organizer can fix any saved table with Edit result (places, drops, duration, rounds, play order) and enter the result of any table not saved yet with Enter result, also one a phone has open (say its battery died): that phone can no longer save it."
     ]
   }

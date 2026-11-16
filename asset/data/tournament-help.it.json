@@ -127,6 +127,7 @@
     "title": "Dopo l'inizio",
     "paras": [
       "Finché non inizia la prima partita (un riposo non è una partita) si può cambiare ogni impostazione, in Modifica torneo; cambiare tavoli, fasi, riserva o giocatori sorteggia di nuovo la fase 1. Una volta iniziata una partita, cambiano solo il nome e la data, niente delle regole. Annulla sorteggio cancella il sorteggio della fase in corso finché nessuna delle sue partite è salvata (annullare la fase 1 riporta a prima dell'inizio, e Inizia sorteggia tutto di nuovo).",
+      "Modifica sorteggio cambia a mano il sorteggio della fase in corso, a ogni tavolo la cui partita non è iniziata: trascina i giocatori ad altri posti o tavoli (l'ordine a un tavolo è il suo ordine di gioco), scegli il cattivo di ogni posto, aggiungi un tavolo. Le regole del sorteggio restano: nessun tavolo oltre la dimensione dei tavoli, e nessun cattivo due volte allo stesso tavolo o oltre le sue copie nella fase.",
       "Un organizzatore può correggere qualsiasi tavolo salvato con Modifica risultato (posti, abbandoni, durata, round, ordine di gioco) e inserire con Inserisci risultato il risultato di qualsiasi tavolo non ancora salvato, anche uno che un telefono ha aperto (per esempio con la batteria scarica): quel telefono non potrà più salvarlo."
     ]
   }

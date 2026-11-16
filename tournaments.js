@@ -538,7 +538,8 @@ function _tnNextStageHTML(tables) {
   const end   = !ko && more && !tnTour.final_table;
   const next  = tnTour.current_stage + 1;
   const ready = tables.every(tb => tb.saved_at);
-  if (!more && !final && !canUndo) return '';
+  const canEdit = !tnTour.finished_at && tables.some(_tnDrawOpen);
+  if (!more && !final && !canUndo && !canEdit) return '';
   const off = ready ? '' : ' disabled';
   const btn = (cls, fn, label) => `<button class="btn ${cls} btn-sm" type="button" onclick="${fn}()"${off}>${label}</button>`;
   const draws = [
@@ -548,10 +549,158 @@ function _tnNextStageHTML(tables) {
   ].join('');
   return `
     <div class="claim-share-row" id="tnNextRow">
+      ${canEdit ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnEditDraw()">${t('Edit draw')}</button>` : ''}
       <button class="btn btn-ghost btn-sm" type="button" onclick="tnUndoStage()"${canUndo ? '' : ` disabled title="${_esc(t('A game of this stage is saved: its draw stays.'))}"`}>${t('Undo draw')}</button>
       ${draws}
     </div>
     ${draws && !ready ? `<p class="tn-hint tn-hint-center">${t('Every table of this stage has to be saved first.')}</p>` : ''}`;
+}
+
+// ── EDIT DRAW ──
+// An organizer overrides the current stage's draw by hand, at the tables whose
+// game hasn't started (no phone took them, no result entered; a bye too): who
+// sits where and in which order (⠿, across tables), each seat's villain, and
+// how many tables (+ Add table; an emptied one goes). The started tables stay.
+// The draw's rules are checked as you go and by the database
+// (edit_tournament_stage): up to the table size, never a villain twice at a
+// table, none over its copies in the stage, a knockout's bracket after stage 1.
+const _tnDrawOpen = tb => !tb.started_at && !tb.game_id;
+let tnDraw = null;   // { items: [{ head: table_no } | { player_id, character }], locked: [tables] }
+
+function tnEditDraw() {
+  const st = tnTour.current_stage;
+  const stage = tnTables.filter(tb => tb.stage === st).sort((a, b) => a.table_no - b.table_no);
+  const open = stage.filter(_tnDrawOpen);
+  if (!open.length) return;
+  tnDraw = {
+    locked: stage.filter(tb => !_tnDrawOpen(tb)),
+    items: open.flatMap(tb => [{ head: tb.table_no }, ...tb.seats.slice().sort((a, b) => a.position - b.position).map(s => ({ player_id: s.player_id, character: s.character, dropped: !!s.dropped }))]),
+  };
+  const ko = tournamentIsKnockout(tnTour);
+  const locked = tnDraw.locked.map(tb => t('Table {n}', { n: tb.table_no }));
+  openConfirmSheet({
+    id:           'tnDrawSheet',
+    title:        `${t('Edit draw')} | ${tnStageLabel(st)}`,
+    bodyHTML:     `<p class="modal-hint">${t('Drag the players by ⠿ to another seat or table, and pick each seat\'s villain. The order at a table is its play order.')}</p>
+                   <div class="err" id="tnDrawErr"></div>
+                   <div class="tn-edit-rows tn-draw-rows" id="tnDrawRows"></div>
+                   ${ko ? '' : `<button class="add-row-btn" type="button" onclick="tnDrawAddTable()">${t('+ Add table')}</button>`}
+                   ${locked.length ? `<p class="modal-hint">${t('Already started or saved, so they stay as they are: {tables}.', { tables: new Intl.ListFormat(LOCALE, { type: 'conjunction' }).format(locked) })}</p>` : ''}`,
+    confirmLabel: t('Save draw'),
+    onConfirm:    async () => {
+      const err = _tnDrawProblem();
+      if (err) { showError('tnDrawErr', err); throw new Error(err); }
+      const { error } = await db.rpc('edit_tournament_stage', { target: tnTour.id, tables: _tnDrawTables().filter(tb => tb.seats.length) });
+      if (error) { showError('tnDrawErr', _tnErrorMsg(error)); throw error; }
+      tnView = 'tables';
+      await tnLoad(tnTour.id);
+    },
+  });
+  const box = document.getElementById('tnDrawRows');
+  if (!box.dataset.drag) {
+    box.dataset.drag = '1';
+    attachRowDrag(box, {
+      rowSelector: '.tn-draw-item',
+      onDrop: (from, to) => {
+        if (to !== from) tnDraw.items.splice(to, 0, tnDraw.items.splice(from, 1)[0]);
+        // A seat dropped above the first table goes to it.
+        if (!('head' in tnDraw.items[0])) { const i = tnDraw.items.findIndex(x => 'head' in x); tnDraw.items.unshift(tnDraw.items.splice(i, 1)[0]); }
+        _tnRenderDraw();
+      },
+    });
+  }
+  _tnRenderDraw();
+}
+
+// The items as tables: [{ table_no, seats: [{ player_id, character }] }].
+function _tnDrawTables() {
+  const out = [];
+  for (const x of tnDraw.items) {
+    if ('head' in x) out.push({ table_no: x.head, seats: [] });
+    else out.at(-1).seats.push({ player_id: x.player_id, character: x.character });
+  }
+  return out;
+}
+
+// What breaks the draw's rules, first found (null: nothing).
+function _tnDrawProblem() {
+  const tables = _tnDrawTables();
+  const copies = tournamentPoolCopies(tnTour.villain_pool);
+  const used = {};
+  for (const tb of tnDraw.locked) for (const s of tb.seats) used[s.character] = (used[s.character] || 0) + 1;
+  for (const tb of tables) {
+    if (tb.seats.length > tnTour.table_size) return t('Table {n} has {k} players: at most {size}.', { n: tb.table_no, k: tb.seats.length, size: tnTour.table_size });
+    const seen = new Set();
+    for (const s of tb.seats) {
+      if (!s.character) return t('Every seat needs a villain.');
+      if (seen.has(s.character)) return t('Table {n} has {villain} twice.', { n: tb.table_no, villain: villainName(s.character) });
+      seen.add(s.character);
+      used[s.character] = (used[s.character] || 0) + 1;
+    }
+  }
+  for (const [v, n] of Object.entries(used)) {
+    if (n > (copies[v] || 0)) return tn(copies[v] || 0, '{villain} is at {count} tables: the pool has {n} copy.', '{villain} is at {count} tables: the pool has {n} copies.', { villain: villainName(v), count: n });
+  }
+  // A knockout after stage 1: each player at the table their table before leads to.
+  const st = tnTour.current_stage;
+  if (tournamentIsKnockout(tnTour) && st > 1) {
+    const k = tnTour.table_size / tnTour.advance;
+    const from = new Map(tnTables.filter(tb => tb.stage === st - 1).flatMap(tb => tb.seats.map(s => [s.player_id, tb.table_no])));
+    for (const tb of tables) for (const s of tb.seats) {
+      if (Math.floor((from.get(s.player_id) - 1) / k) !== tb.table_no - 1) {
+        return t('In the bracket, {name} plays at table {n}.', { name: tnPlayerName(tnPlayers.find(p => p.id === s.player_id)), n: Math.floor((from.get(s.player_id) - 1) / k) + 1 });
+      }
+    }
+  }
+  return null;
+}
+
+function _tnRenderDraw() {
+  const ko = tournamentIsKnockout(tnTour);
+  const pool = tnChars.filter(c => tnTour.villain_pool.includes(c.name));
+  const sizeOf = new Map(_tnDrawTables().map(tb => [tb.table_no, tb.seats.length]));
+  let seat = 0;
+  document.getElementById('tnDrawRows').innerHTML = tnDraw.items.map((x, i) => {
+    if ('head' in x) {
+      seat = 0;
+      const n = sizeOf.get(x.head);
+      return `<div class="tn-draw-item tn-draw-head">
+        <span>${t('Table {n}', { n: x.head })} <span class="tn-draw-size">${n} / ${tnTour.table_size}</span></span>
+        ${!n && !ko ? `<button class="btn btn-ghost btn-sm" type="button" onclick="tnDrawRemoveTable(${x.head})">${t('Remove')}</button>` : ''}
+        ${!n ? `<span class="tn-draw-empty">${t('Empty: drag players here; an empty table goes when you save.')}</span>` : ''}
+      </div>`;
+    }
+    seat++;
+    const name = tnPlayerName(tnPlayers.find(p => p.id === x.player_id));
+    return `<div class="order-slot tn-draw-item${x.dropped ? ' dropped' : ''}">
+      <div class="drag-handle"><span class="drag-dots">⠿</span><span class="row-num">${seat}.</span>
+        <img class="order-slot-portrait" src="${charImgSrc(x.character)}" onerror="this.src='asset/players/default.svg'" alt=""></div>
+      <div class="order-slot-info">
+        <select class="order-slot-select" onchange="tnDrawVillain(${i}, this.value)" aria-label="${_esc(t('Pick villain'))}">${charSelectHTML(pool, x.character, tnBoxInfo)}</select>
+        <div class="order-slot-name">${villainNameHTML(x.character)}<span class="tn-draw-player">${_esc(name)}${x.dropped ? ` | 🏳️ ${t('Withdrawn')}` : ''}</span></div>
+        <span class="chevron order-slot-chevron" aria-hidden="true">▼</span>
+      </div>
+    </div>`;
+  }).join('');
+  const err = _tnDrawProblem();
+  if (err) showError('tnDrawErr', err); else clearError('tnDrawErr');
+}
+
+function tnDrawVillain(i, name) {
+  if (name) tnDraw.items[i].character = name;
+  _tnRenderDraw();
+}
+
+function tnDrawAddTable() {
+  const taken = [...tnDraw.items.filter(x => 'head' in x).map(x => x.head), ...tnDraw.locked.map(tb => tb.table_no)];
+  tnDraw.items.push({ head: Math.max(0, ...taken) + 1 });
+  _tnRenderDraw();
+}
+
+function tnDrawRemoveTable(no) {
+  tnDraw.items = tnDraw.items.filter(x => x.head !== no);
+  if (!tnDraw.items.length || !('head' in tnDraw.items[0])) return tnDrawAddTable();
+  _tnRenderDraw();
 }
 
 // What the next draw makes: "Stage 3 of 5: 2 tables and 1 bye, Swiss pairing."
@@ -1278,7 +1427,7 @@ async function startTournamentTour() {
     { el: '#tnLobbyActions', prep: page(0, 'players'), text: t('<b>Start tournament</b> draws stage 1: the tables and a villain for everyone.') },
     { el: '.tn-view-seg', prep: page(1), text: t('Once started: <b>Players</b> (claims, and Withdraw for a player who leaves), <b>Tables</b> and <b>Standings</b>.') },
     { el: () => document.querySelector('#tnRoot .tn-table'), prep: page(1), text: t('Each table is played on one phone: <b>Start game</b> runs it with New Game\'s timer (an organizer\'s phone, or a seated player\'s). <b>Enter result</b> types it in afterwards; a saved table has <b>Edit result</b>.') },
-    { el: '#tnNextRow', prep: page(1), text: t('Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
+    { el: '#tnNextRow', prep: page(1), text: t('<b>Edit draw</b> changes the tables by hand until they start. Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
     { el: '.tn-standings', prep: page(1, 'standings'), text: IS_BETA
       ? t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.')
       : t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points.') },

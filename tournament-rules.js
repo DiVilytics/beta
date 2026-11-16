@@ -442,6 +442,7 @@ const TN_ERRORS = {
   invalid_players:        'Every player needs a name.',
   last_organizer:         'A tournament needs at least one organizer.',
   wrong_organizer_code:   'This QR code can\'t make you an organizer any more: ask an organizer for the Organizer QR again.',
+  nothing_to_edit:        'Every table of this stage has started: its draw can no longer change.',
   no_tournament:          'This tournament no longer exists.',
 };
 function _tnErrorMsg(error) {

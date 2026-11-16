@@ -1,4 +1,10 @@
 {
+  "2026-11-16": {
+    "title": "Edit draw",
+    "items": [
+      "Tournaments: Edit draw, for organizers: change the current stage's tables by hand until their game starts (who sits where and in which order, each seat's villain, how many tables), with the draw's rules still checked."
+    ]
+  },
   "2026-11-09": {
     "title": "Tournaments: knockout, open stages and copies",
     "items": [

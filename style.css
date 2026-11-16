@@ -2677,6 +2677,14 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
    the place where New Game has the seat number, 🏳️ for a drop. */
 .tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .tn-edit-row .claim-who { flex: 1; }
+/* Edit draw (tournaments.js): the tables' heads between the seats, one list to drag across. */
+.tn-draw-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px;
+  font-size: calc(12px * var(--ts)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tn-draw-head:first-child { margin-top: 0; }
+.tn-draw-size { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.tn-draw-empty { flex-basis: 100%; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.tn-draw-player { display: block; font-size: calc(12px * var(--ts)); color: var(--muted); font-weight: 400; }
+.tn-draw-item.dropped .order-slot-name { color: var(--muted); }
 .tn-edit-row .tn-edit-place { width: 28px; }
 .tn-edit-row.winner { background: var(--gold-d); border-color: rgba(240, 165, 0, 0.28); }
 .tn-edit-row.winner .claim-name, .tn-edit-row.winner .tn-edit-place { color: var(--gold); }
