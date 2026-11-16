@@ -3,20 +3,42 @@
 // the page dims, with a bubble next to it (its text, Back / Next, × to stop).
 // The page builds its steps and any demo state; startTour only shows them.
 //
-//   startTour(steps, { onEnd })
+//   startTour(steps, { id, onEnd })
 //     steps: [{ el: selector, [selectors] (lit together) or () => element, text,
 //     prep?: () => void }],
 //     prep runs before its step is shown (a step whose element is missing or
 //     hidden is skipped); onEnd runs once, however the tour stops (Done, ×
 //     or Esc; a tap on the dimmed page does nothing).
 //
+// id names the tour (new-game, organizers, table-game): once started, it's
+// seen on this browser (localStorage, the beta and the release alike), and
+// the ⓘ that open it (data-tour="id", or tourGlowClass(id) in built HTML) stop
+// glowing (.tour-new, style.css).
+//
 // Keys: → / Enter next, ← back, Esc stops. Follows the page's scroll, size and
 // text size; colors from the theme's tokens (style.css, .tour-*).
 
 let _tour = null;   // { steps, i, onEnd, spot, bubble }
 
-function startTour(steps, { onEnd } = {}) {
+const _tourSeenKey = id => `divilytics_tour_seen_${id}`;
+function tourSeen(id) {
+  try { return localStorage.getItem(_tourSeenKey(id)) === '1'; } catch (_) { return true; }   // no storage: no glow
+}
+// ' tour-new' for a tour never started here (an ⓘ built in HTML), else ''.
+const tourGlowClass = id => tourSeen(id) ? '' : ' tour-new';
+function _tourGlow() {
+  document.querySelectorAll('[data-tour]').forEach(el => el.classList.toggle('tour-new', !tourSeen(el.dataset.tour)));
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _tourGlow, { once: true });
+else _tourGlow();
+
+function startTour(steps, { id, onEnd } = {}) {
   endTour(false);
+  if (id) {
+    try { localStorage.setItem(_tourSeenKey(id), '1'); } catch (_) {}
+    _tourGlow();
+    document.querySelectorAll('.tour-new').forEach(el => el.classList.remove('tour-new'));
+  }
   const spot = document.createElement('div');
   spot.className = 'tour-spot';
   const bubble = document.createElement('div');

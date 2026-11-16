@@ -504,7 +504,7 @@ function _tnYourGameHTML(mine) {
       </div>
       ${action ? `<div class="tn-you-actions">${action}</div>` : ''}
       ${tb.saved_at ? '' : `<p class="tn-you-how">${t('One phone at the table records the game: tap a villain\'s mover when it wins or drops out, and the ranking fills up.')}
-        <a class="tn-info" href="tournament-game.html?tour" title="${_esc(t('Show me around'))}">ⓘ</a></p>`}
+        <a class="tn-info${tourGlowClass('table-game')}" href="tournament-game.html?tour" title="${_esc(t('Show me around'))}">ⓘ</a></p>`}
     </div>`;
 }
 
@@ -1433,7 +1433,7 @@ async function startTournamentTour() {
     { el: '.tn-standings', prep: page(1, 'standings'), text: IS_BETA
       ? t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.')
       : t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points.') },
-  ].filter(s => IS_BETA || !s.betaOnly), { onEnd: () => location.replace(back) });
+  ].filter(s => IS_BETA || !s.betaOnly), { id: 'organizers', onEnd: () => location.replace(back) });
 }
 
 // The tour's Edit draw sheet, when a step left it open.

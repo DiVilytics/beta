@@ -2616,6 +2616,15 @@ a.tn-card { display: block; color: inherit; text-decoration: none; }
    the beta (lang.js); .beta-only shows there only, .release-only on the release only. */
 html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none !important; }
 
+/* An ⓘ opening a tour never started on this browser (tour.js): it glows. */
+.tn-info.tour-new { border-radius: 50%; padding: 1px 4px; background: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 700;
+  animation: tourGlow 1.6s ease-in-out infinite; }
+@keyframes tourGlow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); text-shadow: 0 0 2px var(--accent); }
+  60%      { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); text-shadow: 0 0 10px var(--accent); }
+}
+@media (prefers-reduced-motion: reduce) { .tn-info.tour-new { animation: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); } }
+
 /* Guided tour (tour.js): the page dimmed but the lit element (.tour-spot,
    its shadow is the dimming), a bubble with the step's text. */
 .tour-shade { position: fixed; inset: 0; z-index: 1000; }

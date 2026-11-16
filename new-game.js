@@ -179,7 +179,7 @@ function startNewGameTour() {
     { el: '.tap-resume-card', prep: live(true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
     { el: '#footerLive', prep: live(), text: t('<b>Pause game</b> stops the timer: from there you save the game, or start it again.') },
     { el: '#footerDefault', prep: paused, text: t('Paused: <b>Resume game</b> starts the timer again; <b>Save game</b> saves the game with its duration and rounds (Edit details fixes them later), then you share it so the others claim their villains.') },
-  ], { onEnd: () => location.replace(location.pathname) });
+  ], { id: 'new-game', onEnd: () => location.replace(location.pathname) });
 }
 
 // The demo game paused (or not): Resume game and Save game, as after Pause game.

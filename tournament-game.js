@@ -315,7 +315,7 @@ function startTableTour({ fromLink = false } = {}) {
     { el: ['#liveTime', '.live-turns'], prep: state([won, drop]), text: t('As in New Game: the timer runs from the start; tap + when the first player is up again.') },
     { el: '.tap-resume-card', prep: state([won, drop], false, true), text: t('Lock the phone and the game keeps going: the lock-screen controls, headphones and Bluetooth clickers run it (⏯ pause, ⏭ next round, ⏮ previous). After a reload this screen asks for one tap to turn them back on.') },
     { el: ['#tnRanking', '#tgFooter'], prep: state([won, drop, { position: 3, place: 2, minutes: 34, round: 6, dropped: false }]), text: t('With one villain left, it takes the free place and the game stops (an undo starts it again). <b>Save game</b> sends the result to the tournament; <b>Discard game</b> frees the table for another phone.') },
-  ], { onEnd: () => fromLink && history.length > 1 ? history.back() : location.replace(back) });
+  ], { id: 'table-game', onEnd: () => fromLink && history.length > 1 ? history.back() : location.replace(back) });
 }
 
 init();
