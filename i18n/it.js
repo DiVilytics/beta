@@ -372,7 +372,6 @@ window.I18N.it = {
     "<em>Start tournament</em> draws stage 1: the tables and a villain for everyone. Each table is played on one phone: <em>Start game</em> runs it with New Game's timer, or an organizer types it in afterwards with <em>Enter result</em>.": "<em>Inizia torneo</em> sorteggia la fase 1: i tavoli e un cattivo per ognuno. Ogni tavolo si gioca su un telefono: <em>Inizia partita</em> la gestisce con il timer di Nuova partita, oppure un organizzatore la inserisce dopo con <em>Inserisci risultato</em>.",
     "The next stages": "Le fasi successive",
     "Once every table is saved, an organizer draws the next stage (<em>Undo draw</em> takes it back until a game is saved). <em>Standings</em> ranks the players by points; in a knockout, the <em>Bracket</em> shows who goes on, down to the final.": "Quando tutti i tavoli sono salvati, un organizzatore sorteggia la fase successiva (<em>Annulla sorteggio</em> la ritira finché non si salva una partita). La <em>Classifica</em> ordina i giocatori per punti; nell'eliminazione diretta, il <em>Tabellone</em> mostra chi passa, fino alla finale.",
-    "You": "Tu",
     "Forbidden Mountain Cup": "Coppa della Montagna Proibita",
     "Open Tournaments": "Apri Tornei",
     "<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.": "<b>Nuovo torneo</b>: il nome e il giorno. Il giorno può essere uno a venire: crealo in anticipo e condividilo.",

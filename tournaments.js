@@ -1394,6 +1394,7 @@ function tnToggleDrop(position) {
 // and the page reloads at the end, as it was. Signed out, a stand-in organizer.
 let tnTouring = false;
 const TN_TOUR_NAMES = ['Ada', 'Bea', 'Cleo', 'Dario', 'Elio', 'Fede', 'Gaia', 'Leo'];
+const TN_TOUR_ORGANIZER = 'Morgana';   // signed out: a made-up nickname (signed in: yours)
 let _tnTourDrawn = null;   // stage 1's demo tables, drawn once: the same at every step
 
 async function startTournamentTour() {
@@ -1410,7 +1411,7 @@ async function startTournamentTour() {
   if (!getCurrentUser()) window.getCurrentUser = () => ({ id: 'tn-tour-organizer' });
   const orgId = getCurrentUser().id;
   tnOrganizers = [orgId];
-  tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || t('You') }]]);
+  tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || TN_TOUR_ORGANIZER }]]);
   const form = () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); };
   const page = (stage, view = 'tables') => () => { _tnTourDrawClose(); _tnTourPage(stage); tnView = view; tnRenderTournament(); };
   const drawEditor = () => { page(1)(); tnEditDraw(); };
