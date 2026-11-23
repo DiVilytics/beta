@@ -16,6 +16,8 @@
 // every few seconds, so names, claims and tables show up as they change.
 
 let tnChars    = [];
+// Each villain's pace, for Same pace (tournament-rules.js).
+const _tnPaceOf = () => Object.fromEntries(tnChars.map(c => [c.name, c.pace || null]));
 let tnBoxInfo  = {};
 let tnList     = null;        // the list view's tournaments
 let tnMineIds  = new Set();   // the ones you play in (a name claimed, not withdrawn)
@@ -336,12 +338,14 @@ function _tnOptionsHTML() {
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const name = (rules, id, dflt) => t((rules[id] || rules[dflt]).name);
   const playOrder = opt('Play order', name(TOURNAMENT_PLAY_ORDERS, tnTour.play_order, 'random'));
+  const villainMatch = opt('Villains at a table', name(TOURNAMENT_VILLAIN_MATCHES, tnTour.villain_match, 'any'));
   if (tournamentIsKnockout(tnTour)) return [
     opt('Format', t(TOURNAMENT_FORMATS.knockout.name)),
     opt('Table size', tnTour.table_size),
     opt('Advance from each table', tnTour.advance),
     opt('Stages', tnTour.stages),
     playOrder,
+    villainMatch,
   ].join('');
   return [
     opt('Format', t(TOURNAMENT_FORMATS.points.name)),
@@ -353,6 +357,7 @@ function _tnOptionsHTML() {
     opt('Scoring', TOURNAMENT_SCORINGS[tnTour.scoring] ? name(TOURNAMENT_SCORINGS, tnTour.scoring) : _esc(tnTour.scoring)),
     opt('Bye', name(TOURNAMENT_BYES, tnTour.bye, 'last')),
     opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
+    villainMatch,
   ].join('');
 }
 
@@ -748,7 +753,7 @@ function tnStageLabel(stage) {
 
 // The final: the top of the standings play one last table (tournament-rules.js).
 function tnDrawFinal() {
-  const { players, villains } = tournamentDrawFinal(tnTour, tnPlayers, tnTables);
+  const { players, villains } = tournamentDrawFinal(tnTour, tnPlayers, tnTables, _tnPaceOf());
   const names = players.map(id => _esc(tnPlayerName(tnPlayers.find(p => p.id === id))));
   // Fewer than two still playing: no final to play. One left wins it, like a
   // bye; nobody left, the standings as they are.
@@ -966,7 +971,7 @@ function tnStart() {
 // Stage 1's tables, and its villains for them.
 async function _tnDrawStart() {
   const tables   = tournamentDrawStage(tnTour, tnPlayers, []);
-  const villains = tournamentStageVillains(tnTour, tables, []);
+  const villains = tournamentStageVillains(tnTour, tables, [], _tnPaceOf());
   return (await db.rpc('start_tournament', { target: tnTour.id, villains, tables })).error;
 }
 
@@ -1243,7 +1248,7 @@ function tnNextStage() {
     onConfirm:    async () => {
       // The tables, then their villains (each player's so far: the tables before).
       const tables   = tournamentDrawStage(tnTour, tnPlayers, tnTables);
-      const villains = tables.some(tb => tb.length) ? tournamentStageVillains(tnTour, tables, tnTables) : [];
+      const villains = tables.some(tb => tb.length) ? tournamentStageVillains(tnTour, tables, tnTables, _tnPaceOf()) : [];
       const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables, villains });
       tnView = 'tables';
       await _tnAfter(error);
@@ -1487,7 +1492,7 @@ function _tnTourPage(stage) {
   if (!stage) return;
   if (!_tnTourDrawn) {
     const drawn = tournamentDrawStage(tnTour, tnPlayers, []);
-    _tnTourDrawn = { drawn, villains: tournamentStageVillains(tnTour, drawn, []) || [] };
+    _tnTourDrawn = { drawn, villains: tournamentStageVillains(tnTour, drawn, [], _tnPaceOf()) || [] };
   }
   const { drawn } = _tnTourDrawn;
   const vOf = new Map(_tnTourDrawn.villains.map(v => [v.player_id, v.character]));

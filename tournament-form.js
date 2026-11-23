@@ -10,7 +10,7 @@
 let tnPool     = null;        // the form's draw pool (pace-filter.js)
 let tnCopies   = {};          // its copies: villain → 2…9 (1: not listed), the villains in the pool only
 let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
-const tnRule   = { format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' };
+const tnRule   = { format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any' };
 let   tnCustom = {};   // the custom scoring's points, { n: row } for every table size, 1st first
 
 // ── THE FORM ──────────────────────────────────────────────────────────────────
@@ -84,6 +84,7 @@ function _tnFillSettings(tour) {
   tnRule.scoring     = tour?.scoring || 'borda';
   tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
   tnRule.final       = tour?.final_table ? 'on' : 'off';
+  tnRule.villain_match = tour?.villain_match || 'any';
   tnCustom = tour?.custom_points?.length ? tournamentCustomRows(tour) : _tnCustomRows(tour?.table_size || 4);
 }
 
@@ -159,7 +160,7 @@ function _tnDraftState() {
 function _tnFormChanged() {
   const d = _tnDraftState();
   return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== 'open'
-    || Object.entries({ format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off' }).some(([k, v]) => d.rule[k] !== v)
+    || Object.entries({ format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any' }).some(([k, v]) => d.rule[k] !== v)
     || d.players.length !== 2 || d.players.some(p => p.name.trim() || p.isMe)
     || !tnPool.isDefault() || Object.keys(d.copies).length > 0;
 }
@@ -240,6 +241,7 @@ function _tnRenderRules() {
     ['scoring', TOURNAMENT_SCORINGS, 'tnScoring', 'tnScoringHint'],
     ['bye', TOURNAMENT_BYES, 'tnBye', 'tnByeHint'],
     ['final', TN_FINAL, 'tnFinal', 'tnFinalHint'],
+    ['villain_match', TOURNAMENT_VILLAIN_MATCHES, 'tnMatch', 'tnMatchHint'],
   ]) {
     const seg = document.getElementById(segId);
     const off = seg.classList.contains('disabled');
@@ -655,6 +657,7 @@ function _tnReadForm() {
   for (const [key, value, dflt] of [
     ['table_split', tnRule.table_split, 'even'], ['play_order', tnRule.play_order, 'random'],
     ['bye', tnRule.bye, 'half'], ['event_date', date, _tnToday()], ['final_table', !ko && tnRule.final === 'on', false],
+    ['villain_match', tnRule.villain_match, 'any'],
   ]) {
     if (value !== dflt || (tnFormFor && (tnFormFor[key] ?? dflt) !== value)) row[key] = value;
   }
@@ -676,6 +679,7 @@ function _tnSaveEdit({ row, names, pool, plan }) {
     || (row.format ?? 'points') !== (was.format || 'points') || (row.advance ?? null) !== (was.advance ?? null)
     || row.table_split !== undefined && row.table_split !== (was.table_split || 'even')
     || row.play_order  !== undefined && row.play_order  !== (was.play_order || 'random')
+    || row.villain_match !== undefined && row.villain_match !== (was.villain_match || 'any')
     || [...pool].sort().join('|') !== [...was.villain_pool].sort().join('|');   // the villains or their copies
   if (!redraw) return _tnSaveSetup({ settings: row, plan });
   return openConfirmSheet({
@@ -688,7 +692,7 @@ function _tnSaveEdit({ row, names, pool, plan }) {
       const tour = { ...was, ...row };
       const drawn = players.map(x => { const p = tnPlayers.find(y => y.id === x.id); return { id: x.id, withdrawn_after: p?.withdrawn_after ?? null, joined_stage: p?.joined_stage ?? null }; });
       const tables   = tournamentDrawStage(tour, drawn, []);
-      const villains = tournamentStageVillains(tour, tables, []);
+      const villains = tournamentStageVillains(tour, tables, [], _tnPaceOf());
       await _tnSaveSetup({ settings: row, players, villains, tables });
     },
   });

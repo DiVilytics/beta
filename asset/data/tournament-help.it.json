@@ -100,6 +100,14 @@
       "Non si cambia più una volta iniziata la prima partita."
     ]
   },
+  "match": {
+    "title": "Cattivi al tavolo",
+    "paras": [
+      "Qualsiasi: ogni tavolo riceve cattivi qualsiasi dalla riserva.",
+      "Stessa velocità: i cattivi di ogni tavolo sono di una sola velocità (verde, gialla, arancione o rossa). Più tavoli possono avere la stessa velocità: i tavoli, dal più grande, prendono ciascuno la velocità con più cattivi diversi ancora liberi nella riserva, così le velocità seguono la riserva. Quando nessuna velocità ha abbastanza cattivi per un tavolo intero, i posti mancanti vengono dalle velocità vicine (come Velocità+ nella riserva), e solo se non c'è altro modo da quelle più lontane: il sorteggio non fallisce mai per la velocità.",
+      "La velocità viene prima del resto: un giocatore può ricevere un cattivo già giocato, se così il suo tavolo resta di una sola velocità. Mai lo stesso cattivo due volte a un tavolo e mai oltre le sue copie, come sempre. Anche il tavolo finale segue l'opzione. Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
   "villains": {
     "title": "Cattivi",
     "paras": [
