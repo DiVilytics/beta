@@ -99,7 +99,8 @@ const Charts = (() => {
   // lo?, hi? }: a dashed line at value (an average to compare the bars with),
   // the part from lo to hi shaded (its middle half, as Game length's), with
   // `text` above the plot on the right. A bar's `range` = [lo, hi]: a line across it
-  // from lo to hi (the middle half of its values). `rowH`: each bar that tall,
+  // from lo to hi (the middle half of its values); its `img`: a round portrait
+  // between its name and the bar. `rowH`: each bar that tall,
   // as many bars as there are (a row per villain): they scroll inside the
   // chart's box (.ch-scroll, as Matchups' grid), the axis's numbers pinned at
   // its bottom and the ref's text at its top.
@@ -127,8 +128,11 @@ const Charts = (() => {
       const y = top + i * rowH, x0 = sx(Math.min(0, d.value)), len = Math.max(2, Math.abs(sx(d.value) - sx(0)));
       const name = d.name != null ? d.name : d.label;
       const meta = d.meta != null ? d.meta : String(d.value);
-      return `
-        <text x="${labelW - 8}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
+      const pic = d.img ? rowH - 4 : 0, px = labelW - 4 - pic;   // the portrait's size and left
+      return `${d.img ? `
+        <clipPath id="chp${i}"><circle cx="${px + pic / 2}" cy="${y + rowH / 2 - 2}" r="${pic / 2}"/></clipPath>
+        <image href="${_esc(d.img)}" x="${px}" y="${y + rowH / 2 - 2 - pic / 2}" width="${pic}" height="${pic}" clip-path="url(#chp${i})" preserveAspectRatio="xMidYMid slice"/>` : ''}
+        <text x="${labelW - 8 - (pic ? pic + 4 : 0)}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
         <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>${d.range ? `
         <line x1="${sx(d.range[0]).toFixed(1)}" y1="${(y + rowH / 2 - 2).toFixed(1)}" x2="${sx(d.range[1]).toFixed(1)}" y2="${(y + rowH / 2 - 2).toFixed(1)}" class="ch-range"/>` : ''}`;
     }).join('');

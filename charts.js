@@ -349,7 +349,7 @@ const CHARTS = [
         const vals = rounds[c.name].sort((a, b) => a - b);
         const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(vals, q));
         return {
-          label: villainName(c.name), value: mid, range: [q1, q3], n: vals.length,
+          label: villainName(c.name), img: charImgSrc(c.name), value: mid, range: [q1, q3], n: vals.length,
           color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
           meta: `${t('Median {m} | middle half {a}-{b} rounds', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) })} | ${tn(vals.length, '{n} win', '{n} wins')}`,
@@ -358,7 +358,7 @@ const CHARTS = [
       if (!data.length) return Charts.barsH([]);
       // Every win's round (also those of villains left out): its median, its middle half shaded.
       const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(all, q));
-      const chart = Charts.barsH(data, { labelW: 156, rowH: 22, ref: { value: mid, lo: q1, hi: q3,
+      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, ref: { value: mid, lo: q1, hi: q3,
         text: t('All wins: median {m} | middle half {a}-{b}', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) }) } });
       return byBox ? chart + _boxLegendHTML(boxInfo, new Set(chars.filter(c => rounds[c.name]?.length >= _SPEED_MIN).map(c => c.box).filter(Boolean))) : chart;
     },
