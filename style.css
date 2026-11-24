@@ -958,6 +958,8 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
    while "Loading…" shows, and nothing jumps when the chart arrives. */
 .chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
 .chart-stage > .chart-svg { flex-shrink: 0; }
+/* A chart with a row per villain (Rounds to win) is as tall as its rows. */
+.chart-stage:has(> .ch-tall) { aspect-ratio: auto; }
 /* Villain against villain: a grid that scrolls inside the chart's box, its
    portraits fixed on top and on the left; a line between boxes. */
 .vs-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
@@ -1008,6 +1010,8 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
 /* Game length: the middle half of the games shaded, the median dashed. */
 .ch-spread { fill: var(--accent); fill-opacity: 0.12; }
 .ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+/* A bar's middle half (Rounds to win), across its end. */
+.ch-range { stroke: var(--text); stroke-width: 2; stroke-linecap: round; opacity: 0.75; vector-effect: non-scaling-stroke; }
 .ch-donut-big { font-size: 17px; font-weight: 700; fill: var(--text); }
 .ch-spread-txt { fill: var(--text); }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }

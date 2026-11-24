@@ -69,6 +69,10 @@ function _quantile(sorted, q) {
   return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
 }
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
+// Rounds to win: a villain needs this many won games with a round count.
+const _SPEED_MIN = 3;
+// A median or quartile of rounds: whole, or with its half (12.5).
+const _fmtRound = v => (Math.round(v * 2) / 2).toLocaleString(LOCALE);
 // The win rate of every villain pooled (in the games filtered): the line the
 // % Wins bars compare with. With every table size it sits well under 50%.
 function _overallRef(stats) {
@@ -327,6 +331,34 @@ const CHARTS = [
           meta:  `${chance ? `${t('Δ Wins')} ${fmtChance(d)} | ` : ''}${t('{pct}% win', { pct: Math.round(pct * 100) })} | ${t('fair {pct}%', { pct: Math.round(fair * 100) })} | ${tn(cell.games, '{n} game', '{n} games')}`,
         };
       });
+    },
+  },
+  {
+    // How fast each villain reaches its objective: the round of the games it
+    // won (a game ends when anyone wins, so the games it lost would measure
+    // its opponents). Villains with fewer than _SPEED_MIN such wins stay out.
+    id: 'speed', icon: '🏁', label: 'Rounds to win',
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
+    desc: 'The round in which each villain wins: its median, fastest first, the line across the bar its middle half. Only won games with a recorded round count; villains with fewer than 3 are left out.',
+    render({ games, chars, boxInfo, group }) {
+      const byBox = group === 'box';
+      const rounds = {};
+      for (const g of games) if (g.num_turns != null) for (const s of g.seats) if (s.is_winner) (rounds[s.character] ||= []).push(g.num_turns);
+      const all = Object.values(rounds).flat().sort((a, b) => a - b);
+      const data = chars.filter(c => rounds[c.name]?.length >= _SPEED_MIN).map(c => {
+        const vals = rounds[c.name].sort((a, b) => a - b);
+        const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(vals, q));
+        return {
+          label: villainName(c.name), value: mid, range: [q1, q3], n: vals.length,
+          color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
+          href: `villains.html?vil=${encodeURIComponent(c.name)}`,
+          meta: `${t('Median {m} | middle half {a}-{b} rounds', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) })} | ${tn(vals.length, '{n} win', '{n} wins')}`,
+        };
+      }).sort((a, b) => a.value - b.value || b.n - a.n);
+      if (!data.length) return Charts.barsH([]);
+      const mid = _quantile(all, 0.5);
+      const chart = Charts.barsH(data, { labelW: 156, rowH: 22, ref: { value: mid, text: t('All wins: median {m}', { m: _fmtRound(mid) }) } });
+      return byBox ? chart + _boxLegendHTML(boxInfo, new Set(chars.filter(c => rounds[c.name]?.length >= _SPEED_MIN).map(c => c.box).filter(Boolean))) : chart;
     },
   },
   {
