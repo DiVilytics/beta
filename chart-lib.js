@@ -32,12 +32,15 @@ const Charts = (() => {
   // "Nice" axis ticks: a round step (1 / 2 / 2.5 / 5 x 10^n) so labels land on
   // tidy values (0 500 1000 1500 2000 rather than 0 463 925 ...). Returns the
   // padded axis max plus every tick value from 0 up to it.
-  function niceTicks(dmax, count = 4) {
+  // `steps`: the steps allowed instead (minutes: 5, 10, 15, ...), the smallest
+  // that covers dmax in `count` steps (else the largest).
+  function niceTicks(dmax, count = 4, steps = null) {
     if (!(dmax > 0)) return { max: 1, ticks: [0, 1] };
     const rough = dmax / count;
     const mag = Math.pow(10, Math.floor(Math.log10(rough)));
     const norm = rough / mag;
-    const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
+    const step = steps ? (steps.find(s => s >= rough) ?? steps[steps.length - 1])
+      : (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
     const max = Math.ceil(dmax / step) * step;
     const ticks = [];
     for (let v = 0; v <= max + step * 1e-6; v += step) ticks.push(+v.toFixed(6));
@@ -101,14 +104,15 @@ const Charts = (() => {
   // `text` above the plot on the right. A bar's `range` = [lo, hi]: a line across it
   // from lo to hi (the middle half of its values); its `img`: a round portrait
   // between its name and the bar; `dim`: at the bottom, faded, under a line
-  // and `dimLabel` (too little data: its value may be null, no bar). `rowH`: each bar that tall,
+  // and `dimLabel` (too little data: its value may be null, no bar). `steps`:
+  // the axis's allowed steps (niceTicks). `rowH`: each bar that tall,
   // as many bars as there are (a row per villain): they scroll inside the
   // chart's box (.ch-scroll, as Matchups' grid), the axis's numbers pinned at
   // its bottom and the ref's text at its top.
-  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null, rowH: fixedRow = null, dimLabel = '' } = {}) {
+  function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null, rowH: fixedRow = null, dimLabel = '', steps = null } = {}) {
     if (!data.length) return empty();
     const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value ?? 0) : Math.max(d.value ?? 0, d.range ? d.range[1] : 0)), ref ? Math.abs(ref.value) : 0) || 1;
-    const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4);
+    const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4, steps);
     const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
     const lo = diverging ? -max : 0;
     const scroll = !!fixedRow;

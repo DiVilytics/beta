@@ -69,6 +69,8 @@ function _quantile(sorted, q) {
   return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
 }
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
+// An axis in minutes: steps a clock reads (0 15 30 45, not 0 20 40 60).
+const _MINUTE_STEPS = [1, 2, 5, 10, 15, 20, 30, 60, 120];
 // Speed to win: a villain needs this many wins with a duration (or rounds).
 const _SPEED_MIN = 3;
 // A median or quartile of rounds: whole, or with its half (12.5).
@@ -328,7 +330,7 @@ const CHARTS = [
       if (!all.length) return Charts.barsH([]);
       // Every win's round (also those of villains left out): its median, its middle half shaded.
       const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(all, q));
-      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, axisFmt: mins ? v => `${v} min` : v => v, dimLabel: t('Fewer than {n} wins', { n: _SPEED_MIN }), ref: { value: mid, lo: q1, hi: q3,
+      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, axisFmt: mins ? v => `${v} min` : v => v, steps: mins ? _MINUTE_STEPS : null, dimLabel: t('Fewer than {n} wins', { n: _SPEED_MIN }), ref: { value: mid, lo: q1, hi: q3,
         text: t('All wins: median {m} | middle half {a}-{b}', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) }) } });
       return byBox ? chart + _boxLegendHTML(boxInfo, new Set(data.map(d => d.box).filter(Boolean))) : chart;
     },
