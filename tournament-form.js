@@ -287,7 +287,7 @@ function _tnRenderAdvanced() {
   // its order (a knockout's own).
   const ko = _tnFormKo();
   const name = (rules, id) => t((rules[id] || Object.values(rules)[0]).name);
-  const opt = (label, value) => `${t(label)}: ${value}`;
+  const opt = (label, value) => `<strong>${_esc(t(label))}:</strong> ${_esc(value)}`;   // the name in bold
   const parts = [
     ko ? null : opt('Tables', name(TOURNAMENT_SPLITS, tnRule.table_split)),
     ko ? null : opt('Pairing', name(TOURNAMENT_PAIRINGS, tnRule.pairing)),
@@ -299,7 +299,7 @@ function _tnRenderAdvanced() {
     opt('Villain repeats', name(TOURNAMENT_VILLAIN_REPEATS, tnRule.villain_repeats)),
   ].filter(Boolean);
   const summary = document.getElementById('tnAdvSummary');
-  summary.textContent = parts.join(' | ');
+  summary.innerHTML = parts.join(' | ');
   setVisible(summary, !tnAdvOpen && _tnAllOpen(tnFormFor));
 }
 
