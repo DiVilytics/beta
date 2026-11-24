@@ -1,4 +1,12 @@
 {
+  "2026-11-23": {
+    "title": "Knockout, tiebreaks and Rounds to win",
+    "items": [
+      "Tournaments: a Knockout format, with its bracket: the top of each table go on to the next stage, down to the final.",
+      "Tournaments: choose the tiebreaks and their order (1st places, Buchholz, Placements, Wins by pace), whether a player can get a villain they already played, and villains of one pace at each table; the less used options are folded under Advanced options.",
+      "Charts: Rounds to win, how quickly each villain wins (the round of its wins), colored by pace or by box; the F.A.Q. follows version 6.1."
+    ]
+  },
   "2026-11-16": {
     "title": "Edit draw",
     "items": [

@@ -1,4 +1,12 @@
 {
+  "2026-11-23": {
+    "title": "Eliminazione diretta, spareggi e Round per vincere",
+    "items": [
+      "Tornei: il formato Eliminazione diretta, con il suo tabellone: i primi di ogni tavolo passano alla fase successiva, fino alla finale.",
+      "Tornei: scegli gli spareggi e il loro ordine (Primi posti, Buchholz, Piazzamenti, Vittorie per velocità), se un giocatore può ritrovare un cattivo già giocato e i cattivi di una sola velocità a ogni tavolo; le opzioni meno usate sono raccolte in Opzioni avanzate.",
+      "Grafici: Round per vincere, quanto in fretta vince ogni cattivo (il round delle sue vittorie), colorato per velocità o per scatola; le F.A.Q. seguono la versione 6.1."
+    ]
+  },
   "2026-11-16": {
     "title": "Modifica sorteggio",
     "items": [
