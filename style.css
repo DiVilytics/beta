@@ -1013,6 +1013,8 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
 /* Game length: the middle half of the games shaded, the median dashed. */
 .ch-spread { fill: var(--accent); fill-opacity: 0.12; }
 .ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+/* Too little data (Rounds to win: under 3 wins), at the bottom. */
+.ch-dim { opacity: 0.4; }
 /* A bar's middle half (Rounds to win), across its end. */
 .ch-range { stroke: var(--text); stroke-width: 2; stroke-linecap: round; opacity: 0.75; vector-effect: non-scaling-stroke; }
 .ch-donut-big { font-size: 17px; font-weight: 700; fill: var(--text); }
