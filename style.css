@@ -958,9 +958,14 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
    while "Loading…" shows, and nothing jumps when the chart arrives. */
 .chart-stage { aspect-ratio: 440 / 280; display: flex; flex-direction: column; justify-content: center; }
 .chart-stage > .chart-svg { flex-shrink: 0; }
+/* A row per villain (Rounds to win): the bars scroll in the chart's box, the
+   axis's numbers and the average's text stay at its bottom and top. */
+.ch-pin-top, .ch-pin-bottom { position: sticky; z-index: 1; background: var(--s1); }
+.ch-pin-top { top: 0; }
+.ch-pin-bottom { bottom: 0; }
 /* Villain against villain: a grid that scrolls inside the chart's box, its
    portraits fixed on top and on the left; a line between boxes. */
-.vs-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
+.vs-wrap, .ch-scroll { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; overscroll-behavior: contain; }
 .vs-grid { border-collapse: separate; border-spacing: 0; font-size: 10px; font-weight: 600; margin: 0 auto; }   /* centered when narrower than the chart (Boxes); scrolls when wider */
 .vs-grid td, .vs-grid th { width: 28px; min-width: 28px; height: 28px; padding: 0; text-align: center; border: 1px solid var(--s1); box-sizing: border-box; }
 .vs-grid td { color: #fff; }
@@ -1008,6 +1013,10 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
 /* Game length: the middle half of the games shaded, the median dashed. */
 .ch-spread { fill: var(--accent); fill-opacity: 0.12; }
 .ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+/* Too little data (Rounds to win: under 3 wins), at the bottom. */
+.ch-dim { opacity: 0.4; }
+/* A bar's middle half (Rounds to win), across its end. */
+.ch-range { stroke: var(--text); stroke-width: 2; stroke-linecap: round; opacity: 0.75; vector-effect: non-scaling-stroke; }
 .ch-donut-big { font-size: 17px; font-weight: 700; fill: var(--text); }
 .ch-spread-txt { fill: var(--text); }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }
@@ -1583,6 +1592,9 @@ select:disabled {
   transition: background 0.12s;
 }
 .lb-row:last-child { border-bottom: none; }
+/* A tournament's final table (tournaments.js): its ranking, no value column. */
+.tn-final-rank .lb-row { grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr); }
+.tn-final-rank { margin-bottom: 14px; }
 
 /* Leaderboard only: character rows carry a 2-line identity (name + box sub) while
    player rows are 1 line, so they differ in height. Even both tabs out to a
@@ -2686,6 +2698,20 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
    the place where New Game has the seat number, 🏳️ for a drop. */
 .tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .tn-edit-row .claim-who { flex: 1; }
+/* Tournament form, Tiebreaks: a row each, in order, and the menu to add one. */
+.tn-tiebreak .claim-who { flex: 1; min-width: 0; }
+.tn-tiebreak-add { width: 100%; margin-bottom: 4px; }
+/* Advanced options, folded until opened (tournament-form.js). */
+.tn-adv-toggle { margin-top: 6px; }
+/* Open: the draw pool's box (.exclude-body), under its toggle; the summary
+   sits between them only while folded. */
+#tnForm .tn-adv-toggle.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.tn-advanced .field:last-child { margin-bottom: 0; }
+/* The sections' titles, above the options' own labels: larger, in the
+   text's color, a line between sections. */
+.tn-adv-label { margin: 18px 0 10px; padding-top: 14px; border-top: 1px solid var(--border);
+  font-size: calc(14px * var(--ts)); font-weight: 700; color: var(--text); text-transform: none; letter-spacing: 0; }
+.tn-advanced .tn-adv-label:first-child { margin-top: 2px; padding-top: 0; border-top: none; }
 /* Edit draw (tournaments.js): the tables' heads between the seats, one list to drag across. */
 .tn-draw-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px;
   font-size: calc(12px * var(--ts)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }

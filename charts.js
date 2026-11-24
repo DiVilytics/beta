@@ -69,6 +69,10 @@ function _quantile(sorted, q) {
   return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
 }
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
+// Rounds to win: a villain needs this many won games with a round count.
+const _SPEED_MIN = 3;
+// A median or quartile of rounds: whole, or with its half (12.5).
+const _fmtRound = v => (Math.round(v * 2) / 2).toLocaleString(LOCALE);
 // The win rate of every villain pooled (in the games filtered): the line the
 // % Wins bars compare with. With every table size it sits well under 50%.
 function _overallRef(stats) {
@@ -245,6 +249,24 @@ const CHARTS = [
     },
   },
   {
+    id: 'versus', icon: '🆚', label: 'Matchups',
+    groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
+    modes: _CHANCE_PCT,
+    desc: {
+      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
+      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
+    },
+    render({ games, chars, boxInfo, group, mode }) {
+      const chance = mode === 'chance';
+      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
+        const d = pairDelta(w, l);
+        return chance
+          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
+          : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
+      } });
+    },
+  },
+  {
     // The id stays 'box': it was the win rate chart; Box popularity is its
     // Picks; By pace joined it as its Pace switch.
     id: 'box', icon: '🗂️', label: 'Pace and boxes',
@@ -268,21 +290,36 @@ const CHARTS = [
     render(ctx) { return ctx.group === 'pace' ? _byPaceHTML(ctx) : _byBoxHTML(ctx); },
   },
   {
-    id: 'versus', icon: '🆚', label: 'Matchups',
-    groups: [{ id: 'villains', label: 'Villains' }, { id: 'boxes', label: 'Boxes' }],
-    modes: _CHANCE_PCT,
-    desc: {
-      chance: "Each pair of villains, or boxes, that met: the row's Δ Wins against the column, when one of the two won (0: even). Warmer cells win more; gray under 5 games won by one of the two.",
-      pct:    "Each pair of villains, or boxes, that met: how often the row won, when one of the two did. Warmer cells win more; gray under 5 games won by one of the two. Scroll the grid.",
-    },
-    render({ games, chars, boxInfo, group, mode }) {
-      const chance = mode === 'chance';
-      return _matchupsHTML({ games, chars, boxInfo, group, cell: ({ pct, w, l }) => {
-        const d = pairDelta(w, l);
-        return chance
-          ? { heat: (d + 3) / 6, label: fmtChance(d), meta: `${t('Δ Wins')} ${fmtChance(d)} | ${Math.round(pct * 100)}%` }
-          : { heat: (pct - 0.25) / 0.5, label: Math.round(pct * 100), meta: `${Math.round(pct * 100)}%` };
-      } });
+    // How fast each villain reaches its objective: the round of the games it
+    // won (a game ends when anyone wins, so the games it lost would measure
+    // its opponents). Villains with fewer than _SPEED_MIN such wins sit at
+    // the bottom, faded: a bar for 1 or 2, none for 0.
+    id: 'speed', icon: '🏁', label: 'Rounds to win',
+    groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
+    desc: 'The round in which each villain wins: its median, fastest first, the line across the bar its middle half; dashed and shaded, those of all wins. Only won games with a recorded round count; villains with fewer than 3 are faded at the bottom.',
+    render({ games, chars, boxInfo, group }) {
+      const byBox = group === 'box';
+      const rounds = {};
+      for (const g of games) if (g.num_turns != null) for (const s of g.seats) if (s.is_winner) (rounds[s.character] ||= []).push(g.num_turns);
+      const all = Object.values(rounds).flat().sort((a, b) => a - b);
+      const data = chars.map(c => {
+        const vals = (rounds[c.name] || []).sort((a, b) => a - b), n = vals.length, dim = n < _SPEED_MIN;
+        const [q1, mid, q3] = n ? [0.25, 0.5, 0.75].map(q => _quantile(vals, q)) : [null, null, null];
+        return {
+          label: villainName(c.name), img: charImgSrc(c.name), value: mid, range: dim ? null : [q1, q3], n, dim, box: c.box,
+          color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
+          href: `villains.html?vil=${encodeURIComponent(c.name)}`,
+          meta: !n ? t('No wins with a recorded round count')
+            : `${dim ? t('Median {m} rounds', { m: _fmtRound(mid) }) : t('Median {m} | middle half {a}-{b} rounds', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) })} | ${tn(n, '{n} win', '{n} wins')}`,
+        };
+      // Enough wins first, fastest first; then the rest, most wins first.
+      }).sort((a, b) => a.dim - b.dim || (a.dim ? b.n - a.n || (a.value ?? 0) - (b.value ?? 0) : a.value - b.value || b.n - a.n));
+      if (!all.length) return Charts.barsH([]);
+      // Every win's round (also those of villains left out): its median, its middle half shaded.
+      const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(all, q));
+      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, dimLabel: t('Fewer than {n} wins', { n: _SPEED_MIN }), ref: { value: mid, lo: q1, hi: q3,
+        text: t('All wins: median {m} | middle half {a}-{b}', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) }) } });
+      return byBox ? chart + _boxLegendHTML(boxInfo, new Set(data.map(d => d.box).filter(Boolean))) : chart;
     },
   },
   {
@@ -591,11 +628,68 @@ async function _rerender() {
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
     if (lp) _attachLinePan(lp);
+    const vs = stage.querySelector('.vs-wrap');
+    if (vs) _attachFreeScroll(vs);
   } catch (e) {
     if (token !== _renderToken) return;
     console.error('chart render failed:', e);
     stage.innerHTML = `<div class="chart-note">${t('Could not load this chart.')}</div>`;
   }
+}
+
+// Matchups' grid under a finger (or pen): it follows it in any direction, not
+// only along one axis as a phone's own scrolling locks it, and glides on after
+// a flick. Up or down past the grid's edge, the page scrolls instead. A mouse
+// keeps the browser's own scrolling (a wheel, a trackpad: diagonal already).
+// A drag stamps _lastPanEnd, so the tap that ends it doesn't pick a cell.
+function _attachFreeScroll(el) {
+  el.style.touchAction = 'none';
+  let id = null, start = null, last = null, vx = 0, vy = 0, moved = false, glide = 0;
+  // Scroll the grid by (dx, dy); with `chain`, what it can't take vertically goes to the page.
+  const by = (dx, dy, chain) => {
+    const top = el.scrollTop;
+    el.scrollLeft += dx;
+    el.scrollTop += dy;
+    const rest = dy - (el.scrollTop - top);
+    if (chain && Math.abs(rest) >= 1) window.scrollBy(0, rest);
+  };
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || id != null) return;
+    cancelAnimationFrame(glide);
+    id = e.pointerId; start = last = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+    vx = vy = 0; moved = false;
+  });
+  el.addEventListener('pointermove', e => {
+    if (e.pointerId !== id) return;
+    if (!moved) {
+      if (Math.hypot(e.clientX - start.x, e.clientY - start.y) < 6) return;   // still a tap
+      moved = true;
+      try { el.setPointerCapture(id); } catch (_) {}
+    }
+    const dx = last.x - e.clientX, dy = last.y - e.clientY, dt = Math.max(1, e.timeStamp - last.t);
+    by(dx, dy, true);
+    // Speed in px/ms, smoothed over the last moves.
+    vx = 0.7 * vx + 0.3 * dx / dt; vy = 0.7 * vy + 0.3 * dy / dt;
+    last = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+  });
+  const end = e => {
+    if (e.pointerId !== id) return;
+    id = null;
+    if (!moved) return;
+    _lastPanEnd = Date.now();
+    if (e.type === 'pointercancel' || e.timeStamp - last.t > 80) return;   // held still before letting go: no glide
+    let t0 = performance.now();
+    const step = now => {
+      const dt = now - t0; t0 = now;
+      by(vx * dt, vy * dt, false);
+      const k = Math.pow(0.997, dt);   // slows down by half in about 230 ms
+      vx *= k; vy *= k;
+      if (Math.hypot(vx, vy) > 0.02 && el.isConnected) glide = requestAnimationFrame(step);
+    };
+    glide = requestAnimationFrame(step);
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
 }
 
 // Horizontal pan for a windowed line chart (Charts.line with `visible`): drag

@@ -90,6 +90,7 @@ async function init() {
   }));
 
   const [chars, boxInfo] = await Promise.all([loadCharacters(), loadBoxInfo(), authReady]);
+  tournamentSetPaces(Object.fromEntries(chars.map(c => [c.name, c.pace || null])));   // a tournament's Wins by pace (its medals here)
   pfAllChars   = chars;
   pfBoxInfo    = boxInfo || {};
   pfCharBoxMap = Object.fromEntries(chars.map(c => [c.name, c.box]));
@@ -231,7 +232,7 @@ async function _loadTournaments() {
     const finished = tours.filter(x => x.finished_at && myPlayer.has(x.id));
     if (finished.length) {
       const rows = await _fetchInChunks(finished.map(x => x.id), chunk => db.from('tournament_tables')
-        .select('tournament_id, stage, saved_at, tournament_seats(player_id, position, place, dropped)').in('tournament_id', chunk));
+        .select('tournament_id, stage, saved_at, tournament_seats(player_id, position, place, dropped, character)').in('tournament_id', chunk));
       for (const tour of finished) {
         const tables = rows.filter(r => r.tournament_id === tour.id).map(r => ({ ...r, seats: r.tournament_seats || [] }));
         const me = tournamentStandings(tour, tables).find(r => r.player_id === myPlayer.get(tour.id));

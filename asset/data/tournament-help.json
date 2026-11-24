@@ -50,7 +50,7 @@
   "pairing": {
     "title": "Pairing",
     "paras": [
-      "Random: new random tables every stage.",
+      "Random: new random tables every stage; among the possible draws, the one where the fewest players meet again (several are tried).",
       "Swiss: stage 1 at random. From stage 2, the players are sorted by the standings (points, then the tiebreaks, see Ranking) and seated in that order, the leaders at the same table; then players swap between neighboring tables whenever that lowers how many players at a table already met. A rematch still happens when there is no way around it.",
       "Fixed once the first game starts."
     ]
@@ -89,7 +89,12 @@
   "ranking": {
     "title": "Ranking and tiebreaks",
     "paras": [
-      "The standings rank by points. Equal points are separated by the most 1st places, then by the opponents' points: the sum of the current points of every opponent faced, once for each time they met. Players still equal share their place."
+      "The standings rank by points. Equal points are separated by the tiebreaks you choose, in the order you put them (drag them by ⠿): the first that differs decides. Players still equal share their place. By default: 1st places, then Buchholz.",
+      "1st places: the most 1st places first.",
+      "Buchholz: the points of the opponents faced, added up, once for each time they met (as in Swiss chess): a harder path ranks higher.",
+      "Placements: the most 1st places first; if equal, the most 2nd places, then 3rd, and so on.",
+      "Wins by pace: the most wins with red villains first; if equal, with orange villains, then yellow, then green.",
+      "The tiebreaks also decide who plays the final table, and with Swiss pairing the order the players are seated in. They can change until the first game starts."
     ]
   },
   "final": {
@@ -98,6 +103,22 @@
       "Off: the standings after the last stage are the final ranking.",
       "On: after the last stage, the top of the standings (as many as a table holds, among the players still in the tournament; equal places in the standings' order) play one final table. Its ranking decides the top places: its winner wins the tournament, its 2nd is 2nd, and so on; everyone else keeps their order from the standings, after the finalists. The final scores no points. Each finalist gets a villain they haven't played in the tournament, when the pool allows.",
       "Fixed once the first game starts."
+    ]
+  },
+  "match": {
+    "title": "Villains at a table",
+    "paras": [
+      "Any: each table gets any villains from the draw pool.",
+      "Same pace: each table's villains are of one pace (green, yellow, orange or red). Several tables can share a pace: the tables, largest first, each take the pace with the most different villains still free in the pool, so the paces follow the pool. When no pace has enough villains left for a whole table, its missing seats come from the neighboring paces (as Pace+ in the draw pool), and only if there's no other way from further ones: the draw never fails because of the pace.",
+      "Pace comes before the rest: a player can get a villain they already played, if that keeps their table of one pace. Never the same villain twice at a table, and never over its copies, as always. The final table follows the option too. Fixed once the first game starts."
+    ]
+  },
+  "repeats": {
+    "title": "Villain repeats",
+    "paras": [
+      "Avoid: nobody gets a villain they already played in the tournament, while the pool allows it (with Same pace, the pace comes first).",
+      "Allow: the villains are drawn without looking at who already played them, nor how often: anyone can get the same villain again.",
+      "Never the same villain twice at a table, and never over its copies, either way. Fixed once the first game starts."
     ]
   },
   "villains": {

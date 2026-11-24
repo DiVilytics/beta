@@ -15,7 +15,9 @@
 //   TOURNAMENT_SCORINGS[id]       { name, hint, points(place, n, size, seat, tour) }
 //   TOURNAMENT_BYES[id]           { name, hint, points(win) }: a bye's points
 //   TOURNAMENT_PLAY_ORDERS[id]    { name, hint, order(table, ctx) }
-//   TOURNAMENT_TIEBREAKS          [{ id, name, value(row) }], in order
+//   TOURNAMENT_TIEBREAKS[id]      { name, hint, value(row), note(row) }; a
+//                                 tournament's, in its order: tournamentTiebreaks(tour)
+//   TOURNAMENT_VILLAIN_REPEATS[id] { name, hint }: avoid | allow (villain_repeats)
 //
 //   tournamentSplit(n, size, split)          the table sizes of a stage
 //   tournamentStandings(tour, tables, opts)  the ranking, from saved tables
@@ -32,6 +34,7 @@
 //   tournamentVillainsFit(pool, sizes)       whether tables of these sizes can all
 //                                            have different villains from the pool
 //   tournamentPoolCopies(pool)               { villain: copies }
+//   TOURNAMENT_VILLAIN_MATCHES[id]           { name, hint }: any | pace (villain_match)
 //   tournamentDrawFinal(tour, players, tables) the final table, when there is one
 //   tournamentLastStage(tour)                the last stage (null: open, not ended)
 //   tournamentIsFinal(tour, stage)           whether a stage is the final table's
@@ -222,12 +225,21 @@ function _tnRematches(table, met) {
 // { size, split, stage (the one being drawn), standings (tournamentStandings
 // rows), met, byes }. Returns the tables, play order not yet drawn.
 
+const TN_RANDOM_TRIES = 200;
 const TOURNAMENT_PAIRINGS = {
+  // At random, avoiding rematches: of up to TN_RANDOM_TRIES shuffles, the one
+  // with the fewest players at a table who already met (the first with none).
   random: {
     name: 'Random',
-    hint: 'New random tables every stage.',
+    hint: 'New random tables every stage, avoiding rematches where possible.',
     tables(players, ctx) {
-      return _tnSeat(_tnShuffle(players), ctx);
+      let best = null, bestCost = Infinity;
+      for (let i = 0; i < TN_RANDOM_TRIES && bestCost > 0; i++) {
+        const tables = _tnSeat(_tnShuffle(players), ctx);
+        const cost = tables.reduce((n, tb) => n + _tnRematches(tb, ctx.met), 0);
+        if (cost < bestCost) { best = tables; bestCost = cost; }
+      }
+      return best;
     },
   },
   swiss: {
@@ -452,6 +464,44 @@ function _tnErrorMsg(error) {
 
 // ── Villains ─────────────────────────────────────────────────────────────────
 
+// Villains at a table: any, or of the same pace (tournaments.villain_match).
+const TOURNAMENT_VILLAIN_MATCHES = {
+  any:  { name: 'Any',       hint: 'Any villains at a table.' },
+  pace: { name: 'Same pace', hint: 'Every table\'s villains of one pace, as the pool allows (else the neighboring paces).' },
+};
+// A villain a player already played: avoided while the pool allows, or not.
+const TOURNAMENT_VILLAIN_REPEATS = {
+  avoid: { name: 'Avoid', hint: 'Nobody gets a villain they already played, while the pool allows it.' },
+  allow: { name: 'Allow', hint: 'The villains are drawn without looking at who already played them.' },
+};
+const TN_PACES = ['green', 'yellow', 'orange', 'red'];
+// How far apart two paces are (0 the same, 1 neighbors); a villain with no
+// pace is a neighbor of every pace.
+const _tnPaceGap = (a, b) => (!a || !b) ? 1 : Math.abs(TN_PACES.indexOf(a) - TN_PACES.indexOf(b));
+
+// Each table's pace, from the pool (Same pace): the tables, largest first
+// (equal ones in random order), each take the pace with the most different
+// villains still free, among those with enough for the whole table (else the
+// one with the most); its villains are then counted as taken, the ones with
+// the most copies left first, so the next tables see what's really left.
+// paceOf: villain → pace. Returns a pace per table (null: no pace in the pool).
+function _tnTablePaces(tables, copies, paceOf) {
+  const left = { ...copies };
+  const out = new Array(tables.length).fill(null);
+  const order = _tnShuffle(tables.map((tb, i) => i)).sort((a, b) => tables[b].length - tables[a].length);
+  for (const ti of order) {
+    const n = tables[ti].length;
+    const free = pace => Object.keys(left).filter(v => paceOf[v] === pace && left[v] > 0);
+    const options = _tnShuffle(TN_PACES).map(p => ({ p, free: free(p) })).filter(o => o.free.length);
+    if (!options.length) continue;
+    const fits = options.filter(o => o.free.length >= n);
+    const pick = (fits.length ? fits : options).sort((a, b) => b.free.length - a.free.length)[0];
+    out[ti] = pick.p;
+    pick.free.sort((a, b) => left[b] - left[a]).slice(0, n).forEach(v => left[v]--);
+  }
+  return out;
+}
+
 // The pool names a villain once per copy at hand (Ursula twice: two copies).
 function tournamentPoolCopies(pool) {
   const copies = {};
@@ -468,11 +518,16 @@ function tournamentPoolCopies(pool) {
 // a third twice as much: no duplicate when distinct villains are enough, and
 // as few as possible otherwise), then a villain the player already played
 // (none repeats while the pool allows), then the villains played most so far,
-// then chance. played: player → { villain: times }; used:
-// { villain: times } (everyone). Returns player → villain, or null when the
-// tables can't all have different villains.
-const TN_DUP_COST = 100000;   // over any repeats a stage could hold (1000 each)
-function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
+// then chance. With table paces (Same pace), a villain off its table's pace
+// costs after duplicates and before repeats: a neighbor TN_PACE_COST, further
+// ones that times the square of the gap. Each cost outweighs every one below
+// it put together. played: player → { villain: times }; used:
+// { villain: times } (everyone); paces: { tables: [pace per table], of:
+// villain → pace }. Returns player → villain, or null when the tables can't
+// all have different villains.
+const TN_DUP_COST  = 1e12;   // over every pace cost a stage could hold
+const TN_PACE_COST = 1e8;    // over every repeat a stage could hold (1000 each)
+function _tnAssignVillains(tables, copies, played = new Map(), used = {}, paces = null) {
   const villains = Object.keys(copies);
   const P = tables.reduce((n, tb) => n + tb.length, 0), V = villains.length, T = tables.length;
   // Nodes: 0 start, 1..P players, then (table, villain), then villains, end.
@@ -487,7 +542,9 @@ function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
     const pi = 1 + who.length;
     who.push(id);
     edge(0, pi, 1, 0);
-    villains.forEach((v, vi) => edge(pi, tvAt(ti, vi), 1, 1000 * (played.get(id)?.[v] || 0) + 10 * (used[v] || 0) + _tnRandInt(10)));
+    const want = paces?.tables[ti];
+    villains.forEach((v, vi) => edge(pi, tvAt(ti, vi), 1, (want ? TN_PACE_COST * _tnPaceGap(want, paces.of[v]) ** 2 : 0)
+      + 1000 * (played.get(id)?.[v] || 0) + 10 * (used[v] || 0) + _tnRandInt(10)));
   }));
   for (let ti = 0; ti < T; ti++) villains.forEach((_, vi) => edge(tvAt(ti, vi), vAt(vi), 1, 0));
   // One edge per copy, the extra ones ever dearer: copies only when needed.
@@ -530,14 +587,22 @@ function _tnAssignVillains(tables, copies, played = new Map(), used = {}) {
 // A stage's villains, [{ player_id, character }], for its tables (play order
 // drawn already), given the tables before it (each player's villains so far);
 // null when the pool's copies can't give every table different villains.
-function tournamentStageVillains(tour, tables, before = []) {
+// paceOf (villain → pace) for Same pace (tour.villain_match).
+function _tnPaces(tour, tables, copies, paceOf) {
+  return tour.villain_match === 'pace' && paceOf ? { tables: _tnTablePaces(tables, copies, paceOf), of: paceOf } : null;
+}
+function tournamentStageVillains(tour, tables, before = [], paceOf = null) {
   const played = new Map(), used = {};
   for (const tb of before) for (const s of tb.seats) {
     const p = played.get(s.player_id) || played.set(s.player_id, {}).get(s.player_id);
     p[s.character] = (p[s.character] || 0) + 1;
     used[s.character] = (used[s.character] || 0) + 1;
   }
-  const pick = _tnAssignVillains(tables, tournamentPoolCopies(tour.villain_pool), played, used);
+  const copies = tournamentPoolCopies(tour.villain_pool);
+  const live = tables.filter(tb => tb.length);
+  // Allow: nothing played so far counts, neither by whom nor how often.
+  const allow = tour.villain_repeats === 'allow';
+  const pick = _tnAssignVillains(live, copies, allow ? new Map() : played, allow ? {} : used, _tnPaces(tour, live, copies, paceOf));
   return pick && [...pick].map(([player_id, character]) => ({ player_id, character }));
 }
 
@@ -561,12 +626,32 @@ function tournamentPlaying(players, stage, tour = null, tables = []) {
 
 // ── Standings ────────────────────────────────────────────────────────────────
 
-// In order, after the points: most 1st places, then the opponents' points
-// (the sum of the points of every opponent faced, once per time faced).
-const TOURNAMENT_TIEBREAKS = [
-  { id: 'firsts',    name: '1st places',        value: r => r.firsts },
-  { id: 'opponents', name: "Opponents' points", value: r => r.opponents },
-];
+// After the points, the tournament's tiebreaks in its order (tournaments.
+// tiebreaks: their ids; none: the default). value(row): a number, or a list
+// compared in order (2 firsts beat 1 first and 5 seconds); note(row): how
+// it reads under a tied name.
+const TN_PLACE_PACES = ['red', 'orange', 'yellow', 'green'];   // Wins by pace: the fastest first
+const TOURNAMENT_TIEBREAKS = {
+  firsts:     { name: '1st places', hint: 'Most 1st places.',
+                value: r => r.firsts, note: r => fmtTournamentPoints(r.firsts) },
+  opponents:  { name: 'Buchholz', hint: 'The points of the opponents faced, added up (once for each time they met).',
+                value: r => r.opponents, note: r => fmtTournamentPoints(r.opponents) },
+  placements: { name: 'Placements', hint: 'Most 1st places, then most 2nd places, then 3rd, and so on.',
+                value: r => r.places, note: r => r.places.map((n, i) => n ? `${fmtPlace(i + 1)}×${n}` : '').filter(Boolean).join(' ') || '0' },
+  pace_wins:  { name: 'Wins by pace', hint: 'Most wins with red villains, then orange, yellow and green.',
+                value: r => r.paceWins, note: r => r.paceWins.map((n, i) => n ? `${['🔴', '🟠', '🟡', '🟢'][i]}${n}` : '').filter(Boolean).join(' ') || '0' },
+};
+const TN_TIEBREAKS_DEFAULT = ['firsts', 'opponents'];
+const tournamentTiebreaks = tour => (tour?.tiebreaks?.length ? tour.tiebreaks : TN_TIEBREAKS_DEFAULT).filter(id => TOURNAMENT_TIEBREAKS[id]);
+// Each villain's pace, for Wins by pace (the page sets it once the villains are in).
+let _tnPaceMap = {};
+function tournamentSetPaces(paceOf) { _tnPaceMap = paceOf || {}; }
+// Two tiebreak values compared: numbers, or lists in order (b first: higher ranks first).
+function _tnCompareValues(a, b) {
+  if (!Array.isArray(a)) return b - a;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (b[i] || 0) - (a[i] || 0); if (d) return d; }
+  return 0;
+}
 
 // A table whose players all withdrew before its game: saved without a game,
 // everyone in last place (the database settles it, _tournament_settle_table).
@@ -581,7 +666,7 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
   if (tournamentIsKnockout(tour)) return _tnKnockoutRanking(tour, tables, players, stage);
   const rows = new Map();
   const row = id => {
-    if (!rows.has(id)) rows.set(id, { player_id: id, points: 0, firsts: 0, played: 0, byes: 0, opponents: 0, faced: [] });
+    if (!rows.has(id)) rows.set(id, { player_id: id, points: 0, firsts: 0, played: 0, byes: 0, opponents: 0, faced: [], places: [], paceWins: [0, 0, 0, 0] });
     return rows.get(id);
   };
   for (const p of players) row(p.id);
@@ -598,14 +683,17 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
       if (notPlayed) continue;   // last-place points, but no game, no opponents
       r.played++;
       if (s.place === 1) r.firsts++;
+      r.places[s.place - 1] = (r.places[s.place - 1] || 0) + 1;
+      const pw = TN_PLACE_PACES.indexOf(_tnPaceMap[s.character]);
+      if (s.place === 1 && pw >= 0) r.paceWins[pw]++;
       for (const o of tb.seats) if (o.player_id !== s.player_id) r.faced.push(o.player_id);
     }
   }
   for (const r of rows.values()) r.opponents = r.faced.reduce((sum, id) => sum + (rows.get(id)?.points || 0), 0);
 
-  const keys = [r => r.points, ...TOURNAMENT_TIEBREAKS.map(tb => tb.value)];
+  const keys = [r => r.points, ...tournamentTiebreaks(tour).map(id => TOURNAMENT_TIEBREAKS[id].value)];
   const cmp = (a, b) => {
-    for (const k of keys) { const d = k(b) - k(a); if (Math.abs(d) > 1e-9) return d; }
+    for (const k of keys) { const d = _tnCompareValues(k(a), k(b)); if (Math.abs(d) > 1e-9) return d; }
     return 0;
   };
   let sorted = [...rows.values()].sort(cmp);
@@ -631,19 +719,17 @@ function tournamentStandings(tour, tables, { players = [], stage = Infinity } = 
 // each with a villain from the pool they haven't played yet in the tournament
 // when possible, all different, seated by the play order rule. Returns
 // { players: [ids in play order], villains: [{ player_id, character }] }.
-function tournamentDrawFinal(tour, players, tables) {
+function tournamentDrawFinal(tour, players, tables, paceOf = null) {
   const playing = new Set(tournamentPlaying(players, tour.current_stage + 1).map(p => p.id));
   const finalists = tournamentStandings(tour, tables, { players, stage: tour.current_stage })
     .filter(r => playing.has(r.player_id)).slice(0, tour.table_size).map(r => r.player_id);
-  const played = new Map(finalists.map(id => [id, new Set()]));
-  for (const tb of tables) for (const s of tb.seats) played.get(s.player_id)?.add(s.character);
-  const taken = new Set();
-  const villains = _tnShuffle(finalists).map(id => {
-    const pool = _tnShuffle([...new Set(tour.villain_pool)]).filter(v => !taken.has(v));   // one copy each: one table
-    const pick = pool.find(v => !played.get(id).has(v)) || pool[0];
-    taken.add(pick);
-    return { player_id: id, character: pick };
-  });
+  // Villains they haven't played when possible, all different (one table),
+  // of one pace with Same pace: the stages' draw on the final's one table.
+  const played = new Map(finalists.map(id => [id, {}]));
+  for (const tb of tables) for (const s of tb.seats) { const p = played.get(s.player_id); if (p) p[s.character] = (p[s.character] || 0) + 1; }
+  const one = Object.fromEntries([...new Set(tour.villain_pool)].map(v => [v, 1]));
+  const pick = _tnAssignVillains([finalists], one, tour.villain_repeats === 'allow' ? new Map() : played, {}, _tnPaces(tour, [finalists], one, paceOf)) || new Map();
+  const villains = finalists.map(id => ({ player_id: id, character: pick.get(id) }));
   const { seats } = _tnHistory(tables.filter(x => x.saved_at));
   const order = (TOURNAMENT_PLAY_ORDERS[tour.play_order] || TOURNAMENT_PLAY_ORDERS.random).order(finalists, { seats, size: tour.table_size });
   return { players: order, villains };

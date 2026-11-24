@@ -16,6 +16,8 @@
 // every few seconds, so names, claims and tables show up as they change.
 
 let tnChars    = [];
+// Each villain's pace, for Same pace (tournament-rules.js).
+const _tnPaceOf = () => Object.fromEntries(tnChars.map(c => [c.name, c.pace || null]));
 let tnBoxInfo  = {};
 let tnList     = null;        // the list view's tournaments
 let tnMineIds  = new Set();   // the ones you play in (a name claimed, not withdrawn)
@@ -35,6 +37,7 @@ async function init() {
   const params = new URLSearchParams(location.search);
   await initAuth(() => _tnAuthChanged());
   [tnChars, tnBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  tournamentSetPaces(_tnPaceOf());   // Wins by pace (tournament-rules.js)
   if (params.has('tour')) { history.replaceState(null, '', location.pathname); return startTournamentTour(); }   // the Tutorial's Show me around
   if (params.has('new')) return tnOpenForm(null);
   const id = params.get('t');
@@ -336,12 +339,16 @@ function _tnOptionsHTML() {
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const name = (rules, id, dflt) => t((rules[id] || rules[dflt]).name);
   const playOrder = opt('Play order', name(TOURNAMENT_PLAY_ORDERS, tnTour.play_order, 'random'));
+  const villainMatch = opt('Villains at a table', name(TOURNAMENT_VILLAIN_MATCHES, tnTour.villain_match, 'any'))
+    + opt('Villain repeats', name(TOURNAMENT_VILLAIN_REPEATS, tnTour.villain_repeats, 'avoid'));
+  const tiebreaks = opt('Tiebreaks', tournamentTiebreaks(tnTour).map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) || t('None'));
   if (tournamentIsKnockout(tnTour)) return [
     opt('Format', t(TOURNAMENT_FORMATS.knockout.name)),
     opt('Table size', tnTour.table_size),
     opt('Advance from each table', tnTour.advance),
     opt('Stages', tnTour.stages),
     playOrder,
+    villainMatch,
   ].join('');
   return [
     opt('Format', t(TOURNAMENT_FORMATS.points.name)),
@@ -353,6 +360,8 @@ function _tnOptionsHTML() {
     opt('Scoring', TOURNAMENT_SCORINGS[tnTour.scoring] ? name(TOURNAMENT_SCORINGS, tnTour.scoring) : _esc(tnTour.scoring)),
     opt('Bye', name(TOURNAMENT_BYES, tnTour.bye, 'last')),
     opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
+    tiebreaks,
+    villainMatch,
   ].join('');
 }
 
@@ -442,8 +451,7 @@ function tnToggleOptions() {
 // in bold; section opens it at that option's.
 async function tnHelp(section) {
   const help = await loadTournamentHelp();
-  const betaOnly = ['format', 'advance'];   // knockout is the beta's
-  document.getElementById('tnHelpBody').innerHTML = Object.entries(help).filter(([id]) => IS_BETA || !betaOnly.includes(id)).map(([id, { title, paras }]) => `
+  document.getElementById('tnHelpBody').innerHTML = Object.entries(help).map(([id, { title, paras }]) => `
     <section class="tn-help-section" id="tnHelp-${id}">
       <h4>${_esc(title)}</h4>
       ${paras.map(p => `<p>${_esc(p).replace(/^[^:.;,]{1,24}:/, '<strong>$&</strong>')}</p>`).join('')}
@@ -748,7 +756,7 @@ function tnStageLabel(stage) {
 
 // The final: the top of the standings play one last table (tournament-rules.js).
 function tnDrawFinal() {
-  const { players, villains } = tournamentDrawFinal(tnTour, tnPlayers, tnTables);
+  const { players, villains } = tournamentDrawFinal(tnTour, tnPlayers, tnTables, _tnPaceOf());
   const names = players.map(id => _esc(tnPlayerName(tnPlayers.find(p => p.id === id))));
   // Fewer than two still playing: no final to play. One left wins it, like a
   // bye; nobody left, the standings as they are.
@@ -966,7 +974,7 @@ function tnStart() {
 // Stage 1's tables, and its villains for them.
 async function _tnDrawStart() {
   const tables   = tournamentDrawStage(tnTour, tnPlayers, []);
-  const villains = tournamentStageVillains(tnTour, tables, []);
+  const villains = tournamentStageVillains(tnTour, tables, [], _tnPaceOf());
   return (await db.rpc('start_tournament', { target: tnTour.id, villains, tables })).error;
 }
 
@@ -1086,8 +1094,9 @@ function _tnTieNote(rows, r) {
   const i = rows.indexOf(r);
   const tied = [rows[i - 1], rows[i + 1]].filter(x => x && !x.final && x.points === r.points);
   if (!tied.length) return '';
-  for (const tb of TOURNAMENT_TIEBREAKS) {
-    if (tied.some(x => tb.value(x) !== tb.value(r))) return `${t('Tiebreak')}: ${t(tb.name)} ${fmtTournamentPoints(tb.value(r))}`;
+  for (const id of tournamentTiebreaks(tnTour)) {
+    const tb = TOURNAMENT_TIEBREAKS[id];
+    if (tied.some(x => _tnCompareValues(tb.value(x), tb.value(r)) !== 0)) return `${t('Tiebreak')}: ${t(tb.name)} ${tb.note(r)}`;
   }
   return t('Shared place');
 }
@@ -1095,40 +1104,62 @@ function _tnTieNote(rows, r) {
 // The standings, drawn like the Leaderboard's table: rank (medals for the
 // top three), player, points with their 1st places in parentheses, a bar.
 function _tnStandingsHTML(mine) {
-  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
+  // A saved final table: its ranking on top (no points), then everyone's
+  // points from the stages, ranked by points alone (the finalists too).
+  const finalTb = tnTour.final_table ? tnTables.find(tb => tournamentIsFinal(tnTour, tb.stage) && tb.saved_at) : null;
+  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers, stage: finalTb ? tournamentLastStage(tnTour) : Infinity });
   // Shown from the start: everyone at 0 until the first table is saved (no
   // tie notes until then).
   const started = rows.some(r => r.played || r.byes);
-  const byId = new Map(tnPlayers.map(p => [p.id, p]));
   const max = Math.max(...rows.map(r => r.points)) || 1;
-  const medal = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
   const digits = String(Math.max(0, ...rows.map(r => r.firsts))).length;
-  const body = rows.map(r => {
-    const p = byId.get(r.player_id);
-    const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
-    const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
-    const sub = r.final || !started ? '' : _tnTieNote(rows, r);
-    // A claimed name links to its player page, as in the Leaderboard.
-    const name = prof
-      ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
-      : `<span class="row-name">${_esc(tnPlayerName(p))}</span>`;
-    return `
-      <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
-        <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[r.rank - 1]}</span>` : r.rank}</div>
-        <div class="row-identity">${avatar}<div class="row-id-text">${name}${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>
+  // Medals: the final's, or (no final) the standings' once finished.
+  const medals = !finalTb && !!tnTour.finished_at;
+  const body = rows.map(r => _tnRankRowHTML(r.player_id, r.rank, medals, mine, started && !r.final ? _tnTieNote(rows, r) : '', `
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
           <div class="bar-bg"><div class="bar-fill${r.rank === 1 ? ' gold' : ''}" style="width:${Math.max(0, r.points / max * 100)}%"></div></div>
-        </div>
-      </div>`;
-  }).join('');
+        </div>`)).join('');
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
-  return `
+  const final = finalTb ? `
+    <div class="section-label">${t('Final table')}</div>
+    <div class="lb-table tn-final-rank">
+      ${finalTb.seats.slice().sort((a, b) => a.place - b.place).map(s =>
+        _tnRankRowHTML(s.player_id, s.place, true, mine, `${villainNameHTML(s.character)}${s.dropped ? ` | 🏳️ ${t('Dropped')}` : ''}`, '')).join('')}
+    </div>
+    <div class="section-label">${t('Points')}</div>` : '';
+  return `${final}
     <div class="lb-table tn-standings" style="--sv-games: calc(${digits} * 0.6em + 0.65em)">
       <div class="lb-head"><span>#</span><span>${t('Player')}</span><span class="text-right">${t('Points')} <span class="lb-head-sub">(${t('1st places')})</span></span></div>
       ${body}
     </div>
-    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${_tnTiesLine()}${finalTb ? ` ${t('The final table decides the top places; the points are the stages\' alone.')}` : tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+}
+
+// "Ties: Buchholz, then Placements." (none: shared places).
+function _tnTiesLine() {
+  const ids = tournamentTiebreaks(tnTour);
+  if (!ids.length) return t('Equal points share the place.');
+  return t('Ties: {list}.', { list: ids.map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) });
+}
+
+// A row of a ranking (the standings, the final's): the rank (a medal for the
+// top three when given), the player (linked once claimed, as in the
+// Leaderboard), a line under the name, and what goes on the right.
+function _tnRankRowHTML(playerId, rank, medals, mine, sub, valueHTML) {
+  const p = tnPlayers.find(x => x.id === playerId);
+  const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
+  const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
+  const name = prof
+    ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
+    : `<span class="row-name">${_esc(tnPlayerName(p))}</span>`;
+  const color = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+  return `
+      <div class="lb-row${mine && playerId === mine.id ? ' lb-row-self' : ''}">
+        <div class="rank-num ${medals ? color : ''}">${medals && rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[rank - 1]}</span>` : rank}</div>
+        <div class="row-identity">${avatar}<div class="row-id-text">${name}${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>
+        ${valueHTML}
+      </div>`;
 }
 
 // ── BRACKET (knockout) ──
@@ -1243,7 +1274,7 @@ function tnNextStage() {
     onConfirm:    async () => {
       // The tables, then their villains (each player's so far: the tables before).
       const tables   = tournamentDrawStage(tnTour, tnPlayers, tnTables);
-      const villains = tables.some(tb => tb.length) ? tournamentStageVillains(tnTour, tables, tnTables) : [];
+      const villains = tables.some(tb => tb.length) ? tournamentStageVillains(tnTour, tables, tnTables, _tnPaceOf()) : [];
       const { error } = await db.rpc('next_tournament_stage', { target: tnTour.id, tables, villains });
       tnView = 'tables';
       await _tnAfter(error);
@@ -1430,29 +1461,31 @@ async function startTournamentTour() {
   const orgId = getCurrentUser().id;
   tnOrganizers = [orgId];
   tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || TN_TOUR_ORGANIZER }]]);
-  const form = () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); };
+  // A form step, with Advanced options folded or open.
+  const form = (adv = false) => () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); tnAdvOpen = adv; _tnRenderAdvanced(); };
   const page = (stage, view = 'tables') => () => { _tnTourDrawClose(); _tnTourPage(stage); tnView = view; tnRenderTournament(); };
   const drawEditor = () => { page(1)(); tnEditDraw(); };
   const field = id => () => document.querySelector(`#tnForm [data-help="${id}"]`);
   startTour([
-    { el: () => document.getElementById('tnName').closest('.form-row'), prep: form, text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
-    { el: field('format'), prep: form, betaOnly: true, text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
-    { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form, text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
-    { el: ['#tnForm [data-help="tables"]', '#tnForm [data-help="order"]'], prep: form, text: t('How the tables are made (<b>Tables</b>, <b>Pairing</b>) and who plays first at each (<b>Play order</b>). Every ⓘ explains the choices, with examples.') },
-    { el: ['#tnForm [data-help="scoring"]', '#tnForm [data-help="final"]'], prep: form, text: t('The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and whether the top players play a <b>Final table</b>.') },
-    { el: field('villains'), prep: form, text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
-    { el: '#tnFormPlayers', prep: form, text: t('The players\' names (👤 marks you, if you play too). They claim their names later, with the tournament\'s QR code.') },
-    { el: '.tn-form-actions', prep: form, text: t('<b>Create tournament</b>: its page opens. Everything can still change until the first game starts.') },
+    { el: () => document.getElementById('tnName').closest('.form-row'), prep: form(), text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
+    { el: field('format'), prep: form(), text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
+    { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form(), text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
+    { el: field('villains'), prep: form(), text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
+    { el: field('final'), prep: form(), text: t('<b>Final table</b>: after the last stage, the top of the standings play one last table, which decides the top places.') },
+    { el: ['#tnAdvToggle', '#tnAdvSummary'], prep: form(), text: t('<b>Advanced options</b>: the rest of the rules, folded, with what\'s set on the line under it. A new tournament starts with Swiss pairing, Rotation and Buchholz.') },
+    { el: ['#tnForm [data-help="tables"]', '#tnForm [data-help="order"]'], prep: form(true), text: t('How the tables are made (<b>Tables</b>, <b>Pairing</b>) and who plays first at each (<b>Play order</b>). Every ⓘ explains the choices, with examples.') },
+    { el: ['#tnForm [data-help="scoring"]', '#tnForm [data-help="ranking"]'], prep: form(true), text: t('The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and the <b>Tiebreaks</b> for equal points, in the order you choose.') },
+    { el: ['#tnForm [data-help="match"]', '#tnForm [data-help="repeats"]'], prep: form(true), text: t('<b>Villains at a table</b>: any, or of one pace. <b>Villain repeats</b>: avoid giving a player a villain they already played, or allow it.') },
+    { el: '#tnFormPlayers', prep: form(), text: t('The players\' names (👤 marks you, if you play too). They claim their names later, with the tournament\'s QR code.') },
+    { el: '.tn-form-actions', prep: form(), text: t('<b>Create tournament</b>: its page opens. Everything can still change until the first game starts.') },
     { el: ['.tn-org-actions', '.tn-share-btn'], prep: page(0, 'players'), text: t('<b>Edit tournament</b> changes it until the first game starts; <b>Organizer QR</b> adds other organizers. <b>Share QR</b> is for the players: they scan it and claim their name.') },
     { el: '#tnLobbyActions', prep: page(0, 'players'), text: t('<b>Start tournament</b> draws stage 1: the tables and a villain for everyone.') },
     { el: '.tn-view-seg', prep: page(1), text: t('Once started: <b>Players</b> (claims, and Withdraw for a player who leaves), <b>Tables</b> and <b>Standings</b>.') },
     { el: () => document.querySelector('#tnRoot .tn-table'), prep: page(1), text: t('Each table is played on one phone: <b>Start game</b> runs it with New Game\'s timer (an organizer\'s phone, or a seated player\'s). <b>Enter result</b> types it in afterwards; a saved table has <b>Edit result</b>.') },
     { el: '#tnDrawRows', prep: drawEditor, text: t('<b>Edit draw</b> changes the tables by hand until their game starts: drag the players by ⠿ to other seats or tables, pick each seat\'s villain, add a table. The draw\'s rules are still checked.') },
     { el: '#tnNextRow', prep: page(1), text: t('Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
-    { el: '.tn-standings', prep: page(1, 'standings'), text: IS_BETA
-      ? t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.')
-      : t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points.') },
-  ].filter(s => IS_BETA || !s.betaOnly), { id: 'organizers', onEnd: () => location.replace(back) });
+    { el: '.tn-standings', prep: page(1, 'standings'), text: t('<b>Standings</b>: the points, ties broken by the tiebreaks in their order. In a knockout, this tab is the <b>Bracket</b>.') },
+  ], { id: 'organizers', onEnd: () => location.replace(back) });
 }
 
 // The tour's Edit draw sheet, when a step left it open.
@@ -1487,7 +1520,7 @@ function _tnTourPage(stage) {
   if (!stage) return;
   if (!_tnTourDrawn) {
     const drawn = tournamentDrawStage(tnTour, tnPlayers, []);
-    _tnTourDrawn = { drawn, villains: tournamentStageVillains(tnTour, drawn, []) || [] };
+    _tnTourDrawn = { drawn, villains: tournamentStageVillains(tnTour, drawn, [], _tnPaceOf()) || [] };
   }
   const { drawn } = _tnTourDrawn;
   const vOf = new Map(_tnTourDrawn.villains.map(v => [v.player_id, v.character]));
