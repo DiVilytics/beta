@@ -69,7 +69,7 @@ function _quantile(sorted, q) {
   return sorted[i] + (at - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i]);
 }
 const _MINUTES_ROUNDS = [{ id: 'minutes', label: 'Minutes' }, { id: 'rounds', label: 'Rounds' }];
-// Rounds to win: a villain needs this many won games with a round count.
+// Speed to win: a villain needs this many wins with a duration (or rounds).
 const _SPEED_MIN = 3;
 // A median or quartile of rounds: whole, or with its half (12.5).
 const _fmtRound = v => (Math.round(v * 2) / 2).toLocaleString(LOCALE);
@@ -290,17 +290,27 @@ const CHARTS = [
     render(ctx) { return ctx.group === 'pace' ? _byPaceHTML(ctx) : _byBoxHTML(ctx); },
   },
   {
-    // How fast each villain reaches its objective: the round of the games it
-    // won (a game ends when anyone wins, so the games it lost would measure
-    // its opponents). Villains with fewer than _SPEED_MIN such wins sit at
+    // How fast each villain reaches its objective, in the games it won (a game
+    // ends when anyone wins, so the games it lost would measure its
+    // opponents): their minutes per player (the length over the players, the
+    // same at every table size) or their rounds. Villains with fewer than _SPEED_MIN such wins sit at
     // the bottom, faded: a bar for 1 or 2, none for 0.
-    id: 'speed', icon: '🏁', label: 'Rounds to win',
+    // The id stays 'speed'; it was Rounds to win, rounds only.
+    id: 'speed', icon: '🏁', label: 'Speed to win',
+    modes: _MINUTES_ROUNDS,
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
-    desc: 'The round in which each villain wins: its median, fastest first, the line across the bar its middle half; dashed and shaded, those of all wins. Only won games with a recorded round count; villains with fewer than 3 are faded at the bottom.',
-    render({ games, chars, boxInfo, group }) {
-      const byBox = group === 'box';
+    desc: {
+      minutes: 'The minutes each villain takes to win, per player (the game\'s length over its players, as if every turn took as long): the median, fastest first, the line across the bar its middle half; dashed and shaded, those of all wins. Under 3 wins with a duration: faded at the bottom.',
+      rounds:  'The round in which each villain wins: its median, fastest first, the line across the bar its middle half; dashed and shaded, those of all wins. Only won games with a recorded round count; villains with fewer than 3 are faded at the bottom.',
+    },
+    render({ games, chars, boxInfo, group, mode }) {
+      const byBox = group === 'box', mins = mode === 'minutes';
+      // Each villain's wins: minutes per player, or rounds.
       const rounds = {};
-      for (const g of games) if (g.num_turns != null) for (const s of g.seats) if (s.is_winner) (rounds[s.character] ||= []).push(g.num_turns);
+      for (const g of games) {
+        const v = mins ? (g.duration_minutes != null ? g.duration_minutes / g.seats.length : null) : g.num_turns;
+        if (v != null) for (const s of g.seats) if (s.is_winner) (rounds[s.character] ||= []).push(v);
+      }
       const all = Object.values(rounds).flat().sort((a, b) => a - b);
       const data = chars.map(c => {
         const vals = (rounds[c.name] || []).sort((a, b) => a - b), n = vals.length, dim = n < _SPEED_MIN;
@@ -309,15 +319,16 @@ const CHARTS = [
           label: villainName(c.name), img: charImgSrc(c.name), value: mid, range: dim ? null : [q1, q3], n, dim, box: c.box,
           color: byBox ? _boxColor(boxInfo, c.box) : c.pace ? `var(--pace-${c.pace})` : 'var(--pace-gray)',
           href: `villains.html?vil=${encodeURIComponent(c.name)}`,
-          meta: !n ? t('No wins with a recorded round count')
-            : `${dim ? t('Median {m} rounds', { m: _fmtRound(mid) }) : t('Median {m} | middle half {a}-{b} rounds', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) })} | ${tn(n, '{n} win', '{n} wins')}`,
+          meta: !n ? t(mins ? 'No wins with a recorded duration' : 'No wins with a recorded round count')
+            : `${dim ? t(mins ? 'Median {m} min per player' : 'Median {m} rounds', { m: _fmtRound(mid) })
+                     : t(mins ? 'Median {m} | middle half {a}-{b} min per player' : 'Median {m} | middle half {a}-{b} rounds', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) })} | ${tn(n, '{n} win', '{n} wins')}`,
         };
       // Enough wins first, fastest first; then the rest, most wins first.
       }).sort((a, b) => a.dim - b.dim || (a.dim ? b.n - a.n || (a.value ?? 0) - (b.value ?? 0) : a.value - b.value || b.n - a.n));
       if (!all.length) return Charts.barsH([]);
       // Every win's round (also those of villains left out): its median, its middle half shaded.
       const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(all, q));
-      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, dimLabel: t('Fewer than {n} wins', { n: _SPEED_MIN }), ref: { value: mid, lo: q1, hi: q3,
+      const chart = Charts.barsH(data, { labelW: 178, rowH: 22, axisFmt: mins ? v => `${v} min` : v => v, dimLabel: t('Fewer than {n} wins', { n: _SPEED_MIN }), ref: { value: mid, lo: q1, hi: q3,
         text: t('All wins: median {m} | middle half {a}-{b}', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) }) } });
       return byBox ? chart + _boxLegendHTML(boxInfo, new Set(data.map(d => d.box).filter(Boolean))) : chart;
     },
