@@ -368,7 +368,7 @@ function _tnRenderCustom() {
   const lines = [`<div class="tn-custom-grid" style="--places: ${size}">${cells.join('')}</div>`];
   document.getElementById('tnCustomRows').innerHTML = lines.join('');
   setVisible('tnCustomFill', size > 2);
-  document.getElementById('tnCustomFill').innerHTML = `<span>${t('Fill the smaller tables:')}</span>` +
+  document.getElementById('tnCustomFill').innerHTML = `<span>${t('Autofill the smaller tables:')}</span>` +
     Object.entries(TOURNAMENT_CUSTOM_FILLS).map(([id, f]) =>
       `<button class="btn btn-ghost btn-sm" type="button" onclick="tnCustomFill('${id}')">${t(f.name)}</button>`).join('');
 }

@@ -1155,7 +1155,7 @@ window.I18N.it = {
     "Everyone takes turns at every seat: the order with the fewest players back in a seat they already had.": "Tutti passano per ogni posto: l'ordine in cui meno giocatori tornano in un posto già avuto.",
     "A game of this stage is already saved: its draw can no longer be undone.": "Una partita di questa fase è già salvata: il sorteggio non si può più annullare.",
     "Date": "Data",
-    "Fill the smaller tables:": "Punteggi dei tavoli più piccoli:",
+    "Autofill the smaller tables:": "Riempi in automatico i tavoli più piccoli:",
     "Same win": "Stessa vittoria",
     "Same average": "Stessa media",
     "Custom points: each place scores no more than the one above it.": "Punti personalizzati: ogni posto non può valere più di quello sopra.",
