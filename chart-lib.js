@@ -100,25 +100,27 @@ const Charts = (() => {
   // the part from lo to hi shaded (its middle half, as Game length's), with
   // `text` above the plot on the right. A bar's `range` = [lo, hi]: a line across it
   // from lo to hi (the middle half of its values). `rowH`: each bar that tall,
-  // the chart as tall as they need (many bars; .ch-tall frees it from the
-  // chart box's shape).
+  // as many bars as there are (a row per villain): they scroll inside the
+  // chart's box (.ch-scroll, as Matchups' grid), the axis's numbers pinned at
+  // its bottom and the ref's text at its top.
   function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null, rowH: fixedRow = null } = {}) {
     if (!data.length) return empty();
     const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value) : Math.max(d.value, d.range ? d.range[1] : 0)), ref ? Math.abs(ref.value) : 0) || 1;
     const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4);
     const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
     const lo = diverging ? -max : 0;
-    const top = ref ? 24 : 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
+    const scroll = !!fixedRow;
+    const top = scroll ? 2 : ref ? 24 : 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
     const rowH = fixedRow || Math.min(36, (H - top - B) / data.length), bw = W - labelW - RM;
-    const h = fixedRow ? top + data.length * rowH + B : H;
     const sx = v => labelW + (v - lo) / (max - lo) * bw;
     const botY = top + data.length * rowH;   // baseline = bottom of the last bar
     // x-axis: a gridline + label at each nice tick, drawn behind the bars.
-    let axis = '';
+    let axis = '', nums = '';
     for (const v of ticks) {
       const x = sx(v);
       const anchor = v === lo ? 'start' : v === max ? 'end' : 'middle';
-      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
+      axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/>`;
+      nums += `<text x="${x.toFixed(1)}" y="${((scroll ? 0 : botY) + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
     }
     const band = ref && ref.lo != null ? `<rect x="${sx(ref.lo).toFixed(1)}" y="${top}" width="${Math.max(1, sx(ref.hi) - sx(ref.lo)).toFixed(1)}" height="${(botY - top).toFixed(1)}" class="ch-spread"/>` : '';
     const rows = data.map((d, i) => {
@@ -130,12 +132,12 @@ const Charts = (() => {
         <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${y + 5}" width="${len.toFixed(1)}" height="${rowH - 14}" rx="3" fill="${d.color || color}"><title>${titleText(name, meta)}</title></rect>${d.range ? `
         <line x1="${sx(d.range[0]).toFixed(1)}" y1="${(y + rowH / 2 - 2).toFixed(1)}" x2="${sx(d.range[1]).toFixed(1)}" y2="${(y + rowH / 2 - 2).toFixed(1)}" class="ch-range"/>` : ''}`;
     }).join('');
-    const refHTML = ref ? (() => {
-      const x = sx(ref.value);
-      return `<line x1="${x.toFixed(1)}" y1="${top - 4}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-median"/>` +
-        `<text x="${W - RM}" y="${top - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(ref.text)}</text>`;
-    })() : '';
-    return wrap(axis + band + rows + refHTML, { h, cls: fixedRow ? 'ch-tall' : '' });
+    const refLine = ref ? `<line x1="${sx(ref.value).toFixed(1)}" y1="${scroll ? 0 : top - 4}" x2="${sx(ref.value).toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-median"/>` : '';
+    const refText = ref ? `<text x="${W - RM}" y="${scroll ? 13 : top - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(ref.text)}</text>` : '';
+    if (!scroll) return wrap(axis + nums + band + rows + refLine + refText);
+    return `<div class="ch-scroll">${ref ? `<div class="ch-pin-top">${wrap(refText, { h: 20 })}</div>` : ''}` +
+      wrap(axis + band + rows + refLine, { h: botY + 2 }) +
+      `<div class="ch-pin-bottom">${wrap(nums, { h: 18 })}</div></div>`;
   }
 
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.
