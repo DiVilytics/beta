@@ -11,7 +11,7 @@ on:
 
 permissions:
   contents: read
-  actions: read   # deploy-pages looks up the run's github-pages artifact
+  actions: read   # deploy-pages looks up the run's github-pages artifact (harmless; not the fix)
   pages: write
   id-token: write
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
       - name: Stamp the version
@@ -33,5 +33,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: .
+      # deploy-pages sometimes doesn't find the artifact just uploaded ("No
+      # artifacts named github-pages", since 2026-11-24): once more after 30 s.
       - id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
