@@ -95,14 +95,17 @@ const Charts = (() => {
   }
 
   // Horizontal bars: data = [{ label, value, color?, meta? }]. The x-axis uses
-  // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
+  // nice tick values (axisFmt(v, last) labels them: the unit on the last one only); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
   // `diverging`: values on both sides of 0 (Δ Wins), the axis from -max to
   // max with 0 in the middle, each bar drawn from 0. `ref` = { value, text,
   // lo?, hi? }: a dashed line at value (an average to compare the bars with),
   // the part from lo to hi shaded (its middle half, as Game length's), with
-  // `text` above the plot on the right. A bar's `range` = [lo, hi]: a line across it
-  // from lo to hi (the middle half of its values); its `img`: a round portrait
+  // `text` above the plot on the right. A row's `box` = { min, q1, mid, q3,
+  // max, out }: a box plot instead of a bar (the box its middle half, a gap at
+  // the median, whiskers from min to max, a dot for each value of `out`, past
+  // them), or its `points`: a dot for each value (too few for a box); with
+  // either, the axis starts near the smallest value, not at 0. Its `img`: a round portrait
   // between its name and the bar; `dim`: at the bottom, faded, under a line
   // and `dimLabel` (too little data: its value may be null, no bar). `steps`:
   // the axis's allowed steps (niceTicks). `rowH`: each bar that tall,
@@ -111,10 +114,24 @@ const Charts = (() => {
   // its bottom and the ref's text at its top.
   function barsH(data, { axisFmt = v => v, labelW = 96, color = 'var(--accent)', diverging = false, ref = null, rowH: fixedRow = null, dimLabel = '', steps = null } = {}) {
     if (!data.length) return empty();
-    const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value ?? 0) : Math.max(d.value ?? 0, d.range ? d.range[1] : 0)), ref ? Math.abs(ref.value) : 0) || 1;
-    const { max, ticks: up } = niceTicks(dmax, diverging ? 2 : 4, steps);
-    const ticks = diverging ? [...up.slice(1).reverse().map(v => -v), ...up] : up;
-    const lo = diverging ? -max : 0;
+    // Box plots: the axis from a tick under the smallest value to one over the largest.
+    const boxes = data.some(d => d.box || d.points);
+    let max, ticks, lo;
+    if (boxes) {
+      const vals = data.flatMap(d => d.box ? [d.box.min, d.box.max, ...(d.box.out || [])] : d.points || []).concat(ref ? [ref.value, ref.lo ?? ref.value, ref.hi ?? ref.value] : []);
+      const vmin = Math.min(...vals), vmax = Math.max(...vals);
+      const t = niceTicks(Math.max(vmax - vmin, 1), 4, steps).ticks, step = t[1] - t[0];
+      lo = Math.max(0, Math.floor(vmin / step) * step);
+      max = Math.max(lo + step, Math.ceil(vmax / step) * step);
+      ticks = [];
+      for (let v = lo; v <= max + step * 1e-6; v += step) ticks.push(+v.toFixed(6));
+    } else {
+      const dmax = Math.max(...data.map(d => diverging ? Math.abs(d.value ?? 0) : d.value ?? 0), ref ? Math.abs(ref.value) : 0) || 1;
+      const nt = niceTicks(dmax, diverging ? 2 : 4, steps);
+      max = nt.max;
+      ticks = diverging ? [...nt.ticks.slice(1).reverse().map(v => -v), ...nt.ticks] : nt.ticks;
+      lo = diverging ? -max : 0;
+    }
     const scroll = !!fixedRow;
     const top = scroll ? 2 : ref ? 24 : 10, B = 24, RM = 12;   // RM: right margin so the last tick label is not clipped
     const rowH = fixedRow || Math.min(36, (H - top - B) / data.length), bw = W - labelW - RM;
@@ -125,11 +142,11 @@ const Charts = (() => {
     const botY = top + data.length * rowH + gap;   // baseline = bottom of the last bar
     // x-axis: a gridline + label at each nice tick, drawn behind the bars.
     let axis = '', nums = '';
-    for (const v of ticks) {
+    for (const [i, v] of ticks.entries()) {
       const x = sx(v);
       const anchor = v === lo ? 'start' : v === max ? 'end' : 'middle';
       axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/>`;
-      nums += `<text x="${x.toFixed(1)}" y="${((scroll ? 0 : botY) + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
+      nums += `<text x="${x.toFixed(1)}" y="${((scroll ? 0 : botY) + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v, i === ticks.length - 1))}</text>`;
     }
     const band = ref && ref.lo != null ? `<rect x="${sx(ref.lo).toFixed(1)}" y="${top}" width="${Math.max(1, sx(ref.hi) - sx(ref.lo)).toFixed(1)}" height="${(botY - top).toFixed(1)}" class="ch-spread"/>` : '';
     const rows = data.map((d, i) => {
@@ -141,8 +158,8 @@ const Charts = (() => {
         <clipPath id="chp${i}"><circle cx="${px + pic / 2}" cy="${y + rowH / 2 - 2}" r="${pic / 2}"/></clipPath>
         <image href="${_esc(d.img)}" x="${px}" y="${y + rowH / 2 - 2 - pic / 2}" width="${pic}" height="${pic}" clip-path="url(#chp${i})" preserveAspectRatio="xMidYMid slice"/>` : ''}
         <text x="${labelW - 8 - (pic ? pic + 4 : 0)}" y="${y + rowH / 2}" class="ch-lbl" text-anchor="end" dominant-baseline="middle">${_esc(d.label)}</text>
-        <rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${has ? y + 5 : y}" width="${len.toFixed(1)}" height="${has ? rowH - 14 : rowH}" rx="3" fill="${has ? d.color || color : 'transparent'}"><title>${titleText(name, meta)}</title></rect>${d.range ? `
-        <line x1="${sx(d.range[0]).toFixed(1)}" y1="${(y + rowH / 2 - 2).toFixed(1)}" x2="${sx(d.range[1]).toFixed(1)}" y2="${(y + rowH / 2 - 2).toFixed(1)}" class="ch-range"/>` : ''}${d.dim ? '</g>' : ''}`;
+        ${boxes ? _boxRow(d, y, rowH, sx, labelW, bw, hit(name, meta, d.href), titleText(name, meta), d.color || color)
+        : `<rect${hit(name, meta, d.href)} x="${x0.toFixed(1)}" y="${has ? y + 5 : y}" width="${len.toFixed(1)}" height="${has ? rowH - 14 : rowH}" rx="3" fill="${has ? d.color || color : 'transparent'}"><title>${titleText(name, meta)}</title></rect>`}${d.dim ? '</g>' : ''}`;
     }).join('');
     const dimSep = firstDim >= 0 ? (() => {
       const y = rowY(firstDim) - gap;
@@ -155,6 +172,31 @@ const Charts = (() => {
     return `<div class="ch-scroll">${ref ? `<div class="ch-pin-top">${wrap(refText, { h: 20 })}</div>` : ''}` +
       wrap(axis + band + rows + dimSep + refLine, { h: botY + 2 }) +
       `<div class="ch-pin-bottom">${wrap(nums, { h: 18 })}</div></div>`;
+  }
+
+  // A barsH row's box plot (box) or dots (points), centered on the row's
+  // middle (as its portrait). One invisible box over the whole of it takes the
+  // tap (and its outline when picked); with no values, over the row.
+  function _boxRow(d, y, rowH, sx, labelW, bw, hitAttrs, title, fill) {
+    const cy = y + rowH / 2 - 2, h = rowH - 10, f = v => v.toFixed(1);
+    let marks = '', x0 = labelW, x1 = labelW + bw;
+    if (d.box) {
+      const b = d.box;
+      x0 = sx(b.min); x1 = sx(b.max);
+      const bx = sx(b.q1), bwid = Math.max(3, sx(b.q3) - sx(b.q1));
+      marks = `<line x1="${f(x0)}" y1="${f(cy)}" x2="${f(x1)}" y2="${f(cy)}" class="ch-whisker"/>` +
+        `<line x1="${f(x0)}" y1="${f(cy - h / 4)}" x2="${f(x0)}" y2="${f(cy + h / 4)}" class="ch-whisker"/>` +
+        `<line x1="${f(x1)}" y1="${f(cy - h / 4)}" x2="${f(x1)}" y2="${f(cy + h / 4)}" class="ch-whisker"/>` +
+        `<rect x="${f(bx)}" y="${f(cy - h / 2)}" width="${f(bwid)}" height="${f(h)}" rx="2" fill="${fill}"/>` +
+        `<line x1="${f(sx(b.mid))}" y1="${f(cy - h / 2)}" x2="${f(sx(b.mid))}" y2="${f(cy + h / 2)}" class="ch-box-mid"/>` +
+        (b.out || []).map(v => `<circle cx="${f(sx(v))}" cy="${f(cy)}" r="${f(h / 5)}" class="ch-outlier"/>`).join('');
+      x0 = Math.min(x0, ...(b.out || []).map(sx)); x1 = Math.max(x1, ...(b.out || []).map(sx));
+    } else if (d.points?.length) {
+      x0 = sx(Math.min(...d.points)); x1 = sx(Math.max(...d.points));
+      marks = d.points.map(v => `<circle cx="${f(sx(v))}" cy="${f(cy)}" r="${f(h / 3)}" fill="${fill}"/>`).join('');
+    }
+    const pad = 4;
+    return marks + `<rect${hitAttrs} x="${f(x0 - pad)}" y="${f(cy - h / 2 - 2)}" width="${f(x1 - x0 + 2 * pad)}" height="${f(h + 4)}" rx="4" fill="transparent"><title>${title}</title></rect>`;
   }
 
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.

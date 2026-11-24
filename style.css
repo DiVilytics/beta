@@ -1015,8 +1015,11 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
 .ch-median { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 /* Too little data (Rounds to win: under 3 wins), at the bottom. */
 .ch-dim { opacity: 0.4; }
-/* A bar's middle half (Rounds to win), across its end. */
-.ch-range { stroke: var(--text); stroke-width: 2; stroke-linecap: round; opacity: 0.75; vector-effect: non-scaling-stroke; }
+/* Box plots (Speed to win): the whiskers, and the median as a gap in the box
+   (the card's color: it shows on any box color, in both themes). */
+.ch-whisker { stroke: var(--muted); stroke-width: 1.2; }
+.ch-box-mid { stroke: var(--s1); stroke-width: 2.5; }
+.ch-outlier { fill: none; stroke: var(--muted); stroke-width: 1.2; }
 .ch-donut-big { font-size: 17px; font-weight: 700; fill: var(--text); }
 .ch-spread-txt { fill: var(--text); }
 .ch-cellval { font-size: 10px; font-weight: 600; fill: #fff; }
