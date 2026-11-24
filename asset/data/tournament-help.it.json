@@ -50,7 +50,7 @@
   "pairing": {
     "title": "Abbinamento",
     "paras": [
-      "Casuale: nuovi tavoli a caso a ogni fase.",
+      "Casuale: nuovi tavoli a caso a ogni fase; tra i sorteggi possibili, quello in cui meno giocatori si ritrovano (se ne provano diversi).",
       "Svizzero: fase 1 a caso. Dalla fase 2, i giocatori sono ordinati per classifica (punti, poi gli spareggi, vedi Classifica) e seduti in quell'ordine, i primi allo stesso tavolo; poi i giocatori si scambiano tra tavoli vicini ogni volta che questo riduce quanti giocatori di un tavolo si sono già affrontati. Una rivincita capita comunque quando non c'è modo di evitarla.",
       "Non si cambia più una volta iniziata la prima partita."
     ]

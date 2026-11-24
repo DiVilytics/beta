@@ -338,6 +338,7 @@ window.I18N.it = {
     "Winner picked": "Vincitore indovinato",
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
+    "New random tables every stage, avoiding rematches where possible.": "Nuovi tavoli a caso a ogni fase, evitando le rivincite quando possibile.",
     "Tiebreaks": "Spareggi",
     "Villain repeats": "Ripetizioni dei cattivi",
     "Avoid": "Evita",

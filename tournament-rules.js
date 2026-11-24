@@ -225,12 +225,21 @@ function _tnRematches(table, met) {
 // { size, split, stage (the one being drawn), standings (tournamentStandings
 // rows), met, byes }. Returns the tables, play order not yet drawn.
 
+const TN_RANDOM_TRIES = 200;
 const TOURNAMENT_PAIRINGS = {
+  // At random, avoiding rematches: of up to TN_RANDOM_TRIES shuffles, the one
+  // with the fewest players at a table who already met (the first with none).
   random: {
     name: 'Random',
-    hint: 'New random tables every stage.',
+    hint: 'New random tables every stage, avoiding rematches where possible.',
     tables(players, ctx) {
-      return _tnSeat(_tnShuffle(players), ctx);
+      let best = null, bestCost = Infinity;
+      for (let i = 0; i < TN_RANDOM_TRIES && bestCost > 0; i++) {
+        const tables = _tnSeat(_tnShuffle(players), ctx);
+        const cost = tables.reduce((n, tb) => n + _tnRematches(tb, ctx.met), 0);
+        if (cost < bestCost) { best = tables; bestCost = cost; }
+      }
+      return best;
     },
   },
   swiss: {

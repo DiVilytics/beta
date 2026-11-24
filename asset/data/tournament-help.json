@@ -50,7 +50,7 @@
   "pairing": {
     "title": "Pairing",
     "paras": [
-      "Random: new random tables every stage.",
+      "Random: new random tables every stage; among the possible draws, the one where the fewest players meet again (several are tried).",
       "Swiss: stage 1 at random. From stage 2, the players are sorted by the standings (points, then the tiebreaks, see Ranking) and seated in that order, the leaders at the same table; then players swap between neighboring tables whenever that lowers how many players at a table already met. A rematch still happens when there is no way around it.",
       "Fixed once the first game starts."
     ]
