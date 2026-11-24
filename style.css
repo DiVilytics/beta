@@ -2689,6 +2689,9 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
    the place where New Game has the seat number, 🏳️ for a drop. */
 .tn-edit-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .tn-edit-row .claim-who { flex: 1; }
+/* Tournament form, Tiebreaks: a row each, in order, and the menu to add one. */
+.tn-tiebreak .claim-who { flex: 1; min-width: 0; }
+.tn-tiebreak-add { width: 100%; margin-bottom: 4px; }
 /* Edit draw (tournaments.js): the tables' heads between the seats, one list to drag across. */
 .tn-draw-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px;
   font-size: calc(12px * var(--ts)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }

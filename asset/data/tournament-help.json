@@ -89,7 +89,12 @@
   "ranking": {
     "title": "Ranking and tiebreaks",
     "paras": [
-      "The standings rank by points. Equal points are separated by the most 1st places, then by the opponents' points: the sum of the current points of every opponent faced, once for each time they met. Players still equal share their place."
+      "The standings rank by points. Equal points are separated by the tiebreaks you choose, in the order you put them (drag them by ⠿): the first that differs decides. Players still equal share their place. By default: 1st places, then Buchholz.",
+      "1st places: the most 1st places first.",
+      "Buchholz: the points of the opponents faced, added up, once for each time they met (as in Swiss chess): a harder path ranks higher.",
+      "Placements: the most 1st places first; if equal, the most 2nd places, then 3rd, and so on.",
+      "Wins by pace: the most wins with red villains first; if equal, with orange villains, then yellow, then green.",
+      "The tiebreaks also decide who plays the final table, and with Swiss pairing the order the players are seated in. They can change until the first game starts."
     ]
   },
   "final": {
@@ -106,6 +111,14 @@
       "Any: each table gets any villains from the draw pool.",
       "Same pace: each table's villains are of one pace (green, yellow, orange or red). Several tables can share a pace: the tables, largest first, each take the pace with the most different villains still free in the pool, so the paces follow the pool. When no pace has enough villains left for a whole table, its missing seats come from the neighboring paces (as Pace+ in the draw pool), and only if there's no other way from further ones: the draw never fails because of the pace.",
       "Pace comes before the rest: a player can get a villain they already played, if that keeps their table of one pace. Never the same villain twice at a table, and never over its copies, as always. The final table follows the option too. Fixed once the first game starts."
+    ]
+  },
+  "repeats": {
+    "title": "Villain repeats",
+    "paras": [
+      "Avoid: nobody gets a villain they already played in the tournament, while the pool allows it (with Same pace, the pace comes first).",
+      "Allow: the villains are drawn without looking at who already played them, nor how often: anyone can get the same villain again.",
+      "Never the same villain twice at a table, and never over its copies, either way. Fixed once the first game starts."
     ]
   },
   "villains": {

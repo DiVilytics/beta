@@ -10,7 +10,7 @@
 let tnPool     = null;        // the form's draw pool (pace-filter.js)
 let tnCopies   = {};          // its copies: villain → 2…9 (1: not listed), the villains in the pool only
 let tnFormFor  = null;        // the form edits this tournament's settings (null: a new one)
-const tnRule   = { format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any' };
+const tnRule   = { format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any', villain_repeats: 'avoid', tiebreaks: [...TN_TIEBREAKS_DEFAULT] };
 let   tnCustom = {};   // the custom scoring's points, { n: row } for every table size, 1st first
 
 // ── THE FORM ──────────────────────────────────────────────────────────────────
@@ -85,6 +85,8 @@ function _tnFillSettings(tour) {
   tnRule.bye         = tour?.bye || (tour ? 'last' : 'half');
   tnRule.final       = tour?.final_table ? 'on' : 'off';
   tnRule.villain_match = tour?.villain_match || 'any';
+  tnRule.villain_repeats = tour?.villain_repeats || 'avoid';
+  tnRule.tiebreaks = tour?.tiebreaks?.length ? [...tour.tiebreaks] : [...TN_TIEBREAKS_DEFAULT];
   tnCustom = tour?.custom_points?.length ? tournamentCustomRows(tour) : _tnCustomRows(tour?.table_size || 4);
 }
 
@@ -160,7 +162,8 @@ function _tnDraftState() {
 function _tnFormChanged() {
   const d = _tnDraftState();
   return !!d.name.trim() || !!d.date || d.size !== '4' || d.stages !== 'open'
-    || Object.entries({ format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any' }).some(([k, v]) => d.rule[k] !== v)
+    || Object.entries({ format: 'points', table_split: 'even', pairing: 'random', play_order: 'random', scoring: 'borda', bye: 'half', final: 'off', villain_match: 'any', villain_repeats: 'avoid' }).some(([k, v]) => d.rule[k] !== v)
+    || JSON.stringify(d.rule.tiebreaks || TN_TIEBREAKS_DEFAULT) !== JSON.stringify(TN_TIEBREAKS_DEFAULT)
     || d.players.length !== 2 || d.players.some(p => p.name.trim() || p.isMe)
     || !tnPool.isDefault() || Object.keys(d.copies).length > 0;
 }
@@ -242,6 +245,7 @@ function _tnRenderRules() {
     ['bye', TOURNAMENT_BYES, 'tnBye', 'tnByeHint'],
     ['final', TN_FINAL, 'tnFinal', 'tnFinalHint'],
     ['villain_match', TOURNAMENT_VILLAIN_MATCHES, 'tnMatch', 'tnMatchHint'],
+    ['villain_repeats', TOURNAMENT_VILLAIN_REPEATS, 'tnRepeats', 'tnRepeatsHint'],
   ]) {
     const seg = document.getElementById(segId);
     const off = seg.classList.contains('disabled');
@@ -250,6 +254,44 @@ function _tnRenderRules() {
     document.getElementById(hintId).textContent = t(rules[tnRule[kind]]?.hint || '');
   }
   _tnRenderCustom();
+  _tnRenderTiebreaks();
+}
+
+// The tiebreaks: a row each, in order (⠿ to reorder, ❌ to remove), and a
+// menu with the ones left to add.
+function _tnRenderTiebreaks() {
+  const box = document.getElementById('tnTiebreaks');
+  box.innerHTML = tnRule.tiebreaks.map((id, i) => `
+    <div class="order-slot tn-tiebreak">
+      <div class="drag-handle"><span class="drag-dots">⠿</span><span class="row-num">${i + 1}.</span></div>
+      <div class="claim-who"><div class="claim-name">${t(TOURNAMENT_TIEBREAKS[id].name)}</div><div class="claim-nick">${t(TOURNAMENT_TIEBREAKS[id].hint)}</div></div>
+      <div class="order-slot-actions"><button class="pf-btn del" type="button" onclick="tnRemoveTiebreak(${i})" title="${_esc(t('Remove'))}">❌</button></div>
+    </div>`).join('');
+  const left = Object.keys(TOURNAMENT_TIEBREAKS).filter(id => !tnRule.tiebreaks.includes(id));
+  const add = document.getElementById('tnTiebreakAdd');
+  add.innerHTML = `<option value="">${t('+ Add tiebreak')}</option>` + left.map(id => `<option value="${id}">${_esc(t(TOURNAMENT_TIEBREAKS[id].name))}</option>`).join('');
+  setVisible(add, left.length > 0);
+  if (!box.dataset.drag) {
+    box.dataset.drag = '1';
+    attachRowDrag(box, {
+      rowSelector: '.tn-tiebreak',
+      onDrop: (from, to) => {
+        if (to !== from) tnRule.tiebreaks.splice(to, 0, tnRule.tiebreaks.splice(from, 1)[0]);
+        _tnRenderTiebreaks();
+        _tnSaveDraft();
+      },
+    });
+  }
+}
+
+function tnAddTiebreak(id) {
+  if (id && TOURNAMENT_TIEBREAKS[id] && !tnRule.tiebreaks.includes(id)) tnRule.tiebreaks.push(id);
+  _tnRenderTiebreaks();
+}
+
+function tnRemoveTiebreak(i) {
+  tnRule.tiebreaks.splice(i, 1);
+  _tnRenderTiebreaks();
 }
 
 const _tnToday     = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
@@ -657,10 +699,12 @@ function _tnReadForm() {
   for (const [key, value, dflt] of [
     ['table_split', tnRule.table_split, 'even'], ['play_order', tnRule.play_order, 'random'],
     ['bye', tnRule.bye, 'half'], ['event_date', date, _tnToday()], ['final_table', !ko && tnRule.final === 'on', false],
-    ['villain_match', tnRule.villain_match, 'any'],
+    ['villain_match', tnRule.villain_match, 'any'], ['villain_repeats', tnRule.villain_repeats, 'avoid'],
   ]) {
     if (value !== dflt || (tnFormFor && (tnFormFor[key] ?? dflt) !== value)) row[key] = value;
   }
+  const tbs = JSON.stringify(tnRule.tiebreaks);
+  if (tbs !== JSON.stringify(TN_TIEBREAKS_DEFAULT) || (tnFormFor && tbs !== JSON.stringify(tnFormFor.tiebreaks?.length ? tnFormFor.tiebreaks : TN_TIEBREAKS_DEFAULT))) row.tiebreaks = [...tnRule.tiebreaks];
   // The format only for a knockout, or one that was (points is the default).
   if (ko || tnFormFor?.format === 'knockout') Object.assign(row, { format: tnRule.format, advance: ko ? ko.advance : null });
   return { row, names, pool, plan: _tnPlayersPlan(names) };

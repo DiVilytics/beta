@@ -37,6 +37,7 @@ async function init() {
   const params = new URLSearchParams(location.search);
   await initAuth(() => _tnAuthChanged());
   [tnChars, tnBoxInfo] = await Promise.all([loadCharacters(), loadBoxInfo()]);
+  tournamentSetPaces(_tnPaceOf());   // Wins by pace (tournament-rules.js)
   if (params.has('tour')) { history.replaceState(null, '', location.pathname); return startTournamentTour(); }   // the Tutorial's Show me around
   if (params.has('new')) return tnOpenForm(null);
   const id = params.get('t');
@@ -338,7 +339,9 @@ function _tnOptionsHTML() {
   const opt = (label, value) => `<div class="claim-meta">${t(label)}: ${value}</div>`;
   const name = (rules, id, dflt) => t((rules[id] || rules[dflt]).name);
   const playOrder = opt('Play order', name(TOURNAMENT_PLAY_ORDERS, tnTour.play_order, 'random'));
-  const villainMatch = opt('Villains at a table', name(TOURNAMENT_VILLAIN_MATCHES, tnTour.villain_match, 'any'));
+  const villainMatch = opt('Villains at a table', name(TOURNAMENT_VILLAIN_MATCHES, tnTour.villain_match, 'any'))
+    + opt('Villain repeats', name(TOURNAMENT_VILLAIN_REPEATS, tnTour.villain_repeats, 'avoid'));
+  const tiebreaks = opt('Tiebreaks', tournamentTiebreaks(tnTour).map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) || t('None'));
   if (tournamentIsKnockout(tnTour)) return [
     opt('Format', t(TOURNAMENT_FORMATS.knockout.name)),
     opt('Table size', tnTour.table_size),
@@ -357,6 +360,7 @@ function _tnOptionsHTML() {
     opt('Scoring', TOURNAMENT_SCORINGS[tnTour.scoring] ? name(TOURNAMENT_SCORINGS, tnTour.scoring) : _esc(tnTour.scoring)),
     opt('Bye', name(TOURNAMENT_BYES, tnTour.bye, 'last')),
     opt('Final table', t(TN_FINAL[tnTour.final_table ? 'on' : 'off'].name)),
+    tiebreaks,
     villainMatch,
   ].join('');
 }
@@ -1091,8 +1095,9 @@ function _tnTieNote(rows, r) {
   const i = rows.indexOf(r);
   const tied = [rows[i - 1], rows[i + 1]].filter(x => x && !x.final && x.points === r.points);
   if (!tied.length) return '';
-  for (const tb of TOURNAMENT_TIEBREAKS) {
-    if (tied.some(x => tb.value(x) !== tb.value(r))) return `${t('Tiebreak')}: ${t(tb.name)} ${fmtTournamentPoints(tb.value(r))}`;
+  for (const id of tournamentTiebreaks(tnTour)) {
+    const tb = TOURNAMENT_TIEBREAKS[id];
+    if (tied.some(x => _tnCompareValues(tb.value(x), tb.value(r)) !== 0)) return `${t('Tiebreak')}: ${t(tb.name)} ${tb.note(r)}`;
   }
   return t('Shared place');
 }
@@ -1129,7 +1134,14 @@ function _tnStandingsHTML(mine) {
       <div class="lb-head"><span>#</span><span>${t('Player')}</span><span class="text-right">${t('Points')} <span class="lb-head-sub">(${t('1st places')})</span></span></div>
       ${body}
     </div>
-    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${finalTb ? ` ${t('The final table decides the top places; the points are the stages\' alone.')}` : tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${_tnTiesLine()}${finalTb ? ` ${t('The final table decides the top places; the points are the stages\' alone.')}` : tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+}
+
+// "Ties: Buchholz, then Placements." (none: shared places).
+function _tnTiesLine() {
+  const ids = tournamentTiebreaks(tnTour);
+  if (!ids.length) return t('Equal points share the place.');
+  return t('Ties: {list}.', { list: ids.map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) });
 }
 
 // A row of a ranking (the standings, the final's): the rank (a medal for the

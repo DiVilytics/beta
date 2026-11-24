@@ -89,7 +89,12 @@
   "ranking": {
     "title": "Classifica e spareggi",
     "paras": [
-      "La classifica ordina per punti. A pari punti conta chi ha più primi posti, poi i punti degli avversari: la somma dei punti attuali di ogni avversario affrontato, una volta per ogni incontro. I giocatori ancora pari condividono il posto."
+      "La classifica ordina per punti. A parità di punti decidono gli spareggi che scegli, nell'ordine in cui li metti (trascinali per ⠿): decide il primo che è diverso. I giocatori ancora pari condividono il posto. Di partenza: Primi posti, poi Buchholz.",
+      "Primi posti: prima chi ha più primi posti.",
+      "Buchholz: i punti degli avversari affrontati, sommati, una volta per ogni incontro (come negli scacchi svizzeri): un percorso più difficile vale di più.",
+      "Piazzamenti: prima chi ha più primi posti; a parità, più secondi posti, poi terzi, e così via.",
+      "Vittorie per velocità: prima chi ha più vittorie con cattivi rossi; a parità, con cattivi arancioni, poi gialli, poi verdi.",
+      "Gli spareggi decidono anche chi gioca il tavolo finale e, con l'abbinamento Svizzero, l'ordine in cui i giocatori si siedono. Si possono cambiare finché non inizia la prima partita."
     ]
   },
   "final": {
@@ -106,6 +111,14 @@
       "Qualsiasi: ogni tavolo riceve cattivi qualsiasi dalla riserva.",
       "Stessa velocità: i cattivi di ogni tavolo sono di una sola velocità (verde, gialla, arancione o rossa). Più tavoli possono avere la stessa velocità: i tavoli, dal più grande, prendono ciascuno la velocità con più cattivi diversi ancora liberi nella riserva, così le velocità seguono la riserva. Quando nessuna velocità ha abbastanza cattivi per un tavolo intero, i posti mancanti vengono dalle velocità vicine (come Velocità+ nella riserva), e solo se non c'è altro modo da quelle più lontane: il sorteggio non fallisce mai per la velocità.",
       "La velocità viene prima del resto: un giocatore può ricevere un cattivo già giocato, se così il suo tavolo resta di una sola velocità. Mai lo stesso cattivo due volte a un tavolo e mai oltre le sue copie, come sempre. Anche il tavolo finale segue l'opzione. Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "repeats": {
+    "title": "Ripetizioni dei cattivi",
+    "paras": [
+      "Evita: nessuno riceve un cattivo che ha già giocato nel torneo, finché la riserva lo permette (con Stessa velocità, la velocità viene prima).",
+      "Permetti: i cattivi si sorteggiano senza guardare chi li ha già giocati, né quante volte: chiunque può ritrovare lo stesso cattivo.",
+      "In entrambi i casi mai lo stesso cattivo due volte a un tavolo, e mai oltre le sue copie. Non si cambia più una volta iniziata la prima partita."
     ]
   },
   "villains": {
