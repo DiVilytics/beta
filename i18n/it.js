@@ -338,6 +338,7 @@ window.I18N.it = {
     "Winner picked": "Vincitore indovinato",
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
+    "Tables and pairing": "Tavoli e abbinamento",
     "The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and the <b>Tiebreaks</b> for equal points, in the order you choose.": "I punti per ogni posto (<b>Punteggio</b>), per una fase saltata (<b>Riposo</b>), e gli <b>Spareggi</b> a parità di punti, nell'ordine che scegli.",
     "<b>Final table</b>: after the last stage, the top of the standings play one last table, which decides the top places.": "<b>Tavolo finale</b>: dopo l'ultima fase, i primi della classifica giocano un ultimo tavolo, che decide i primi posti.",
     "<b>Advanced options</b>: the rest of the rules, folded, with what's set on the line under it. A new tournament starts with Swiss pairing, Rotation and Buchholz.": "<b>Opzioni avanzate</b>: il resto delle regole, chiuse, con quello che è impostato nella riga sotto. Un torneo nuovo parte con abbinamento Svizzero, Rotazione e Buchholz.",

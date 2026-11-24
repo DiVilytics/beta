@@ -281,19 +281,22 @@ function _tnRenderAdvanced() {
   const box = document.getElementById('tnAdvanced');
   if (!box) return;
   box.classList.toggle('open', tnAdvOpen);
+  document.getElementById('tnAdvToggle').classList.toggle('open', tnAdvOpen);
   document.getElementById('tnAdvChevron').classList.toggle('open', tnAdvOpen);
-  // The summary, folded: what's set, in the form's order (a knockout's own).
+  // The summary, folded: each option with its name, as the form calls it, in
+  // its order (a knockout's own).
   const ko = _tnFormKo();
   const name = (rules, id) => t((rules[id] || Object.values(rules)[0]).name);
+  const opt = (label, value) => `${t(label)}: ${value}`;
   const parts = [
-    ko ? null : name(TOURNAMENT_SPLITS, tnRule.table_split),
-    ko ? null : name(TOURNAMENT_PAIRINGS, tnRule.pairing),
-    name(TOURNAMENT_PLAY_ORDERS, tnRule.play_order),
-    ko ? null : name(TOURNAMENT_SCORINGS, tnRule.scoring),
-    ko ? null : name(TOURNAMENT_BYES, tnRule.bye),
-    ko ? null : (tnRule.tiebreaks.map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) || t('No tiebreaks')),
-    name(TOURNAMENT_VILLAIN_MATCHES, tnRule.villain_match),
-    t('Repeats: {r}', { r: name(TOURNAMENT_VILLAIN_REPEATS, tnRule.villain_repeats) }),
+    ko ? null : opt('Tables', name(TOURNAMENT_SPLITS, tnRule.table_split)),
+    ko ? null : opt('Pairing', name(TOURNAMENT_PAIRINGS, tnRule.pairing)),
+    opt('Play order', name(TOURNAMENT_PLAY_ORDERS, tnRule.play_order)),
+    ko ? null : opt('Scoring', name(TOURNAMENT_SCORINGS, tnRule.scoring)),
+    ko ? null : opt('Bye', name(TOURNAMENT_BYES, tnRule.bye)),
+    ko ? null : opt('Tiebreaks', tnRule.tiebreaks.map(id => t(TOURNAMENT_TIEBREAKS[id].name)).join(t(', then ')) || t('None')),
+    opt('Villains at a table', name(TOURNAMENT_VILLAIN_MATCHES, tnRule.villain_match)),
+    opt('Villain repeats', name(TOURNAMENT_VILLAIN_REPEATS, tnRule.villain_repeats)),
   ].filter(Boolean);
   const summary = document.getElementById('tnAdvSummary');
   summary.textContent = parts.join(' | ');
