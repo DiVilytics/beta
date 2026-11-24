@@ -338,6 +338,7 @@ window.I18N.it = {
     "Winner picked": "Vincitore indovinato",
     "Gain": "Guadagno",
     "Play now": "Gioca ora",
+    "The final table decides the top places; the points are the stages' alone.": "Il tavolo finale decide i primi posti; i punti sono quelli delle sole fasi.",
     "Villains at a table": "Cattivi al tavolo",
     "Any": "Qualsiasi",
     "Same pace": "Stessa velocità",

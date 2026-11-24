@@ -1100,40 +1100,55 @@ function _tnTieNote(rows, r) {
 // The standings, drawn like the Leaderboard's table: rank (medals for the
 // top three), player, points with their 1st places in parentheses, a bar.
 function _tnStandingsHTML(mine) {
-  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers });
+  // A saved final table: its ranking on top (no points), then everyone's
+  // points from the stages, ranked by points alone (the finalists too).
+  const finalTb = tnTour.final_table ? tnTables.find(tb => tournamentIsFinal(tnTour, tb.stage) && tb.saved_at) : null;
+  const rows = tournamentStandings(tnTour, tnTables, { players: tnPlayers, stage: finalTb ? tournamentLastStage(tnTour) : Infinity });
   // Shown from the start: everyone at 0 until the first table is saved (no
   // tie notes until then).
   const started = rows.some(r => r.played || r.byes);
-  const byId = new Map(tnPlayers.map(p => [p.id, p]));
   const max = Math.max(...rows.map(r => r.points)) || 1;
-  const medal = rank => rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
   const digits = String(Math.max(0, ...rows.map(r => r.firsts))).length;
-  const body = rows.map(r => {
-    const p = byId.get(r.player_id);
-    const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
-    const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
-    const sub = r.final || !started ? '' : _tnTieNote(rows, r);
-    // A claimed name links to its player page, as in the Leaderboard.
-    const name = prof
-      ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
-      : `<span class="row-name">${_esc(tnPlayerName(p))}</span>`;
-    return `
-      <div class="lb-row${mine && r.player_id === mine.id ? ' lb-row-self' : ''}">
-        <div class="rank-num ${medal(r.rank)}">${tnTour.finished_at && r.rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[r.rank - 1]}</span>` : r.rank}</div>
-        <div class="row-identity">${avatar}<div class="row-id-text">${name}${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>
+  // Medals: the final's, or (no final) the standings' once finished.
+  const medals = !finalTb && !!tnTour.finished_at;
+  const body = rows.map(r => _tnRankRowHTML(r.player_id, r.rank, medals, mine, started && !r.final ? _tnTieNote(rows, r) : '', `
         <div class="row-val row-val-stack">
           <span class="sv"><span class="sv-main">${fmtTournamentPoints(r.points)}</span><span class="sv-games">(${r.firsts})</span></span>
           <div class="bar-bg"><div class="bar-fill${r.rank === 1 ? ' gold' : ''}" style="width:${Math.max(0, r.points / max * 100)}%"></div></div>
-        </div>
-      </div>`;
-  }).join('');
+        </div>`)).join('');
   const scoring = TOURNAMENT_SCORINGS[tnTour.scoring];
-  return `
+  const final = finalTb ? `
+    <div class="section-label">${t('Final table')}</div>
+    <div class="lb-table tn-final-rank">
+      ${finalTb.seats.slice().sort((a, b) => a.place - b.place).map(s =>
+        _tnRankRowHTML(s.player_id, s.place, true, mine, `${villainNameHTML(s.character)}${s.dropped ? ` | 🏳️ ${t('Dropped')}` : ''}`, '')).join('')}
+    </div>
+    <div class="section-label">${t('Points')}</div>` : '';
+  return `${final}
     <div class="lb-table tn-standings" style="--sv-games: calc(${digits} * 0.6em + 0.65em)">
       <div class="lb-head"><span>#</span><span>${t('Player')}</span><span class="text-right">${t('Points')} <span class="lb-head-sub">(${t('1st places')})</span></span></div>
       ${body}
     </div>
-    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+    <p class="results-hint">${_esc(t(scoring?.hint || ''))} ${t('Ties: most 1st places, then the points of the opponents faced.')}${finalTb ? ` ${t('The final table decides the top places; the points are the stages\' alone.')}` : tnTour.final_table ? ` ${t('With a final table, the finalists come first, in the final\'s order.')}` : ''}</p>`;
+}
+
+// A row of a ranking (the standings, the final's): the rank (a medal for the
+// top three when given), the player (linked once claimed, as in the
+// Leaderboard), a line under the name, and what goes on the right.
+function _tnRankRowHTML(playerId, rank, medals, mine, sub, valueHTML) {
+  const p = tnPlayers.find(x => x.id === playerId);
+  const prof = p?.user_id ? tnProfiles.get(p.user_id) : null;
+  const avatar = prof ? avatarHTML(resolveAvatar(prof)) : '<img class="player-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">';
+  const name = prof
+    ? `<a class="row-name row-name-link" href="players.html?nick=${encodeURIComponent(prof.nickname)}">${_esc(tnPlayerName(p))}</a>`
+    : `<span class="row-name">${_esc(tnPlayerName(p))}</span>`;
+  const color = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+  return `
+      <div class="lb-row${mine && playerId === mine.id ? ' lb-row-self' : ''}">
+        <div class="rank-num ${medals ? color : ''}">${medals && rank <= 3 ? `<span class="tn-medal">${TOURNAMENT_MEDALS[rank - 1]}</span>` : rank}</div>
+        <div class="row-identity">${avatar}<div class="row-id-text">${name}${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>
+        ${valueHTML}
+      </div>`;
 }
 
 // ── BRACKET (knockout) ──

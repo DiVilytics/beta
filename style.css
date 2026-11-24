@@ -1583,6 +1583,9 @@ select:disabled {
   transition: background 0.12s;
 }
 .lb-row:last-child { border-bottom: none; }
+/* A tournament's final table (tournaments.js): its ranking, no value column. */
+.tn-final-rank .lb-row { grid-template-columns: calc(20px * var(--ts)) minmax(0, 1fr); }
+.tn-final-rank { margin-bottom: 14px; }
 
 /* Leaderboard only: character rows carry a 2-line identity (name + box sub) while
    player rows are 1 line, so they differ in height. Even both tabs out to a
