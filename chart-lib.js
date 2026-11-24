@@ -95,9 +95,10 @@ const Charts = (() => {
   // nice tick values (axisFmt labels them); a bar's exact value lives in the tap
   // caption (meta), not at the bar end.
   // `diverging`: values on both sides of 0 (Δ Wins), the axis from -max to
-  // max with 0 in the middle, each bar drawn from 0. `ref` = { value, text }: a
-  // dashed line at value (an average to compare the bars with), with `text`
-  // above the plot on the right. A bar's `range` = [lo, hi]: a line across it
+  // max with 0 in the middle, each bar drawn from 0. `ref` = { value, text,
+  // lo?, hi? }: a dashed line at value (an average to compare the bars with),
+  // the part from lo to hi shaded (its middle half, as Game length's), with
+  // `text` above the plot on the right. A bar's `range` = [lo, hi]: a line across it
   // from lo to hi (the middle half of its values). `rowH`: each bar that tall,
   // the chart as tall as they need (many bars; .ch-tall frees it from the
   // chart box's shape).
@@ -119,6 +120,7 @@ const Charts = (() => {
       const anchor = v === lo ? 'start' : v === max ? 'end' : 'middle';
       axis += `<line x1="${x.toFixed(1)}" y1="${top}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-grid${diverging && v === 0 ? ' ch-ref-zero' : ''}"/><text x="${x.toFixed(1)}" y="${(botY + 13).toFixed(1)}" class="ch-ax" text-anchor="${anchor}">${_esc(axisFmt(v))}</text>`;
     }
+    const band = ref && ref.lo != null ? `<rect x="${sx(ref.lo).toFixed(1)}" y="${top}" width="${Math.max(1, sx(ref.hi) - sx(ref.lo)).toFixed(1)}" height="${(botY - top).toFixed(1)}" class="ch-spread"/>` : '';
     const rows = data.map((d, i) => {
       const y = top + i * rowH, x0 = sx(Math.min(0, d.value)), len = Math.max(2, Math.abs(sx(d.value) - sx(0)));
       const name = d.name != null ? d.name : d.label;
@@ -133,7 +135,7 @@ const Charts = (() => {
       return `<line x1="${x.toFixed(1)}" y1="${top - 4}" x2="${x.toFixed(1)}" y2="${botY.toFixed(1)}" class="ch-median"/>` +
         `<text x="${W - RM}" y="${top - 10}" class="ch-ax ch-spread-txt" text-anchor="end">${_esc(ref.text)}</text>`;
     })() : '';
-    return wrap(axis + rows + refHTML, { h, cls: fixedRow ? 'ch-tall' : '' });
+    return wrap(axis + band + rows + refHTML, { h, cls: fixedRow ? 'ch-tall' : '' });
   }
 
   // Vertical bars: data = [{ value, ... }]. xTick(i) optional axis label every xEvery.

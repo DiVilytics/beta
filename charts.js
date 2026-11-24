@@ -339,7 +339,7 @@ const CHARTS = [
     // its opponents). Villains with fewer than _SPEED_MIN such wins stay out.
     id: 'speed', icon: '🏁', label: 'Rounds to win',
     groups: [{ id: 'pace', label: 'Pace' }, { id: 'box', label: 'Boxes' }],
-    desc: 'The round in which each villain wins: its median, fastest first, the line across the bar its middle half. Only won games with a recorded round count; villains with fewer than 3 are left out.',
+    desc: 'The round in which each villain wins: its median, fastest first, the line across the bar its middle half; dashed and shaded, those of all wins. Only won games with a recorded round count; villains with fewer than 3 are left out.',
     render({ games, chars, boxInfo, group }) {
       const byBox = group === 'box';
       const rounds = {};
@@ -356,8 +356,10 @@ const CHARTS = [
         };
       }).sort((a, b) => a.value - b.value || b.n - a.n);
       if (!data.length) return Charts.barsH([]);
-      const mid = _quantile(all, 0.5);
-      const chart = Charts.barsH(data, { labelW: 156, rowH: 22, ref: { value: mid, text: t('All wins: median {m}', { m: _fmtRound(mid) }) } });
+      // Every win's round (also those of villains left out): its median, its middle half shaded.
+      const [q1, mid, q3] = [0.25, 0.5, 0.75].map(q => _quantile(all, q));
+      const chart = Charts.barsH(data, { labelW: 156, rowH: 22, ref: { value: mid, lo: q1, hi: q3,
+        text: t('All wins: median {m} | middle half {a}-{b}', { m: _fmtRound(mid), a: _fmtRound(q1), b: _fmtRound(q3) }) } });
       return byBox ? chart + _boxLegendHTML(boxInfo, new Set(chars.filter(c => rounds[c.name]?.length >= _SPEED_MIN).map(c => c.box).filter(Boolean))) : chart;
     },
   },
@@ -623,11 +625,68 @@ async function _rerender() {
     if (z) _attachZoom(z);
     const lp = stage.querySelector('.ch-pannable');
     if (lp) _attachLinePan(lp);
+    const vs = stage.querySelector('.vs-wrap');
+    if (vs) _attachFreeScroll(vs);
   } catch (e) {
     if (token !== _renderToken) return;
     console.error('chart render failed:', e);
     stage.innerHTML = `<div class="chart-note">${t('Could not load this chart.')}</div>`;
   }
+}
+
+// Matchups' grid under a finger (or pen): it follows it in any direction, not
+// only along one axis as a phone's own scrolling locks it, and glides on after
+// a flick. Up or down past the grid's edge, the page scrolls instead. A mouse
+// keeps the browser's own scrolling (a wheel, a trackpad: diagonal already).
+// A drag stamps _lastPanEnd, so the tap that ends it doesn't pick a cell.
+function _attachFreeScroll(el) {
+  el.style.touchAction = 'none';
+  let id = null, start = null, last = null, vx = 0, vy = 0, moved = false, glide = 0;
+  // Scroll the grid by (dx, dy); with `chain`, what it can't take vertically goes to the page.
+  const by = (dx, dy, chain) => {
+    const top = el.scrollTop;
+    el.scrollLeft += dx;
+    el.scrollTop += dy;
+    const rest = dy - (el.scrollTop - top);
+    if (chain && Math.abs(rest) >= 1) window.scrollBy(0, rest);
+  };
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || id != null) return;
+    cancelAnimationFrame(glide);
+    id = e.pointerId; start = last = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+    vx = vy = 0; moved = false;
+  });
+  el.addEventListener('pointermove', e => {
+    if (e.pointerId !== id) return;
+    if (!moved) {
+      if (Math.hypot(e.clientX - start.x, e.clientY - start.y) < 6) return;   // still a tap
+      moved = true;
+      try { el.setPointerCapture(id); } catch (_) {}
+    }
+    const dx = last.x - e.clientX, dy = last.y - e.clientY, dt = Math.max(1, e.timeStamp - last.t);
+    by(dx, dy, true);
+    // Speed in px/ms, smoothed over the last moves.
+    vx = 0.7 * vx + 0.3 * dx / dt; vy = 0.7 * vy + 0.3 * dy / dt;
+    last = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+  });
+  const end = e => {
+    if (e.pointerId !== id) return;
+    id = null;
+    if (!moved) return;
+    _lastPanEnd = Date.now();
+    if (e.type === 'pointercancel' || e.timeStamp - last.t > 80) return;   // held still before letting go: no glide
+    let t0 = performance.now();
+    const step = now => {
+      const dt = now - t0; t0 = now;
+      by(vx * dt, vy * dt, false);
+      const k = Math.pow(0.997, dt);   // slows down by half in about 230 ms
+      vx *= k; vy *= k;
+      if (Math.hypot(vx, vy) > 0.02 && el.isConnected) glide = requestAnimationFrame(step);
+    };
+    glide = requestAnimationFrame(step);
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
 }
 
 // Horizontal pan for a windowed line chart (Charts.line with `visible`): drag
