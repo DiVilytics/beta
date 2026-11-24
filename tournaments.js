@@ -1462,19 +1462,23 @@ async function startTournamentTour() {
   const orgId = getCurrentUser().id;
   tnOrganizers = [orgId];
   tnProfiles = new Map([[orgId, { id: orgId, nickname: getCurrentProfile()?.nickname || TN_TOUR_ORGANIZER }]]);
-  const form = () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); };
+  // A form step, with Advanced options folded or open.
+  const form = (adv = false) => () => { setVisible('tnRoot', false); setVisible('tnForm', true); setVisible('tnIntroHelp', true); tnAdvOpen = adv; _tnRenderAdvanced(); };
   const page = (stage, view = 'tables') => () => { _tnTourDrawClose(); _tnTourPage(stage); tnView = view; tnRenderTournament(); };
   const drawEditor = () => { page(1)(); tnEditDraw(); };
   const field = id => () => document.querySelector(`#tnForm [data-help="${id}"]`);
   startTour([
-    { el: () => document.getElementById('tnName').closest('.form-row'), prep: form, text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
-    { el: field('format'), prep: form, betaOnly: true, text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
-    { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form, text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
-    { el: ['#tnForm [data-help="tables"]', '#tnForm [data-help="order"]'], prep: form, text: t('How the tables are made (<b>Tables</b>, <b>Pairing</b>) and who plays first at each (<b>Play order</b>). Every ⓘ explains the choices, with examples.') },
-    { el: ['#tnForm [data-help="scoring"]', '#tnForm [data-help="final"]'], prep: form, text: t('The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and whether the top players play a <b>Final table</b>.') },
-    { el: field('villains'), prep: form, text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
-    { el: '#tnFormPlayers', prep: form, text: t('The players\' names (👤 marks you, if you play too). They claim their names later, with the tournament\'s QR code.') },
-    { el: '.tn-form-actions', prep: form, text: t('<b>Create tournament</b>: its page opens. Everything can still change until the first game starts.') },
+    { el: () => document.getElementById('tnName').closest('.form-row'), prep: form(), text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
+    { el: field('format'), prep: form(), betaOnly: true, text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
+    { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form(), text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
+    { el: field('villains'), prep: form(), text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
+    { el: field('final'), prep: form(), text: t('<b>Final table</b>: after the last stage, the top of the standings play one last table, which decides the top places.') },
+    { el: ['#tnAdvToggle', '#tnAdvSummary'], prep: form(), text: t('<b>Advanced options</b>: the rest of the rules, folded, with what\'s set on the line under it. A new tournament starts with Swiss pairing, Rotation and Buchholz.') },
+    { el: ['#tnForm [data-help="tables"]', '#tnForm [data-help="order"]'], prep: form(true), text: t('How the tables are made (<b>Tables</b>, <b>Pairing</b>) and who plays first at each (<b>Play order</b>). Every ⓘ explains the choices, with examples.') },
+    { el: ['#tnForm [data-help="scoring"]', '#tnForm [data-help="ranking"]'], prep: form(true), text: t('The points for each place (<b>Scoring</b>), for a stage sat out (<b>Bye</b>), and the <b>Tiebreaks</b> for equal points, in the order you choose.') },
+    { el: ['#tnForm [data-help="match"]', '#tnForm [data-help="repeats"]'], prep: form(true), text: t('<b>Villains at a table</b>: any, or of one pace. <b>Villain repeats</b>: avoid giving a player a villain they already played, or allow it.') },
+    { el: '#tnFormPlayers', prep: form(), text: t('The players\' names (👤 marks you, if you play too). They claim their names later, with the tournament\'s QR code.') },
+    { el: '.tn-form-actions', prep: form(), text: t('<b>Create tournament</b>: its page opens. Everything can still change until the first game starts.') },
     { el: ['.tn-org-actions', '.tn-share-btn'], prep: page(0, 'players'), text: t('<b>Edit tournament</b> changes it until the first game starts; <b>Organizer QR</b> adds other organizers. <b>Share QR</b> is for the players: they scan it and claim their name.') },
     { el: '#tnLobbyActions', prep: page(0, 'players'), text: t('<b>Start tournament</b> draws stage 1: the tables and a villain for everyone.') },
     { el: '.tn-view-seg', prep: page(1), text: t('Once started: <b>Players</b> (claims, and Withdraw for a player who leaves), <b>Tables</b> and <b>Standings</b>.') },
