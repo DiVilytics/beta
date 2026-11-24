@@ -451,8 +451,7 @@ function tnToggleOptions() {
 // in bold; section opens it at that option's.
 async function tnHelp(section) {
   const help = await loadTournamentHelp();
-  const betaOnly = ['format', 'advance'];   // knockout is the beta's
-  document.getElementById('tnHelpBody').innerHTML = Object.entries(help).filter(([id]) => IS_BETA || !betaOnly.includes(id)).map(([id, { title, paras }]) => `
+  document.getElementById('tnHelpBody').innerHTML = Object.entries(help).map(([id, { title, paras }]) => `
     <section class="tn-help-section" id="tnHelp-${id}">
       <h4>${_esc(title)}</h4>
       ${paras.map(p => `<p>${_esc(p).replace(/^[^:.;,]{1,24}:/, '<strong>$&</strong>')}</p>`).join('')}
@@ -1469,7 +1468,7 @@ async function startTournamentTour() {
   const field = id => () => document.querySelector(`#tnForm [data-help="${id}"]`);
   startTour([
     { el: () => document.getElementById('tnName').closest('.form-row'), prep: form(), text: t('<b>New tournament</b>: its name and day. The day can be one to come: create it ahead and share it.') },
-    { el: field('format'), prep: form(), betaOnly: true, text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
+    { el: field('format'), prep: form(), text: t('<b>Points</b>: every stage everyone plays and scores by their place. <b>Knockout</b>: a bracket, the top of each table go on to the final. Each shows its own options.') },
     { el: () => document.getElementById('tnSize').closest('.form-row'), prep: form(), text: t('<b>Table size</b> is the largest table; <b>Stages</b> how many rounds of tables, or <b>Open-ended</b>: you end them when you like.') },
     { el: field('villains'), prep: form(), text: t('The <b>draw pool</b>: the villains drawn every stage, never twice at a table. <b>Copies</b> lets more players than villains play.') },
     { el: field('final'), prep: form(), text: t('<b>Final table</b>: after the last stage, the top of the standings play one last table, which decides the top places.') },
@@ -1485,10 +1484,8 @@ async function startTournamentTour() {
     { el: () => document.querySelector('#tnRoot .tn-table'), prep: page(1), text: t('Each table is played on one phone: <b>Start game</b> runs it with New Game\'s timer (an organizer\'s phone, or a seated player\'s). <b>Enter result</b> types it in afterwards; a saved table has <b>Edit result</b>.') },
     { el: '#tnDrawRows', prep: drawEditor, text: t('<b>Edit draw</b> changes the tables by hand until their game starts: drag the players by ⠿ to other seats or tables, pick each seat\'s villain, add a table. The draw\'s rules are still checked.') },
     { el: '#tnNextRow', prep: page(1), text: t('Once every table is saved, <b>Draw stage 2</b>, or <b>End tournament</b> to stop after this stage. <b>Undo draw</b> takes a draw back until one of its games is saved.') },
-    { el: '.tn-standings', prep: page(1, 'standings'), text: IS_BETA
-      ? t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points. In a knockout, this tab is the <b>Bracket</b>.')
-      : t('<b>Standings</b>: the points, ties by most 1st places, then the opponents\' points.') },
-  ].filter(s => IS_BETA || !s.betaOnly), { id: 'organizers', onEnd: () => location.replace(back) });
+    { el: '.tn-standings', prep: page(1, 'standings'), text: t('<b>Standings</b>: the points, ties broken by the tiebreaks in their order. In a knockout, this tab is the <b>Bracket</b>.') },
+  ], { id: 'organizers', onEnd: () => location.replace(back) });
 }
 
 // The tour's Edit draw sheet, when a step left it open.
