@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: read   # deploy-pages looks up the run's github-pages artifact
   pages: write
   id-token: write
 
