@@ -445,7 +445,7 @@
         {
           "term": "Mrs. Bric e Chicco",
           "villain": "Gaston",
-          "text": "“all Heroes” → muove tutti gli Eroi."
+          "text": "“all Heroes to new locations” → muove tutti gli Eroi, anche in luoghi diversi."
         },
         {
           "term": "La pentola magica",
@@ -704,6 +704,11 @@
         "term": "Primo bacio d'amore",
         "text": "Può essere giocata se la Regina non ha Veleno, ma non se non ci sono Eroi nella pila degli scarti.",
         "source": "Stephanie Straw, designer del gioco"
+      },
+      {
+        "term": "Nero della notte",
+        "text": "Non si può usare il Nero della notte per svolgere nuovamente un'azione svolta tramite Vi schiaccerò!: il Nero della notte specifica che l'azione deve essere disponibile.",
+        "source": "Testo della carta"
       }
     ],
     "Hades": [
@@ -736,8 +741,8 @@
       },
       {
         "term": "Banzai la iena",
-        "text": "La sua abilità entra in funzione solo quando sono scartate altre Iene dal suo stesso luogo. Se Banzai stesso viene scartato, non si ottiene alcun gettone Potere.",
-        "source": "Regolamento di gioco"
+        "text": "La sua abilità entra in funzione anche quando Banzai stesso viene scartato.",
+        "source": "Guida al cattivo"
       },
       {
         "term": "Bastone di Rafiki",

@@ -126,7 +126,7 @@ function _menuHTML() {
           <div class="faq-roster-sub">${tn(faqData.villains[v].length, '{n} entry', '{n} entries')}</div>
         </a>`).join('')}
     </div>
-    <p class="faq-credit">${t('Translated from the F.A.Q. by {link} (version 6.0, September 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.', { link: '<a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>' })}</p>`;
+    <p class="faq-credit">${t('Translated from the F.A.Q. by {link} (version 6.1, October 2026). Each entry names its source: the rulebook, the card text, the Villain Guide, a designer or a playtester.', { link: '<a href="https://www.instagram.com/villainousitalia/" target="_blank" rel="noopener">Villainous Italia</a>' })}</p>`;
 }
 
 // A topic's ← link: back to the page you came from (the topic menu, a

@@ -224,7 +224,7 @@
       "intro": "These cards say “any” in the original English text. Read them as follows.",
       "items": [
         { "term": "Beast", "villain": "Gaston", "text": "“any Allies to any other location”: move any number of Allies to one single location." },
-        { "term": "Mrs. Potts and Chip", "villain": "Gaston", "text": "“all Heroes”: move all Heroes." },
+        { "term": "Mrs. Potts and Chip", "villain": "Gaston", "text": "“all Heroes to new locations”: move all Heroes, possibly to different locations." },
         { "term": "The Black Cauldron", "villain": "Horned King", "text": "“any location”: discard a Cauldron Born from one single location." },
         { "term": "Doli", "villain": "Horned King", "text": "“each Hero to any other location”: move each Hero to one single location." },
         { "term": "The Key", "villain": "Lady Tremaine", "text": "“any Hero”: move exactly one Hero." },
@@ -294,7 +294,8 @@
     "Evil Queen": [
       { "term": "I'll Fix Ya!", "text": "Can be used even if there is more than one Hero at that location.", "source": "Card text" },
       { "term": "Magic Mirror & Mummy Dust", "text": "The Fate card and the Poison token are drawn and gained only once the Fate action is over, not before. Drawing a card with Magic Mirror stays optional despite the card text, as stated in the Villain Guide.", "source": "Ruby Wishnietsky, designer" },
-      { "term": "Love's First Kiss", "text": "Can be played if Evil Queen has no Poison, but not if there are no Heroes in the discard pile.", "source": "Stephanie Straw, designer" }
+      { "term": "Love's First Kiss", "text": "Can be played if Evil Queen has no Poison, but not if there are no Heroes in the discard pile.", "source": "Stephanie Straw, designer" },
+      { "term": "Black of Night", "text": "Can't be used to take again an action taken through I'll Fix Ya!: Black of Night requires the action to be available.", "source": "Card text" }
     ],
     "Hades": [
       { "term": "Get Ready to Rumble!", "text": "When moved two locations, Titans skip any location in between (so they avoid the abilities of Heroes placed there) and can use their ability only once, because it is a single move.", "source": "Card text" },
@@ -304,7 +305,7 @@
     "Scar": [
       { "term": "Be Prepared", "text": "It can't be put into your own hand, because it goes to the discard pile only after its Effect is over.", "source": "Rulebook" },
       { "term": "Injustice", "text": "The Fate cards looked at can both be discarded, both kept, or one discarded and one kept. If you have two copies of Injustice in hand and want to play them, you must play both at the same time and resolve them one at a time.", "source": "Rulebook" },
-      { "term": "Banzai the Hyena", "text": "His ability works only when other Hyenas are discarded from his location. If Banzai himself is discarded, you gain no Power.", "source": "Rulebook" },
+      { "term": "Banzai the Hyena", "text": "His ability also works when Banzai himself is discarded.", "source": "Villain Guide" },
       { "term": "Rafiki's Stick", "text": "If a Hero with Rafiki's Stick attached is defeated, it does NOT trigger other players' Conditions based on defeating Heroes (such as Ursula's Arrogance) because, per the rulebook, a Hero is defeated when it is discarded from the Realm after a Vanquish action or a card's effect.", "source": "Rulebook" }
     ],
     "Ratigan": [
