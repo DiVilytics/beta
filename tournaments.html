@@ -123,6 +123,11 @@
       <select id="tnAdvance" onchange="_tnSyncFormat()"></select>
       <p class="modal-hint tn-rule-hint" id="tnAdvanceHint"></p>
     </div>
+    <div class="field tn-fixed tn-points-only" data-help="final">
+      <label data-i18n>Final table</label>
+      <div class="seg seg-sm tn-rule-seg" id="tnFinal"></div>
+      <p class="modal-hint tn-rule-hint" id="tnFinalHint"></p>
+    </div>
     <div class="field tn-fixed" data-help="villains">
       <label data-i18n>Villains</label>
       <button class="exclude-toggle" type="button" onclick="tnTogglePool()">
@@ -161,11 +166,6 @@
         <div id="tnPoolGrid"></div>
       </div>
       <p class="modal-hint tn-rule-hint" data-i18n>Every stage, each player gets a villain from the pool, never two of the same at a table.</p>
-    </div>
-    <div class="field tn-fixed tn-points-only" data-help="final">
-      <label data-i18n>Final table</label>
-      <div class="seg seg-sm tn-rule-seg" id="tnFinal"></div>
-      <p class="modal-hint tn-rule-hint" id="tnFinalHint"></p>
     </div>
     <!-- Advanced options, folded until opened (a summary of them when folded;
          open by itself when one differs from a new tournament's): tournament-form.js. -->

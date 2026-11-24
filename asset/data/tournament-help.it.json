@@ -38,6 +38,21 @@
       "Non si cambia più una volta iniziata la prima partita."
     ]
   },
+  "final": {
+    "title": "Tavolo finale",
+    "paras": [
+      "No: la classifica dopo l'ultima fase è quella finale.",
+      "Sì: dopo l'ultima fase, i primi della classifica (quanti ne tiene un tavolo, tra i giocatori ancora nel torneo; a pari posto, nell'ordine della classifica) giocano un tavolo finale. La sua classifica decide i primi posti: chi la vince vince il torneo, il suo 2º è 2º, e così via; tutti gli altri tengono il loro ordine della classifica, dopo i finalisti. La finale non dà punti. Ogni finalista riceve un cattivo che non ha giocato nel torneo, se la riserva lo permette.",
+      "Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
+  "villains": {
+    "title": "Cattivi",
+    "paras": [
+      "I cattivi di ogni fase si pescano insieme ai suoi tavoli, dalla riserva: mai lo stesso cattivo due volte allo stesso tavolo, in una fase un cattivo al massimo tante volte quante sono le sue copie, e nessuno riprende lo stesso cattivo finché la riserva lo permette. I cattivi di una fase si vedono solo quando la fase è sorteggiata.",
+      "La riserva ha una copia di ogni cattivo, salvo dove Copie indica altro (da 0 a 9; 0 lo toglie dalla riserva): le copie fanno giocare più giocatori dei cattivi, ogni copia a un tavolo diverso. I giocatori possono essere al massimo le copie nella riserva. Non si cambia più una volta iniziata la prima partita."
+    ]
+  },
   "tables": {
     "title": "Tavoli",
     "paras": [
@@ -97,14 +112,6 @@
       "Gli spareggi decidono anche chi gioca il tavolo finale e, con l'abbinamento Svizzero, l'ordine in cui i giocatori si siedono. Si possono cambiare finché non inizia la prima partita."
     ]
   },
-  "final": {
-    "title": "Tavolo finale",
-    "paras": [
-      "No: la classifica dopo l'ultima fase è quella finale.",
-      "Sì: dopo l'ultima fase, i primi della classifica (quanti ne tiene un tavolo, tra i giocatori ancora nel torneo; a pari posto, nell'ordine della classifica) giocano un tavolo finale. La sua classifica decide i primi posti: chi la vince vince il torneo, il suo 2º è 2º, e così via; tutti gli altri tengono il loro ordine della classifica, dopo i finalisti. La finale non dà punti. Ogni finalista riceve un cattivo che non ha giocato nel torneo, se la riserva lo permette.",
-      "Non si cambia più una volta iniziata la prima partita."
-    ]
-  },
   "match": {
     "title": "Cattivi al tavolo",
     "paras": [
@@ -119,13 +126,6 @@
       "Evita: nessuno riceve un cattivo che ha già giocato nel torneo, finché la riserva lo permette (con Stessa velocità, la velocità viene prima).",
       "Permetti: i cattivi si sorteggiano senza guardare chi li ha già giocati, né quante volte: chiunque può ritrovare lo stesso cattivo.",
       "In entrambi i casi mai lo stesso cattivo due volte a un tavolo, e mai oltre le sue copie. Non si cambia più una volta iniziata la prima partita."
-    ]
-  },
-  "villains": {
-    "title": "Cattivi",
-    "paras": [
-      "I cattivi di ogni fase si pescano insieme ai suoi tavoli, dalla riserva: mai lo stesso cattivo due volte allo stesso tavolo, in una fase un cattivo al massimo tante volte quante sono le sue copie, e nessuno riprende lo stesso cattivo finché la riserva lo permette. I cattivi di una fase si vedono solo quando la fase è sorteggiata.",
-      "La riserva ha una copia di ogni cattivo, salvo dove Copie indica altro (da 0 a 9; 0 lo toglie dalla riserva): le copie fanno giocare più giocatori dei cattivi, ogni copia a un tavolo diverso. I giocatori possono essere al massimo le copie nella riserva. Non si cambia più una volta iniziata la prima partita."
     ]
   },
   "players": {
