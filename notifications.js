@@ -11,6 +11,7 @@ const NT_ERRORS = {
   no_invite:       'This invitation was withdrawn or already answered. The page is up to date now.',
   already_in_game: 'You already have a villain in one of these games.',
   no_profile:      'You need a nickname before you can accept.',
+  seat_changed:    'This game was just changed or claimed. The page is up to date now.',
 };
 const ntError = e => {
   const code = Object.keys(NT_ERRORS).find(k => e?.message?.includes(k));
@@ -92,25 +93,30 @@ function ntCardHTML(i) {
       <div class="nt-games"></div>
       <p class="modal-hint nt-error hidden"></p>
       <div class="nt-actions">
-        <button class="btn btn-ghost btn-sm" type="button" onclick="ntDecline('${i.id}')">${t('Decline')}</button>
-        <button class="btn btn-primary btn-sm" type="button" onclick="ntAccept('${i.id}')">${t('Accept')}</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="ntDecline('${i.id}')">${i.games.length > 1 ? t('Decline all') : t('Decline')}</button>
+        <button class="btn btn-primary btn-sm" type="button" onclick="ntAccept('${i.id}')">${i.games.length > 1 ? t('Accept all') : t('Accept')}</button>
       </div>
     </section>`;
 }
 
 // An invitation's game cards (game-card.js): your seat as the pending name,
-// each to the game's page; the first NT_SHOWN, or all.
+// each to the game's page (a tap outside its buttons); the first NT_SHOWN, or
+// all. With more than one game, each has its own Accept and Decline.
 function ntFillGames(i, all = false) {
   const box = document.querySelector(`#nt-${i.id} .nt-games`);
   if (!box) return;
   box.innerHTML = '';
   for (const g of all ? i.games : i.games.slice(0, NT_SHOWN)) {
     const gp = (i.seats[g.id] || []).map(s => s.pending_player_id === i.pid ? { ...s, pending: { name: i.name } } : s);
-    const link = document.createElement('a');
-    link.className = 'nt-game-link';
-    link.href = `claim.html?game=${g.id}`;
-    link.append(buildGameCard(g, gp, { isSelf: p => p.pending_player_id === i.pid, layout: 'rows' }));
-    box.append(link);
+    const seat = gp.find(s => s.pending_player_id === i.pid);
+    const actions = i.games.length > 1 && seat ? `<div class="nt-game-actions">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="ntDeclineGame('${i.id}', '${g.id}', '${seat.id}')">${t('Decline')}</button>
+        <button class="btn btn-ghost btn-sm nt-accept-one" type="button" onclick="ntAnswerGame('${i.id}', '${g.id}', '${seat.id}', 'accept_invite_seat')">${t('Accept')}</button>
+      </div>` : '';
+    const card = buildGameCard(g, gp, { isSelf: p => p.pending_player_id === i.pid, layout: 'rows', actions });
+    card.classList.add('nt-game');
+    card.addEventListener('click', e => { if (!e.target.closest('button, a')) location.href = `claim.html?game=${g.id}`; });
+    box.append(card);
   }
   if (!all && i.games.length > NT_SHOWN) {
     box.insertAdjacentHTML('beforeend', `<button class="btn-load-more nt-show-all" type="button" onclick="ntShowAll('${i.id}', this)">${t('Show all {n} games', { n: i.games.length })}</button>`);
@@ -131,6 +137,44 @@ function ntRender() {
   root.innerHTML = ntInvites.map(ntCardHTML).join('');
   for (const i of ntInvites) ntFillGames(i);
   if (ntMore) appendLoadMore(root, async () => { if (await ntLoadPage()) ntRender(); });
+}
+
+// One game of an invitation: Decline asks first (no invitation to it again).
+function ntDeclineGame(id, gameId, seatId) {
+  const i = ntInvites.find(x => x.id === id);
+  openConfirmSheet({
+    id: 'ntDeclineSheet',
+    title: t('Decline this game?'),
+    bodyHTML: `<p class="modal-hint">${t('{who} won\'t be able to invite you to this game again. You can still claim it yourself with its QR code.', { who: _esc(i?.inviter || '') })}</p>`,
+    confirmLabel: t('Decline'),
+    danger: true,
+    onConfirm: () => ntAnswerGame(id, gameId, seatId, 'decline_invite_seat'),
+  });
+}
+
+// One game answered: it leaves the invitation (the whole card once none is left).
+async function ntAnswerGame(id, gameId, seatId, fn) {
+  const i = ntInvites.find(x => x.id === id);
+  const card = document.getElementById(`nt-${id}`);
+  card?.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  const { error } = await db.rpc(fn, { target: id, seat_id: seatId });
+  if (error) {
+    const msg = card?.querySelector('.nt-error');
+    if (msg) { msg.textContent = ntError(error); msg.classList.remove('hidden'); }
+    card?.querySelectorAll('button').forEach(b => { b.disabled = false; });
+    if (/no_invite|seat_changed/.test(error.message || '')) await ntLoad();
+    return;
+  }
+  i.games = i.games.filter(g => g.id !== gameId);
+  if (!i.games.length) { ntInvites = ntInvites.filter(x => x.id !== id); card?.remove(); }
+  else if (card) {
+    const all = !card.querySelector('.nt-show-all');
+    card.outerHTML = ntCardHTML(i);
+    await ntLoadSeats(i.games.filter(g => !i.seats[g.id]).slice(0, all ? undefined : NT_SHOWN).map(g => [i, g.id]));
+    ntFillGames(i, all);
+  }
+  if (!ntInvites.length) await ntLoad();
+  refreshNotificationCount();
 }
 
 async function ntAccept(id) {
