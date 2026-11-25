@@ -3666,6 +3666,4 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
 .up-search { width: 100%; margin-top: 8px; }
 .up-search input { width: 100%; }
 .up-search .cs-dropdown { position: static; box-shadow: none; margin-top: 6px; }
-/* A name's claim link (claim.html?pending=…). */
-.claim-link-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; text-align: center; }
-.claim-link-intro { font-size: calc(15px * var(--ts)); margin: 0 0 8px; }
+.csv-unknown { margin: 6px 0; }
