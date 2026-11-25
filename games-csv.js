@@ -19,14 +19,11 @@
 //   Seat      the play order, 1 to the players, or empty on every row.
 //   Winner    yes / no, one yes (Solo: yes is won, no is lost).
 //   Solo      yes / no; a solo game is one row, yours, with its Solo Difficulty.
-//   Solo Difficulty  Easy / Medium / Hard, solo only ("Difficulty" before
-//             2026-11-26: an older file's header is still read).
+//   Solo Difficulty  Easy / Medium / Hard, solo only.
 // Depends on db.js, ui.js (overlays), solo.js (SOLO_LEVELS) and shared.js
 // (the signed-in user and profile).
 
 const GAMES_CSV_HEADER = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Solo Difficulty'];
-// The header of files downloaded before Solo Difficulty had its name.
-const GAMES_CSV_HEADER_OLD = GAMES_CSV_HEADER.map(h => h === 'Solo Difficulty' ? 'Difficulty' : h);
 const GAMES_CSV_MAX_GAMES = 2000;   // per file: larger files go in parts
 const GAMES_CSV_LEVELS    = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };   // a solo game's level, as written
 
@@ -84,7 +81,7 @@ async function checkGamesCsv(text) {
   const err = (line, msg) => errors.push([line, msg]);
   const rows = parseCsv(text);
   const head = (rows.shift()?.cells || []).map(c => c.trim());
-  if (head.join('|') !== GAMES_CSV_HEADER.join('|') && head.join('|') !== GAMES_CSV_HEADER_OLD.join('|')) {
+  if (head.join('|') !== GAMES_CSV_HEADER.join('|')) {
     err(1, t('The first row must be exactly: {header}', { header: GAMES_CSV_HEADER.join(', ') }));
     return { errors };
   }
