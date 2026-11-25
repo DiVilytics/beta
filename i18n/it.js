@@ -814,6 +814,7 @@ window.I18N.it = {
     "Answer": "Rispondi",
     "invitation sent": "invito inviato",
     "Who played?": "Chi ha giocato?",
+    "Another player was named for this villain and hasn't answered yet. Claim it only if you really played it: their invitation will be withdrawn.": "Per questo cattivo è stato indicato un altro giocatore, che non ha ancora risposto. Rivendicalo solo se l'hai giocato davvero: il suo invito verrà ritirato.",
     "Who played {villain}?": "Chi ha giocato {villain}?",
     "Search their nickname: they get an invitation, and the villain shows as theirs once they accept.": "Cerca il suo nickname: riceve un invito, e il cattivo risulta suo quando accetta.",
     "Not on DiVilytics? They can claim it themselves with the game's QR code.": "Non è su DiVilytics? Può rivendicarlo da sé con il codice QR della partita.",

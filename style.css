@@ -3643,3 +3643,6 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
    be cut by the sheet's own scroll). */
 .who-search .cs-dropdown { position: static; box-shadow: none; margin-top: 6px; }
 .who-qr { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+
+/* The claim's warning: a seat someone else was named for. */
+.confirm-warn { margin: 10px 0 0; padding: 8px 10px; border-radius: var(--rs); background: color-mix(in srgb, var(--gold) 14%, transparent); font-size: calc(13px * var(--ts)); line-height: 1.4; }

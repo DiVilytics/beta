@@ -406,10 +406,16 @@ function claimCharacter(playerId) {
   // If it got claimed out from under us, refresh
   if (player.user_id) { init(); return; }
 
+  // A seat someone was named for (a pending player: an invitation or an
+  // uploaded file's name) can still be claimed (the QR code wins), but first
+  // a warning; not for its own invitee. Who was named stays private.
+  const inv = player.pending_player_id ? claimInvites[player.pending_player_id] : null;
+  const named = player.pending_player_id && inv?.invited_user !== user.id;
   openConfirmSheet({
     id:           'claimConfirmOverlay',
     title:        t('Confirm your villain'),
-    bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`,
+    bodyHTML:     `<p class="confirm-text">${t("You're about to claim {villain} in this game. Picked the wrong one? You can release it afterwards.", { villain: `<strong class="text-emph">${charImgHTML(player.character)}${villainNameInline(player.character)}</strong>` })}</p>`
+      + (named ? `<p class="confirm-warn">⚠️ ${t('Another player was named for this villain and hasn\'t answered yet. Claim it only if you really played it: their invitation will be withdrawn.')}</p>` : ''),
     confirmLabel: t('Claim villain'),
     onConfirm:    () => _doClaim(playerId),
   });
