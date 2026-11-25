@@ -611,6 +611,13 @@ function openOverlay(id) {
 // The avatar zoom lightbox (showAvatarFromEl / showAvatarLightbox /
 // closeAvatarLightbox) lives in avatar.js.
 
+// A page's link to share (a QR code): from the site's root, never /beta/: a
+// browser that joined the beta goes there by itself (lang.js), anyone else
+// stays on the release.
+function shareUrl(path) {
+  return new URL(path, location.origin + '/').href;
+}
+
 function showQRModal(url, codeElId, overlayId) {
   document.getElementById('qrUrlText').textContent = url;
   const el = document.getElementById(codeElId);

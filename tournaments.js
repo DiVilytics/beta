@@ -883,7 +883,7 @@ async function tnShareOrganizers() {
 function _tnQR(title, hint, query) {
   document.getElementById('qrTitle').textContent = title;
   document.getElementById('qrHint').textContent = hint;
-  showQRModal(new URL(`tournaments.html?t=${tnTour.id}${query}`, location.href).href, 'qrCode', 'qrOverlay');
+  showQRModal(shareUrl(`tournaments.html?t=${tnTour.id}${query}`), 'qrCode', 'qrOverlay');
 }
 
 // After an action: the tournament as it is now, and the error if it failed.

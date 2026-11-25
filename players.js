@@ -635,7 +635,7 @@ function showProfileQR() {
   if (!pfNick) return;
   const title = document.getElementById('pfQrTitle');
   if (title) title.textContent = t('Share {nick}', { nick: pfNick });
-  showQRModal(new URL(`players.html?nick=${encodeURIComponent(pfNick)}`, location.href).href, 'pfQrCode', 'pfQrOverlay');
+  showQRModal(shareUrl(`players.html?nick=${encodeURIComponent(pfNick)}`), 'pfQrCode', 'pfQrOverlay');
 }
 
 function closeProfileQR() {

@@ -308,7 +308,7 @@ const _claimBack = () => ({
 
 function shareGame() {
   if (!claimGame) return;
-  const url = new URL(`claim.html?game=${claimGame.id}`, location.href).href;
+  const url = shareUrl(`claim.html?game=${claimGame.id}`);
   showQRModal(url, 'qrCode', 'qrOverlay');
 }
 
