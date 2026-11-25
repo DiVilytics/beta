@@ -145,6 +145,7 @@ async function initAuth(onChange) {
   if (session?.user) {
     _currentUser = session.user;
     await _loadProfile();
+    refreshNotificationCount();   // no wait: the page goes on
   } else {
     _setCachedNavAvatar(null);   // not logged in, drop any stale cached avatar
   }
@@ -156,6 +157,7 @@ async function initAuth(onChange) {
 
     if (_currentUser && _currentUser.id !== prevId) {
       await _loadProfile();
+      refreshNotificationCount();
     }
     if (!_currentUser) { _currentProfile = null; _setCachedNavAvatar(null); }
 
@@ -271,8 +273,36 @@ function _updateAuthUI() {
     el.innerHTML = menuBtn('nav-avatar-btn', t('Sign in and settings'), '<img class="nav-avatar nav-avatar-guest" src="asset/players/default.svg" alt="">');
   }
   _renderSettingsAccount();
+  _paintNotifCount();
   _updateThemeBtn();
   _updateThemeIcons();
+}
+
+// ── NOTIFICATIONS (beta) ─────────────────────────────────────────────────────
+// Your open invitations to games you played (pending players, PLAYERS_SPEC.md):
+// their count beside the nav's avatar (to notifications.html), and a
+// Notifications row under the account in the settings panel. Counted once per
+// page once signed in (refreshNotificationCount: again after an answer).
+let _notifCount = 0;
+async function refreshNotificationCount() {
+  if (!IS_BETA || !_currentUser) _notifCount = 0;
+  else {
+    const { count, error } = await db.from('pending_invites').select('id', { count: 'exact', head: true }).eq('invited_user', _currentUser.id);
+    _notifCount = error ? 0 : count || 0;
+  }
+  _paintNotifCount();
+}
+function _paintNotifCount() {
+  const el = document.getElementById('navAuth');
+  el?.querySelector('.nav-notif')?.remove();
+  if (el && IS_BETA && _currentUser && _notifCount) {
+    const label = _esc(tn(_notifCount, '{n} notification', '{n} notifications'));
+    el.insertAdjacentHTML('beforeend', `<a class="nav-notif" href="notifications.html" title="${label}" aria-label="${label}">${_notifCount > 9 ? '9+' : _notifCount}</a>`);
+  }
+  const row = document.getElementById('settingsNotif');
+  if (row) row.innerHTML = IS_BETA && _currentUser
+    ? `<a class="settings-account settings-notif" href="notifications.html"><span class="settings-notif-ico" aria-hidden="true">🔔</span><span class="settings-nick">${t('Notifications')}</span>${_notifCount ? `<span class="badge visible">${_notifCount}</span>` : ''}<span class="settings-go">›</span></a>`
+    : '';
 }
 
 // ── SETTINGS PANEL ───────────────────────────────────────────────────────────
@@ -313,6 +343,7 @@ function _settingsPanel() {
     <div class="settings-row">
       <span class="settings-lbl">${t('Account')}</span>
       <div id="settingsAccount">${_settingsAccountHTML()}</div>
+      <div id="settingsNotif"></div>
     </div>
     <div class="settings-row">
       <span class="settings-lbl">${t('Theme')}</span>
@@ -338,6 +369,7 @@ function _settingsPanel() {
   _updateTextSizeBtns(panel);
   nav.appendChild(panel);
   _updateThemeBtn();
+  _paintNotifCount();   // its Notifications row
   return panel;
 }
 

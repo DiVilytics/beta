@@ -201,7 +201,14 @@ nav {
 :root[data-beta] nav { border-bottom-color: rgba(124, 106, 247, 0.35); }
 
 .nav-right { display: flex; align-items: center; gap: 4px; }
-.nav-auth  { display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }
+.nav-auth  { position: relative; display: flex; align-items: center; gap: 6px; padding-left: 6px; border-left: 1px solid var(--border); margin-left: 2px; }
+/* Your open notifications (beta), on the avatar's top right corner, to the
+   notifications page. */
+.nav-notif {
+  position: absolute; top: -4px; right: -7px; min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 999px; background: var(--accent); color: #fff; border: 2px solid var(--bg);
+  font-size: 10px; font-weight: 700; line-height: 12px; text-align: center; text-decoration: none; box-sizing: content-box;
+}
 /* Until shared.js fills it, at the end of the page, #navAuth keeps the room of
    its avatar, so the icons beside it don't jump on every page. */
 .nav-auth:empty::after { content: ''; width: 28px; height: 28px; }   /* .nav-avatar */
@@ -320,6 +327,9 @@ nav {
 .settings-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .settings-nick { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
 .settings-go { color: var(--muted); }
+/* Notifications (beta), under the account: the bell, the count, to their page. */
+#settingsNotif:empty { display: none; }
+.settings-notif-ico { width: 22px; text-align: center; flex-shrink: 0; }
 
 /* Clickable chip (profile link from game card / leaderboard) */
 a.chip {
@@ -1128,6 +1138,9 @@ input[type="datetime-local"]:disabled::-webkit-calendar-picker-indicator { visib
 .win-star { font-size: calc(13px * var(--ts)); line-height: 1; align-self: center; }
 
 .chip-nick { font-size: calc(11px * var(--ts)); color: var(--muted); }
+/* A pending player (not confirmed yet), to those who may see it: ⏳ and the
+   name in gray italics. */
+.chip-pending { color: var(--muted); font-style: italic; }
 
 /* Winner highlight, game-card chips and claim-page rows. */
 .chip.winner,
@@ -3603,3 +3616,15 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
 @media (max-width: 359px) {
   .date-field-row input { padding-left: 6px; padding-right: 6px; }
 }
+
+/* ── Notifications page (beta) ─────────────────────────────────────────────── */
+.nt-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; margin-bottom: 14px; }
+.nt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.nt-title { margin: 0; font-size: calc(14px * var(--ts)); line-height: 1.4; }
+.nt-as { display: block; font-size: calc(12px * var(--ts)); color: var(--muted); }
+.nt-when { margin: 0; font-size: calc(11px * var(--ts)); color: var(--muted); white-space: nowrap; }
+.nt-games { display: flex; flex-direction: column; gap: 8px; }
+.nt-game-link { display: block; color: inherit; text-decoration: none; }
+.nt-game-link .game-card { margin: 0; }
+.nt-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.nt-error { color: var(--red); margin: 8px 0 0; }

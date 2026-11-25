@@ -24,6 +24,8 @@ function gameUserRole(g, gp, user) {
 // (solo.js) says Solo and its level where the others give the table size
 // (just the level with `soloLabel: false`, in a list of solo games only), and
 // its rounds out of the level's; its card is dashed.
+// A seat with `pending` ({ name }: a pending player, PLAYERS_SPEC.md, shown
+// only to who may see it) reads as pending: ⏳ and the name in gray italics.
 // A game's rounds as its card and its page say them: "12 rounds"; a solo game
 // out of its level's ("12/20 rounds") when won, "Game over" when lost (the
 // Phantom's last round came and went), whatever its rounds.
@@ -66,7 +68,8 @@ function buildGameCardHTML(g, gp, { isSelf = () => false, actions = '', location
       <a class="char-link chip-img" href="villains.html?vil=${encodeURIComponent(p.character)}">${charImgHTML(p.character)}</a>
       <div class="chip-body">
         <div class="chip-char"><a class="char-link" href="villains.html?vil=${encodeURIComponent(p.character)}">${villainNameHTML(p.character)}</a></div>
-        ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>` : ''}
+        ${p.nickname ? `<div class="chip-nick"><a class="nick-link" href="players.html?nick=${encodeURIComponent(p.nickname)}">${_esc(p.nickname)}</a></div>`
+          : p.pending ? `<div class="chip-nick chip-pending" title="${_esc(t('Pending: not confirmed yet'))}">⏳ ${_esc(p.pending.name)}</div>` : ''}
       </div>
       ${rows ? star : ''}
     </div>`;
