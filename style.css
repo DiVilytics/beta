@@ -262,6 +262,10 @@ nav {
   border-radius: 50%;
   text-decoration: none;
 }
+/* Signed in: a very thin ring of the accent around your avatar. */
+.nav-avatar-link.active .nav-avatar {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 75%, transparent);
+}
 .nav-avatar {
   width: 28px;
   height: 28px;

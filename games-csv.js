@@ -363,7 +363,10 @@ async function renderUploadPeople(uploadId, box = _upBoxes[uploadId]) {
   const userIds = [...new Set(invites.map(i => i.invited_user).concat(seats.map(s => s.user_id)).filter(Boolean))];
   const [people, matches] = await Promise.all([
     _fetchInChunks(userIds, ch => db.from('profiles').select('id, nickname').in('id', ch)),
-    Promise.all(pp.map(p => db.from('profiles').select('id, nickname').ilike('nickname', p.name.replace(/[%_\\]/g, '\\$&')).limit(1).then(r => r.data?.[0] || null))),
+    // The nickname equal to the name: exactly, else case aside when only one is (nicknames
+    // are unique as written, so "Ada" and "ada" can be two players: then none is suggested).
+    Promise.all(pp.map(p => db.from('profiles').select('id, nickname').ilike('nickname', p.name.replace(/[%_\\]/g, '\\$&')).limit(5)
+      .then(r => { const all = r.data || []; return all.find(x => x.nickname === p.name) || (all.length === 1 ? all[0] : null); }))),
   ]);
   const nick = Object.fromEntries(people.map(p => [p.id, p.nickname]));
   const me = getCurrentUser()?.id;
