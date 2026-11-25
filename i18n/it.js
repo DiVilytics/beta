@@ -799,6 +799,7 @@ window.I18N.it = {
     "as {name}": "come {name}",
     "Decline": "Rifiuta",
     "Accept": "Accetta",
+    "Show all {n} games": "Mostra tutte le {n} partite",
     "Decline the invitation?": "Rifiutare l'invito?",
     "{who} won't be able to invite you to these games again. You can still claim them yourself with their QR code.": "{who} non potrà più invitarti a queste partite. Puoi comunque rivendicarle tu con il loro codice QR.",
     "The minutes each villain's wins take, per player (the length over the players): the box is their middle half, the gap the median (fastest first), the whiskers the other wins, rings the unusual ones. Dashed and shaded: all wins. Under 3 wins, a dot each, at the bottom.": "I minuti delle vittorie di ogni cattivo, per giocatore (la durata divisa per i giocatori): il box è la loro metà centrale, lo stacco la mediana (dal più veloce), i baffi le altre vittorie, i cerchietti quelle insolite. Tratteggiate e ombreggiate: tutte le vittorie. Sotto le 3 vittorie, un punto ciascuna, in fondo.",

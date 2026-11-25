@@ -18,7 +18,11 @@ const ntError = e => {
   return t(code ? NT_ERRORS[code] : 'Something went wrong. Try again.');
 };
 
-let ntInvites = [];   // [{ id, created_at, inviter, name, pid, games: [{ g, seats }] }]
+// 20 invitations at a time (Load more); each shows its first 3 games (Show
+// all for the rest, an upload's name can cover many), its count always whole.
+const NT_PAGE = 20, NT_SHOWN = 3;
+let ntInvites = [];   // [{ id, created_at, inviter, name, pid, games: [g, newest first], seats: { gameId: [seat] } }]
+let ntMore = false;   // more invitations after these
 
 async function ntLoad() {
   const root = document.getElementById('ntRoot');
@@ -29,38 +33,56 @@ async function ntLoad() {
       `<button class="btn btn-primary btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button>`);
     return;
   }
-  const { data: invites, error } = await db.from('pending_invites')
-    .select('id, created_at, invited_by, pending_player_id, pending_players(name)')
-    .eq('invited_user', me.id).order('created_at', { ascending: false });
-  if (error) { root.innerHTML = loadErrorHTML(t('Could not load your notifications.'), error); return; }
-  if (!invites.length) {
+  ntInvites = [];
+  const ok = await ntLoadPage();
+  if (!ok) { root.innerHTML = loadErrorHTML(t('Could not load your notifications.')); return; }
+  if (!ntInvites.length) {
     root.innerHTML = emptyStateHTML('🔔', t('No notifications'), t('When someone names you in a game, the invitation shows up here.'));
     return;
   }
-  // The invitations' seats, their games with every seat, and who invited.
-  const pids = invites.map(i => i.pending_player_id);
-  const mine = await _fetchInChunks(pids, ch => db.from('game_players').select('game_id, pending_player_id').in('pending_player_id', ch));
-  const gameIds = [...new Set(mine.map(s => s.game_id))];
-  const [games, seats, people] = await Promise.all([
-    _fetchInChunks(gameIds, ch => db.from('games').select('*').in('id', ch)),
-    _fetchInChunks(gameIds, ch => db.from('game_players').select('*').in('game_id', ch)),
-    _fetchInChunks([...new Set(invites.map(i => i.invited_by))], ch => db.from('profiles').select('id, nickname').in('id', ch)),
-  ]);
-  const nick = Object.fromEntries(people.map(p => [p.id, p.nickname]));
-  const seatsOf = {};
-  for (const s of seats) (seatsOf[s.game_id] ||= []).push(s);
-  ntInvites = invites.map(i => ({
-    id: i.id, created_at: i.created_at, inviter: nick[i.invited_by] || t('A player'), name: i.pending_players?.name || '', pid: i.pending_player_id,
-    games: games.filter(g => mine.some(s => s.game_id === g.id && s.pending_player_id === i.pending_player_id))
-      .sort((a, b) => Date.parse(b.played_at || b.created_at) - Date.parse(a.played_at || a.created_at))
-      .map(g => ({ g, seats: sortGamePlayers(seatsOf[g.id] || []) })),
-  }));
   ntRender();
 }
 
-function ntRender() {
-  const root = document.getElementById('ntRoot');
-  root.innerHTML = ntInvites.map(i => `
+// The next invitations, with their games (the shown ones' seats only) and who
+// invited; false if they couldn't load.
+async function ntLoadPage() {
+  const me = getCurrentUser();
+  const { data: invites, error } = await db.from('pending_invites')
+    .select('id, created_at, invited_by, pending_player_id, pending_players(name)')
+    .eq('invited_user', me.id).order('created_at', { ascending: false })
+    .range(ntInvites.length, ntInvites.length + NT_PAGE);   // one more: is there a next page?
+  if (error) { console.warn('notifications:', error); return false; }
+  ntMore = invites.length > NT_PAGE;
+  const page = invites.slice(0, NT_PAGE);
+  if (!page.length) return true;
+  const mine = await _fetchInChunks(page.map(i => i.pending_player_id), ch => db.from('game_players').select('game_id, pending_player_id').in('pending_player_id', ch));
+  const [games, people] = await Promise.all([
+    _fetchInChunks([...new Set(mine.map(s => s.game_id))], ch => db.from('games').select('*').in('id', ch)),
+    _fetchInChunks([...new Set(page.map(i => i.invited_by))], ch => db.from('profiles').select('id, nickname').in('id', ch)),
+  ]);
+  const nick = Object.fromEntries(people.map(p => [p.id, p.nickname]));
+  const added = page.map(i => {
+    const ids = new Set(mine.filter(s => s.pending_player_id === i.pending_player_id).map(s => s.game_id));
+    return {
+      id: i.id, created_at: i.created_at, inviter: nick[i.invited_by] || t('A player'), name: i.pending_players?.name || '', pid: i.pending_player_id,
+      games: games.filter(g => ids.has(g.id)).sort((a, b) => Date.parse(b.played_at || b.created_at) - Date.parse(a.played_at || a.created_at)),
+      seats: {},
+    };
+  });
+  await ntLoadSeats(added.flatMap(i => i.games.slice(0, NT_SHOWN).map(g => [i, g.id])));
+  ntInvites.push(...added);
+  return true;
+}
+
+// Every seat of these games ([invitation, game id] pairs), for their cards.
+async function ntLoadSeats(pairs) {
+  const ids = [...new Set(pairs.map(([, id]) => id))];
+  const seats = await _fetchInChunks(ids, ch => db.from('game_players').select('*').in('game_id', ch));
+  for (const [i, id] of pairs) i.seats[id] = sortGamePlayers(seats.filter(s => s.game_id === id));
+}
+
+function ntCardHTML(i) {
+  return `
     <section class="nt-card" id="nt-${i.id}">
       <div class="nt-head">
         <p class="nt-title">${t('{who} says you played {n}', { who: `<strong>${_esc(i.inviter)}</strong>`, n: tn(i.games.length, '{n} game', '{n} games') })}
@@ -73,21 +95,42 @@ function ntRender() {
         <button class="btn btn-ghost btn-sm" type="button" onclick="ntDecline('${i.id}')">${t('Decline')}</button>
         <button class="btn btn-primary btn-sm" type="button" onclick="ntAccept('${i.id}')">${t('Accept')}</button>
       </div>
-    </section>`).join('');
-  // The games' cards (game-card.js): your seat as the pending name, linked to the game's page.
-  for (const i of ntInvites) {
-    const box = document.querySelector(`#nt-${i.id} .nt-games`);
-    for (const { g, seats } of i.games) {
-      const gp = seats.map(s => s.pending_player_id === i.pid ? { ...s, pending: { name: i.name } } : s);
-      const card = buildGameCard(g, gp, { isSelf: p => p.pending_player_id === i.pid, layout: 'rows' });
-      const link = document.createElement('a');
-      link.className = 'nt-game-link';
-      link.href = `claim.html?game=${g.id}`;
-      link.append(card);
-      box.append(link);
-    }
+    </section>`;
+}
+
+// An invitation's game cards (game-card.js): your seat as the pending name,
+// each to the game's page; the first NT_SHOWN, or all.
+function ntFillGames(i, all = false) {
+  const box = document.querySelector(`#nt-${i.id} .nt-games`);
+  if (!box) return;
+  box.innerHTML = '';
+  for (const g of all ? i.games : i.games.slice(0, NT_SHOWN)) {
+    const gp = (i.seats[g.id] || []).map(s => s.pending_player_id === i.pid ? { ...s, pending: { name: i.name } } : s);
+    const link = document.createElement('a');
+    link.className = 'nt-game-link';
+    link.href = `claim.html?game=${g.id}`;
+    link.append(buildGameCard(g, gp, { isSelf: p => p.pending_player_id === i.pid, layout: 'rows' }));
+    box.append(link);
   }
-  layoutGameCardMeta(root);   // the details on as many lines as they need, as in the game log
+  if (!all && i.games.length > NT_SHOWN) {
+    box.insertAdjacentHTML('beforeend', `<button class="btn-load-more nt-show-all" type="button" onclick="ntShowAll('${i.id}', this)">${t('Show all {n} games', { n: i.games.length })}</button>`);
+  }
+  layoutGameCardMeta(box);   // the details on as many lines as they need, as in the game log
+}
+
+async function ntShowAll(id, btn) {
+  const i = ntInvites.find(x => x.id === id);
+  if (!i) return;
+  btn.disabled = true;
+  await ntLoadSeats(i.games.filter(g => !i.seats[g.id]).map(g => [i, g.id]));
+  ntFillGames(i, true);
+}
+
+function ntRender() {
+  const root = document.getElementById('ntRoot');
+  root.innerHTML = ntInvites.map(ntCardHTML).join('');
+  for (const i of ntInvites) ntFillGames(i);
+  if (ntMore) appendLoadMore(root, async () => { if (await ntLoadPage()) ntRender(); });
 }
 
 async function ntAccept(id) {
