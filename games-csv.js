@@ -18,11 +18,15 @@
 //             that isn't a nickname stops the file (they're listed).
 //   Seat      the play order, 1 to the players, or empty on every row.
 //   Winner    yes / no, one yes (Solo: yes is won, no is lost).
-//   Solo      yes / no; a solo game is one row, yours, with its Difficulty.
+//   Solo      yes / no; a solo game is one row, yours, with its Solo Difficulty.
+//   Solo Difficulty  Easy / Medium / Hard, solo only ("Difficulty" before
+//             2026-11-26: an older file's header is still read).
 // Depends on db.js, ui.js (overlays), solo.js (SOLO_LEVELS) and shared.js
 // (the signed-in user and profile).
 
-const GAMES_CSV_HEADER = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Difficulty'];
+const GAMES_CSV_HEADER = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Solo Difficulty'];
+// The header of files downloaded before Solo Difficulty had its name.
+const GAMES_CSV_HEADER_OLD = GAMES_CSV_HEADER.map(h => h === 'Solo Difficulty' ? 'Difficulty' : h);
 const GAMES_CSV_MAX_GAMES = 2000;   // per file: larger files go in parts
 const GAMES_CSV_LEVELS    = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };   // a solo game's level, as written
 
@@ -80,7 +84,7 @@ async function checkGamesCsv(text) {
   const err = (line, msg) => errors.push([line, msg]);
   const rows = parseCsv(text);
   const head = (rows.shift()?.cells || []).map(c => c.trim());
-  if (head.join('|') !== GAMES_CSV_HEADER.join('|')) {
+  if (head.join('|') !== GAMES_CSV_HEADER.join('|') && head.join('|') !== GAMES_CSV_HEADER_OLD.join('|')) {
     err(1, t('The first row must be exactly: {header}', { header: GAMES_CSV_HEADER.join(', ') }));
     return { errors };
   }
@@ -114,7 +118,7 @@ async function checkGamesCsv(text) {
   for (const [id, rs] of byId) {
     if (existing.has(id.toLowerCase())) { skipped.push(id); continue; }
     const first = rs[0], at = first.line;
-    const sameGame = ['Date', 'Location', 'Duration (min)', 'Rounds', 'Solo', 'Difficulty'];
+    const sameGame = ['Date', 'Location', 'Duration (min)', 'Rounds', 'Solo', 'Solo Difficulty'];
     const differ = sameGame.find(h => rs.some(r => r.v[h] !== first.v[h]));
     if (differ) { err(at, t('Game {id}: its rows have different values in {column}.', { id, column: differ })); continue; }
 
@@ -134,9 +138,9 @@ async function checkGamesCsv(text) {
     };
     const solo = yesNo(g.Solo);
     if (solo === undefined) { err(at, t('Game {id}: Solo must be yes or no.', { id })); continue; }
-    const level = Object.keys(GAMES_CSV_LEVELS).find(k => GAMES_CSV_LEVELS[k].toLowerCase() === g.Difficulty.toLowerCase());
-    if (solo && !level) err(at, t('Game {id}: a solo game needs its Difficulty: Easy, Medium or Hard.', { id }));
-    if (!solo && g.Difficulty) err(at, t('Game {id}: only a solo game has a Difficulty.', { id }));
+    const level = Object.keys(GAMES_CSV_LEVELS).find(k => GAMES_CSV_LEVELS[k].toLowerCase() === g['Solo Difficulty'].toLowerCase());
+    if (solo && !level) err(at, t('Game {id}: a solo game needs its Solo Difficulty: Easy, Medium or Hard.', { id }));
+    if (!solo && g['Solo Difficulty']) err(at, t('Game {id}: only a solo game has a Solo Difficulty.', { id }));
     const dur   = whole('Duration (min)');
     const turns = whole('Rounds', solo && level ? SOLO_LEVELS[level].turns : Infinity);
     if (g.Location.length > 60) err(at, t('Game {id}: the location is longer than 60 characters.', { id }));
@@ -274,7 +278,7 @@ function openUploadGames() {
     ['Seat', t('The play order, 1 to the players, or empty on every row of the game.')],
     ['Winner', t('yes or no: one yes per game (Solo: yes if you won).')],
     ['Solo', t('yes or no. A solo game is one row, yours.')],
-    ['Difficulty', t('Solo only: Easy, Medium or Hard.')],
+    ['Solo Difficulty', t('Solo only: Easy, Medium or Hard.')],
   ];
   body.innerHTML =
     p(t('Add games from a CSV file in the format of <em>Download my data</em>: one row per player per game, these columns in this order. The file is checked first: if a row is wrong, nothing is uploaded.')) +
