@@ -2,6 +2,10 @@
 
 let claimGame    = null;
 let claimPlayers = [];
+// The beta's pending players on this game's seats that you may see (yours, or
+// one you're invited as: PLAYERS_SPEC.md), and their open invitations.
+let claimPending = {};   // pending player id → { name, origin, created_by }
+let claimInvites = {};   // pending player id → { id, invited_user, invited_by }
 
 // Opened by New Game right after saving (claim.html?game=…&saved=1): the QR
 // sheet opens on top once, and Back leads to the Game Log.
@@ -26,6 +30,15 @@ const CLAIM_ERRORS = {
   solo_seat:       'A solo game is always its creator\'s.',
   solo_locked:     "A solo game's difficulty, villain and result can't be changed.",
   tournament_seat: "This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.",
+  external_seat:   'This seat comes from an online game: its player links their account instead.',
+  not_in_game:     'Only the player who recorded the game, or one who played it, can name the others.',
+  invite_self:     'That\'s you: claim the villain instead.',
+  declined:        'This player declined this seat. They can still claim it themselves with the QR code.',
+  seat_invited:    'Another player already invited someone to this seat.',
+  seat_pending:    'This seat comes from an uploaded file: its uploader invites the player.',
+  seat_taken:      'This villain was just claimed. The page is up to date now.',
+  no_player:       'No player with that nickname.',
+  not_your_invite: 'Only the player who sent the invitation can withdraw it.',
 };
 const _claimErrorMsg = error => CLAIM_ERRORS[error.message] ? t(CLAIM_ERRORS[error.message]) : error.message;
 
@@ -52,6 +65,7 @@ async function init() {
   await initAuth(() => render());
   setBackLink('claimBack', _claimBack());
   attachLocationAutocomplete('editLocation', 'editLocationDropdown');
+  _attachWhoSearch();
 
   const params = new URLSearchParams(location.search);
   const gameId = params.get('game');
@@ -78,6 +92,8 @@ async function init() {
   if (playersErr) return showClaimError(t("Couldn't load the game"), t('Try reloading the page.'), playersErr);
 
   await attachTournaments([game]);   // a tournament's game: changed only from its tournament
+  claimPlayers = players || [];
+  await _loadPending();
   claimGame    = game;
   if (game.tournament) setBackLink('claimBack', _claimBack());
   claimPlayers = (players || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));   // play order
@@ -125,12 +141,18 @@ function render() {
   ].filter(Boolean).join(' | ');
 
   // Like the game cards: the player's nickname sits under the villain's name;
-  // the right side only holds the action (Release your claim, or Claim).
+  // the right side only holds the action (Release your claim, or Claim; on the
+  // beta also Who played?, and Cancel for an invitation you sent).
   const rowsHTML = claimPlayers.map((p, i) => {
     const isMine = p.user_id === user.id;
     let nickHTML = '', actionHTML = '';
+    const pend = !p.nickname && p.pending_player_id ? claimPending[p.pending_player_id] : null;
+    const inv  = pend ? claimInvites[p.pending_player_id] : null;
     if (p.nickname)    nickHTML = `<div class="claim-nick">${_esc(p.nickname)}</div>`;
+    else if (inv && inv.invited_user === user.id) nickHTML = `<div class="claim-nick chip-pending">⏳ ${t('You\'re invited')} | <a href="notifications.html">${t('Answer')} ›</a></div>`;
+    else if (pend) nickHTML = `<div class="claim-nick chip-pending">⏳ ${_esc(pend.name)}${inv ? ` | ${t('invitation sent')}` : ''}</div>`;
     else if (myClaim || claimGame.tournament) nickHTML = `<div class="claim-nick unclaimed">${t('Unclaimed')}</div>`;
+    const canName = _claimCanName(p, role);
     if (solo) {
       // One seat, always its creator's: nothing to claim or release.
     } else if (isMine) {
@@ -140,6 +162,8 @@ function render() {
       // A tournament game's villains go with the names claimed in the tournament.
       actionHTML = `<button class="btn btn-ghost btn-sm" onclick="claimCharacter('${p.id}')">${t('Claim')}</button>`;
     }
+    if (inv && inv.invited_by === user.id) actionHTML = `<button class="btn btn-ghost btn-sm" onclick="cancelSeatInvite('${inv.id}')">${t('Cancel')}</button>`;
+    else if (canName && !inv) actionHTML = `<div class="claim-actions">${actionHTML}<button class="btn btn-ghost btn-sm claim-who-btn" onclick="openWhoPlayed('${p.id}')">${t('Who played?')}</button></div>`;
     return `
       <div class="claim-row${p.is_winner ? ' winner' : ''}${isMine ? ' mine' : ''}">
         <div class="claim-char">
@@ -169,6 +193,98 @@ function render() {
     ${claimGame.tournament && !myClaim ? `<p class="results-hint">${t('This is a tournament game: its villains go to the players who claim their name in the tournament, with its QR code.')}</p>` : ''}
     ${solo ? soloHintHTML() : ''}
     ${role.isCreator ? `<div class="claim-delete-row"><button class="btn btn-danger btn-sm" onclick="deleteGame()">${t('Delete game')}</button></div>` : ''}`;
+}
+
+// ── WHO PLAYED? (beta) ──────────────────────────────────────────────────────
+// The recorder, or a player seated in the game, names a free seat's player:
+// someone on DiVilytics gets an invitation (notifications.html), nothing shows
+// until they accept; anyone else claims it with the game's QR code. Not in a
+// solo, tournament or online game, nor on an uploaded file's seat (its
+// uploader invites from the upload). invite_to_seat / cancel_invite.
+
+// The pending players on this game's seats that you may see, and their open
+// invitations (row security keeps the rest out).
+async function _loadPending() {
+  claimPending = {}; claimInvites = {};
+  const pids = [...new Set(claimPlayers.map(p => p.pending_player_id).filter(Boolean))];
+  if (!IS_BETA || !getCurrentUser() || !pids.length) return;
+  const [pp, inv] = await Promise.all([
+    db.from('pending_players').select('id, name, origin, created_by').in('id', pids),
+    db.from('pending_invites').select('id, pending_player_id, invited_user, invited_by').in('pending_player_id', pids),
+  ]);
+  for (const r of pp.data || []) claimPending[r.id] = r;
+  for (const r of inv.data || []) claimInvites[r.pending_player_id] = r;
+}
+
+function _claimCanName(seat, role) {
+  if (!IS_BETA || seat.nickname || claimIsSolo() || claimGame.tournament || !role.isParticipant) return false;
+  if (['digital-villainous'].includes(claimGame.source)) return false;
+  const pend = seat.pending_player_id ? claimPending[seat.pending_player_id] : null;
+  return !seat.pending_player_id || pend?.origin === 'invite';   // not an upload's or an external site's
+}
+
+let _whoSeat = null;
+function openWhoPlayed(seatId) {
+  const seat = claimPlayers.find(p => p.id === seatId);
+  if (!seat) return;
+  _whoSeat = seat;
+  document.getElementById('whoTitle').textContent = t('Who played {villain}?', { villain: villainName(seat.character) });
+  const input = document.getElementById('whoInput');
+  input.value = '';
+  document.getElementById('whoError').classList.add('hidden');
+  openOverlay('whoOverlay');
+  setTimeout(() => input.focus(), 50);
+}
+
+function _attachWhoSearch() {
+  const input = document.getElementById('whoInput');
+  if (!input || input.dataset.wired) return;   // init runs again after a claim
+  input.dataset.wired = '1';
+  attachSearchBox({
+    inputId:    'whoInput',
+    dropdownId: 'whoDropdown',
+    debounceMs: 200,
+    fetchOptions: async q => {
+      const { data } = await db.from('profiles').select('id, nickname, avatar_url, default_avatar')
+        .ilike('nickname', `${q}%`).not('nickname', 'is', null).limit(10);
+      // Not you, nor anyone already in this game.
+      const seated = new Set(claimPlayers.map(p => p.user_id).filter(Boolean).concat(getCurrentUser()?.id));
+      return (data || []).filter(p => !seated.has(p.id)).slice(0, 8);
+    },
+    renderOption: p => `
+      <div class="cs-option" data-id="${p.id}" data-nick="${_esc(p.nickname)}">
+        ${playerAvatarHTML(resolveAvatar(p))}
+        <span>${_esc(p.nickname)}</span>
+      </div>`,
+    onSelect: opt => inviteToSeat(opt.dataset.id),
+  });
+}
+
+async function inviteToSeat(playerId) {
+  if (!_whoSeat) return;
+  const err = document.getElementById('whoError');
+  const { error } = await db.rpc('invite_to_seat', { seat_id: _whoSeat.id, invitee: playerId });
+  if (error) {
+    err.textContent = _claimErrorMsg(error);
+    err.classList.remove('hidden');
+    return;
+  }
+  closeOverlay('whoOverlay');
+  await _reloadSeats();
+}
+
+async function cancelSeatInvite(inviteId) {
+  const { error } = await db.rpc('cancel_invite', { target: inviteId });
+  if (error) _showClaimRowError(_claimErrorMsg(error));
+  await _reloadSeats();
+}
+
+// The seats again (after an invitation sent or withdrawn).
+async function _reloadSeats() {
+  const { data } = await db.from('game_players').select('*').eq('game_id', claimGame.id);
+  claimPlayers = (data || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  await _loadPending();
+  render();
 }
 
 // "You played as …": in a solo game, whether you won or lost with it.

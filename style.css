@@ -3632,3 +3632,14 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
 .nt-game-actions .btn { padding: 2px 10px; font-size: calc(11.5px * var(--ts)); }
 .nt-accept-one { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
 .nt-error { color: var(--red); margin: 8px 0 0; }
+
+/* Who played? (beta, the game page): a free seat's two actions side by side,
+   and the sheet's search across its width. */
+.claim-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.claim-nick.chip-pending a { color: var(--accent); text-decoration: none; font-style: normal; }
+.who-search { width: 100%; margin: 10px 0 4px; }
+.who-search input { width: 100%; }
+/* In the sheet the results are a list under the field (a floating menu would
+   be cut by the sheet's own scroll). */
+.who-search .cs-dropdown { position: static; box-shadow: none; margin-top: 6px; }
+.who-qr { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }

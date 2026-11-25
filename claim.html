@@ -76,6 +76,28 @@
   </div>
 </div>
 
+<!-- Who played? (beta): name a free seat's player, an invitation to them
+     (claim.js); someone not on DiVilytics gets the QR code instead. -->
+<div class="overlay" id="whoOverlay" onclick="if(event.target===this) closeOverlay('whoOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="whoTitle"></h3>
+      <button class="sheet-close" onclick="closeOverlay('whoOverlay')">×</button>
+    </div>
+    <div class="sheet-body">
+      <p class="modal-hint" data-i18n>Search their nickname: they get an invitation, and the villain shows as theirs once they accept.</p>
+      <div class="cs-search who-search">
+        <input type="text" id="whoInput" placeholder="Search player…" maxlength="30" autocomplete="off" data-i18n-attr="placeholder">
+        <div class="cs-dropdown" id="whoDropdown"></div>
+      </div>
+      <p class="modal-hint nt-error hidden" id="whoError"></p>
+      <p class="modal-hint who-qr"><span data-i18n>Not on DiVilytics? They can claim it themselves with the game's QR code.</span>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeOverlay('whoOverlay'); shareGame()" data-i18n>Share QR</button></p>
+    </div>
+  </div>
+</div>
+
 <!-- Edit game details sheet -->
 <div class="overlay" id="editDetailsOverlay" onclick="if(event.target===this) closeEditDetails()">
   <div class="sheet">
