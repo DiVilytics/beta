@@ -314,7 +314,7 @@ async function initPendingLink() {
   const { data, error } = await db.rpc('pending_player_preview', { target: pid, code });
   const p = data?.[0];
   if (!p) return showClaimError(t('Link not found'), t(LINK_ERRORS.bad_code), error && error.code !== '22P02' ? error : null);
-  const intro = t('{who} says you played {n} as {name}.', {
+  const intro = t('{who} says you played {n} as {name}', {
     who: `<strong>${_esc(p.named_by || t('A player'))}</strong>`, n: tn(p.games, '{n} game', '{n} games'),
     name: `<span class="chip-pending">⏳ ${_esc(p.name)}</span>` });
   if (p.claimed) { root.innerHTML = emptyStateHTML('✓', t('Already claimed'), t(LINK_ERRORS.already_claimed)); return; }

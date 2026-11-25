@@ -826,7 +826,7 @@ window.I18N.it = {
     "You need a nickname before you can claim them.": "Ti serve un nickname prima di poterle rivendicare.",
     "Your games": "Le tue partite",
     "Link not found": "Link non trovato",
-    "{who} says you played {n} as {name}.": "{who} dice che hai giocato {n} come {name}.",
+    "{who} says you played {n} as {name}": "{who} dice che hai giocato {n} come {name}",
     "Already claimed": "Già rivendicate",
     "Claim them only if you really played them: they go on your page, all at once.": "Rivendicale solo se le hai giocate davvero: vanno sulla tua pagina, tutte insieme.",
     "Claim it": "Rivendicala",
