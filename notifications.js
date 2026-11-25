@@ -12,6 +12,7 @@ const NT_ERRORS = {
   already_in_game: 'You already have a villain in one of these games.',
   no_profile:      'You need a nickname before you can accept.',
   seat_changed:    'This game was just changed or claimed. The page is up to date now.',
+  not_your_invite: 'This invitation was withdrawn or already answered. The page is up to date now.',
 };
 const ntError = e => {
   const code = Object.keys(NT_ERRORS).find(k => e?.message?.includes(k));
@@ -22,6 +23,18 @@ const ntError = e => {
 // 20 invitations at a time (Load more); each shows its first 3 games (Show
 // all for the rest, an upload's name can cover many), its count always whole.
 const NT_PAGE = 20, NT_SHOWN = 3;
+// Received (to you: Accept / Decline) or Sent (yours still waiting: Cancel),
+// the switch on top, remembered on this browser.
+let ntMode = (() => { try { return localStorage.getItem('divilytics_nt_mode') === 'sent' ? 'sent' : 'received'; } catch (_) { return 'received'; } })();
+function setNtMode(mode) {
+  ntMode = mode;
+  try { localStorage.setItem('divilytics_nt_mode', mode); } catch (_) {}
+  ntLoad();
+}
+function _ntSwitchHTML() {
+  const b = (id, label) => `<button class="seg-btn${ntMode === id ? ' on' : ''}" type="button" onclick="setNtMode('${id}')">${t(label)}</button>`;
+  return `<div class="seg">${b('received', 'Received')}${b('sent', 'Sent')}</div>`;
+}
 let ntInvites = [];   // [{ id, created_at, inviter, name, pid, games: [g, newest first], seats: { gameId: [seat] } }]
 let ntMore = false;   // more invitations after these
 
@@ -34,11 +47,14 @@ async function ntLoad() {
       `<button class="btn btn-primary btn-sm" type="button" onclick="goToSignIn()">${t('Sign in')}</button>`);
     return;
   }
+  document.getElementById('ntSwitch').innerHTML = _ntSwitchHTML();
   ntInvites = [];
   const ok = await ntLoadPage();
   if (!ok) { root.innerHTML = loadErrorHTML(t('Could not load your notifications.')); return; }
   if (!ntInvites.length) {
-    root.innerHTML = emptyStateHTML('🔔', t('No notifications'), t('When someone names you in a game, the invitation shows up here.'));
+    root.innerHTML = ntMode === 'sent'
+      ? emptyStateHTML('📤', t('No invitations waiting'), t('Those you send, from a game\'s page or an upload, show here until they\'re answered.'))
+      : emptyStateHTML('🔔', t('No notifications'), t('When someone names you in a game, the invitation shows up here.'));
     return;
   }
   ntRender();
@@ -49,8 +65,8 @@ async function ntLoad() {
 async function ntLoadPage() {
   const me = getCurrentUser();
   const { data: invites, error } = await db.from('pending_invites')
-    .select('id, created_at, invited_by, pending_player_id, pending_players(name)')
-    .eq('invited_user', me.id).order('created_at', { ascending: false })
+    .select('id, created_at, invited_by, invited_user, pending_player_id, pending_players(name)')
+    .eq(ntMode === 'sent' ? 'invited_by' : 'invited_user', me.id).order('created_at', { ascending: false })
     .range(ntInvites.length, ntInvites.length + NT_PAGE);   // one more: is there a next page?
   if (error) { console.warn('notifications:', error); return false; }
   ntMore = invites.length > NT_PAGE;
@@ -59,13 +75,14 @@ async function ntLoadPage() {
   const mine = await _fetchInChunks(page.map(i => i.pending_player_id), ch => db.from('game_players').select('game_id, pending_player_id').in('pending_player_id', ch));
   const [games, people] = await Promise.all([
     _fetchInChunks([...new Set(mine.map(s => s.game_id))], ch => db.from('games').select('*').in('id', ch)),
-    _fetchInChunks([...new Set(page.map(i => i.invited_by))], ch => db.from('profiles').select('id, nickname').in('id', ch)),
+    // The other side: who invited you, or whom you invited.
+    _fetchInChunks([...new Set(page.map(i => ntMode === 'sent' ? i.invited_user : i.invited_by))], ch => db.from('profiles').select('id, nickname').in('id', ch)),
   ]);
   const nick = Object.fromEntries(people.map(p => [p.id, p.nickname]));
   const added = page.map(i => {
     const ids = new Set(mine.filter(s => s.pending_player_id === i.pending_player_id).map(s => s.game_id));
     return {
-      id: i.id, created_at: i.created_at, inviter: nick[i.invited_by] || t('A player'), name: i.pending_players?.name || '', pid: i.pending_player_id,
+      id: i.id, created_at: i.created_at, inviter: nick[ntMode === 'sent' ? i.invited_user : i.invited_by] || t('A player'), name: i.pending_players?.name || '', pid: i.pending_player_id,
       games: games.filter(g => ids.has(g.id)).sort((a, b) => Date.parse(b.played_at || b.created_at) - Date.parse(a.played_at || a.created_at)),
       seats: {},
     };
@@ -86,15 +103,18 @@ function ntCardHTML(i) {
   return `
     <section class="nt-card" id="nt-${i.id}">
       <div class="nt-head">
-        <p class="nt-title">${t('{who} says you played {n}', { who: `<strong>${_esc(i.inviter)}</strong>`, n: tn(i.games.length, '{n} game', '{n} games') })}
+        <p class="nt-title">${ntMode === 'sent'
+          ? t('You invited {who} to {n}', { who: `<strong>${_esc(i.inviter)}</strong>`, n: tn(i.games.length, '{n} game', '{n} games') })
+          : t('{who} says you played {n}', { who: `<strong>${_esc(i.inviter)}</strong>`, n: tn(i.games.length, '{n} game', '{n} games') })}
           <span class="nt-as">${t('as {name}', { name: `<span class="chip-pending">⏳ ${_esc(i.name)}</span>` })}</span></p>
         <p class="nt-when">${fmtDateShort(i.created_at)}</p>
       </div>
       <div class="nt-games"></div>
       <p class="modal-hint nt-error hidden"></p>
-      <div class="nt-actions">
-        <button class="btn btn-ghost btn-sm" type="button" onclick="ntDecline('${i.id}')">${i.games.length > 1 ? t('Decline all') : t('Decline')}</button>
-        <button class="btn btn-primary btn-sm" type="button" onclick="ntAccept('${i.id}')">${i.games.length > 1 ? t('Accept all') : t('Accept')}</button>
+      <div class="nt-actions">${ntMode === 'sent'
+        ? `<span class="nt-waiting">⏳ ${t('Waiting for an answer')}</span><button class="btn btn-ghost btn-sm" type="button" onclick="ntCancel('${i.id}')">${t('Cancel')}</button>`
+        : `<button class="btn btn-ghost btn-sm" type="button" onclick="ntDecline('${i.id}')">${i.games.length > 1 ? t('Decline all') : t('Decline')}</button>
+        <button class="btn btn-primary btn-sm" type="button" onclick="ntAccept('${i.id}')">${i.games.length > 1 ? t('Accept all') : t('Accept')}</button>`}
       </div>
     </section>`;
 }
@@ -109,11 +129,13 @@ function ntFillGames(i, all = false) {
   for (const g of all ? i.games : i.games.slice(0, NT_SHOWN)) {
     const gp = (i.seats[g.id] || []).map(s => s.pending_player_id === i.pid ? { ...s, pending: { name: i.name } } : s);
     const seat = gp.find(s => s.pending_player_id === i.pid);
-    const actions = i.games.length > 1 && seat ? `<div class="nt-game-actions">
+    const actions = ntMode === 'received' && i.games.length > 1 && seat ? `<div class="nt-game-actions">
         <button class="btn btn-ghost btn-sm" type="button" onclick="ntDeclineGame('${i.id}', '${g.id}', '${seat.id}')">${t('Decline')}</button>
         <button class="btn btn-ghost btn-sm nt-accept-one" type="button" onclick="ntAnswerGame('${i.id}', '${g.id}', '${seat.id}', 'accept_invite_seat')">${t('Accept')}</button>
       </div>` : '';
-    const card = buildGameCard(g, gp, { isSelf: p => p.pending_player_id === i.pid, layout: 'rows', actions });
+    // Purple is you: your pending seat (Received), or your own seat (Sent).
+    const me = getCurrentUser()?.id;
+    const card = buildGameCard(g, gp, { isSelf: p => ntMode === 'sent' ? !!me && p.user_id === me : p.pending_player_id === i.pid, layout: 'rows', actions });
     card.classList.add('nt-game');
     card.addEventListener('click', e => { if (!e.target.closest('button, a')) location.href = `claim.html?game=${g.id}`; });
     box.append(card);
@@ -177,6 +199,11 @@ async function ntAnswerGame(id, gameId, seatId, fn) {
   refreshNotificationCount();
 }
 
+// Sent: withdraw it (gone from their notifications; a game page's seat is free again).
+async function ntCancel(id) {
+  await ntAnswer(id, 'cancel_invite');
+}
+
 async function ntAccept(id) {
   await ntAnswer(id, 'accept_invite');
 }
@@ -201,7 +228,7 @@ async function ntAnswer(id, fn) {
     const msg = card?.querySelector('.nt-error');
     if (msg) { msg.textContent = ntError(error); msg.classList.remove('hidden'); }
     card?.querySelectorAll('button').forEach(b => { b.disabled = false; });
-    if (error.message?.includes('no_invite')) await ntLoad();
+    if (/no_invite|not_your_invite/.test(error.message || '')) await ntLoad();
     return;
   }
   await Promise.all([ntLoad(), refreshNotificationCount()]);

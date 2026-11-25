@@ -3628,7 +3628,8 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
 .nt-games { display: flex; flex-direction: column; gap: 8px; }
 .nt-games .game-card { margin: 0; }
 .nt-show-all { margin: 0; }
-.nt-actions { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+.nt-actions { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 14px; }
+.nt-waiting { font-size: calc(12px * var(--ts)); color: var(--muted); font-style: italic; }
 /* A game of a several-game invitation: its own answer, at the card's foot;
    the card itself to the game's page. */
 .nt-game { cursor: pointer; }
