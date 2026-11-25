@@ -118,8 +118,8 @@ function _renderPage() {
       <div class="err" id="identitiesErr"></div>
       <div id="identitiesList" class="acct-identities">${_renderIdentitiesHTML()}</div>
       <div class="acct-actions">
-        <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
         <button class="btn btn-ghost" onclick="openUploadGames()">${t('Upload games')}</button>
+        <button class="btn btn-ghost" id="exportDataBtn" onclick="exportMyData()">${t('Download my data')}</button>
         <button class="btn btn-ghost" id="exportTournamentsBtn" onclick="exportMyTournaments()"${_acctOrganized ? '' : ` disabled title="${_esc(t("You haven't organized a tournament"))}"`}>${t('Download my tournaments')}</button>
         <button class="btn btn-ghost" onclick="signOut()">${t('Sign out')}</button>
       </div>
@@ -255,11 +255,14 @@ async function exportMyData() {
 
     const rows = [GAMES_CSV_HEADER];   // the file Upload games reads back (games-csv.js)
     for (const g of games) {
-      const dateStr = isDateOnly(g) ? g.played_at.slice(0, 10) : _csvDateTime(g.played_at);   // date-only sources: the day, no time
+      // Its time on its own zone's clock (the zone beside it), else this browser's; date-only: the day.
+      const zone = g.time_zone && csvTimeZone(g.time_zone);
+      const dateStr = !g.played_at ? '' : isDateOnly(g) ? g.played_at.slice(0, 10) : csvDateTimeIn(g.played_at, zone);
       for (const p of sortGamePlayers(playersByGame[g.id] || [])) {
         rows.push([
           g.id,
           dateStr,
+          zone || '',
           g.location || '',
           g.duration_minutes ?? '',
           g.num_turns ?? '',

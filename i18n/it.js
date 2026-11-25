@@ -801,6 +801,8 @@ window.I18N.it = {
     "Accept": "Accetta",
     "Show all {n} games": "Mostra tutte le {n} partite",
     "Accept all": "Accetta tutte",
+    "Game {id}: {value} is not a time zone (like Europe/Rome).": "Partita {id}: {value} non è un fuso orario (come Europe/Rome).",
+    "Optional: where it was played, like Europe/Rome; the time is on its clock. Empty: no time zone is saved (the game stays out of Day and hour).": "Facoltativo: dove si è giocata, come Europe/Rome; l'orario è quello del suo fuso. Vuoto: non si salva nessun fuso orario (la partita resta fuori da Giorno e ora).",
     "{player} is not a DiVilytics player: write their nickname, or leave Player empty (they claim theirs with the game's QR code).": "{player} non è un giocatore di DiVilytics: scrivi il suo nickname, o lascia Player vuoto (rivendica il suo con il codice QR della partita).",
     "Not DiVilytics players: {names}": "Non sono giocatori di DiVilytics: {names}",
     "Your nickname on your villain, which claims it. On the others, their DiVilytics nickname (they're invited: nothing shows until they accept) or empty (they claim theirs with the game's QR code).": "Il tuo nickname sul tuo cattivo, che lo rivendica. Sugli altri, il loro nickname di DiVilytics (vengono invitati: non si vede nulla finché non accettano) o niente (rivendicano il loro con il codice QR della partita).",

@@ -11,6 +11,9 @@
 //             already in DiVilytics (its id, from a download) is skipped.
 //   Date      YYYY-MM-DD HH:MM, YYYY-MM-DD (the day without a time:
 //             time_unknown) or empty (no date); not in the future.
+//   Time zone where it was played (Europe/Rome): the time is on its clock and
+//             it's saved with the game; empty: no time zone saved (the time
+//             read on this browser's clock), so Day and hour leaves it out.
 //   Player    your nickname on your villain (claims it), empty, or (the beta)
 //             another DiVilytics player's nickname (case aside): a pending
 //             player of the upload, one per player across its games, invited
@@ -23,7 +26,7 @@
 // Depends on db.js, ui.js (overlays), solo.js (SOLO_LEVELS) and shared.js
 // (the signed-in user and profile).
 
-const GAMES_CSV_HEADER = ['Game ID', 'Date', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Solo Difficulty'];
+const GAMES_CSV_HEADER = ['Game ID', 'Date', 'Time zone', 'Location', 'Duration (min)', 'Rounds', 'Player', 'Villain', 'Seat', 'Winner', 'Solo', 'Solo Difficulty'];
 const GAMES_CSV_MAX_GAMES = 2000;   // per file: larger files go in parts
 const GAMES_CSV_LEVELS    = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };   // a solo game's level, as written
 
@@ -58,10 +61,35 @@ function parseCsv(text) {
   return rows.filter(r => r.cells.some(c => c.trim() !== ''));   // blank lines
 }
 
-// "YYYY-MM-DD HH:MM" (or with a T) in local time, as New Game; "YYYY-MM-DD"
-// the day alone, as New Game's Unknown time (00:00 UTC, time_unknown); '' no date.
-// Returns { played_at, time_unknown, future }, or undefined when it isn't a date.
-function _csvParseDate(s) {
+// A time zone's name as the browser knows it (europe/rome → Europe/Rome), or
+// null for one it doesn't.
+function csvTimeZone(z) {
+  try { return new Intl.DateTimeFormat('en-US', { timeZone: z }).resolvedOptions().timeZone; } catch (_) { return null; }
+}
+// A moment's YYYY-MM-DD HH:MM on the clock of zone z (null: this browser's).
+function csvDateTimeIn(iso, z) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: z || undefined, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date(iso)).map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day} ${String(Number(p.hour) % 24).padStart(2, '0')}:${p.minute}`;
+}
+// The moment that reads y-m-d h:mi on the clock of zone z (null: this
+// browser's): from the UTC reading, less the zone's offset then (twice, for a
+// daylight saving change in between).
+function _csvZoned(y, mo, d, h, mi, z) {
+  if (!z) return new Date(y, mo - 1, d, h, mi);
+  const want = Date.UTC(y, mo - 1, d, h, mi);
+  const offset = ts => { const [a, b] = csvDateTimeIn(new Date(ts).toISOString(), z).split(' '); return Date.parse(`${a}T${b}:00Z`) - ts; };
+  let ts = want - offset(want);
+  ts = want - offset(ts);
+  return new Date(ts);
+}
+
+// "YYYY-MM-DD HH:MM" (or with a T) on the clock of zone z (null: this
+// browser's), as New Game; "YYYY-MM-DD" the day alone, as New Game's Unknown
+// time (00:00 UTC, time_unknown); '' no date. Returns { played_at,
+// time_unknown, future }, or undefined when it isn't a date (in that zone:
+// the hour skipped when daylight saving starts isn't).
+function _csvParseDate(s, z = null) {
   if (!s) return { played_at: null, time_unknown: false, future: false };
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?$/);
   if (!m) return undefined;
@@ -69,8 +97,8 @@ function _csvParseDate(s) {
   const day = new Date(Date.UTC(y, mo - 1, d));
   if (day.getUTCFullYear() !== y || day.getUTCMonth() !== mo - 1 || day.getUTCDate() !== d) return undefined;
   if (h === undefined) return { played_at: day.toISOString(), time_unknown: true, future: s > _localDateTimeValue().slice(0, 10) };
-  const dt = new Date(y, mo - 1, d, h, mi);
-  if (dt.getHours() !== h || dt.getMinutes() !== mi) return undefined;
+  const dt = _csvZoned(y, mo, d, h, mi, z);
+  if (csvDateTimeIn(dt.toISOString(), z) !== `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}`) return undefined;
   return { played_at: dt.toISOString(), time_unknown: false, future: dt > new Date() };
 }
 
@@ -115,12 +143,14 @@ async function checkGamesCsv(text) {
   for (const [id, rs] of byId) {
     if (existing.has(id.toLowerCase())) { skipped.push(id); continue; }
     const first = rs[0], at = first.line;
-    const sameGame = ['Date', 'Location', 'Duration (min)', 'Rounds', 'Solo', 'Solo Difficulty'];
+    const sameGame = ['Date', 'Time zone', 'Location', 'Duration (min)', 'Rounds', 'Solo', 'Solo Difficulty'];
     const differ = sameGame.find(h => rs.some(r => r.v[h] !== first.v[h]));
     if (differ) { err(at, t('Game {id}: its rows have different values in {column}.', { id, column: differ })); continue; }
 
     const g = first.v;
-    const when = _csvParseDate(g.Date);
+    const zone = g['Time zone'] ? csvTimeZone(g['Time zone']) : null;
+    if (g['Time zone'] && !zone) err(at, t('Game {id}: {value} is not a time zone (like Europe/Rome).', { id, value: g['Time zone'] }));
+    const when = _csvParseDate(g.Date, zone);
     if (when === undefined) err(at, t('Game {id}: {value} is not a date (YYYY-MM-DD HH:MM or YYYY-MM-DD).', { id, value: g.Date }));
     else if (when.future) err(at, t('Game {id}: the date is in the future.', { id }));
     const whole = (h, max = Infinity) => {
@@ -171,7 +201,7 @@ async function checkGamesCsv(text) {
     }
 
     games.push({
-      game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, time_zone: when?.played_at ? browserTimeZone() : null, duration_minutes: dur, num_turns: turns, location: g.Location || null,
+      game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, time_zone: when?.played_at ? zone : null, duration_minutes: dur, num_turns: turns, location: g.Location || null,
               ...(solo ? { variant: 'solo', solo_level: level } : {}) },
       // Solo: the one seat is yours, as in New Game.
       seats: ps.map(p => ({ character: p.character, is_winner: p.is_winner, mine: solo || p.isMe, name: solo ? null : p.name, line: p.line,
@@ -250,12 +280,12 @@ async function uploadGames(games, fileName) {
 // picked: what's wrong (nothing uploaded), or the summary and Upload.
 
 const _GAMES_CSV_EXAMPLE = [
-  ['1', '2026-10-12 21:30', 'Home', '75', '9', '', 'Maleficent', '1', 'no', 'no', ''],
-  ['1', '2026-10-12 21:30', 'Home', '75', '9', 'NICK', 'Captain Hook', '2', 'yes', 'no', ''],
-  ['1', '2026-10-12 21:30', 'Home', '75', '9', '', 'Ursula [I2E]', '3', 'no', 'no', ''],
-  ['2', '', '', '', '', 'NICK', 'Jafar', '', 'no', 'no', ''],
-  ['2', '', '', '', '', '', 'Hades', '', 'yes', 'no', ''],
-  ['3', '', '', '40', '14', 'NICK', 'Yzma', '', 'yes', 'yes', 'Medium'],
+  ['1', '2026-10-12 21:30', 'Europe/Rome', 'Home', '75', '9', '', 'Maleficent', '1', 'no', 'no', ''],
+  ['1', '2026-10-12 21:30', 'Europe/Rome', 'Home', '75', '9', 'NICK', 'Captain Hook', '2', 'yes', 'no', ''],
+  ['1', '2026-10-12 21:30', 'Europe/Rome', 'Home', '75', '9', '', 'Ursula [I2E]', '3', 'no', 'no', ''],
+  ['2', '', '', '', '', '', 'NICK', 'Jafar', '', 'no', 'no', ''],
+  ['2', '', '', '', '', '', '', 'Hades', '', 'yes', 'no', ''],
+  ['3', '', '', '', '40', '14', 'NICK', 'Yzma', '', 'yes', 'yes', 'Medium'],
 ];
 let _gamesCsvChecked = null;
 
@@ -267,6 +297,7 @@ function openUploadGames() {
   const cols = [
     ['Game ID', t('Groups the rows of one game: any label for a new game (1, 2, 3...). A game already in DiVilytics (its ID from a download) is skipped.')],
     ['Date', t('YYYY-MM-DD HH:MM, YYYY-MM-DD for the day without a time, or empty for no date. Not in the future.')],
+    ['Time zone', t('Optional: where it was played, like Europe/Rome; the time is on its clock. Empty: no time zone is saved (the game stays out of Day and hour).')],
     ['Location', t('Optional.')],
     ['Duration (min), Rounds', t('Optional, whole numbers.')],
     ['Player', IS_BETA ? t('Your nickname on your villain, which claims it. On the others, their DiVilytics nickname (they\'re invited: nothing shows until they accept) or empty (they claim theirs with the game\'s QR code).')
