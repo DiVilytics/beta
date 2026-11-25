@@ -11,7 +11,10 @@
 //             already in DiVilytics (its id, from a download) is skipped.
 //   Date      YYYY-MM-DD HH:MM, YYYY-MM-DD (the day without a time:
 //             time_unknown) or empty (no date); not in the future.
-//   Player    your nickname on your villain (claims it) or empty: nobody else's.
+//   Player    your nickname on your villain (claims it), empty, or (the beta)
+//             another player's name: a pending player of the upload, one per
+//             name across its games, not shown until they claim
+//             (PLAYERS_SPEC.md; People in this file invites them).
 //   Seat      the play order, 1 to the players, or empty on every row.
 //   Winner    yes / no, one yes (Solo: yes is won, no is lost).
 //   Solo      yes / no; a solo game is one row, yours, with its Difficulty.
@@ -144,8 +147,9 @@ async function checkGamesCsv(text) {
       const won = yesNo(v.Winner);
       if (won === undefined) err(line, t('Winner must be yes or no.'));
       const isMe = v.Player !== '' && v.Player.toLowerCase() === nick;
-      if (v.Player && !isMe) err(line, t("{player} isn't you: Player is your nickname on your villain, or empty (the others claim theirs with the game's QR code).", { player: v.Player }));
-      ps.push({ line, character: v.Villain, is_winner: !!won, isMe, seat: v.Seat });
+      if (v.Player && !isMe && !IS_BETA) err(line, t("{player} isn't you: Player is your nickname on your villain, or empty (the others claim theirs with the game's QR code).", { player: v.Player }));
+      if (v.Player.length > 40) err(line, t('{player}: a name is at most 40 characters.', { player: v.Player.slice(0, 40) + '…' }));
+      ps.push({ line, character: v.Villain, is_winner: !!won, isMe, seat: v.Seat, name: v.Player && !isMe ? v.Player : null });
     }
     if (solo) {
       if (ps.length !== 1) err(at, t('Game {id}: a solo game has one row, yours.', { id }));
@@ -154,6 +158,9 @@ async function checkGamesCsv(text) {
       if (new Set(ps.map(p => p.character)).size !== ps.length) err(at, t('Game {id}: each player must use a different villain.', { id }));
       if (ps.filter(p => p.is_winner).length !== 1) err(at, t('Game {id}: exactly one winner (yes).', { id }));
       if (ps.filter(p => p.isMe).length > 1) err(at, t('Game {id}: your nickname is on more than one row.', { id }));
+      const named = ps.filter(p => p.name).map(p => p.name.toLowerCase());
+      const twice = named.find((n, i) => named.indexOf(n) !== i);
+      if (twice) err(at, t('Game {id}: {player} is on more than one row.', { id, player: ps.find(p => p.name?.toLowerCase() === twice).name }));
     }
     // The play order: 1 to the players, each once, or empty on every row.
     const seatsGiven = ps.filter(p => p.seat !== '');
@@ -166,14 +173,21 @@ async function checkGamesCsv(text) {
       game: { played_at: when?.played_at ?? null, time_unknown: !!when?.time_unknown, time_zone: when?.played_at ? browserTimeZone() : null, duration_minutes: dur, num_turns: turns, location: g.Location || null,
               ...(solo ? { variant: 'solo', solo_level: level } : {}) },
       // Solo: the one seat is yours, as in New Game.
-      seats: ps.map(p => ({ character: p.character, is_winner: p.is_winner, mine: solo || p.isMe,
+      seats: ps.map(p => ({ character: p.character, is_winner: p.is_winner, mine: solo || p.isMe, name: solo ? null : p.name,
                             position: solo ? 0 : seatsGiven.length ? Number(p.seat) - 1 : null })),
     });
     seats += ps.length;
     if (solo || ps.some(p => p.isMe)) mine++;
   }
   errors.sort((a, b) => a[0] - b[0]);
-  return { errors, games, skipped, seats, mine };
+  // The other players named, one per name (case aside, its first spelling), and their games.
+  const people = new Map();
+  for (const x of games) for (const s of x.seats) if (s.name) {
+    const key = s.name.toLowerCase();
+    const p = people.get(key) || people.set(key, { name: s.name, games: 0 }).get(key);
+    p.games++;
+  }
+  return { errors, games, skipped, seats, mine, people: [...people.values()].sort((a, b) => b.games - a.games || a.name.localeCompare(b.name)) };
 }
 
 // Adds the checked games: the file's row first (uploads), then its games 100 at
@@ -185,6 +199,17 @@ async function uploadGames(games, fileName) {
   const { error: fileErr } = await db.from('uploads').insert({ id: uploadId, created_by: user.id, file_name: fileName.slice(0, 200) || 'games.csv', games: games.length });
   if (fileErr) return { error: fileErr };
   try {
+    // The other players named: one pending player each, for its seats below.
+    const pendingOf = {};
+    const first = new Map();   // one per name, case aside: its first spelling (as the summary)
+    for (const s of games.flatMap(x => x.seats)) if (s.name && !first.has(s.name.toLowerCase())) first.set(s.name.toLowerCase(), s.name);
+    const names = [...first.values()];
+    for (let i = 0; i < names.length; i += 100) {
+      const { data, error } = await db.from('pending_players')
+        .insert(names.slice(i, i + 100).map(name => ({ origin: 'upload', name, upload_id: uploadId }))).select('id, name');
+      if (error) throw error;
+      for (const p of data) pendingOf[p.name.toLowerCase()] = p.id;
+    }
     for (let i = 0; i < games.length; i += 100) {
       const batch = games.slice(i, i + 100).map(x => ({ ...x, id: crypto.randomUUID() }));
       const { error } = await db.from('games').insert(batch.map(x => ({ id: x.id, ...x.game, created_by: user.id, source: 'upload', upload_id: uploadId })));
@@ -192,10 +217,11 @@ async function uploadGames(games, fileName) {
       const { error: seatsErr } = await db.from('game_players').insert(batch.flatMap(x => x.seats.map(s => ({
         game_id: x.id, character: s.character, is_winner: s.is_winner, position: s.position,
         user_id: s.mine ? user.id : null, nickname: s.mine ? profile.nickname : null,
+        ...(s.name ? { pending_player_id: pendingOf[s.name.toLowerCase()] } : {}),
       }))));
       if (seatsErr) throw seatsErr;
     }
-    return { error: null };
+    return { error: null, uploadId };
   } catch (error) {
     await db.from('uploads').delete().eq('id', uploadId);
     return { error };
@@ -226,7 +252,8 @@ function openUploadGames() {
     ['Date', t('YYYY-MM-DD HH:MM, YYYY-MM-DD for the day without a time, or empty for no date. Not in the future.')],
     ['Location', t('Optional.')],
     ['Duration (min), Rounds', t('Optional, whole numbers.')],
-    ['Player', t('Your nickname on your villain, which claims it; empty on the others (they claim theirs with the game\'s QR code).')],
+    ['Player', IS_BETA ? t('Your nickname on your villain, which claims it. On the others, their name (they\'re invited after the upload: nothing shows until they accept) or empty (they claim theirs with the game\'s QR code).')
+                       : t('Your nickname on your villain, which claims it; empty on the others (they claim theirs with the game\'s QR code).')],
     ['Villain', t('As written on its page, e.g. Captain Hook [I2E].')],
     ['Seat', t('The play order, 1 to the players, or empty on every row of the game.')],
     ['Winner', t('yes or no: one yes per game (Solo: yes if you won).')],
@@ -279,6 +306,7 @@ async function pickGamesCsv(input) {
   const summary = [
     tn(res.games.length, '{n} game to add', '{n} games to add') + ` (${tn(res.seats, '{n} seat', '{n} seats')})`,
     res.games.length ? t('your villain in {n}', { n: res.mine }) : null,
+    res.people.length ? t('other players named: {list}', { list: res.people.slice(0, 6).map(p => `${_esc(p.name)} (${p.games})`).join(', ') + (res.people.length > 6 ? ', …' : '') }) : null,
     res.skipped.length ? tn(res.skipped.length, '{n} already in DiVilytics, skipped', '{n} already in DiVilytics, skipped') : null,
   ].filter(Boolean).join(' | ');
   _gamesCsvChecked = { ...res, fileName: file.name };
@@ -292,13 +320,122 @@ async function confirmUploadGames() {
   const btn = document.getElementById('uploadGamesBtn');
   btn.disabled = true;
   btn.textContent = t('Uploading…');
-  const { error } = await uploadGames(res.games, res.fileName);
+  const { error, uploadId } = await uploadGames(res.games, res.fileName);
   const out = document.getElementById('uploadGamesResult');
   _gamesCsvChecked = null;
   out.innerHTML = error
     ? `<div class="err show">${t("Couldn't upload the games, nothing was added: {error}", { error: _esc(error.message || String(error)) })}</div>`
-    : `<p class="modal-hint">${tn(res.games.length, '{n} game added.', '{n} games added.')} <a class="char-guide-link" href="players.html?nick=${encodeURIComponent(getCurrentProfile()?.nickname || '')}">${t('Open your page')} ›</a></p>`;
-  if (!error) renderMyUploads();
+    : `<p class="modal-hint">${tn(res.games.length, '{n} game added.', '{n} games added.')} <a class="char-guide-link" href="players.html?nick=${encodeURIComponent(getCurrentProfile()?.nickname || '')}">${t('Open your page')} ›</a></p>
+       ${res.people.length ? `<div class="up-people" id="upPeopleNew"></div>` : ''}`;
+  if (!error) { renderMyUploads(); if (res.people.length) renderUploadPeople(uploadId, document.getElementById('upPeopleNew')); }
+}
+
+// ── PEOPLE IN THIS FILE (beta) ───────────────────────────────────────────────
+// An upload's other players (its pending players, PLAYERS_SPEC.md), each with
+// its games, for its uploader: invite a DiVilytics player to all of them (a
+// nickname equal to the name is only suggested), or share the name's claim
+// link (claim.html?pending=…&code=…) with someone without an account; else it
+// stays pending, hidden. Shown after an upload and under Your uploads' People.
+const UP_ERRORS = {
+  declined:        'This player declined these games: they can still claim them with the link.',
+  already_in_game: 'This player already has a villain in one of these games.',
+  invite_self:     "That's you: your games are yours already.",
+  already_claimed: 'Someone claimed these games already.',
+  not_yours:       'Only the uploader can invite to these games.',
+};
+const _upError = e => { const k = Object.keys(UP_ERRORS).find(x => e?.message?.includes(x)); return t(k ? UP_ERRORS[k] : 'Something went wrong. Try again.'); };
+
+// box: where (the upload's result, or its row under Your uploads); later
+// calls for the same upload redraw it there.
+const _upBoxes = {};
+async function renderUploadPeople(uploadId, box = _upBoxes[uploadId]) {
+  if (!box) return;
+  _upBoxes[uploadId] = box;
+  const key = box.id;   // the box's own ids (both boxes can be in the page)
+  const { data: pp, error } = await db.from('pending_players').select('id, name, user_id, claim_code').eq('upload_id', uploadId).order('name');
+  if (error || !pp?.length) { box.innerHTML = ''; return; }
+  const ids = pp.map(p => p.id);
+  const [seats, invites] = await Promise.all([
+    _fetchInChunks(ids, ch => db.from('game_players').select('pending_player_id, user_id').in('pending_player_id', ch)),
+    _fetchInChunks(ids, ch => db.from('pending_invites').select('id, pending_player_id, invited_user').in('pending_player_id', ch)),
+  ]);
+  // Nicknames: who was invited, who claimed; and a player whose nickname is the name (a suggestion).
+  const userIds = [...new Set(invites.map(i => i.invited_user).concat(seats.map(s => s.user_id)).filter(Boolean))];
+  const [people, matches] = await Promise.all([
+    _fetchInChunks(userIds, ch => db.from('profiles').select('id, nickname').in('id', ch)),
+    Promise.all(pp.map(p => db.from('profiles').select('id, nickname').ilike('nickname', p.name.replace(/[%_\\]/g, '\\$&')).limit(1).then(r => r.data?.[0] || null))),
+  ]);
+  const nick = Object.fromEntries(people.map(p => [p.id, p.nickname]));
+  const me = getCurrentUser()?.id;
+  box.innerHTML = `
+    <div class="acct-uploads-title">${t('People in this file')}</div>
+    <p class="modal-hint">${t('Nothing shows until they accept. Invite a DiVilytics player, or send the link to someone without an account.')}</p>
+    ${pp.map((p, k) => {
+      const mine = seats.filter(s => s.pending_player_id === p.id);
+      const taken = mine.filter(s => s.user_id);
+      const inv = invites.find(i => i.pending_player_id === p.id);
+      const match = matches[k] && matches[k].id !== me && !inv ? matches[k] : null;
+      let status;
+      if (mine.length && taken.length === mine.length) status = `<span class="up-done">✓ ${_esc([...new Set(taken.map(s => nick[s.user_id]).filter(Boolean))].join(', '))}</span>`;
+      else if (inv) status = `<span class="up-sent">${t('Invitation sent to {player}', { player: `<strong>${_esc(nick[inv.invited_user] || '')}</strong>` })}</span>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="upCancelInvite('${uploadId}', '${inv.id}')">${t('Cancel')}</button>`;
+      else status = `${match ? `<button class="btn btn-ghost btn-sm up-suggest" type="button" onclick="upInvite('${uploadId}', '${p.id}', '${match.id}')">${t('Invite {player}', { player: _esc(match.nickname) })}</button>` : ''}
+        <button class="btn btn-ghost btn-sm" type="button" onclick="upOpenInvite('${uploadId}', '${p.id}', '${key}')">${match ? t('Someone else') : t('Invite')}</button>
+        <button class="btn btn-ghost btn-sm" type="button" data-link="${_esc(new URL(`claim.html?pending=${p.id}&code=${p.claim_code}`, location.href).href)}" onclick="upShareLink(this)">${t('Link')}</button>`;
+      return `
+      <div class="up-person" data-pid="${p.id}">
+        <div class="up-person-head">
+          <span class="chip-pending up-name">⏳ ${_esc(p.name)}</span>
+          <span class="up-games">${tn(mine.length, '{n} game', '{n} games')}${taken.length && taken.length < mine.length ? ` | ${t('{n} accepted', { n: taken.length })}` : ''}</span>
+        </div>
+        <div class="up-person-actions">${status}</div>
+        <div class="cs-search up-search hidden"><input type="text" id="${key}-inv-${p.id}" placeholder="${_esc(t('Search player…'))}" maxlength="30" autocomplete="off"><div class="cs-dropdown" id="${key}-drop-${p.id}"></div></div>
+        <p class="modal-hint nt-error hidden"></p>
+      </div>`;
+    }).join('')}`;
+}
+
+// Invite: a search under the name (not you).
+function upOpenInvite(uploadId, pid, key) {
+  const row = document.querySelector(`#${key} [data-pid="${pid}"]`);
+  row.querySelector('.up-search').classList.remove('hidden');
+  const input = document.getElementById(`${key}-inv-${pid}`);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    attachSearchBox({
+      inputId: `${key}-inv-${pid}`, dropdownId: `${key}-drop-${pid}`, debounceMs: 200,
+      fetchOptions: async q => ((await db.from('profiles').select('id, nickname, avatar_url, default_avatar').ilike('nickname', `${q}%`).limit(9)).data || [])
+        .filter(p => p.id !== getCurrentUser()?.id).slice(0, 8),
+      renderOption: p => `<div class="cs-option" data-id="${p.id}">${playerAvatarHTML(resolveAvatar(p))}<span>${_esc(p.nickname)}</span></div>`,
+      onSelect: opt => upInvite(uploadId, pid, opt.dataset.id),
+    });
+  }
+  input.focus();
+}
+
+async function upInvite(uploadId, pid, playerId) {
+  const { error } = await db.rpc('invite_pending_player', { target: pid, invitee: playerId });
+  if (error) {
+    const msg = _upBoxes[uploadId]?.querySelector(`[data-pid="${pid}"] .nt-error`);
+    if (msg) { msg.textContent = _upError(error); msg.classList.remove('hidden'); }
+    return;
+  }
+  renderUploadPeople(uploadId);
+}
+
+async function upCancelInvite(uploadId, inviteId) {
+  await db.rpc('cancel_invite', { target: inviteId });
+  renderUploadPeople(uploadId);
+}
+
+// The name's claim link: the phone's share sheet, else copied.
+async function upShareLink(btn) {
+  const url = btn.dataset.link;
+  if (navigator.share) { try { await navigator.share({ url }); return; } catch (_) {} }
+  try { await navigator.clipboard.writeText(url); } catch (_) { prompt(t('Copy this link:'), url); return; }
+  const was = btn.textContent;
+  btn.textContent = t('Copied ✓');
+  setTimeout(() => { btn.textContent = was; }, 1600);
 }
 
 // ── YOUR UPLOADS (account page) ──────────────────────────────────────────────
@@ -310,14 +447,29 @@ async function renderMyUploads() {
   if (!el) return;
   const { data, error } = await db.from('uploads').select('id, file_name, games, uploaded_at').order('uploaded_at', { ascending: false });
   if (error || !data?.length) { el.innerHTML = ''; return; }
+  // The beta: how many other players each file names (People).
+  const named = {};
+  if (IS_BETA) {
+    const rows = await _fetchInChunks(data.map(u => u.id), ch => db.from('pending_players').select('upload_id').in('upload_id', ch));
+    for (const r of rows) named[r.upload_id] = (named[r.upload_id] || 0) + 1;
+  }
   el.innerHTML = `
     <div class="acct-uploads-title">${t('Your uploads')}</div>
     ${data.map(u => `
       <div class="acct-upload">
         <span class="acct-upload-name">${_esc(u.file_name)}</span>
         <span class="acct-upload-meta">${tn(u.games, '{n} game', '{n} games')} | ${fmtDateShort(u.uploaded_at)}</span>
+        ${named[u.id] ? `<button class="btn btn-ghost btn-sm" type="button" onclick="toggleUploadPeople('${u.id}')">${t('People ({n})', { n: named[u.id] })}</button>` : ''}
         <button class="btn btn-ghost btn-sm" type="button" data-id="${u.id}" data-name="${_esc(u.file_name)}" data-games="${u.games}" onclick="deleteUpload(this.dataset)">${t('Delete')}</button>
-      </div>`).join('')}`;
+      </div>
+      <div class="up-people hidden" id="upPeople-${u.id}"></div>`).join('')}`;
+}
+
+function toggleUploadPeople(id) {
+  const box = document.getElementById(`upPeople-${id}`);
+  if (!box) return;
+  box.classList.toggle('hidden');
+  if (!box.classList.contains('hidden')) renderUploadPeople(id, box);
 }
 
 async function deleteUpload({ id, name, games }) {

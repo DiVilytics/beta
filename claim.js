@@ -62,6 +62,11 @@ function lineupEditable(user) {
 
 async function init() {
   setActiveNav('');
+  // A name's claim link (an upload's other player): its own view.
+  if (new URLSearchParams(location.search).get('pending')) {
+    await initAuth(() => initPendingLink());
+    return initPendingLink();
+  }
   await initAuth(() => render());
   setBackLink('claimBack', _claimBack());
   attachLocationAutocomplete('editLocation', 'editLocationDropdown');
@@ -285,6 +290,66 @@ async function _reloadSeats() {
   claimPlayers = (data || []).slice().sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   await _loadPending();
   render();
+}
+
+// ── A NAME'S CLAIM LINK (beta) ──────────────────────────────────────────────
+// claim.html?pending=<id>&code=<code>: an uploaded file names a player (a
+// pending player) and its uploader shares this link. It says only what it's
+// about (pending_player_preview: the name, its games, who named them) and,
+// signed in, claims every one of those games at once (claim_pending_player).
+const LINK_ERRORS = {
+  bad_code:        'This link is wrong, or its games were deleted.',
+  already_claimed: 'Someone has claimed these games already.',
+  already_in_game: 'You already have a villain in one of these games.',
+  external_player: 'These games come from an online site: link your account there instead.',
+  no_profile:      'You need a nickname before you can claim them.',
+};
+const _linkParams = () => { const q = new URLSearchParams(location.search); return { pid: q.get('pending'), code: q.get('code') || '' }; };
+
+async function initPendingLink() {
+  document.getElementById('claimTitle').textContent = t('Your games');
+  const root = document.getElementById('claimRoot');
+  root.className = '';
+  const { pid, code } = _linkParams();
+  const { data, error } = await db.rpc('pending_player_preview', { target: pid, code });
+  const p = data?.[0];
+  if (!p) return showClaimError(t('Link not found'), t(LINK_ERRORS.bad_code), error && error.code !== '22P02' ? error : null);
+  const intro = t('{who} says you played {n} as {name}.', {
+    who: `<strong>${_esc(p.named_by || t('A player'))}</strong>`, n: tn(p.games, '{n} game', '{n} games'),
+    name: `<span class="chip-pending">⏳ ${_esc(p.name)}</span>` });
+  if (p.claimed) { root.innerHTML = emptyStateHTML('✓', t('Already claimed'), t(LINK_ERRORS.already_claimed)); return; }
+  const user = getCurrentUser(), profile = getCurrentProfile();
+  if (!user) {
+    root.innerHTML = emptyStateHTML('🔑', t('Sign in to claim'), intro, `<button class="btn btn-primary" onclick="goToSignIn()">${t('Sign in')}</button>`);
+    return;
+  }
+  if (!profile) {
+    root.innerHTML = emptyStateHTML('👤', t('Set a nickname first'), intro, `<button class="btn btn-primary" onclick="_openNicknameModal()">${t('Set nickname')}</button>`);
+    return;
+  }
+  root.innerHTML = `
+    <div class="claim-link-card">
+      <p class="claim-link-intro">${intro}</p>
+      <p class="modal-hint">${t('Claim them only if you really played them: they go on your page, all at once.')}</p>
+      <p class="modal-hint nt-error hidden" id="linkError"></p>
+      <button class="btn btn-primary" id="linkClaimBtn" type="button" onclick="claimPendingLink()">${tn(p.games, 'Claim it', 'Claim them')}</button>
+    </div>`;
+}
+
+async function claimPendingLink() {
+  const { pid, code } = _linkParams();
+  const btn = document.getElementById('linkClaimBtn');
+  btn.disabled = true;
+  const { error } = await db.rpc('claim_pending_player', { target: pid, code });
+  if (error) {
+    const k = Object.keys(LINK_ERRORS).find(x => error.message?.includes(x));
+    const msg = document.getElementById('linkError');
+    msg.textContent = t(k ? LINK_ERRORS[k] : 'Something went wrong. Try again.');
+    msg.classList.remove('hidden');
+    btn.disabled = false;
+    return;
+  }
+  location.href = `players.html?nick=${encodeURIComponent(getCurrentProfile()?.nickname || '')}`;
 }
 
 // "You played as …": in a solo game, whether you won or lost with it.

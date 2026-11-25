@@ -3646,3 +3646,22 @@ html:not([data-beta]) .beta-only, html[data-beta] .release-only { display: none 
 
 /* The claim's warning: a seat someone else was named for. */
 .confirm-warn { margin: 10px 0 0; padding: 8px 10px; border-radius: var(--rs); background: color-mix(in srgb, var(--gold) 14%, transparent); font-size: calc(13px * var(--ts)); line-height: 1.4; }
+
+/* People in this file (beta, Upload games and Your uploads): each name, its
+   games and its answer (invite, link, sent, claimed). */
+.up-people { margin-top: 12px; }
+.up-people .acct-uploads-title { margin-top: 0; }
+.up-person { padding: 10px 0; border-top: 1px solid var(--border); }
+.up-person-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.up-name { font-size: calc(14px * var(--ts)); }
+.up-games { font-size: calc(12px * var(--ts)); color: var(--muted); white-space: nowrap; }
+.up-person-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.up-person-actions .up-sent, .up-person-actions .up-done { font-size: calc(12px * var(--ts)); color: var(--muted); }
+.up-done { color: var(--green, var(--text)); }
+.up-suggest { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.up-search { width: 100%; margin-top: 8px; }
+.up-search input { width: 100%; }
+.up-search .cs-dropdown { position: static; box-shadow: none; margin-top: 6px; }
+/* A name's claim link (claim.html?pending=…). */
+.claim-link-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; text-align: center; }
+.claim-link-intro { font-size: calc(15px * var(--ts)); margin: 0 0 8px; }
